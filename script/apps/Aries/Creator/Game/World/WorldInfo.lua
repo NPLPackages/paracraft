@@ -18,7 +18,18 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
 local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-local WorldInfo = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.WorldInfo"));
+local WorldInfo = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.WorldInfo"));
+
+WorldInfo.class_name = "WorldInfo";
+WorldInfo:Property({"totalTime", 0, auto=true})
+WorldInfo:Property({"worldTime", 0, auto=true})
+WorldInfo:Property({"totalEditSeconds", 0, auto=true})
+WorldInfo:Property({"totalClicks", 0, auto=true})
+WorldInfo:Property({"totalKeyStrokes", 0, auto=true})
+WorldInfo:Property({"totalSingleBlocks", 0, auto=true})
+WorldInfo:Property({"editCodeLine", 0, auto=true})
+WorldInfo:Property({"assetUrl", "", auto=true})
+WorldInfo:Property({"isFreezeWorld", false, auto=true})
 
 -- x,y,z,block_id
 function WorldInfo:ctor()
@@ -29,6 +40,7 @@ function WorldInfo:ctor()
 	self.totalKeyStrokes = 0;
 	self.totalSingleBlocks = 0;
 	self.editCodeLine = 0
+	self.isFreezeWorld = false
 end
 
 function WorldInfo:LoadFromXMLNode(node)
@@ -38,6 +50,7 @@ function WorldInfo:LoadFromXMLNode(node)
 		self.weather_strength = tonumber(self.weather_strength);
 		self.totaltime = tonumber(self.totaltime);
 		self.isVipWorld = self.isVipWorld == "true" or self.isVipWorld == true;
+		self.isCommonVipWorld = self.isCommonVipWorld == "true" or self.isCommonVipWorld == true;
 		self.hasCopyright = self.hasCopyright == "true" or self.hasCopyright == true;
 		self.selectWater = self.selectWater == "true" or self.selectWater == true;
 
@@ -58,8 +71,23 @@ function WorldInfo:LoadFromXMLNode(node)
 		self.materialName = self.materialName or ""
 		self.classroomId = self.classroomId or ""
 		self.sectionContentId = self.sectionContentId or ""
-		-- web课程相关 end		
+		-- web课程相关 end	
+		
+		--世界类型
+		--类型 '来源标识: 自主创建.0 (默认), edu课程-创作模板.1, 赛事系统.2, 帕帕奇遇记课程-创作模板.3',
+		self.channel = self.channel or 0
+		self.visibility = self.visibility or 0 --是否私有
+		
 		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
+
+		--世界冻结
+		self.isFreezeWorld = self.isFreezeWorld == "true" or self.isFreezeWorld == true;
+
+		--p3d文件
+		self.parentInfo = self.parentInfo or "";
+
+		-- 是否显示宠物 和 坐骑
+		self.show_mount_pet = self.show_mount_pet or "false";
 	end
 end
 
@@ -86,6 +114,7 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		global_terrain = self.global_terrain,
 		fromProjects = self.fromProjects,
 		isVipWorld = self.isVipWorld,
+		isCommonVipWorld = self.isCommonVipWorld,
 		hasCopyright = self.hasCopyright,
 		selectWater = self.selectWater,
 		extra = tostring(self.extra),
@@ -103,9 +132,8 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		stereoMode = self.stereoMode or "", --立体输出
 		weather = self.weather or "", --环境设置界面的, sun,cloudy,rain,snow
 		lightcolor = self.lightcolor or "", --光源颜色
-		timesAutoGo = self.timesAutoGo or "true", --自动昼夜交替
-		frozendaytime = self.frozendaytime or "", --关闭自动昼夜交替后，固定在在哪个时间
-		lastdaytime = self.lastdaytime or "",--自动昼夜交替生效时，退出世界自动保存时间
+		autoDayTime = self.autoDayTime, --自动昼夜交替
+		lastdaytime = self.lastdaytime or "",--退出世界自动保存时间
 		eyeBrightness = self.eyeBrightness or "",--亮度
 		cloudThickness = self.cloudThickness or "",--云量
 		editCodeLine = tonumber(self.editCodeLine) or 0, 
@@ -120,17 +148,33 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		classroomId = self.classroomId or "",
 		sectionContentId = self.sectionContentId or "",
 
+		--世界类型
+		--类型 '来源标识: 自主创建.0 (默认), edu课程-创作模板.1, 赛事系统.2, 帕帕奇遇记课程-创作模板.3',
+		channel = self.channel or 0, 
+		visibility = self.visibility or 0, --是否私有
+
 		player_skin = self.player_skin or "",
 		platform = self.platform or "paracraft", -- from which client.
+		assetUrl = self.assetUrl,
+		isFreezeWorld = self.isFreezeWorld,
+
+		-- p3d文件
+		parentInfo = self.parentInfo or "",
+		-- 是否显示宠物 和 坐骑
+		show_mount_pet = self.show_mount_pet or "false",
 	};
 
 	GameLogic.GetFilters():apply_filters("save_world_info", self, node);
 	return node;
 end
 
---(作品体量总分 ) = (totalEditSeconds/20 + totalClicks + totalKeyStrokes * 2 + totalSingleBlocks * 3)/ 1000 （取整数）
+--(作品体量总分 ) = (totalEditSeconds/20 + totalClicks + totalKeyStrokes * 2 + totalSingleBlocks * 3)/ 1000 （取小数后一位，最小0.1）
 function WorldInfo:GetTotalWorkScore()
-	return math.floor((self.totalEditSeconds/20 + self.totalClicks + self.totalKeyStrokes * 2 + self.totalSingleBlocks * 3 + self.editCodeLine*5 + (self.model_entity_num or 0)*5)/ 1000)
+	local totalWorkScore = math.floor(((self.totalEditSeconds/20 + self.totalClicks + self.totalKeyStrokes * 2 + self.totalSingleBlocks * 3 + self.editCodeLine*5 + (self.model_entity_num or 0)*5)/ 1000)*10)/10
+	if System.options.isPapaAdventure then --帕帕奇遇记的先放大10倍，方便生成视频
+		totalWorkScore = totalWorkScore * 10
+	end
+	return totalWorkScore
 end
 
 function WorldInfo:GetTerrainType()

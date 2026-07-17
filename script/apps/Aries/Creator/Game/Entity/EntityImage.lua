@@ -38,7 +38,7 @@ Entity.is_persistent = true;
 -- always serialize to 512*512 regional entity file
 Entity.is_regional = true;
 --Entity.is_root = false;
-Entity.text_offset = {x=0,y=0.45,z=0.315};
+Entity.text_offset = {x=0,y=0.45, z = 0.3}; -- z = 0.315, too much z fighting in mobile device, we will make it 0.3.
 
 Entity.load_image_times = 0;
 Entity.modelFile = "model/blockworld/Painting/Painting.x";
@@ -46,6 +46,7 @@ Entity.modelFile = "model/blockworld/Painting/Painting.x";
 local sys_images = {
 	["logo"] = "Texture/3DMapSystem/brand/paraworld_text_256X128.png",
 	["preview"] = "preview.jpg",
+	["video"] = "Texture/Aries/Creator/paracraft/playvideo.png",
 }
 
 Entity.rows_to_top = 0;
@@ -127,7 +128,8 @@ end
 function Entity:GetImageFilePath()
 	local cmd = self.cmd or "";
 	cmd = cmd:gsub("^$%(.*%)", "")
-	return sys_images[cmd] or cmd;
+	local isMP4File = cmd:match("%.mp4$");
+	return sys_images[cmd] or cmd, isMP4File;
 end
 
 -- self.cmd like $(/loadworld 503)preview.jpg
@@ -147,14 +149,19 @@ function Entity:GetFullFilePath(filename)
 	local bExist
 	local old_filename = filename;
 	if(filename and filename~="") then
-		if(filename:match("^https?://") or filename:match("^_miniscenegraph")) then
+		if(filename:match("^https?://") or filename:match("^_miniscenegraph") or filename:match("^_texture")) then
 			bExist = true;
 		else
 			filename = filename:gsub("[;:].*$", "")
 			if(not ParaIO.DoesAssetFileExist(filename, true)) then
 				local filename = Files.GetWorldFilePath(filename);
 				if(filename) then
-					return ParaWorld.GetWorldDirectory()..old_filename, true;
+					local tailText = old_filename:match("([;:].*)$");
+					if(tailText) then
+						return filename..tailText, true;
+					else
+						return filename, true;
+					end
 				end
 			else
 				bExist = true;
@@ -548,10 +555,15 @@ end
 function Entity:Refresh(bForceRefresh)
 	self.bNeedUpdate = nil;
 
-	local filename = self:GetImageFilePath(); 
+	local filename, isMP4File = self:GetImageFilePath();
 	if(filename) then
-		filename = self:GetFullFilePath(filename);
+		filename, self.bFileExist = self:GetFullFilePath(filename);
 	end
+
+	local video_url = self:GetVideoPath();
+    if(video_url) then
+        self:SetCommand(string.format("$(video=%s)%s", video_url, isMP4File and sys_images["video"] or filename));
+    end
 	
 	if(filename and bForceRefresh)then
 		if(filename == "") then
@@ -627,7 +639,7 @@ function Entity:RefreshBakedImage()
 		self.hasBakedImage = false;
 		local filename = self:GetImageFilePath(); 
 		if(filename) then
-			filename, bFileExist = self:GetFullFilePath(filename);
+			filename, self.bFileExist = self:GetFullFilePath(filename);
 			self:SetImageFileName(filename);
 			self:ApplyExpansionData();
 			self:UpdateImageModel(filename, self.isSingle)
@@ -707,7 +719,14 @@ function Entity:UpdateImageModel(filename, isSingle)
 				self.headon_filename = filename or ""
 				self.headon_width = 90
 				self.headon_height = 90
-				Image3DDisplay.ShowHeadonDisplay(true, obj, self.headon_filename, self.headon_width, self.headon_height, nil, self.text_offset, -1.57);
+				if(self.bFileExist) then
+					Image3DDisplay.ShowHeadonDisplay(true, obj, self.headon_filename, self.headon_width, self.headon_height, nil, self.text_offset, -1.57);
+				else
+					Image3DDisplay.ShowHeadonDisplay(true, obj, nil, self.headon_width, self.headon_height, nil, self.text_offset, -1.57);
+					if(self.headon_filename ~= "") then
+						LOG.std(nil, "debug", "EntityImage", "file not exist: %s", self.headon_filename);
+					end
+				end
 			else
 				local imageScale = imageRadius*2;
 				local data = self.block_data or 0;
@@ -718,10 +737,17 @@ function Entity:UpdateImageModel(filename, isSingle)
 					end
 				end
 				local text_offset = {x = (self.text_offset.x + gridWidth*0.5-0.5)  / imageScale, y = (0.5+imageRadius) / imageScale, z = self.text_offset.z / imageScale}
-				self.headon_filename = filename
+				self.headon_filename = filename or ""
 				self.headon_width = 100/imageScale * gridWidth
 				self.headon_height = 100/imageScale*gridHeight
-				Image3DDisplay.ShowHeadonDisplay(true, obj, self.headon_filename, self.headon_width, self.headon_height, nil, text_offset, -1.57);
+				if(self.bFileExist) then
+					Image3DDisplay.ShowHeadonDisplay(true, obj, self.headon_filename, self.headon_width, self.headon_height, nil, text_offset, -1.57);
+				else
+					Image3DDisplay.ShowHeadonDisplay(true, obj, nil, self.headon_width, self.headon_height, nil, text_offset, -1.57);
+					if(self.headon_filename ~= "") then
+						LOG.std(nil, "debug", "EntityImage", "file not exist: %s", self.headon_filename);
+					end
+				end
 			end
 		end
 	end
@@ -755,47 +781,140 @@ end
 
 -- right click to show item
 function Entity:OnClick(x, y, z, mouse_button)
-	if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-		local old_value = self:GetCommand();
-		if(old_value) then
-			local cmd, path = old_value:match("^$%((.*)%)(.*)$")
-			if(cmd and cmd~="") then
-				old_value = format("$(%s)%s", commonlib.Encoding.Utf8ToDefault(cmd), path)
+	if(mouse_button=="right") then
+		if(GameLogic.GameMode:CanEditBlock()) then
+			if(self:GetRootImageEntity().isPlayingVideo) then
+				GameLogic.AddBBS("statusBar", L"请先停止视频播放，再编辑", 3000);
+				return true;
 			end
-		end
-		self:BeginEdit();
-		local  function startEdit(result)
-			if(result) then
-				result = result:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
-
-				if(result) then
-					local cmd, path = result:match("^$%((.*)%)(.*)$")
-					if(cmd and cmd~="") then
-						result = format("$(%s)%s", commonlib.Encoding.DefaultToUtf8(cmd), path)
-					end
+			local old_value = self:GetCommand();
+			if(old_value) then
+				local cmd, path = old_value:match("^$%((.*)%)(.*)$")
+				if(cmd and cmd~="") then
+					old_value = format("$(%s)%s", commonlib.Encoding.Utf8ToDefault(cmd), path)
 				end
-				self:SetCommand(result);
-				self:Refresh(true);
 			end
-			self:EndEdit();
-		end
-		if true then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenImageDialog.lua");
-			local OpenImageDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenImageDialog");
-			OpenImageDialog.ShowPage(self:GetCommandTitle(), function(result)
-				startEdit(result)
-			end, old_value)
-		else
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-			local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-			OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
-				startEdit(result)
-			end, old_value, L"贴图文件", "texture");
+			local video_url, img_url = self:GetVideoPath();
+			if(video_url) then
+				if(img_url and img_url ~= sys_images["video"]) then
+					old_value = string.format("$(video=%s)%s", video_url, img_url);
+				else
+					old_value = video_url;
+				end
+			end
+			self:BeginEdit();
+			local function startEdit(result)
+				if(result) then
+					result = result:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
+
+					if(result) then
+						local cmd, path = result:match("^$%((.*)%)(.*)$")
+						if(cmd and cmd~="") then
+							result = format("$(%s)%s", commonlib.Encoding.DefaultToUtf8(cmd), path)
+						end
+					end
+					self:SetCommand(result);
+					self:Refresh(true);
+				end
+				self:EndEdit();
+			end
+			if true then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenImageDialog.lua");
+				local OpenImageDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenImageDialog");
+				OpenImageDialog.ShowPage(self:GetCommandTitle(), function(result)
+					startEdit(result)
+				end, old_value)
+			else
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+				local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+				OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
+					startEdit(result)
+				end, old_value, L"贴图文件", "texture");
+			end
+			return true;
 		end
 	else
-		self:RunCommand()
+		if(mouse_button == "left") then
+			self:PlayOrStopVideo();
+		end
+		local value = self:GetInlineCommand();
+		if(value and not value:match("%.mp4$")) then
+			self:RunCommand();
+		end
+		return true;
 	end
-	return true;
+end
+
+function Entity:GetRootImageEntity()
+	if(self.root_entity_coord) then
+		local x = self.root_entity_coord.x;
+		local y = self.root_entity_coord.y;
+		local z = self.root_entity_coord.z;
+		if(x ~= self.bx or y ~= self.by or z ~= self.bz) then
+			return EntityManager.GetEntityInBlock(x, y, z, self.class_name);
+		end
+	end
+	return self;
+end
+
+function Entity:GetVideoPath()
+	local value = self:GetCommand();
+	if(value) then
+		local video_url = value:match("%$%(video=(.-)%)");
+		if(video_url and video_url:match("%.mp4$")) then
+			local img_url = self:GetImageFilePath();
+			return video_url, img_url;
+		elseif(value:match("%.mp4$")) then
+			return value;
+		end
+	end
+end
+
+function Entity:PlayVideo()
+	local video_url, img_url = self:GetVideoPath();
+	if(video_url) then
+		local WebCamera = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/WebCamera.lua");
+		Entity.lastClickedEntity = self;
+		if(img_url and img_url ~= sys_images["video"]) then
+			self.original_cmd_value = string.format("$(video=%s)%s", video_url, img_url);
+		else
+			self.original_cmd_value = video_url;
+		end
+		self:BeginEdit();
+		self:SetCommand(string.format("_texture_0;0 0 %s %s", 100 * self.columns, 100 * self.rows));
+		self:Refresh(true);
+		self:EndEdit();
+		WebCamera:Open(100 * self.columns, 100 * self.rows, video_url);
+		WebCamera:SetReceiveCameraDataInterval(5);
+		self.isPlayingVideo = true;
+	end
+end
+
+function Entity:StopVideo()
+	local WebCamera = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/WebCamera.lua");
+	WebCamera:Close();
+	if(not self.wasDeleted) then
+		self:BeginEdit();
+		self:SetCommand(self.original_cmd_value);
+		self:Refresh(true);
+		self:EndEdit();
+	end
+	self.isPlayingVideo = false;
+end
+
+function Entity:PlayOrStopVideo()
+	local image_entity = self:GetRootImageEntity();
+	if(image_entity) then
+		if(image_entity.isPlayingVideo) then
+			image_entity:StopVideo();
+		else
+			local entity = Entity.lastClickedEntity;
+			if(entity and entity.isPlayingVideo) then
+				entity:StopVideo();
+			end
+			image_entity:PlayVideo();
+		end
+	end
 end
 
 -- virtual

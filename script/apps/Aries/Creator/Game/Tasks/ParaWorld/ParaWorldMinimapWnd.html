@@ -18,31 +18,10 @@ end
 ]]>
 </script>
 <pe:if condition="<%=isSurface%>">
-    <pe:custom name="surface" src="ParaWorldMinimapSurface.lua" classns="Paracraft.Controls.ParaWorldMinimapSurface" style="margin-left:0px;margin-top:25px;width:192px;height:192px;"></pe:custom>
+    <pe:custom name="surface" src="ParaWorldMinimapSurface.lua" classns="Paracraft.Controls.ParaWorldMinimapSurface" style="margin-left:0px;width:192px;height:192px;"></pe:custom>
 </pe:if>
 <pe:if condition="<%=not isSurface%>">
-    <div style="color:#ffffff;background-color:#000000;height:25px;width:192px">
-        <div style="float:left;">
-            <input type="button" name="mapName" value='<%=ParaWorldMinimapWnd.nameMap or L"地图"%>' tooltip = '<%=L"点击看作者信息"%>' onclick="ParaWorldMinimapWnd.OnClickMapName" style="color:#aad1f7;background:url();width:192px;height:25px;margin-top:0px;" />
-        </div>
-        <!--<div style="float:left;width:155px"><%=ParaWorldMinimapWnd.GetWorldName()%></div>-->
-        <!--<input type="button" onclick="ParaWorldMinimapWnd.CloseWindow()" name="close" style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#367 63 18 18);width:18px;height:18px;margin-left:5px;" />-->
-    </div>
     <pe:custom name="surfaceRealtime" src="ParaWorldMinimapSurfaceRealtime.lua" classns="Paracraft.Controls.ParaWorldMinimapSurfaceRealtime" style="margin-left:0px;width:192px;height:192px;"></pe:custom>
-    <div style="padding-left:2px;padding-bottom:2px;background-color:#000000;height:30px;width:192px;">
-        <div style="background-color:#f0f0f0;height:28px;width:188px;height:28px;padding-top:2px;">
-            <pe:if condition='<%=ParaAudio.GetVolume()>0%>'>
-                <input type="button" tooltip="关闭背景音乐" onclick="ParaWorldMinimapWnd.OnClickEnableSound()" style="background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_yinyue1_25X24_32bits.png#0 0 25 24);width:25px;height:24px;margin-left:8px;" />
-            </pe:if>
-            <pe:if condition='<%=ParaAudio.GetVolume()==0%>'>
-                <input type="button" tooltip="打开背景音乐" onclick="ParaWorldMinimapWnd.OnClickEnableSound()" style="background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_yinyue2_25X24_32bits.png#0 0 25 24);width:25px;height:24px;margin-left:8px;" />
-            </pe:if>
-            <input type="button" tooltip="调整光线强度" onclick="ParaWorldMinimapWnd.OnClickEvnTime()" style="background:url(Texture/Aries/Creator/keepwork/ParaWorld/btn_guang_25X24_32bits.png#0 0 25 24);width:25px;height:24px;margin-left:10px;" />
-            <input type="button" tooltip="并行世界列表" onclick="ParaWorldMinimapWnd.OnClickParaWorldList()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_worldmap_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:20px;" />
-            <input type="button" tooltip="世界信息" onclick="ParaWorldMinimapWnd.OnLocalWorldInfo()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_localmap_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:5px;" />
-            <input type="button" tooltip="回到出生点" onclick="ParaWorldMinimapWnd.OnClickSpawnpoint()" style="background:url(Texture/Aries/Creator/keepwork/map/btn_spawnpoint_32bits.png#0 0 28 26);width:28px;height:26px;margin-left:5px;" />
-        </div>
-    </div>
 </pe:if>
 </pe:mcml>
 </html>

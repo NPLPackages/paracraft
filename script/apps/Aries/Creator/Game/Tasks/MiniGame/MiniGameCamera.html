@@ -1,0 +1,28 @@
+<html>
+<body>
+<pe:mcml>
+<script type="text/npl"> <![CDATA[
+    local MiniGameCamera = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameCamera.lua")
+    MiniGameCamera.OnInit()
+    function close()
+        MiniGameCamera.ClosePage()
+    end
+
+    function start_shooting()
+        MiniGameCamera.ClosePage()
+        MiniGameCamera.OnClickStartShot()
+    end
+]]>
+</script>
+<div style="width: 760px; height: 540px;">
+    <div style="position: relative; width: 700px; height: 480px; background: url(Texture/Aries/Creator/keepwork/kuang_187x128_32bits.png#0 0 187 128:55 45 90 45);">
+        <input type="button" style="width: 128px;height: 50px;margin-top: 434px; margin-right: 45px; background: url(Texture/Aries/Creator/keepwork/luzhianniu_100x44_32bits.png#0 0 100 44);font-weight:bold;font-size:20px;text-offset-y:-4"
+            onclick="start_shooting()" align="right"
+            value="<%= L'开始拍摄' %>" />
+    </div>
+    <input type="button" style="width: 46px;height: 46px;background: url(Texture/player/close.png);"
+            onclick="close()" align="right"/>
+</div>
+</pe:mcml>
+</body>
+</html>

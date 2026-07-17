@@ -34,3 +34,11 @@ function API.dragEndMaxDist(msg)
         end
     end
 end
+
+function API.DragEndToResetModel(msg)
+    msg = commonlib.totable(msg);
+    local entity = GameLogic.EntityManager.GetEntity(msg.name)
+    if(entity) then
+        entity:ResetModelLocalTransform()
+    end
+end

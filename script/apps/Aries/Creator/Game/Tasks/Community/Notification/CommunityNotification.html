@@ -1,0 +1,252 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Community/Notification/CommunityNotification.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="CommunityNotification.lua"><![CDATA[
+local NotificationManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/Notification/NotificationManager.lua")
+local CommunityNotification = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/Notification/CommunityNotification.lua")
+CommunityNotification.OnInit()
+
+cur_email_content = NotificationManager.cur_email_content and NotificationManager.cur_email_content[1] or {}
+
+--echo(cur_email_content,true)
+--print("=================")
+
+function ClosePage()
+    Page:CloseWindow();
+    CommunityNotification.CloseView()
+end
+
+function HasEmail()
+    return #NotificationManager.email_list > 0
+end
+
+function IsShowEmail()
+    return CommunityNotification.IsShowEmail()
+end
+
+function EmailData(index)
+    if(index == nil) then
+        return #CommunityNotification.email_list;
+    else
+        return CommunityNotification.email_list[index];
+    end
+end
+
+function isEmailRead(index)
+    local num = #NotificationManager.email_list
+    for i = 1,num do
+        if NotificationManager.email_list[i].id == index then
+            return NotificationManager.email_list[i].read == 1
+        end
+    end 
+    return false   
+end
+
+function isEmailSelect(index)
+    return CommunityNotification.select_email_idx == index
+end
+
+function isShowEmailGet()
+    return NotificationManager.IsHaveReward(CommunityNotification.select_email_idx)
+end
+
+function isShowEmailAllGet()
+    return NotificationManager.IsCanShowAllGet()
+end
+
+function ClickEmailItem(index)
+    CommunityNotification.ClickEmailItem(index)
+end
+
+function OnClickDeleteAll()
+    CommunityNotification.OnClickDeleteAll()
+end
+
+function OnClickGetAll()
+    CommunityNotification.OnClickGetAll()
+end
+
+function OnClickDelete()
+    CommunityNotification.OnClickDelete()	
+end
+
+function OnClickGet()
+    CommunityNotification.OnClickGet()
+end
+
+function isShowContent()
+    local isShow = cur_email_content~=nil and #NotificationManager.cur_email_content > 0 
+    --print("isShow==========",isShow)
+    return isShow
+end
+
+function getReward(index)
+    if index == nil then
+        return #cur_email_content.rewards 
+    else
+        return cur_email_content.rewards[index]
+    end
+    
+end
+
+function getRewardIcon(gsId)
+    local icon = string.format("width: 36px; height: 36px; margin-left:6px; margin-top:4px; background: url(Texture/Aries/Creator/keepwork/items/item_%d_32bits.png#32 0 65 64);",gsId)
+    if gsId > 80000 then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+        local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+        local item = CustomCharItems:GetItemByGsid(tostring(gsId))
+        if item then
+            echo(item)
+            icon = string.format("width: 36px; height: 36px; margin-left:6px; margin-top:4px; background: url(%s);",item.icon) 
+        end
+    end
+    return icon
+end
+
+function EmailContent(index)
+    if index == nil then
+        return #CommunityNotification.conten_data
+    else
+        return CommunityNotification.conten_data[index]
+    end
+end 
+
+function getTime()
+    return CommunityNotification.GetTimeDescByAtTime(cur_email_content.updatedAt)
+end
+
+function getTitleTime()
+    return os.date("%Y/%m/%d",commonlib.timehelp.GetTimeStampByDateTime(Eval("createdAt")))
+end
+
+function getEx()
+    local str = CommunityNotification.GetEmailContent(cur_email_content.content)
+    return str
+end
+
+function getBtnTitle(str)
+    return CommunityNotification.GetStrWithLength(str,12)
+end
+
+function getEmailTitle(str)
+    return CommunityNotification.GetStrWithLength(str,22)
+end
+
+]]></script>
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+    <pe:container alignment="_ct" width="690" height="500" style="margin-left:-345px;margin-top:-250px;background-color: #2e2e2e; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+        <div style="color:#ffffff;width:690px;height:500px" >
+            <div onclick="ClosePage()" style="position: relative; margin-left: 654px; margin-top: 14px; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#246 238 16 16)"></div>
+            <div zorder="-1" style=" width:240px; height: 500px; background-color: #262626;">
+                <div style="font-size: 18px; base-font-size: 18px; font-weight: bold; margin-top: 12px; margin-left: 12px;"><%=L"消息通知"%></div>
+                <pe:if condition='<%=HasEmail()%>'>
+                    <div style="position: relative; width: 266px; height: 380px; margin-left: -3px;">
+                        <pe:gridview name="community_email_gridview" CellPadding="12" VerticalScrollBarStep="36" RememberScrollPos="true" VerticalScrollBarOffsetX="1200" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "66" 
+                            DataSource='<%=EmailData%>'>
+                            <Columns>
+                                <pe:if condition='<%=isEmailSelect(Eval("id")) %>'>
+                                    <div style="color:#ffffff;width: 220px;height: 66px; position: relative;">
+                                        <input type="button" value='' zorder=-1 name = '<%=Eval("id") %>' onclick="ClickEmailItem" param1='<%=Eval("id") %>' style="position: relative; margin-top:0px;width:220px;height:66px;background-color: #1C1C1CFF; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);" />
+                                        <div style="position: relative; width: 220px;">
+                                                <div style="float: left; margin-top: 8px; margin-left: 8px; font-size: 14px; base-font-size: 14px; font-weight: bold; "><%=L"系统通知"%></div>
+                                                <div align="right" style="float: left; width: 76px; height: 16px; margin-top: 8px; margin-right: 2px; color: #7D7C92FF;"><%=getTitleTime()%></div>
+                                        </div>
+                                        <div style="margin-left: 8px; margin-top: 42px; color: #7D7C92FF; width: 220px;"><%=getBtnTitle(Eval("title"))  %></div>
+                                    </div>
+                                </pe:if>  
+                                <pe:if condition='<%=not isEmailSelect(Eval("id")) %>'>
+                                        <div style="color:#ffffff;width: 220px;height: 66px; position: relative;">
+                                            <input type="button" value='' zorder=-1 name = '<%=Eval("id") %>' onclick="ClickEmailItem" param1='<%=Eval("id") %>' style="position: relative; margin-top:0px;width:220px;height:66px;background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);" />
+                                            <div style="position: relative; width: 220px;">
+                                                <div style="float: left; margin-top: 8px; margin-left: 8px; font-size: 14px; base-font-size: 14px; font-weight: bold; "><%=L"系统通知"%></div>
+                                                <div align="right" style="float: left; width: 76px; height: 16px; margin-top: 8px; margin-right: 2px; color: #7D7C92FF;"><%=getTitleTime()%></div>
+                                        </div>
+                                        <div style="margin-left: 8px; margin-top: 42px; color: #7D7C92FF; width: 220px;"><%=getBtnTitle(Eval("title"))  %></div>
+                                        </div>      
+                                </pe:if> 
+                                <pe:if condition='<%=not isEmailRead(Eval("id")) %>'>
+                                    <div style="margin-top: -2px; margin-left: 214px; width: 10px; height: 10px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#458 106 8 8);"></div>
+                                </pe:if>  
+                            </Columns>                
+                        </pe:gridview>    
+                        <div style="margin-top: 20px; margin-left: 20px; ">
+                            <pe:if condition='<%=isShowEmailAllGet()%>'>
+                                <div style="float: left; width: 90px; height: 36px; background-color: #FFFFFF; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <input type="button" value="全部删除" onclick="OnClickDeleteAll" style="color: #ffffff; width: 88px; height: 34px; margin-left: 1px; margin-top: 1px; background-color: #2e2e2e; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                                </div>
+                                <input type="button" value="全部领取" onclick="OnClickGetAll" style="color: #ffffff; margin-left: 20px; width: 90px; height: 36px; background-color: #404BF5; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                            </pe:if>
+                            <pe:if condition='<%=not isShowEmailAllGet()%>'>
+                                <div style="float: left; margin-left: 50px; width: 90px; height: 36px; background-color: #FFFFFF; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <input type="button" value="全部删除" onclick="OnClickDeleteAll" style="color: #ffffff; width: 88px; height: 34px; margin-left: 1px; margin-top: 1px; background-color: #2e2e2e; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                                </div>
+                            </pe:if>
+                        </div>
+                    </div>
+                    <div style="position: relative; width: 450px; height: 2px; margin-left: 240px; margin-top: 0px; background-color: #313131ff"></div>
+                    <div style="margin-top: 0px; margin-left: 240px; width: 450px; height: 450px; background: url();">
+                        <pe:if condition='<%=isShowContent()%>'>                        
+                            <div style="width: 500px; height: 320px;">
+                                <div style="margin-top: 16px;margin-left: 16px;  font-size: 20px;base-font-size: 20px;color: #ffffff; font-weight: bold;"><%=getEmailTitle(cur_email_content.title)%></div>
+                                <div>
+                                    <div style="float: left; margin-top: 20px;margin-left: 16px; font-size: 14px;base-font-size: 14px;color: #A8A7B0;"><%=L"系统通知："%></div>
+                                    <div style="float: left; margin-top: 20px;margin-left: 80px; font-size: 14px;base-font-size: 14px;color: #A8A7B0;"><%=getTime()%></div>
+                                </div>
+                                <div style="width: 450px; height: 246px; margin-top: 7px; ">
+                                    <pe:treeview  ItemsPerLine="1" AllowPaging="false" CellPadding="0"  DefaultNodeHeight="160" style='background:;'>
+                                            <div style="margin-top: 20px; font-size: 14px;base-font-size: 14px;color: #D9D9D9; min-height: 160px; margin-left: 4px;width: 420px;">
+                                                <%=getEx()%>
+                                            </div>
+                                    </pe:treeview>
+                                </div>
+                            </div>
+                            <div style="width: 450px; height: 2px; margin-left: 0px; margin-top: 20px; background-color: #313131ff"></div>
+                            <div name ="email_reward" style="width: 466px; height: 70px; float: left;">
+                                <pe:gridview name="extra_reward_view" DataSource="<%=getReward%>" ItemsPerLine="6" AllowPaging="false" CellPadding="6"  DefaultNodeHeight="0">
+                                    <Columns>
+                                        <div style="width: 50px; height: 50px; margin-left: 20px;  background-color: #1C1C1C; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                            <div style='<%=getRewardIcon(Eval("gsId"))%>'></div>
+                                            <div style="text-align: right; margin-right: 4px; margin-top: -8px;color: #ffffff; font-weight: bold;text-shadow:true;shadow-quality:8"><%=Eval("amount")%></div>
+                                        </div>            
+                                    </Columns>                                   
+                                </pe:gridview>
+                            </div>
+                            <div style="width: 466px; height: 70px;  margin-left: 40px;">
+                                    <pe:if condition='<%=isShowEmailGet()%>'>
+                                        <div style="float: left; margin-left: 190px; width: 90px; height: 36px; background-color: #FFFFFF; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                            <input type="button" value="删除" onclick="OnClickDelete" style="color: #ffffff; margin-left: 1px; margin-top: 1px; width: 88px; height: 34px; background-color: #2E2E2E; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                                        </div>
+                                        <input type="button" value="领取" onclick="OnClickGet" style="color: #ffffff; margin-left: 20px; width: 90px; height: 36px; background-color: #404BF5; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                                    </pe:if>
+                                    <pe:if condition='<%=not isShowEmailGet()%>'>
+                                        <div style="float: left; margin-left: 290px; width: 90px; height: 36px; background-color: #FFFFFF; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                            <input type="button" value="删除" onclick="OnClickDelete" style="color: #ffffff; margin-left: 1px; margin-top: 1px; width: 88px; height: 34px; background-color: #2E2E2E; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                                        </div>
+                                    </pe:if>
+                            </div>
+                        </pe:if>                        
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not HasEmail()%>'>
+                    <div style='font-weight: bold; margin-left: 380px;'>
+                        <div style='width: 160px;height: 128px; margin-top: 130px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#2 2 160 128)'>
+                            <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: 120px; color: #A8A7B0;" ><%=L"暂无消息通知"%></div>
+                        </div>
+                    </div>
+                </pe:if>
+            </div>
+        </div>    
+    </pe:container>
+</pe:container>
+
+
+</pe:mcml>
+</body>
+</html>
+

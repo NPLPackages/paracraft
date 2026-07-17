@@ -10,8 +10,47 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandScreenRecorder.lua"
 ]]
 
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");	
-local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
+local ScreenRecorderHandler = commonlib.gettable("MyCompany.Aries.Game.Mobile.ScreenRecorderHandler");
+
+ScreenRecorderHandler.savedCallbackFunc = function() end;
+ScreenRecorderHandler.recordFinishedCallbackFunc = function() end;
+ScreenRecorderHandler.startedCallbackFunc = function() end;
+ScreenRecorderHandler.savedPath = "";
+
+function ScreenRecorderHandler.SetStartedCallbackFunc(callback)
+    ScreenRecorderHandler.startedCallbackFunc = function()
+        if (callback and type(callback) == "function") then
+            callback();
+        end
+
+        -- reset
+        ScreenRecorderHandler.startedCallbackFunc = function() end;
+    end
+end
+
+function ScreenRecorderHandler.SetSavedCallbackFunc(callback)
+    ScreenRecorderHandler.savedCallbackFunc = function(savedPath)
+        if (callback and type(callback) == "function") then
+            callback(savedPath);
+        end
+
+        -- reset
+        ScreenRecorderHandler.savedCallbackFunc = function() end;
+    end;
+end
+
+function ScreenRecorderHandler.SetRecordFinishedCallbackFunc(callback)
+    ScreenRecorderHandler.recordFinishedCallbackFunc = function(savedPath)
+        if (callback and type(callback) == "function") then
+            callback(savedPath);
+        end
+
+        -- reset
+        ScreenRecorderHandler.recordFinishedCallbackFunc = function() end;
+    end;
+end
 
 Commands["screenrecorder"] = {
     name = "screenrecorder", 
@@ -30,17 +69,30 @@ Commands["screenrecorder"] = {
         mode, cmd_text = CmdParser.ParseWord(cmd_text);
 
         if (not ScreenRecorder) then
+            -- only for mobile platform
             return;
         end
 
         if mode == "start" then
-            ScreenRecorder.start();
+            if(ScreenRecorder.start) then
+                ScreenRecorder.start();
+            end
         elseif mode == "stop" then
-            ScreenRecorder.stop();
+            if(ScreenRecorder.stop) then
+                ScreenRecorder.stop();
+            end
         elseif mode == "play" then
-            ScreenRecorder.play();
+            if(ScreenRecorder.play) then
+                ScreenRecorder.play();
+            end
         elseif mode == "save" then
-            ScreenRecorder.save();
+            if(ScreenRecorder.save) then
+                ScreenRecorderHandler.savedPath = ScreenRecorder.save();
+            end
+        elseif mode == "delete" then
+            if(ScreenRecorder.removeVideo) then
+                ScreenRecorder.removeVideo();
+            end
         end
     end
 }

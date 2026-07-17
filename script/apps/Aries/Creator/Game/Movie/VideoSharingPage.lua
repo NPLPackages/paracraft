@@ -96,28 +96,21 @@ function VideoSharingPage.CheckShow()
         end, _guihelper.MessageBoxButtons.YesNo);
     else
         KeepworkServiceProject:GetProject(tonumber(projectId), function(data)
-            -- print("=======ssssssssssssssssss")
-            -- echo(data,true)
             if data and data.world and data.world.worldName then
                 VideoSharingPage.currentWorldKeepworkInfo = data
             end
-
-            if VideoSharingPage.currentWorldKeepworkInfo.userId~=userId then
-                GameLogic.AddBBS(nil,L"只能分享自己的世界")
-            else
-                local info = VideoSharingPage.currentWorldKeepworkInfo
-                VideoSharingPage.bCheckdAutoVideo = not info.extra.cancelAutoGenVideo
-                local hasPanorama = info and info.extra and info.extra.cubeMap and #info.extra.cubeMap==6;
-                local hasVideo = info and info.extra and info.extra.video and info.extra.video~="";
-                local hasAutoVideo = info and info.autoVideo and info.autoVideo.url and info.autoVideo.url~="";
-                local hasWxacode = info and info.wxacode and info.wxacode~=""
-
-                VideoSharingPage.hasPanorama = not (not hasPanorama)
-                VideoSharingPage.hasVideo = not (not hasVideo)
-                VideoSharingPage.hasAutoVideo = not (not hasAutoVideo)
-
-                VideoSharingPage._ShowPage()
+            local channel = VideoSharingPage.currentWorldKeepworkInfo.channel
+            if channel and tonumber(channel) > 0 then
+                GameLogic.AddBBS(nil,L"当前世界不支持分享")
+                return 
             end
+
+            local info = VideoSharingPage.currentWorldKeepworkInfo
+            if not info.kpProjectId then
+                info.kpProjectId = info.id
+            end
+            local WorldSharePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareWorld/WorldSharePage.lua") 
+            WorldSharePage.ShowView(info)
         end)
     end
 end
@@ -270,7 +263,7 @@ end
 function VideoSharingPage.on_click_save_name()
     local temp_modify_worldname = page:GetUIValue("input_name")
     -- 客户端处理铭感词
-    local temp = MyCompany.Aries.Chat.BadWordFilter.FilterString(temp_modify_worldname);
+    local temp = MyCompany.Aries.Chat.BadWordFilter.FilterString2(temp_modify_worldname);
     if temp~=temp_modify_worldname then 
         _guihelper.MessageBox(L"该世界名称不可用，请重新设定");
         return

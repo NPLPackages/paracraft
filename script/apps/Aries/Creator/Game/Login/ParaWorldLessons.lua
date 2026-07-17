@@ -662,6 +662,7 @@ local classIdMapsToProjectId = {
 	['28x83'] = 19352,
 	-- 830
 	['20x79'] = 830,
+	['44x79'] = 830,
 }
 
 function ParaWorldLessons.GetLessonWorld(id)
@@ -677,7 +678,7 @@ end
 function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 	if (classIdMapsToProjectId[id]) then
 		CommandManager:RunCommand("/loadreadonlyworld " .. classIdMapsToProjectId[id])
-		return
+		return true
 	end
 
 	-- ParaWorldLessons.StaticInit()

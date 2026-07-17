@@ -46,11 +46,29 @@ function OpenFileDialog.GetFilters(filterName)
 			{L"bmax模型(*.bmax)",  "*.bmax"},
 			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml"},
 			{L"block模版(*.blocks.xml)",  "*.blocks.xml"},
+			{L"glb模型(*.glb)",  "*.glb"},
+			{L"ply点云(*.ply)",  "*.ply"},
 		};
 	elseif(filterName == "bmax") then
 		OpenFileDialog.bBanChinese = true
 		return {
 			{L"bmax模型(*.bmax)",  "*.bmax"},
+		};
+	elseif(filterName == "ply") then
+		OpenFileDialog.bBanChinese = true
+		return {
+			{L"ply点云(*.ply)",  "*.ply"},
+		};
+	elseif(filterName == "glb") then
+		OpenFileDialog.bBanChinese = true
+		return {
+			{L"gltf模型(*.glb)",  "*.glb"},
+		};
+	elseif(filterName == "gltf") then
+		OpenFileDialog.bBanChinese = true
+		return {
+			{L"gltf模型(*.gltf)",  "*.gltf"},
+			{L"gltf模型(*.glb)",  "*.glb"},
 		};
 	elseif(filterName == "x") then
 		OpenFileDialog.bBanChinese = true
@@ -116,6 +134,7 @@ end
 -- @param editButton: this can be nil or a function(filename) end or {text="edit", callback=function(filename) end}
 -- the callback function can return a new filename to be displayed. 
 function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, IsSaveMode, editButton, auto_virtual_keyboard)
+	OpenFileDialog.OnClose()
 	OpenFileDialog.result = nil;
 	OpenFileDialog.text = text;
 	OpenFileDialog.title = title;
@@ -404,7 +423,7 @@ function OpenFileDialog.OnOpenFileDialog()
 					local filename = fileItem.relativeToRootPath;
 					page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
 				else
-					filename = filename:match("[^/\\]+$")
+					-- filename = filename:match("[^/\\]+$")
 					page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
 				end
 			end

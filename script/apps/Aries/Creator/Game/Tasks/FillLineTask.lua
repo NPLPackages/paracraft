@@ -99,7 +99,7 @@ function FillLine:FrameMove()
 				UndoManager.PushCommand(self);
 			end
 		end
-		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",blocks)
+		GameLogic.GetFilters():apply_filters("BatchModifyBlocks",blocks)
 		blocks = {}
 	end
 end

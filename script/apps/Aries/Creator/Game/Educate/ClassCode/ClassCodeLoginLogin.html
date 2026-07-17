@@ -1,0 +1,247 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Educate/Project/ClassCodeLoginLogin.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ClassCodeLoginLogin.lua"><![CDATA[
+    local Validated = NPL.load('(gl)Mod/WorldShare/helper/Validated.lua')
+
+    local ClassCodeLoginLogin = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/ClassCode/ClassCodeLoginLogin.lua")
+    ClassCodeLoginLogin.OnInit()
+
+    local page = document:GetPageCtrl()
+
+    function ClosePage()
+        ClassCodeLoginLogin.CloseView()
+    end
+    
+    function get_page()
+        return page
+    end
+
+    function onPasswordInputFocusIn()
+        get_page():FindControl('password_input_bg').visible = false
+        get_page():FindControl('password_input_bg_select').visible = true
+    end
+
+    function onPasswordInputFocusOut()
+        get_page():FindControl('password_input_bg').visible = true
+        get_page():FindControl('password_input_bg_select').visible = false
+    end
+
+    function click_set_show_password()
+        has_click_change_show_password = true
+        set_show_password()
+    end
+
+    function set_show_password()
+        if be_show_password then
+            be_show_password = false
+
+            local val = get_page():GetValue('password_show')
+            get_page():SetValue('password_hide', val)
+            get_page():SetValue('password', val)
+
+            get_page():FindControl('password_show').visible = false
+            get_page():FindControl('password_hide').visible = true
+        else
+            be_show_password = true
+
+            local val = get_page():GetValue('password_hide')
+            get_page():SetValue('password_show', val)
+            get_page():SetValue('password', val)
+
+            get_page():FindControl('password_show').visible = true
+            get_page():FindControl('password_hide').visible = false
+        end
+    end
+
+    function update_login_button_status()
+        local beSuccess = true
+        local password
+
+        if be_show_password then
+            password = get_page():GetValue('password_show')
+        else
+            password = get_page():GetValue('password_hide')
+        end
+
+        if string.find(password, 'pa') == 1 and not has_click_change_show_password then
+            local check_str = {'p','a','r','a'} 
+            local is_macth = true
+
+            for i = 1, #check_str do
+                local char = string.sub(password, i, i)
+                if char and char ~= '' and check_str[i] ~= char then
+                    is_macth = false
+                    break
+                end
+            end
+
+            if not is_macth then
+                if auto_show_password then
+                    get_page():SetValue('eye_show_password', false)
+                    auto_show_password = false
+                    be_show_password = true
+                    set_show_password()
+
+                    local node = get_page():FindControl('password_hide')
+                    if node then
+                        node:Focus()
+                        node:SetCaretPosition(-1)
+                    end
+                end
+            elseif not be_show_password then
+                get_page():SetValue('eye_show_password', true)
+                set_show_password()
+                auto_show_password = true
+                local node = get_page():FindControl('password_show')
+                if node then
+                    node:Focus()
+                    node:SetCaretPosition(-1)
+                end
+            end
+        end
+
+        if string.find(password, 'paracraft.cn') == 1 then
+            -- 不允许自动登录
+            get_page():SetUIValue('auto_login_name', false)
+        end
+
+        get_page():SetValue('password', password)
+
+        if not Validated:Password(password) then
+            beSuccess = false
+        else
+            get_page():FindControl('password_field_error').visible = false
+        end    
+    end
+
+    function OnClickLogin()
+        ClassCodeLoginLogin.OnClickLogin()
+    end
+    
+    function OnClickBack()
+        ClassCodeLoginLogin.OnClickBack()
+    end
+
+    function GetName()
+        return (ClassCodeLoginLogin.pageData and ClassCodeLoginLogin.pageData.name and ClassCodeLoginLogin.pageData.name ~= "") 
+        and ClassCodeLoginLogin.pageData.name or '未命名'
+    end
+
+    function IsNameEmpty()
+        return (not ClassCodeLoginLogin.pageData or not ClassCodeLoginLogin.pageData.name or ClassCodeLoginLogin.pageData.name == "")
+    end
+
+    function GetClassInfo()
+        if not ClassCodeLoginLogin.pageData then
+            return "北京大学附属小学｜六年级1班" 
+        end
+        local orgName = ClassCodeLoginLogin.pageData.orgName
+        local className = ClassCodeLoginLogin.pageData.className
+        if orgName and className then
+            return orgName.. "｜".. className
+        else
+            return "北京大学附属小学｜六年级1班" 
+        end
+    end
+    -- don't remove
+    Mod.WorldShare.Utils.SetTimeOut(function()
+        local val = get_page():GetValue('password_show')
+        get_page():SetValue('password_hide', val)
+        get_page():SetValue('password', val)
+
+        local password_show_ctl = get_page():FindControl('password_show')
+        local password_hide_ctl = get_page():FindControl('password_hide')
+
+        if password_show_ctl then
+            password_show_ctl.visible = false
+        end
+
+        if password_hide_ctl then
+            password_hide_ctl.visible = true
+        end
+
+        update_login_button_status()
+    end, 0)
+
+
+]]></script>
+<pe:container alignment="_fi" zorder='-2' onclick = "onclickBackground" width="100%" height="100%" style="background-color:#B4BBC29F; ">
+</pe:container>
+<pe:container alignment="_ct"  width="400" height="400" style="margin-left: -200px; margin-top: -200px background: url();">
+    <div style="width: 400px;height: 400px;">
+        <div style="width:400px; height: 400px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/dialog_256x256_32bits.png#0 0 256 256:100 100 100 100);">
+            <div style="position: relative; ">
+                <pe:if condition="<%=IsNameEmpty()%>">
+                    <div style="color: #A8A7B0;  font-size: 30px; base-font-size: 30px;  text-align: center; margin-top: 57px;"><%= GetName() %></div>
+                </pe:if>
+                <pe:if condition="<%=not IsNameEmpty()%>">
+                    <div style="color: #38374D; font-size: 30px; base-font-size: 30px; font-weight:bold; text-align: center; margin-top: 57px;"><%= GetName() %></div>
+                </pe:if>
+                <div style="color: #A8A7B0; font-size: 12px; text-align: center; margin-top: 3px;"><%=GetClassInfo()%></div>
+                <div style="color: #38374D; font-size: 12px; base-font-size: 12px; font-weight:bold; margin-left: 67px; margin-top: 35px;">登录密码：</div>
+            </div>
+            <div style="position: relative; margin-left: 67px; margin-top: 140px;">
+                <pe:container name = "password_input_bg_select" visible = "true" style='position:relative;margin-top:35px;width:267px;height:44px;background: url(Texture/Aries/Creator/paracraft/Educate/Login1/input1_51x32_32bits.png#0 0 51 32:22 14 22 14);'>
+                </pe:container>
+                <pe:container name='password_field_error' visible='false' style='position:relative;margin-top:80px;margin-left:2px;height: 16px;line-height: 5px;background: url();'>
+                    <label value="密码错误" style='font-size: 12px;base-font-size: 12px;line-height: 5px;color: #E61b1b;' name='password_field_error_msg' />
+                </pe:container>
+                <div  name = "password_input_bg" style='margin-top:35px;width:267px;height:44px;background: url(Texture/Aries/Creator/paracraft/Educate/Login1/input2_51x32_32bits.png#0 0 51 32:22 14 22 14);'>
+                    <div style="float: left;width: 267px;">
+                        <input type='text'
+                                name='password_show'
+                                style='background:;
+                                        textcolor: #0e1627;
+                                        height: 30px;
+                                        width: 230px;
+                                        margin-top: 10px;
+                                        margin-left: 15px;
+                                        font-size: 16px;'
+                                onchange='update_login_button_status'
+                                onfocusin='onPasswordInputFocusIn'
+                                onfocusout ="onPasswordInputFocusOut"
+                                SkipAutoBadWordFilter='true'
+                                RemoveSpaces='true'
+                                EmptyText='<%= L"请输入密码" %>'
+                                MoveViewWhenAttachWithIME='true' />
+                        <input type='text'
+                                name='password_hide'
+                                PasswordChar="*"
+                                style='background:;textcolor: #0e1627;height: 30px;width: 230px; margin-left: -230px;margin-top: 8px;font-size: 16px;'
+                                onchange='update_login_button_status'
+                                onfocusin='onPasswordInputFocusIn'
+                                onfocusout ="onPasswordInputFocusOut"
+                                SkipAutoBadWordFilter='true'
+                                RemoveSpaces='true'
+                                EmptyText='<%= L"请输入密码" %>'
+                                MoveViewWhenAttachWithIME='true' />
+                        <input type="hidden" name="password" value="" />
+                    </div>
+                    <input type="checkbox"
+                            name="eye_show_password"
+                            checked="false"
+                            iconsize="20"
+                            CheckedBG="Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#272 52 20 20"
+                            UncheckedBG="Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#297 52 20 20"
+                            style="position: relative;margin-left: -41px;margin-top: 14px;"
+                            onclick="click_set_show_password"/>
+                </div>
+            </div>
+            <div style="position: relative; margin-top: 249px; margin-left: 67px;">
+                <input type="button" value="<%=L'登录'%>" onclick="OnClickLogin" style="color: #FFFFFF; width: 267px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu2_200x30_32bits.png# 0 0 200 30:98 14 98 14);"/>
+                <input type="button" value="<%=L'重新选择姓名'%>" onclick="OnClickBack" style="color: #404BF5; margin-top: 14px; width: 267px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu_40x30_32bits.png#0 0 40 30:18 14 18 14);"/>
+            </div>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

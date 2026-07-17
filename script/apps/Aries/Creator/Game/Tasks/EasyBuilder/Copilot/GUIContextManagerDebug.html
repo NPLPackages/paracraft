@@ -1,0 +1,71 @@
+<pe:mcml>
+<script type="text/npl" src="GUIContextManagerDebug.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/GUIContextManager.lua");
+local GUIContextManager = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.GUIContextManager");
+
+GUIContextManagerDebug = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.GUIContextManagerDebug");
+
+function GUIContextManagerDebug.OnInit()
+    GUIContextManager:Init();
+end
+
+function GUIContextManagerDebug.RefreshPage()
+    Page:Refresh(0.01);
+end
+
+-- State variables
+GUIContextManagerDebug.contextText = "";
+GUIContextManagerDebug.isRefreshing = false;
+GUIContextManagerDebug.elementCount = 0;
+GUIContextManagerDebug.lastRefreshTime = 0;
+
+function GUIContextManagerDebug.GetContextText()
+    return GUIContextManagerDebug.contextText or "";
+end
+
+function GUIContextManagerDebug.OnRefresh()
+    GUIContextManager:GetGUIContextForLLMAsync({
+        format = "markdown",
+        forceRefresh = true,
+    }, function(context)
+        GUIContextManagerDebug.contextText = context or "";
+        GUIContextManagerDebug.elementCount = #(GUIContextManager.cachedElements or {});
+        GUIContextManagerDebug.lastRefreshTime = os.time();
+        Page:SetValue("contextTextBox", GUIContextManagerDebug.contextText);
+    end);
+end
+
+function GUIContextManagerDebug.OnClear()
+    GUIContextManagerDebug.contextText = "";
+    GUIContextManagerDebug.elementCount = 0;
+    GUIContextManager:ClearCache();
+    Page:SetValue("contextTextBox", GUIContextManagerDebug.contextText);
+end
+
+function GUIContextManagerDebug.OnCopy()
+    local text = GUIContextManagerDebug.contextText or "";
+    if text ~= "" then
+        ParaMisc.CopyTextToClipboard(text);
+        _guihelper.MessageBox(L"已复制到剪贴板 / Copied to clipboard");
+    end
+end
+
+function GUIContextManagerDebug.OnClose()
+    GUIContextManager.debugPage = nil;
+    Page:CloseWindow();
+end
+]]></script>
+
+<aries:window mode="thin" style="" title='<%=L"GUI Context Manager Debug"%>' onclose="GUIContextManagerDebug.OnClose()">
+    <!-- Buttons -->
+    <input type="button" name="refreshBtn" value="Refresh" style="float:left;width:80px;height:28px;background-color:#333355;color:#ffffff;margin-right:5px;" onclick="GUIContextManagerDebug.OnRefresh()"/>
+    <input type="button" name="copyBtn" value="Copy to Clipboard" style="float:left;width:130px;height:28px;background-color:#333355;color:#ffffff;margin-right:5px;" onclick="GUIContextManagerDebug.OnCopy()"/>
+    <input type="button" name="clearBtn" value="Clear" style="float:left;width:70px;height:28px;background-color:#333355;color:#ffffff" onclick="GUIContextManagerDebug.OnClear()"/>
+    
+    <!-- Context Text Area -->
+    <div style="color:#ffffff">GUI Context Output:</div>
+    <div style="background-color:#f0f0f0;margin-right:10px;margin-bottom:10px;">
+        <textarea UseSystemControl="true" rows="30" enable_ime="false" name="contextTextBox" style="float:left;" EmptyText="Click 'Refresh' to capture GUI context..." readonly="true" value="<%=GUIContextManagerDebug.GetContextText()%>"></textarea>
+    </div>
+</aries:window>
+</pe:mcml>

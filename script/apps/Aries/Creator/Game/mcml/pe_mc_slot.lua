@@ -27,6 +27,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemStack.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TouchSession.lua");
 NPL.load("(gl)script/ide/System/Core/PainterContext.lua");
+NPL.load("(gl)script/ide/System/Util/Iterators.lua");
+local Iterators = commonlib.gettable("System.Util.Iterators");
 local PainterContext = commonlib.gettable("System.Core.PainterContext");
 local TouchSession = commonlib.gettable("MyCompany.Aries.Game.Common.TouchSession")
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
@@ -76,6 +78,13 @@ function pe_mc_slot.render_callback(mcmlNode, rootName, bindingContext, _parent,
 	_guihelper.SetUIFontFormat(_this, 38);
 	_this.shadow = true;
 	_this.background = "";
+	
+	if(not mcmlNode:GetBool("DisableDrag", false)) then
+		_this.candrag = true;
+		_this:SetScript("ondragbegin",function() pe_mc_slot.OnDragBegin(mcmlNode);	end)
+		_this:SetScript("ondragmove",function() pe_mc_slot.OnDragMove(mcmlNode); end)
+		_this:SetScript("ondragend",function() pe_mc_slot.OnDragEnd(mcmlNode); end)
+	end
 
 	_parent:AddChild(_this);
 
@@ -123,6 +132,101 @@ end
 -- this is just a temparory tag for offline mode
 function pe_mc_slot.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, style, parentLayout)
 	return mcmlNode:DrawDisplayBlock(rootName, bindingContext, _parent, left, top, width, height, parentLayout, style, pe_mc_slot.render_callback);
+end
+
+function pe_mc_slot.OnDragBegin(mcmlNode)
+	mcmlNode.isDragging = true;
+end
+
+-- dragging target rendering
+local function GetGlobalDragTipBox()
+	local _bordertip = ParaUI.GetUIObject("_g_drag_tip_box")
+	if(_bordertip:IsValid() ~= true) then
+		_bordertip = ParaUI.CreateUIObject("button", "_g_drag_tip_box", "_lt", -1000, -1000, 64, 64);
+		_bordertip.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;74 45 38 38:12 12 12 12";
+		_bordertip.enabled = false;
+		_bordertip.zorder = 1000;
+		_guihelper.SetUIColor(_bordertip, "#ffffffff");
+		_bordertip:AttachToRoot();
+	end
+	return _bordertip;
+end
+
+function pe_mc_slot.HideGlobalDragTipBox()
+	local _bordertip = ParaUI.GetUIObject("_g_drag_tip_box")
+	if(_bordertip:IsValid()) then
+		_bordertip.x = -1000;
+		_bordertip.y = -1000;
+	end
+end
+
+-- @param fromMcmlNode: this can be nil, if one just want to highlight. 
+function pe_mc_slot.OnDragMove(fromMcmlNode)
+	-- since, both receiver and dragging node will receive OnDragMove, we will only process the dragging node.
+	if(fromMcmlNode and not fromMcmlNode.isDragging) then return end
+
+	local m_x, m_y = ParaUI.GetMousePosition();
+	local mcmlNode = pe_mc_slot.GetNodeByMousePosition(m_x, m_y, nil, fromMcmlNode);
+	
+	if(mcmlNode) then
+		if((not fromMcmlNode or fromMcmlNode.contView) and mcmlNode.contView and fromMcmlNode ~= mcmlNode) then
+			if(not pe_mc_slot.CanDragOrEditNode(mcmlNode)) then
+				return;
+			end
+			-- hint to drop to mcmlNode slot
+			local srcObj = mcmlNode:GetControl();
+			if(srcObj) then
+				local x, y, width, height = srcObj:GetAbsPosition();
+				local _bordertip = GetGlobalDragTipBox()
+				_bordertip:Reposition("_lt", x, y, srcObj.width, srcObj.height);
+				return
+			end
+		end
+	else
+		local temp = ParaUI.GetUIObjectAtPoint(m_x, m_y);
+		if(not temp:IsValid()) then
+			-- hint to drop to 3d scene. 
+		end
+	end
+	pe_mc_slot.HideGlobalDragTipBox()
+end
+
+function pe_mc_slot.OnDragEnd(fromMcmlNode)
+	fromMcmlNode.isDragging = nil;
+	pe_mc_slot.HideGlobalDragTipBox()
+	local m_x, m_y = ParaUI.GetMousePosition();
+	local mcmlNode = pe_mc_slot.GetNodeByMousePosition(m_x, m_y, nil, fromMcmlNode);
+	if(mcmlNode) then
+		if(fromMcmlNode.contView and mcmlNode.contView and fromMcmlNode ~= mcmlNode) then
+			if(not pe_mc_slot.CanDragOrEditNode(mcmlNode)) then
+				return;
+			end
+			local itemStack = fromMcmlNode.contView:ClickSlot(fromMcmlNode.slot_index, "SlotToPlayer", nil, EntityManager.GetPlayer());
+			if(itemStack) then
+				local drag_item = EntityManager.GetPlayer():GetDragItem()
+				if(drag_item) then
+					mcmlNode.contView:ClickSlot(mcmlNode.slot_index, "PlayerToSlot", nil, EntityManager.GetPlayer());
+					local drag_item = EntityManager.GetPlayer():GetDragItem()
+					if(drag_item) then
+						-- drop existing to 3d scene
+						GameLogic.GetPlayerController():DropItemTo3DScene();
+					end
+				end
+			end
+		end
+	else
+		local temp = ParaUI.GetUIObjectAtPoint(m_x, m_y);
+		if(not temp:IsValid()) then
+			-- drop to 3d scene. 
+			local itemStack = fromMcmlNode.contView:ClickSlot(fromMcmlNode.slot_index, "SlotToPlayer", nil, EntityManager.GetPlayer());
+			if(itemStack) then
+				local drag_item = EntityManager.GetPlayer():GetDragItem()
+				if(drag_item) then
+					GameLogic.GetPlayerController():DropItemTo3DScene();
+				end
+			end
+		end
+	end
 end
 
 -- refresh according to current slot
@@ -414,8 +518,12 @@ function pe_mc_slot.OnClickSlot(ui_obj, mcmlNode)
 					Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onclick_empty, mcmlNode);
 				else
 					-- dragging operation: left click to take all 
-					bIsDragClick = true;
-					count = nil;
+					if(mcmlNode:GetAttributeWithCode("DisableClickDrag")) then
+						local newStack, hasHandled = itemStack:OnItemRightClick(EntityManager.GetPlayer());
+					else
+						bIsDragClick = true;
+						count = nil;
+					end
 				end
 			end
 		elseif(mouse_button=="right") then
@@ -537,12 +645,23 @@ function pe_mc_slot.OnDragFrameMove(x, y)
 	end
 end
 
-
 -- @param m_x, m_y: mouse x, y position. 
+-- @param fingerRadius: default to 0.
+-- @param excludeMcmlNode: the mcmlNode to exclude. 
 -- @return the mcmlNode or nil if not found
-function pe_mc_slot.GetNodeByMousePosition(m_x, m_y)
+function pe_mc_slot.GetNodeByMousePosition(m_x, m_y, fingerRadius, excludeMcmlNode)
 	if(not m_x) then
 		m_x, m_y = ParaUI.GetMousePosition();
+	end
+	fingerRadius = fingerRadius or 0
+	if(fingerRadius > 0) then
+		for dx, dy in Iterators.SpiralCircle(fingerRadius) do
+			local mcmlNode = pe_mc_slot.GetNodeByMousePosition(m_x+dx, m_y+dy, 0)
+			if(mcmlNode) then
+				return mcmlNode
+			end
+		end
+		return
 	end
 
 	local candidateNode, candidatePath;
@@ -550,28 +669,30 @@ function pe_mc_slot.GetNodeByMousePosition(m_x, m_y)
 	for ui_id, mcmlNode in pairs(pe_mc_slot.block_icon_instances) do
 		local _dragtarget = ParaUI.GetUIObject(ui_id);
 		if(_dragtarget and _dragtarget:IsValid()) then
-			local border = 6; -- using a border size of 6
-			local x, y, width, height = _dragtarget:GetAbsPosition();
-			if((m_x >= (x-border)) and (m_x <= (x + width + border)) and (m_y >= (y-border)) and (m_y <= (y + height+border))) then
-				-- mark gsid
+			if(excludeMcmlNode ~= mcmlNode) then
+				local border = 6; -- using a border size of 6
+				local x, y, width, height = _dragtarget:GetAbsPosition();
+				if((m_x >= (x-border)) and (m_x <= (x + width + border)) and (m_y >= (y-border)) and (m_y <= (y + height+border))) then
+					-- mark gsid
 
-				-- ensure that the node is 95% visible in its parent container(just in case of a scrollable container)
-				if(_dragtarget:GetField("VisibleRecursive", false) and not _guihelper.IsUIObjectClipped(_dragtarget, 0.2)) then
-					local path = 0;
-					local parent = _dragtarget;
-					while parent and parent:IsValid() do
-						local index = parent:GetField("index", 0);
-						if(index>=0) then
-							path = index + path / 100;
-							parent = parent.parent;
-						else
-							break;
+					-- ensure that the node is 95% visible in its parent container(just in case of a scrollable container)
+					if(_dragtarget:GetField("VisibleRecursive", false) and not _guihelper.IsUIObjectClipped(_dragtarget, 0.2)) then
+						local path = 0;
+						local parent = _dragtarget;
+						while parent and parent:IsValid() do
+							local index = parent:GetField("index", 0);
+							if(index>=0) then
+								path = index + path / 100;
+								parent = parent.parent;
+							else
+								break;
+							end
 						end
-					end
-					-- compare with last candidates. 
-					if(not candidatePath or candidatePath < path) then
-						candidateNode = mcmlNode;
-						candidatePath = path;
+						-- compare with last candidates. 
+						if(not candidatePath or candidatePath < path) then
+							candidateNode = mcmlNode;
+							candidatePath = path;
+						end
 					end
 				end
 			end

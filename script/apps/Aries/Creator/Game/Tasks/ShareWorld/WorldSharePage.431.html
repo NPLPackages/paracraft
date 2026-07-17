@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="WorldSharePage.lua" ><![CDATA[
+    local WorldSharePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareWorld/WorldSharePage.lua") 
+    WorldSharePage.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetQrcode()
+        return WorldSharePage.GetShareLink()
+    end
+
+    function OnClickCopy()
+        WorldSharePage.OnClickCopyLink()
+    end
+]]></script>
+    <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #000000cc;">
+        <pe:container alignment="_ct" width="430" height="340" style="margin-left:-215px;margin-top:-170px;background: ;">
+            <div style="width: 430px;height: 340px;">
+                <div style="width: 430px;height: 40px;margin-top: 0px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdin_54x60_32bits.png#0 0 54 60:20 20 20 20;">
+                    <div style="float: left;margin-left: 18px;margin-top: 8px;color: #ffffff;font-size: 18px;font-weight: bold;"><%=L"分享作品"%></div>
+                    <div onclick="ClosePage" style="float: left;margin-left: 310px;margin-top: 14px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+                </div>
+                <div style="width: 430px;height: 300px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdi_54x60_32bits.png#0 0 54 54:25 25 25 25;">
+                    <div style="margin-top: 18px; width: 464px; height: 190px; background: url();">
+                        <div style="text-align: center; color: #383838;font-size: 18px; base-font-size: 18px;"><%=L"使用手机微信或者QQ扫码分享作品"%></div>
+                        <div style="margin-top: 14px; margin-left: 140px; width: 140px; height: 140px; background: url(Texture/Aries/Creator/keepwork/Window/qrcode_bg_128x128_32bits.png#0 0 128 128:60 60 60 60);">
+                            <div style="margin-left: 5px; margin-top: 5px; width: 130px; height: 130px; background-color: #ffffff;">
+                                <kp:qrcode value="<%=GetQrcode()%>" style="margin-left: 2px; margin-top: 2px; width: 126px; height: 126px; color: #404BF5ff;"></kp:qrcode>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div style=" margin-left: 102px; margin-top: 16px;">
+                        <input type='button' value='<%=L"复制分享链接"%>' onclick='OnClickCopy' style='float: left;  font-size: 18px; base-font-size: 18px; font-weight: bold; color: #404BF5; width: 220px; height: 44px; background: url(Texture/Aries/Creator/paracraft/login/Update/btn_120x44_32bits.png#0 0 120 44:50 20 50 20);'/>
+                    </div>
+                </div>
+            </div>
+        </pe:container>
+    </pe:container> 
+</pe:mcml>
+</body>
+</html>

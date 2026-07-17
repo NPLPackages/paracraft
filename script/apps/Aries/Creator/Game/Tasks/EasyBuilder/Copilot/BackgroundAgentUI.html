@@ -1,0 +1,275 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/BackgroundAgentUI.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>BackgroundAgent UI</title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="BackgroundAgent.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/BackgroundAgent.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/VoiceContextManager.lua");
+
+BackgroundAgent = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.BackgroundAgent");
+VoiceContextManager = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.VoiceContextManager");
+
+local agent = nil;
+local refreshTimer = nil;
+local lastStreamingContent = "";
+
+function GetAgent()
+    if not agent then
+        agent = BackgroundAgent:GetInstance();
+    end
+    return agent;
+end
+
+function OnClose()
+    StopAutoRefresh();
+    GetAgent():ShowUI(false);
+end
+
+--------------------------------------------------------------------------------
+-- Playback Controls
+--------------------------------------------------------------------------------
+
+function OnPlay()
+    GetAgent():Play();
+    VoiceContextManager:Start();
+    RefreshPage();
+end
+
+function OnPause()
+    GetAgent():Pause();
+    RefreshPage();
+end
+
+function OnStop()
+    GetAgent():Stop();
+    VoiceContextManager:Stop();
+    RefreshPage();
+end
+
+--------------------------------------------------------------------------------
+-- TTS Controls
+--------------------------------------------------------------------------------
+
+function OnStopTTS()
+    GetAgent():StopTTS();
+    GetAgent():ClearTTSQueue();
+    RefreshPage();
+end
+
+function IsTTSPlaying()
+    return GetAgent():IsTTSPlaying();
+end
+
+function GetTTSStatusText()
+    if IsTTSPlaying() then
+        return L"Speaking...";
+    end
+    return L"Silent";
+end
+
+function GetTTSStatusColor()
+    if IsTTSPlaying() then
+        return "#ff00ff";
+    end
+    return "#888888";
+end
+
+--------------------------------------------------------------------------------
+-- Debug Controls
+--------------------------------------------------------------------------------
+
+function OnToggleDebug()
+    local agent = GetAgent();
+    if agent:IsDebugEnabled() then
+        agent:SetDebugEnabled(false);
+    else
+        agent:SetDebugEnabled(true);
+        agent:ShowDebugUI(true);
+    end
+    RefreshPage();
+end
+
+function IsDebugEnabled()
+    return GetAgent():IsDebugEnabled();
+end
+
+--------------------------------------------------------------------------------
+-- State Display
+--------------------------------------------------------------------------------
+
+function GetPlaybackState()
+    return GetAgent():GetPlaybackState();
+end
+
+function GetStateText()
+    local state = GetPlaybackState();
+    if state == "playing" then
+        return L"Playing";
+    elseif state == "paused" then
+        return L"Paused";
+    else
+        return L"Stopped";
+    end
+end
+
+function GetStateColor()
+    local state = GetPlaybackState();
+    if state == "playing" then
+        return "#00ff66";
+    elseif state == "paused" then
+        return "#ffaa00";
+    else
+        return "#888888";
+    end
+end
+
+function IsPlaying()
+    return GetPlaybackState() == "playing";
+end
+
+function IsPaused()
+    return GetPlaybackState() == "paused";
+end
+
+function IsStopped()
+    return GetPlaybackState() == "stopped";
+end
+
+--------------------------------------------------------------------------------
+-- Streaming Text Display
+--------------------------------------------------------------------------------
+
+function GetCurrentStreamingText()
+    local msg = GetAgent():GetCurrentChatMessage();
+    if msg and msg.content then
+        return msg.content;
+    end
+    return "";
+end
+
+function HasCurrentStreamingText()
+    local text = GetCurrentStreamingText();
+    return text and text ~= "";
+end
+
+function GetStreamingLabel()
+    if HasCurrentStreamingText() then
+        return L"AI Response:";
+    end
+    return L"Waiting...";
+end
+
+--------------------------------------------------------------------------------
+-- Auto-refresh for real-time updates
+--------------------------------------------------------------------------------
+
+function StartAutoRefresh()
+    if not refreshTimer then
+        refreshTimer = commonlib.Timer:new({
+            callbackFunc = function()
+                if Page then
+                    UpdateUI();
+                end
+            end
+        });
+        refreshTimer:Change(100, 100);  -- 100ms interval
+    end
+end
+
+function StopAutoRefresh()
+    if refreshTimer then
+        refreshTimer:Change();
+        refreshTimer = nil;
+    end
+end
+
+function UpdateUI()
+    if not Page then return; end
+    
+    -- Update state indicators
+    Page:SetValue("stateText", GetStateText());
+    Page:SetValue("ttsStatus", GetTTSStatusText());
+    
+    -- Update streaming text
+    local currentContent = GetCurrentStreamingText();
+    if currentContent ~= lastStreamingContent then
+        lastStreamingContent = currentContent;
+        Page:SetValue("streamingText", currentContent);
+    end
+end
+
+function RefreshPage()
+    if Page then
+        Page:Refresh(0.1);
+    end
+end
+
+-- Start auto-refresh when page loads
+function OnPageLoad()
+    StartAutoRefresh();
+    
+    -- Connect to chatContentUpdate signal for immediate text updates
+    local agent = GetAgent();
+    agent:Connect("chatContentUpdate", nil, function(content)
+        if Page and content then
+            Page:SetValue("streamingText", content);
+            lastStreamingContent = content;
+        end
+    end);
+end
+
+-- Call OnPageLoad when script runs
+OnPageLoad();
+]]></script>
+
+<!-- Main Container -->
+<div style="width:280px;height:180px;background-color:#1e1e28;padding:6px;">
+    
+    <!-- Header Row: State + Close Button -->
+    <div style="height:22px;margin-bottom:4px;">
+        <div style="float:left;">
+            <span style="color:<%=GetStateColor()%>;font-weight:bold;font-size:12px;">●</span>
+            <pe:label name="stateText" style="color:#ffffff;font-size:11px;margin-left:4px;"><%=GetStateText()%></pe:label>
+        </div>
+        <div style="float:right;">
+            <input type="button" value="✕" style="width:20px;height:20px;background-color:#444444;color:#ffffff;font-size:10px;" onclick="OnClose"/>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    
+    <!-- Control Row: Play/Pause/Stop -->
+    <div style="height:28px;margin-bottom:4px;background-color:#2a2a35;padding:3px;">
+        <input type="button" value="▶" style="width:36px;height:24px;margin-right:4px;background-color:<%=IsPlaying() and '#006633' or '#00aa44'%>;color:#ffffff;font-size:12px;" onclick="OnPlay"/>
+        <input type="button" value="⏸" style="width:36px;height:24px;margin-right:4px;background-color:<%=IsPaused() and '#996600' or '#cc8800'%>;color:#ffffff;font-size:12px;" onclick="OnPause"/>
+        <input type="button" value="■" style="width:36px;height:24px;margin-right:4px;background-color:<%=IsStopped() and '#993333' or '#cc4444'%>;color:#ffffff;font-size:12px;" onclick="OnStop"/>
+        <span style="color:#888888;font-size:10px;margin-left:8px;"><%=L"Agent Control"%></span>
+    </div>
+    
+    <!-- TTS Row: Stop Talking + Status -->
+    <div style="height:26px;margin-bottom:4px;background-color:#2a2a35;padding:3px;">
+        <input type="button" value="<%=L'Stop Talking'%>" style="width:80px;height:22px;margin-right:6px;background-color:<%=IsTTSPlaying() and '#aa0066' or '#555555'%>;color:#ffffff;font-size:10px;" onclick="OnStopTTS"/>
+        <span style="color:<%=GetTTSStatusColor()%>;font-size:10px;">
+            <pe:label name="ttsStatus"><%=GetTTSStatusText()%></pe:label>
+        </span>
+        <div style="float:right;">
+            <input type="button" value="<%=L'Debug'%>" style="width:50px;height:22px;background-color:<%=IsDebugEnabled() and '#00aa44' or '#555555'%>;color:#ffffff;font-size:10px;" onclick="OnToggleDebug"/>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    
+    <!-- Streaming Text Display -->
+    <div style="background-color:#0a0a12;padding:4px;height:74px;">
+        <div style="font-size:10px;color:#88ccff;margin-bottom:2px;"><%=GetStreamingLabel()%></div>
+        <textarea name="streamingText" ReadOnly="true" WordWrap="true" rows="3" style="width:260px;height:54px;font-size:10px;textcolor:#ccffcc;background-color:#0a0a12;"><%=GetCurrentStreamingText()%></textarea>
+    </div>
+    
+</div>
+
+</pe:mcml>
+</body>
+</html>

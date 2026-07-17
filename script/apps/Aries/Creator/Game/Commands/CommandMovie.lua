@@ -118,3 +118,34 @@ Commands["movieoutputmode"] = {
 		GameLogic.options:EnableMovieOutputMode(enabled~=false);
 	end,
 };
+
+Commands["generatevideos"] = {
+	name='generatevideos',
+	quick_ref='/generatevideos [projectId1,projectId2,projectId3 ...]',
+	desc='generate a collection of exciting videos ',
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local strProjectIds;
+		strProjectIds, cmd_text = CmdParser.ParseString(cmd_text);
+		if strProjectIds and strProjectIds ~= "" then
+			local GenerateVideoQueue = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildReplay/GenerateVideoQueue.lua");
+			GenerateVideoQueue:StartPlay(strProjectIds)
+		end
+	end,
+};
+
+Commands["screen"] = {
+	name="screen",
+	quick_ref='/screen [-nofit] [width] [height]',
+	desc=[[change screen size without changing window size, using black color to fill window
+@param -nofit: if specified, the screen will not be scaled to fit the window size.
+/screen 1280 720
+/screen : reset to default size
+]],
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local width, height, options
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		width, cmd_text = CmdParser.ParseInt(cmd_text);
+		height, cmd_text = CmdParser.ParseInt(cmd_text);
+		GameLogic.options:SetScreenSize(width, height, not options.nofit);
+	end,
+};

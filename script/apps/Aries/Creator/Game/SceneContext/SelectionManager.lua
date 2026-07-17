@@ -38,14 +38,16 @@ local result = nil;
 local eye_pos = {0,0,0};
 
 function SelectionManager:ctor()
-	NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/PickingResult.lua");
-	local PickingResult = commonlib.gettable("MyCompany.Aries.Game.SceneContext.PickingResult");
-	result = PickingResult:new();
-	self.result = result;
 end
 
 -- get the current mouse picking result. 
 function SelectionManager:GetPickingResult()
+	if(not self.result) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/PickingResult.lua");
+		local PickingResult = commonlib.gettable("MyCompany.Aries.Game.SceneContext.PickingResult");
+		result = PickingResult:new();
+		self.result = result;
+	end
 	return self.result;
 end
 
@@ -63,7 +65,7 @@ function SelectionManager:Clear()
 end
 
 function SelectionManager:ClearPickingResult()
-	result:Clear();
+	self:GetPickingResult():Clear();
 end
 
 -- @param callbackFunc: callback function
@@ -115,21 +117,122 @@ function SelectionManager:IsMousePickingEntity(entity, event)
 	end
 end
 
+-- @param eyeX, eyeY, eyeZ: ray origin in world space
+-- @param dirX, dirY, dirZ: ray direction, default to 0, -1, 0
+-- @param maxDistance: default to 10
+-- @return dist, result. if we hit something, dist is the distance to the block, otherwise it is nil. 
+function SelectionManager:RayPicking(eyeX, eyeY, eyeZ, dirX, dirY, dirZ, maxDistance)
+	maxDistance = maxDistance or 10;
+	local dist, result;
+	
+	-- try picking physical mesh
+	local pt = ParaScene.Pick(eyeX, eyeY, eyeZ, dirX, dirY, dirZ, maxDistance, "point")
+	if(pt:IsValid())then
+		local x1, y1, z1 = pt:GetPosition()
+		dist = ((x1-eyeX)^2) + ((y1 - eyeY)^2) + ((z1-eyeZ) ^2)
+		if(dist > 0.0001) then
+			dist = math.sqrt(dist);
+		end
+		local entity;
+		local entityName = pt:GetName();
+		if(entityName) then
+			local bx, by, bz = entityName:match("^(%d+),(%d+),(%d+)$");
+			if(bx and by and bz) then
+				bx = tonumber(bx);
+				by = tonumber(by);
+				bz = tonumber(bz);
+				local entityBlock = BlockEngine:GetBlockEntity(bx, by, bz);
+				if(entityBlock) then
+					entity = entityBlock;
+					block_id = entity:GetBlockId();
+					blockY = blockY + 1; -- restore blockY-1 in case terrain point is picked. 
+				end
+			end
+			if(entityName~="") then
+				local entity1 = EntityManager.GetEntity(entityName);
+				if(entity1) then
+					if(true) then
+						entity = entity1;
+					else
+						-- no long verify distance since we may be dealing with big physical meshes
+						local x1, y1, z1 = entity1:GetPosition()
+						local lengthSq = ((x1 - x)^2 + (y1 - y)^2 + (z1 - z)^2);
+						-- tricky: if the entity and hit points are close to each other, it is likely that they are the same object. 
+						if(lengthSq < (10^2)) then
+							entity = entity1
+							blockY = blockY + 1; -- restore blockY-1 in case terrain point is picked. 
+						end
+					end
+				end
+			end
+		end
+		result = result or {}
+		result.entity = entity;
+		result.hitX, result.hitY, result.hitZ = x1, y1, z1;
+	end
+	-- try to pick block 
+	local blockDist, bx, by, bz, blockId = BlockEngine:RayPicking(eyeX, eyeY, eyeZ, dirX, dirY, dirZ, maxDistance)
+	if(blockDist and (not dist or blockDist < dist)) then
+		dist = blockDist;
+		result = result or {}
+		result.entity = nil;
+		result.hitX, result.hitY, result.hitZ = nil, nil, nil;
+		result.bx, result.by, result.bz = bx, by, bz;
+		result.block_id = blockId;
+	end
+	return dist, result
+end
+
+-- this is the preferred way to call ParaTerrain.MousePick(picking_dist, result, filters)
+function SelectionManager:MousePick(picking_dist, result, filters, mouseX, mouseY)
+	result = result or {};
+	local mouseRay;
+	if (not mouseX and GameLogic.Macros:IsPlaying()) then
+		mouseX, mouseY = mouse_x, mouse_y
+	end
+	if(mouseX and mouseY) then
+		mouseRay = Cameras:GetCurrent():GetMouseRay(mouseX, mouseY, Matrix4.IDENTITY);
+		if(mouseRay) then
+			local origin = Cameras:GetCurrent():GetRenderOrigin();
+			mouseRay.mOrig:add(origin[1], origin[2], origin[3])
+		end
+	end
+	result.mouseX, result.mouseY = mouseX, mouseY;
+	if(not mouseRay) then
+		result = ParaTerrain.MousePick(picking_dist, result, filters);
+	else
+		result = ParaTerrain.Pick(mouseRay.mOrig[1], mouseRay.mOrig[2], mouseRay.mOrig[3], mouseRay.mDir[1], mouseRay.mDir[2], mouseRay.mDir[3], picking_dist, result, filters);
+	end
+	return result;
+end
+
 -- @param bPickBlocks, bPickPoint, bPickObjects: default to true
 -- @param mouseX, mouseY: if nil, it means the current mouse cursor screen position. 
 -- return result;
 function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist, mouseX, mouseY)
 	self:ClearPickingResult();
-	
+	local result = self:GetPickingResult()
+
 	eye_pos = ParaCamera.GetAttributeObject():GetField("Eye position", eye_pos);
 	
 	picking_dist = picking_dist or self:GetPickingDist();
+	local transparent_length;
 
 	local mouseRay;
+	if (not mouseX) then
+		if(GameLogic.Macros:IsPlaying()) then
+			mouseX, mouseY = mouse_x, mouse_y
+		else
+			mouseX, mouseY = ParaUI.GetMousePosition();
+		end
+	end
+
 	if(mouseX and mouseY) then
 		mouseRay = Cameras:GetCurrent():GetMouseRay(mouseX, mouseY, Matrix4.IDENTITY);
-		local origin = Cameras:GetCurrent():GetRenderOrigin();
-		mouseRay.mOrig:add(origin[1], origin[2], origin[3])
+		if(mouseRay) then
+			local origin = Cameras:GetCurrent():GetRenderOrigin();
+			mouseRay.mOrig:add(origin[1], origin[2], origin[3])
+		end
 	end
 	result.mouseX, result.mouseY = mouseX, mouseY;
 
@@ -179,6 +282,10 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 						result.block_id = nil;
 						result.blockX, result.blockY, result.blockZ = nil, nil, nil
 					end
+				end
+				if(block and (not block.solid)) then
+					-- tricky: for non-solid blocks(grass), we will slightly increase the picking distance to allow picking of objects behind it.
+					transparent_length = math.max((result.length or 0) + 1, picking_dist);
 				end
 				if(result.blockX and result.block_id) then
 					result.blockRealX, result.blockRealY, result.blockRealZ = result.x, result.y, result.z;
@@ -242,6 +349,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 				if(not entity or self:FilterEntity(entity)) then
 					result.entity = entity;
 					result.length = length;
+					transparent_length = nil;
 					result.x, result.y, result.z = x, y, z;
 					result.physicalX, result.physicalY, result.physicalZ = result.x, result.y, result.z;
 					result.blockX, result.blockY, result.blockZ = blockX, blockY, blockZ;
@@ -255,7 +363,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 	-- pick any scene object with AABB bounding box
 	if(bPickObjects~=false) then
 		local lastEntity = result.entity;
-		local lastLength = result.length;
+		local lastLength = transparent_length or result.length;
 		-- pick recursively and ignore physical objects along the eye ray
 		-- @return entity that is picked. It will also fill result.obj with its object. 
 		local function PickEntity_()
@@ -349,7 +457,9 @@ end
 -- @return x, y, z: nil or a hit point
 function SelectionManager:GetMouseInteractionPointWithAABB(aabb, mouse_x, mouse_y)
 	local mouseRay = Cameras:GetCurrent():GetMouseRay(mouse_x, mouse_y, Matrix4.IDENTITY);
-	
+	if(not mouseRay) then
+		return;
+	end
 	aabb = aabb:clone_from_pool();
 	local origin = Cameras:GetCurrent():GetRenderOrigin();
 	aabb:Offset(-origin[1], -origin[2], -origin[3])
@@ -395,7 +505,7 @@ function SelectionManager:MousePickWithFingerSize(bPickBlocks, bPickPoint, bPick
 			end
 		end
 	end
-	self.result:CopyFrom(results[1])
+	self:GetPickingResult():CopyFrom(results[1])
 	return results;
 end
 

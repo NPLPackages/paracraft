@@ -11,6 +11,8 @@ ObjectSelectPage.SelectByScreenRect(left, top, width, height);
 ObjectSelectPage.SelectEntities({})
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/PlayContext.lua");
+local PlayContext = commonlib.gettable("MyCompany.Aries.Game.SceneContext.PlayContext");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -50,9 +52,11 @@ function ObjectSelectPage.SelectByScreenRect(left, top, width, height)
 	if(not left) then
 		left, top, width, height = ParaUI.GetUIObject("root"):GetAbsPosition();
 	end
-	last_result = {}; 
+	last_result = {};
 	local count = ParaScene.GetObjectsByScreenRect(last_result, left, top, left + width, top + height, "4294967295", -1);
-	if(count and count>0) then
+	if(PlayContext.enableLeftButtonSelectObjects) then
+		GameLogic.GetFilters():apply_filters("customLeftButtonSelectObjects", last_result);
+	elseif(count and count > 0) then
 		ObjectSelectPage.ShowPage();
 		ObjectSelectPage.UpdateView();
 	end

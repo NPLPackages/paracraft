@@ -1,7 +1,8 @@
 --[[
 Title: CommandEffect
-Author(s): LiXizhi
-Date: 2014/7/4
+Author(s): LiXizhi, big
+CreateDate: 2014/7/4
+ModifyDate: 2024/7/23
 Desc: command effect
 use the lib:
 -------------------------------------------------------
@@ -202,7 +203,7 @@ Commands["grey"] = {
 	desc=[[turn grey effect on and off
 /grey 1.2 1.2 0.9
 /grey 0.85 0.79 0.74 0.27 0.14 0.03
-/grey	  turn it off
+/grey     turn it off
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local bIsOn;
@@ -296,20 +297,24 @@ Commands["viewport"] = {
 	name="viewport", 
 	mode_deny = "",
 	mode_allow = "",
-	quick_ref="/viewport [@id] [alignment:_lt|_fi|_rt] [left] [top] [width] [height]", 
+	quick_ref="/viewport [@id_or_name] [alignment:_lt|_fi|_rt] [left] [top] [width] [height]", 
 	desc=[[ change main viewport 
 e.g.
 /viewport							fill all viewport
 /viewport 0 0 100 0
 /viewport _lt 0 0 600 400
 /viewport @0 _lt 0 0 600 400
+/viewport @GUI _lt 0 0 600 400
+/viewport @scene _fi 10 10 10 10
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local id, alignment, left, top, width, height;
-		id, cmd_text = CmdParser.ParseFormated(cmd_text, "@%d");
+		id, cmd_text = CmdParser.ParseFormated(cmd_text, "@%S+");
 		if(id) then
 			id = id:gsub("@", "");
-			id = tonumber(id);
+			if(id:match("^%d+")) then
+				id = tonumber(id) or id;
+			end
 		else
 			id = 1;
 		end
@@ -321,39 +326,66 @@ e.g.
 		width, cmd_text = CmdParser.ParseInt(cmd_text);
 		height, cmd_text = CmdParser.ParseInt(cmd_text);
 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Viewport.lua");
-		local Viewport = commonlib.gettable("MyCompany.Aries.Game.Common.Viewport")
-		Viewport.Get(id):SetPosition(alignment, left or 0, top or 0, width or 0, height or 0);
+		NPL.load("(gl)script/ide/System/Scene/Viewports/Viewport.lua");
+		local Viewport = commonlib.gettable("System.Scene.Viewports.Viewport");
+		local viewport = Viewport:new():init(id)
+		if(viewport) then
+			viewport:SetPosition(alignment, left or 0, top or 0, width or 0, height or 0);
+		end
 	end,
 };
 
+-- Stereoscopic vision command.
 Commands["stereo"] = {
 	name="stereo", 
 	mode_deny = "",
 	mode_allow = "",
-	quick_ref="/stereo [on|off|red|left|ods|odsdebug] [eye_dist]", 
+	quick_ref="/stereo [-s] [on|off|webxr|red|interlaced|left|ods|odsdebug] [eye_dist] [lookat_offset]", 
 	desc=[[turn on/off stereo mode. 
+@param -s: whether to silently enable stereo mode.
+@param on: turn on the stereo mode.
+@param off: turn off the stereo mode.
+@param webxr: turn on the webxr mode.
 e.g.
-/stereo on 0.1			with 0.1 eye distance
-/stereo 0.03			with 0.03 eye distance
-/stereo off				turn 3d off
-/stereo red				red/blue mode 
-/stereo left			left/right mode
-/stereo ods			    ods 360 single eye
+/stereo on 0.1          with 0.1 eye seperation distance
+/stereo 0.03  3         with 0.03 eye seperation distance and 3 convergence plane offset
+/stereo off             turn 3d off
+/stereo red             red/blue mode 
+/stereo interlaced      mode 
+/stereo left            left/right mode
+/stereo ods             ods 360 single eye
 /stereo odsdebug        ods 360 single eye debug mode
-/stereo					toggle
+/stereo                 toggle
+/stereo -s webxr        silently enable webxr mode
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local mode,eyeDist;
+		local option = "";
+		local silently = false;
+		while (option) do
+            option, cmd_text = CmdParser.ParseOption(cmd_text);
+            if (option == "s") then
+                silently = true;
+            end
+        end
+
+		local mode,eyeDist, lookat_offset;
 		mode, cmd_text = CmdParser.ParseFormated(cmd_text, "[^%d]%w+");
 		eyeDist, cmd_text = CmdParser.ParseInt(cmd_text);
 		if(not mode and not eyeDist) then
 			-- toggle mode
 			mode = if_else(GameLogic.options:IsStereoMode(), "off", "on");
 		end
+		lookat_offset, cmd_text = CmdParser.ParseInt(cmd_text);
+
+		NPL.load("(gl)script/ide/System/Scene/Cameras/WebXRCamera.lua");
+		local WebXRCamera = commonlib.gettable("System.Scene.Cameras.WebXRCamera");
+		WebXRCamera:deactivate();
+
 		if(mode) then
 			if(mode:match("^on") or mode:match("^left")) then
 				mode = 2;
+			elseif(mode:match("^interlaced")) then
+				mode = 4;
 			elseif(mode:match("^red")) then
 				mode = 5;
 			elseif(mode:match("^ods")) then
@@ -368,6 +400,17 @@ e.g.
 					GameLogic.options:EnableStereoMode(mode);
 				end)
 				return
+			elseif(mode:match("^webxr")) then
+				if (silently) then
+					WebXRCamera:activate();
+				else
+					_guihelper.MessageBox(L"是否要启用 WebXR 模式？", function(res)
+						if (res and res == _guihelper.DialogResult.Yes) then
+							WebXRCamera:activate();
+						end
+					end, _guihelper.MessageBoxButtons.YesNo);
+				end
+				return;
 			else
 				mode = 0;
 			end
@@ -375,6 +418,9 @@ e.g.
 		end
 		if(eyeDist) then
 			GameLogic.options:SetStereoEyeSeparationDist(eyeDist);
+		end
+		if(lookat_offset) then
+			GameLogic.options:SetStereoConvergenceOffset(lookat_offset);
 		end
 	end,
 };

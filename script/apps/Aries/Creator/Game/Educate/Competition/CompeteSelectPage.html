@@ -1,0 +1,101 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Educate/Project/CompeteSelectPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="CompeteSelectPage.lua"><![CDATA[
+local CompeteSelectPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Competition/CompeteSelectPage.lua");
+CompeteSelectPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    CompeteSelectPage.CloseView()
+end
+
+function CompetiesData(index)
+    if(index == nil) then
+        return #CompeteSelectPage.CompetiesData;
+    else
+        return CompeteSelectPage.CompetiesData[index];
+    end
+end
+
+function IsHaveCreateTask()
+    return CompeteSelectPage.CompetiesData and #CompeteSelectPage.CompetiesData > 0
+end
+
+function IsSelect(index)
+    return false    
+end
+
+function OnOpen(index)
+    CompeteSelectPage.OnOpen(index)
+end
+
+function IsNeedGotoUrl()
+    return CompeteSelectPage.isNeedGotoEdu == true
+end
+
+function GetPaperName()
+    return (CompeteSelectPage.ServerData and CompeteSelectPage.ServerData.name) and CompeteSelectPage.ServerData.name or ""
+end
+
+function OpenWebUrl()
+    CompeteSelectPage.OpenWebUrl()
+end
+
+]]></script>
+
+<div style="width: 640px;height: 393px;">
+    <div style="width: 640px;height: 60px;margin-top: 0px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdin_54x60_32bits.png#0 0 54 60:20 20 20 20;">
+        <div style="float: left;margin-left: 20px;margin-top: 15px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;">当前赛事</div>
+        <div onclick="ClosePage" style="float: left;margin-left: 502px;margin-top: 20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+    </div>
+    <div style="width: 640px;height: 333px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdi_54x60_32bits.png#0 0 54 54:25 25 25 25;">
+        <div style="color: #000000;margin-top: 10px;margin-left: 20px;font-size: 12px;">
+            <div style="base-font-size: 18px;font-size: 18px;"><%=GetPaperName()%></div>
+            <pe:if condition="<%=IsNeedGotoUrl()%>">
+                <div style="position: relative; base-font-size: 13px;font-size: 13px; margin-top: 10px;">注意:该赛事其他测验部分，请访问智慧教育平台(edu.palaka.cn)获取</div>
+                <input type="button" tooltip="打开网站" onclick="OpenWebUrl" style="margin-left: 440px; margin-top: 4px; width: 47px; height: 27px; background: url(Texture/Aries/Creator/paracraft/Educate/jinru_47x27_32bits.png#0 0 47 27);"/>
+            </pe:if>
+        </div>
+
+        <div type ="box" style="width:615px;height:220px;margin-left:10px;margin-top: 10px;">
+            <pe:if condition="<%=IsHaveCreateTask()%>">
+                <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="10" VerticalScrollBarStep="68" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" 
+                    DataSource='<%=CompetiesData %>'>
+                    <Columns>
+                        <div style="width: 563px; height: 68px;">
+                            <div style="position: relative;">
+                                <div style="position: relative;padding-left:3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 563px; height: 68px; 
+                                    background:url(Texture/Aries/Creator/paracraft/Educate/shurukuang_46x46_32bits.png#0 0 46 46:10 10 10 10);background2:url(Texture/Aries/Creator/paracraft/Educate/xiaoquedin_46x46_32bits.png#0 0 46 46:10 10 10 10)">
+                                </div>
+                                <div onclick="OnOpen" name='<%=Eval("index")%>' style="position: relative;padding-left:3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 563px; height: 68px; 
+                                    background:;background2:url(Texture/Aries/Creator/paracraft/Educate/xiaoquedin_46x46_32bits.png#0 0 46 46:10 10 10 10)">
+                                </div>
+                            </div>
+                            <div style="position: relative;">
+                                <div style="margin-left: 12px; margin-top: 11px; base-font-size:12px;font-size: 12px;color: #000000;"><%=Eval("name")%></div>
+                            </div>
+                        </div>
+                    </Columns>
+                    <EmptyDataTemplate>
+                    </EmptyDataTemplate>
+                </pe:gridview>
+            </pe:if>
+            <pe:if condition="<%=not IsHaveCreateTask()%>">
+                <div style="position: relative; base-font-size: 18px;font-size: 18px; margin-top: 10px; margin-left: 6px;">本赛事不包含3D测验部分</div>
+            </pe:if>
+            
+        </div>
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

@@ -198,10 +198,21 @@ end
 -- @param rule_value: this is usually nil. 
 function GameRules:AddRule(class_name, rule_name, rule_value)
 	local class = self:GetRuleClass(class_name)
+	local rule_key = rule_name
+	if not rule_value and class_name ~= "Block" then
+		local name, value = rule_name:match("^(%S+)%s+(.*)$");
+		rule_key = name
+	end
+	if not rule_key or rule_key == "" then
+		return
+	end
 	if(class) then
+		if self.rules[rule_key] then
+			self.rules[rule_key] = nil			
+		end
 		local rule = class:new():Init(rule_name, rule_value);
 		if(rule) then
-			self.rules[rule_name] = rule;
+			self.rules[rule_key] = rule;
 		end
 	end
 end
@@ -217,7 +228,7 @@ function GameRules:ShowAllRules()
 		local i = 0;
 		for name, rule in pairs(self.rules) do
 			i = i+1;
-			GameLogic.RunCommand("tip", format("-rule%d %s", i, name));
+			GameLogic.RunCommand("tip", format("-rule%d %s %s", i, name,tostring(rule.value)));
 		end
 		if(i == 0) then
 			GameLogic.RunCommand("tip", "no rules are defined.");

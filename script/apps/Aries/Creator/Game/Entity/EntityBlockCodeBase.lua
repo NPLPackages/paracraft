@@ -22,8 +22,9 @@ Entity.class_name = "EntityBlockCodeBase";
 EntityManager.RegisterEntityClass(Entity.class_name, Entity);
 
 Entity:Property("NplBlocklyToolboxXmlText");
-Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
+Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode", auto=true})
 Entity:Property({"isStepMode", nil, "IsStepMode", "SetStepMode", auto=true})
+Entity:Property({"isGliaFile", false, "IsGliaFile", "SetGliaFile", auto=true})
 Entity:Property({"lastEditTime", false, "GetLastEditTime", "SetLastEditTime"})
 Entity:Signal("remotelyUpdated")
 
@@ -96,6 +97,14 @@ function Entity:IsUseCustomBlock()
 	return self.isUseCustomBlock;
 end
 
+function Entity:GetCustomBlockText(text)
+	return self.custom_block_text or "";
+end
+
+function Entity:SetCustomBlockText(text)
+	self.custom_block_text = text;
+end
+
 function Entity:IsBlocklyEditMode()
 	return self.isBlocklyEditMode;
 end
@@ -103,7 +112,7 @@ end
 function Entity:GetLanguageVersion()
 	if (not self.languageVersion) then
 		local LanguageConfig = NPL.load("script/ide/System/UI/Blockly/Blocks/LanguageConfig.lua");
-		return LanguageConfig.GetVersion(self.languageConfigFile);  -- 初始版本使用最新版本
+		return LanguageConfig:GetVersion(self.languageConfigFile);  -- 初始版本使用最新版本
 	end
 	return self.languageVersion;
 end
@@ -144,7 +153,7 @@ function Entity:SaveBlocklyToXMLNode(node)
 	end
 	node.attr.languageVersion = self:GetLanguageVersion();
 
-	if(self:GetBlocklyXMLCode() ~= "" or self:GetNPLBlocklyXMLCode() ~= "") then
+	if(self:GetBlocklyXMLCode() ~= "" or self:GetNPLBlocklyXMLCode() ~= "" or self:GetCustomBlockText() ~= "") then
 		local blocklyNode = {name="blockly"};
 		node[#node+1] = blocklyNode;
 		blocklyNode[#blocklyNode+1] = {name="code", self:TextToXmlInnerNode(self:GetNPLCode())}
@@ -153,6 +162,7 @@ function Entity:SaveBlocklyToXMLNode(node)
 		blocklyNode[#blocklyNode+1] = {name="npl_xmlcode", self:TextToXmlInnerNode(self.npl_blockly_xmlcode)}
 		blocklyNode[#blocklyNode+1] = {name="npl_nplcode", self:TextToXmlInnerNode(self.npl_blockly_nplcode)}
 		blocklyNode[#blocklyNode+1] = {name="npl_toolbox_xml_text", self:TextToXmlInnerNode(self:GetNplBlocklyToolboxXmlText())}
+		blocklyNode[#blocklyNode+1] = {name="custom_block_text", self:TextToXmlInnerNode(self:GetCustomBlockText())}
 	end
 
 	if(self.includedFiles) then
@@ -199,6 +209,8 @@ function Entity:LoadBlocklyFromXMLNode(node)
 						self:SetNPLCode(code);
 					elseif(sub_node.name == "npl_toolbox_xml_text") then
 						self:SetNplBlocklyToolboxXmlText(code);
+					elseif(sub_node.name == "custom_block_text") then
+						self:SetCustomBlockText(code);
 					end
 				end
 			end
@@ -246,6 +258,15 @@ function Entity:IsCodeEmpty()
 	end
 end
 
+function Entity:GetCodeSize()
+	local cmd = self:GetCommand()
+	if(not cmd or cmd == "") then
+		return 0;
+	else
+		return #cmd;
+	end
+end
+
 -- virtual
 function Entity:OnInventoryChanged(inventory, slot_index)
 end
@@ -269,5 +290,23 @@ function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
 			self:OnInventoryChanged();
 			self:remotelyUpdated();
 		end
+	end
+end
+
+function Entity:GetBlockName()
+	local x,y,z = self:GetBlockPos();
+	return format("%s_block(%d, %d, %d)", self:GetDisplayName() or "", x, y, z);	
+end
+
+-- whether this entity is locked.
+function Entity:IsLocked()
+	return self.bx and not GameLogic.EditableWorld:IsEditableBlock(self.bx, self.by, self.bz)
+end
+
+function Entity:SetLocked(bLocked)
+	if(not bLocked) then
+		GameLogic.EditableWorld:AddEditablePos(self.bx, self.by, self.bz)
+	else
+		GameLogic.EditableWorld:RemoveEditablePos(self.bx, self.by, self.bz)
 	end
 end

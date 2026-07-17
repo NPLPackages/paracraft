@@ -40,7 +40,7 @@ function StereoVisionController:SetEnabled(bEnable)
 		ParaScene.UnregisterEvent("_a_paracraft_accelerometer");
 		self.pitch = 0;
 		self.roll = 0;
-		CameraController:SetAdditionalCameraRotate(0, 0, 0);
+		CameraController:SetAdditionalCameraRotate(0, 0, 0, true);
 	end
 end
 

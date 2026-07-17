@@ -624,7 +624,7 @@ cylinder("difference", 0.8, 4, #ffc658");
 
 {
 	type = "cone", 
-	message0 = L"%1 圆锥体 顶部半径 %2 底部半径 %3 高 %4 %5",
+	message0 = L"%1 圆台 顶部半径 %2 底部半径 %3 高 %4 %5",
     arg0 = {
         {
 			name = "op",

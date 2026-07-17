@@ -1,0 +1,62 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ClientUpdate/DownLoadPage.html?latestVersion&curVersion=" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+    DownLoadPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdate/DownLoadPage.lua");
+    DownLoadPage:OnInit()
+
+    function OnClose()
+        Page:CloseWindow();
+    end
+
+]]></script>
+    <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #040A1CCC;">
+        <pe:container alignment="_ct" width="500" height="150" style="margin-left:-250px;margin-top:-75px;background: ;">
+            <div style="position: relative; margin-left: 20px; margin-top: 10px; color: #ffffff; font-size: 26px; base-font-size: 26px; font-weight: bold;"><%=L"版本更新中"%></div>
+            <div style="position: relative; margin-left: 300px; margin-top: 10px; width: 200px; ">
+                <label zorder="6" 
+                    name="progressSpeedText"
+                    value="0kb/s"
+                    style="margin-top: 0px;
+                        font-size: 18px;
+                        base-font-size: 18px;
+                        font-weight: bold;
+                        color: #ffffff;
+                        height: 50px;
+                        text-align: center;">
+                </label>
+            </div>
+            <div style="width: 500px; height: 150px; background: url(Texture/Aries/Creator/paracraft/login/Update/bg_500x150_32bits.png#0 0 500 150);">
+                <div style="margin-top: 54px; width: 500px; height: 96px; background: url(Texture/Aries/Creator/paracraft/login/Update/bg_500x96_32bits.png#0 0 500 96);">
+                    <div style="margin-left: 18px; margin-top: 18px; width: 464px; height: 60px; background:url(Texture/Aries/Creator/paracraft/login/Update/bg_464x60_32bits.png#0 0 464 60);">
+                        <pe:progressbar name="update_progressbar" 
+                            Minimum = "0" Maximum = "100" Value = "0" Step = "1"
+                            background = "" 
+                            blockimage = "Texture/Aries/Creator/paracraft/login/Update/progress_454x50_32bits.png;0 0 454 50" 
+                            style=" margin-left: 5px; margin-top: 5px; width:454px;height:50px;"
+                            />
+                    </div>
+                </div>
+            </div>
+            <label zorder="6" 
+                name="progressText"
+                value="0%"
+                style="margin-top: -60px;
+                    margin-left: 25px;
+                    font-size: 18px;
+                    base-font-size: 18px;
+                    font-weight: bold;
+                    color: #ffffff;
+                    width: 440px;
+                    height: 50px;
+                    text-align: center;">
+            </label>
+        </pe:container>
+        
+    </pe:container>     
+    
+</pe:mcml>
+</body>
+</html>

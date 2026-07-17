@@ -100,10 +100,13 @@ end
 function BlockTemplatePage.OnClickTakeSnapshot()
 	NPL.load("(gl)script/kids/3DMapSystemUI/ScreenShot/SnapshotPage.lua");
 	if(MyCompany.Apps.ScreenShot.SnapshotPage.TakeSnapshot(BlockTemplatePage.DefaultSnapShot, 64, 64, false, false)) then
-		-- refresh image
-		ParaAsset.LoadTexture("", BlockTemplatePage.DefaultSnapShot,1):UnloadAsset();
+		
 	else
-		_guihelper.MessageBox(L"截图失败了, 请确定您有权限读写磁盘")
+		if System.os.GetPlatform() == "win32" then
+			_guihelper.MessageBox(L"截图失败了, 请确定您有权限读写磁盘")
+		else
+			LOG.std(nil,"info","BlockTemplatePage","template保存界面截图失败，可能没有权限读写磁盘")
+		end
 	end
 end
 
@@ -342,9 +345,36 @@ function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh, searchText)
 		local folder_local = {name="folder", attr={text=L"本地模板", expanded=true},};
 		root[#root+1] = folder_local;
 
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+		local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+		local exFolder = Files.GetAdditionalWorldSearchPath() or "";
+		if(exFolder ~= "") then
+			local folder_assetEx = {name="folder", attr={text=L"外部资源包", expanded=true},};
+			
+			local result = commonlib.Files.Find({}, exFolder.."blocktemplates/", 2, 500, function(item)
+					if(item.filename:match("%.bmax$") or item.filename:match("%.x$") or item.filename:match("%.blocks%.xml$")) then
+						return true;
+					end
+				end, "*.zip")
+
+			for _, file in ipairs(result) do 
+				file.text = file.filename:match("([^/\\]+)%.blocks%.xml$")
+				if(not file.text) then
+					file.text = file.filename:match("([^/\\]+%.bmax)$") or file.filename:match("([^/\\]+%.x)$")
+				end
+				if(file.text) then
+					file.text = commonlib.Encoding.url_decode(commonlib.Encoding.DefaultToUtf8(file.text));
+					file.filename = "blocktemplates/"..file.filename;
+					folder_assetEx[#folder_assetEx+1] = {name="file", attr=file};
+				end
+			end
+			if(#folder_assetEx > 0) then
+				root[#root+1] = folder_assetEx;
+			end
+		end
+
 		-- global dir and all of its sub directories.
 		local result = commonlib.Files.Find({}, BlockTemplatePage.global_template_dir, 2, 500, "*.blocks.xml")
-		local _, file
 		for _, file in ipairs(result) do 
 			file.text = file.filename:match("([^/\\]+)%.blocks%.xml$")
 			if(file.text) then
@@ -371,6 +401,18 @@ function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh, searchText)
 			table.insert(result,value)
 		end
 
+		-- 个人目录下载
+		local personnalstore = commonlib.Files.Find({}, GameLogic.current_worlddir.."personnalstore/", 2, 500, function(item)
+			item.fromPersonnalMall = false
+			if(item.filename:match("%.bmax$") or item.filename:match("%.x$")or item.filename:match("%.blocks%.xml$")) then
+				return true;
+			end
+		end)
+
+		for key, value in pairs(personnalstore) do
+			table.insert(result,value)
+		end
+
 		table.sort(result,function (a, b)
 			local isABlocks = a.filename:match("([^/\\]+)%.blocks%.xml$")
 			local isBBlocks = b.filename:match("([^/\\]+)%.blocks%.xml$")
@@ -388,6 +430,8 @@ function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh, searchText)
 				file.text = commonlib.Encoding.url_decode(commonlib.Encoding.DefaultToUtf8(file.text));
 				if file.fromMall then
 					file.filename = GameLogic.current_worlddir.."onlinestore/"..file.filename;
+				elseif file.fromPersonnalMall then
+					file.filename = GameLogic.current_worlddir.."personnalstore/"..file.filename;
 				else
 					file.filename = GameLogic.current_worlddir.."blocktemplates/"..file.filename;
 				end

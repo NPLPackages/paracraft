@@ -1,0 +1,107 @@
+<!-- script/apps/Aries/Creator/Game/Tasks/Community/AIGC/CreateNewWorldAIGC.html -->
+<body>
+    <pe:mcml>
+        <script type='text/npl'>
+            <![CDATA[
+                NPL.load("(gl)script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua");
+                local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+                local CreateNewWorldAIGC = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/AIGC/CreateNewWorldAIGC.lua")
+                CreateNewWorldAIGC.OnInit()
+                local page = document:GetPageCtrl()
+
+                function close_page()
+                    page:CloseWindow()
+                    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.create_new_world.click_cancel", {useNoId=true},nil,true);
+                end
+
+                function create_new_world()
+                    CreateNewWorldAIGC.CreateNewWorld()
+                end
+
+
+                function IsFroceCreate()
+                    return CreateNewWorldAIGC.IsFroceCreate()
+                end
+
+                function GetWorldName()
+                    return CreateNewWorldAIGC.GetFolderName()
+                end
+
+                function OnWorldNameChange()
+                    CreateNewWorld.LastWorldName = page:GetUIValue("new_world_name", "");
+                end
+
+                function GetProjectData(index)
+                    if index == nil then
+                        return #CreateNewWorldAIGC.project_datas
+                    else
+                        return CreateNewWorldAIGC.project_datas[index]
+                    end
+                end
+
+                function GetWorldType()
+                    return CreateNewWorldAIGC.GetWorldType()
+                end
+
+
+                function OnClickWorldType(name,mcmlNode)
+                    local data = mcmlNode:GetAttribute("param1");
+                    CreateNewWorldAIGC.OnClickWorldType(data)
+                end
+            ]]>
+        </script>
+        <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+            <pe:container alignment="_ct" width="520" height="480" style="margin-left:-260px;margin-top:-240px; background: url(Texture/Aries/Creator/keepwork/Community/confirmbg_858x696_32bits.png#0 0 858 696);">
+                <div style="margin-top: 12px; width: 520xp; height: 30px; text-align: center; color: #d3d3d3; font-size: 20px; base-font-size: 20px; font-weight: bold; "><%=L"新建世界"%></div>
+                <div style="width: 420px; height: 200px; margin-left: 60px; margin-top: 30px; ">
+                    <pe:gridview RememberScrollPos="true" AllowPaging="false" name="CommunityWorldModule.slot_gridview1" CellPadding="30" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="14" ItemsPerLine="2" DefaultNodeHeight = "100" 
+                        DataSource='<%=GetProjectData%>'>
+                        <Columns>
+                            <div zorder="-3"  style=" width: 150px; height: 100px; background-color: #7781f2; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                <img zorder="-2" src="<%=Eval('img_bg')%>" style="position: relative; margin-left: 0px; margin-top: 0px; width: 150px; height: 100px;"/>
+                                <div style="position: relative; margin-top: 106px;  font-size: 16px; base-font-size: 16px; font-weight: bold; width: 150px; height: 24px; text-align: center;"><%=Eval("name")%></div>
+                                <input type="button" value="" param1="<%=XPath('this')%>" onclick="OnClickWorldType" style="width: 150px; height: 100px; background: url();" />
+                            </div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <div style='font-weight: bold;'>
+                                <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: -10px; color: #A8A7B0;" ><%=L"数据加载中"%></div>
+                            </div>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+                <div style="margin-top: 16px; width: 360px; margin-left: 84px; height: 40px; ">
+                    <div style="float: left; font-size: 16px; base-font-size: 16px; font-weight: bold;"><%=L"世界类型:"%></div>
+                    <input type="text" width="160" ReadOnly="true" name="new_world_type" value='<%=GetWorldType()%>' style="float:left;  font-size: 16px; base-font-size: 16px; margin-top:0px;margin-left:10px;height:25px; background: url();"/>
+                </div>
+                <div style="margin-top: 16px; width: 360px; margin-left: 84px; height: 40px; ">
+                    <div style="float: left; font-size: 16px; base-font-size: 16px; font-weight: bold;"><%=L"世界名称:"%></div>
+                    <div style="float: left; margin-top: -6px; margin-left: 14px; width: 200px; height: 40px; background-color: #7781f2; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                        <div style="float: left; margin-top: 4px; margin-left: 4px; width: 192px; height: 32x; background-color: #ffffff; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                            <input type="text" width="186" SkipAutoBadWordFilter="true" ReadOnly="<%= IsFroceCreate() %>" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" onkeyup="OnWorldNameChange" style="float:left;margin-top:4px;margin-left:10px;height:25px; background: url();"/>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 18px; margin-left: 84px;">
+                    <div width='130'
+                            style='float: left;
+                                padding-right: 5px;'>
+                        <input width='100%'
+                            type='button'
+                            onclick='close_page'
+                            style='text-align: center; color: #d3d3d3; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                            value='<%= L"返回" %>' />
+                    </div>
+                    <div width='220'style='float: left; margin-left: 14px;'>
+                        <input width='100%'
+                                onclick='create_new_world'
+                                type='button'
+                                style='text-align: center; color: #ffffff; height: 44px; background-color: #7781f2; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)'
+                                value='<%= L"创建新世界" %>' />
+                    </div>
+                </div>
+            </pe:container>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

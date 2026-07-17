@@ -160,16 +160,16 @@ function ActorAnimationsDialog.UpdateModel(modelName, skin, options)
 		if(ctl) then
 			local ReplaceableTextures, CCSInfoStr, CustomGeosets;
 			if(PlayerAssetFile:IsCustomModel(filepath)) then
-				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
+				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString(filepath)
 			elseif(PlayerAssetFile:HasCustomGeosets(filepath)) then
-				CustomGeosets = skin or PlayerAssetFile:GetDefaultCustomGeosets();
+				CustomGeosets = skin or PlayerAssetFile:GetDefaultCustomGeosets(filepath);
 			elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 				-- TODO:  hard code worker skin here
 				ReplaceableTextures = {[2] = skin or PlayerSkins:GetSkinByID(12)};
 			end
-			local skin_ = CustomCharItems:GetSkinByAsset(filepath);
+			local skin_,default_assets = CustomCharItems:GetSkinByAsset(filepath);
 			if (skin_) then
-				filepath = CustomCharItems.defaultModelFile;
+				filepath = default_assets or CustomCharItems.defaultModelFile;
 				CustomGeosets = CustomGeosets or skin_;
 			end
 			

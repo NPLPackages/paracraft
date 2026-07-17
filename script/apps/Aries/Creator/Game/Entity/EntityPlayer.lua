@@ -104,6 +104,14 @@ function Entity:ctor()
 	self.dataBlockInHand = dataWatcher:AddField(nil, nil);
 	-- main asset path. only used in network mode.  
 	self.dataMainAsset = dataWatcher:AddField(nil, nil);
+	-- editable world
+	self.dataFieldEditableWorld = dataWatcher:AddField(nil, nil);
+	-- follow state
+	self.dataFieldFollowTarget = dataWatcher:AddField(nil, nil);
+	-- item in hand
+	self.dataFieldItemInHand = dataWatcher:AddField(nil, nil);
+	-- pet item
+	self.dataFieldPetItem = dataWatcher:AddField(nil, nil);
 	self:SetPhysicsRadius(0.5);
 	self:SetPhysicsHeight(1.765);
 
@@ -112,8 +120,12 @@ end
 -- @param Entity: the half radius of the object. 
 function Entity:init(world)
 	self.worldObj = world;
-	-- TODO: create scene object representing this object. 
-	-- self:RefreshClientModel();
+
+	local skin,default_assets = CustomCharItems:GetSkinByAsset(self:GetMainAssetPath());
+	if (skin) then
+		self.mainAssetPath = default_assets or CustomCharItems.defaultModelFile;
+		self.skin = skin;
+	end
 	return self;
 end
 
@@ -121,11 +133,17 @@ end
 function Entity:SetMainAssetPath(name)
 	if(self:GetMainAssetPath() ~= name) then
 		self.mainAssetPath = name;
+		
 		self:RefreshClientModel(true);
 		self:GetDataWatcher():SetField(self.dataMainAsset, self:GetMainAssetPath());
 		return true;
 	end
 end
+
+function Entity:GetModelFile()
+	return self:GetMainAssetPath()
+end
+
 
 function Entity:CanSelectModel()
 	return false;
@@ -214,7 +232,7 @@ function Entity:BindToScenePlayer(obj, isOPC)
 	end
 end
 
-function Entity:SetAnimId(nAnimId)
+function Entity:SetAnimId(nAnimId) -- 主角动作改变 -- 0 待机
 	self.dataWatcher:SetField(self.dataFieldAnim, nAnimId);
 end
 
@@ -237,6 +255,7 @@ function Entity:Destroy()
 	if(not self:HasFocus()) then
 		self:DestroyInnerObject();
 	end
+	self:PlayMovieFile(nil);
 	Entity._super.Destroy(self);
 end
 
@@ -330,6 +349,7 @@ end
 -- @return return true if focus is set
 function Entity:SetFocus()
 	EntityManager.SetFocus(self);
+	self:SetFollowTarget(nil);
 	return true;
 end
 
@@ -363,12 +383,6 @@ function Entity:OnFocusOut()
 		obj:SetField("MovementStyle", 3);
 		-- obj:SetField("SkipPicking", false);
 	end
-end
-
--- get teleport position list
-function Entity:GetPosList()
-	self.tp_list = self.tp_list or {};
-	return self.tp_list;
 end
 
 -- the item that the player is currently dragging (in the UI interface)
@@ -418,14 +432,15 @@ function Entity:PlayStepSound()
 		self.last_step_dist = self.dist_walked;
 		local x,y,z = self:GetBlockPos();
 		local step_block = BlockEngine:GetBlock(x,y, z);
+
 		if(step_block and step_block.step_sound) then
 			-- in case of slab block
-			step_block:play_step_sound();
+			step_block:play_step_sound(step_block:ComputeSoundVolumeByEntityPos(self));
 		else
 			-- solid block
 			step_block = BlockEngine:GetBlock(x,y-1, z);
 			if(step_block) then
-				step_block:play_step_sound();
+				step_block:play_step_sound(step_block:ComputeSoundVolumeByEntityPos(self));
 			end	
 		end
 	end
@@ -566,15 +581,9 @@ function Entity:CollideWithEntity(fromEntity, deltaTime)
 end
 
 function Entity:LoadFromXMLNode(node)
-	Entity._super.LoadFromXMLNode(self, node);
-	self.skin = node.attr.skin;
+	Entity._super.LoadFromXMLNode(self, node);	self.skin = node.attr.skin;
 	if(self.skin) then
 		Files.FindFile(self.skin);
-	end
-	for _, subnode in ipairs(node) do 
-		if(subnode.name == "teleport_list") then
-			self.tp_list = NPL.LoadTableFromString(subnode[1] or "");
-		end
 	end
 	self.capabilities:LoadFromXMLNode(node);
 end
@@ -582,9 +591,6 @@ end
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	node.attr.skin = self.skin;
-	if(self.tp_list) then
-		node[#node+1] = {[1]=commonlib.serialize_compact(self.tp_list, bSort), name="teleport_list"};
-	end
 	self.capabilities:SaveToXMLNode(node, bSort);
 	return node;
 end
@@ -741,6 +747,9 @@ function Entity:FrameMove(deltaTime)
 		end
 	end
 	self:OnUpdate();
+	if(self.controller) then
+		self.controller:FrameMove();
+	end
 end
 
 function Entity:IsNearbyChunkLoaded()
@@ -841,69 +850,11 @@ end
 
 -- set new skin texture by filename. 
 function Entity:SetSkin(skin, bIgnoreSetSkinId)
-	if System.options.channelId_431 then
-		self:SetSkinIn431Platform(skin)
-		return 
-	end
 	Entity._super.SetSkin(self, skin, bIgnoreSetSkinId);
 	if(not bIgnoreSetSkinId) then
 		self.dataWatcher:SetField(self.dataFieldSkin, self:GetSkin());
 	end
 end
-
--- set new skin texture by filename. 
--- @param skin: if nil, it will use the default skin. 
--- if it only contains file path, then by default it will always be set at replaceable texture id 2.
--- if the string is of format "id:filename;id:filename;...", it can be used to set multiple replaceable textures at custom index. 
--- it can also be model and texture ids like "id1;id2;...", which is used in movie block actor. 
---[[进入校园版的角色，使用同—衣着(对其他版本无影响)
-老师服装编号
-80001;84060;81010;85081;83190
-学生服装编号
-80001;82029;84012;81070;85009]]
-
-function Entity:SetSkinIn431Platform(skin)
-	-- local isTeacher = KeepWorkItemManager.IsTeacher()
-	-- local skin = skin
-	-- if isTeacher then
-	-- 	skin = "80001;84060;81010;85081;83190"
-	-- else
-	-- 	skin = "80001;82029;84012;81070;85009"
-	-- end
-	local skin = "80001;82011;84012;81018;85009"
-	if(self.skin ~= skin) then
-		if(skin) then
-			skin = tostring(skin)
-			local customSkin = skin;
-			if (self:HasCustomGeosets()) then
-				if(skin:match("^(%d+):[^;+]")) then
-					-- this never happens in a movie block actor, since movie block actor uses "id1;id2;..."
-					customSkin = CustomCharItems:ReplaceSkinTexture(self.skin, skin);
-				end
-			end
-			self.skin = customSkin;
-			if (not self.isCustomModel and not self.hasCustomGeosets) then
-				if (skin:match("^%d+;") and EntityManager.GetPlayer() == self) then
-					self.skin = nil;
-				elseif (not self:FindSkinFiles(skin)) then
-					LOG.std(nil, "warn", "Entity:SetSkin", "skin files does not exist %s", tostring(skin));
-				end
-			end
-		else
-			if (not self:HasCustomGeosets()) then
-				self.skin = skin;
-				self:RefreshSkin();
-			end
-		end
-
-		if(self.username == System.User.username) then
-			PlayerAssetFile.Store.skin = self.skin;
-		end
-
-		self:RefreshClientModel();
-	end
-end
-
 
 function Entity:GetSkinId()
 	return self.dataWatcher:GetField(self.dataFieldSkin, nil);
@@ -1002,6 +953,7 @@ function Entity:ToggleFly(bFly)
 			bFly = false;
 		end
 	end
+
 	if(bFly) then
 		-- make it light to fly
 		player:SetDensity(0);
@@ -1024,6 +976,7 @@ function Entity:ToggleFly(bFly)
 		if(player) then
 			player:SetFacing(facing);
 		end
+		GameLogic.GetFilters():apply_filters('OnPlayerToggleFly',bFly)
 	elseif(bFly == false) then
 		-- restore to original density
 		player:SetDensity(GameLogic.options.NormalDensity);
@@ -1033,7 +986,7 @@ function Entity:ToggleFly(bFly)
 		player:SetField("AlwaysFlying",false);
 		player:ToCharacter():SetSpeedScale(GameLogic.options.WalkSpeedScale * (self.speedscale or 1));
 		player:ToCharacter():FallDown();
-
+		GameLogic.GetFilters():apply_filters('OnPlayerToggleFly',bFly)
 		-- BroadcastHelper.PushLabel({id="fly_tip", label = "�˳�����ģʽ", max_duration=1500, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	end
 	return self.bFlying;
@@ -1090,7 +1043,7 @@ function Entity:UpdateActionState()
 	local obj = self:GetInnerObject();
 	if(obj) then
 		self.facing = obj:GetFacing();
-		self:SetAnimId(obj:GetField("AnimID", 0));
+		self:SetAnimId(self.customAnimationId or obj:GetField("AnimID", 0));
 	end
 end
 
@@ -1208,6 +1161,48 @@ end
 
 -- do not support modify position when linked
 function Entity:OnUpdateLinkPosition()
+end
+
+-- similar to LinkTo function, except that it will take mount points into consideration. 
+-- mount current entity to another entity's mount point at mountPointIndex. 
+-- if no mountpoint is found, we will simply linkto the target entity
+-- @param mountPointIndex: default to 1, 
+-- @param bUseCurrentLocation: if true, we will use the current entity's facing and position, instead of the target mount point's settings. 
+function Entity:MountTo(mountTarget, mountPointIndex, bUseCurrentLocation)
+	mountPointIndex = mountPointIndex or 1
+	if(mountTarget and mountTarget.GetMountPoints) then
+		if(not bUseCurrentLocation and mountTarget:GetMountPoints()) then
+			local x, y, z = mountTarget:GetMountPoints():GetMountPositionInWorldSpace(mountPointIndex)
+			local facing = mountTarget:GetMountPoints():GetMountFacingInWorldSpace(mountPointIndex)
+			if(x and facing) then
+				self:SetPosition(x, y, z)
+				self:SetFacing(facing)
+			end
+		end
+		self:LinkTo(mountTarget)
+		
+		if(mountPointIndex and mountPointIndex>0 and mountTarget:GetMountPoints()) then
+			local mountpoint = mountTarget:GetMountPoints():GetMountPoint(mountPointIndex)
+			if(mountpoint) then
+				mountTarget:OnMount(mountpoint.name, mountPointIndex, self)
+				if(mountpoint.name == "lie") then
+					self:SetAnimation(100); -- 100 lie facing up; 88 lie facing side ways
+				elseif(mountpoint.name == "sit") then
+					if(self:HasCustomGeosets()) then
+						self:SetAnimation(235); -- sit looking front 
+					else
+						self:SetAnimation(72); -- sit on ground
+					end
+				elseif(mountpoint.name == "eat") then
+				elseif(mountpoint.name == "create") then
+				elseif(mountpoint.name == "run") then
+					self:SetAnimation(5);
+				end
+			end
+		else
+			mountTarget:OnMount(nil, nil, self)
+		end
+	end
 end
 
 -- but we use the current relative position between this and link target. 
@@ -1345,10 +1340,243 @@ end
 -- virtual: for players, invisible players are always non-pickable. 
 function Entity:SetVisible(bVisible)
 	Entity._super.SetVisible(self, bVisible)
-	self:SetSkipPicking(not bVisible);
+	if(not bVisible) then
+		self:SetSkipPicking(true);
+	end
 end
 
 -- virtual function: right click to edit. 
 function Entity:OpenEditor(editor_name, entity)
 	-- disable editors
+end
+
+function Entity:CanHasCollisionEventWith(entity)
+	-- player can sense every thing
+    return true;
+end
+
+function Entity:SetAnimation(filenames)
+	if tonumber(filenames) then
+		local animId = tonumber(filenames);
+		if animId >= 100001 then
+			self:PlayCustomAnimation(filenames)
+			return
+		end
+		-- Prevent infinite recursion: don't stop movie if we're already stopping it
+		-- (i.e., restoring animation from PlayMovieFile cleanup)
+		if(animId < 100000 and self:IsPlayingMovieFile() and not self._isStoppingMovieFile) then
+			self:PlayMovieFile(nil);
+		end
+	end
+	Entity._super.SetAnimation(self, filenames)
+end
+
+-- call this function to make the entity kinematic, usually called for main player entity. 
+-- the entity will not be pushed by other physical objects, but will push other dynamic physical objects according to its velocity.
+-- currently defaults to capsule physics shape. kinematic objects will not collect with other kinematic objects.
+-- @param enable: boolean, true to make it kinematic.
+function Entity:SetKinematic(enable)
+	local obj = self:GetInnerObject();
+	obj:SetField("PhysicsShape", "capsule");
+	obj:SetField("Kinematic", enable);
+	-- obj:SetField("Density", 1.2);
+end
+
+function Entity:MountOnPet(petStr)
+	local item = CustomCharItems:GetPetItem(petStr)
+	if item and item.id then
+		local skin = self:GetSkinId()
+		local newSkin = PlayerAssetFile.AddPetIdToSkinIds(skin, item.id)
+		if PlayerAssetFile.IsPetSkinIdExist(newSkin) then
+			self:SetSkin(newSkin,true)
+		end
+	else
+		LOG.std(nil, "error", "Entity", "MountOnPet failed, pet item not found: %s", petStr);
+	end
+end
+
+-- set new editable world. 
+-- @param world: the world data eg. subTag..";"..modelId. 
+function Entity:SetEditableWorld(world, bIgnoreSetEditWorld)
+	if(not bIgnoreSetEditWorld) then
+		self.dataWatcher:SetField(self.dataFieldEditableWorld, world);
+	end
+end
+
+function Entity:GetEditableWorld()
+	return self.dataWatcher:GetField(self.dataFieldEditableWorld, nil);
+end
+
+function Entity:SetFollowTarget(entity, bIgnoreSetFollowTarget)
+	if not entity or entity == self then
+		if self.followController then
+			self.followController:SetFollowTarget(nil)
+			if(self.controller == self.followController) then
+				self.controller = nil
+			end
+		end
+		if not bIgnoreSetFollowTarget then
+			self.dataWatcher:SetField(self.dataFieldFollowTarget, nil)
+		end
+	else
+		-- create follow controller on demand
+		if not self.followController then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/Controllers/FollowController.lua");
+			local FollowController = commonlib.gettable("MyCompany.Aries.Game.EntityManager.Controllers.FollowController");
+			self.followController = FollowController:new():Init(self)
+			self.followController:SetMode("FollowCurrent");
+		end
+		self.followController:SetFollowTarget(entity)
+		if not bIgnoreSetFollowTarget then
+			local followName = entity:GetName()
+			self.dataWatcher:SetField(self.dataFieldFollowTarget, followName)
+		end
+		self.controller = self.followController;
+	end
+end
+
+function Entity:GetFollowTargetName()
+	return self.dataWatcher:GetField(self.dataFieldFollowTarget, nil);
+end
+
+function Entity:GetFollowTarget()
+	return self.followController and self.followController:GetFollowTarget()
+end
+
+function Entity:HasFollowTarget()
+	return self.followController and self.followController:HasFollowTarget()
+end
+
+local function serializeItem(item)
+    local id = item.id or item[1] or ""
+    local name = item.name or item[2] or ""
+    local posx = item.posx or item[3] or ""
+    local posy = item.posy or item[4] or ""
+    local posz = item.posz or item[5] or ""
+    local scale = item.scale or item[6] or ""
+    local facing = item.facing or item[7] or ""
+    return table.concat({id, name, posx, posy, posz, scale, facing}, ",")
+end
+
+local function serializeItems(items)
+    if not items or #items == 0 then
+        return ""
+    end
+    local parts = {}
+    for i, it in ipairs(items) do
+        parts[i] = serializeItem(it)
+    end
+    return table.concat(parts, ";")
+end
+
+local function deserializeItems(str)
+    if not str or str == "" then
+        return nil
+    end
+    local arr = {}
+    local list = commonlib.split(str, ";")
+    for _, s in ipairs(list) do
+        if s and s ~= "" then
+            local info = commonlib.split(s, ",")
+            local it = {}
+            if info and #info >= 2 then
+                it.id = info[1]
+                it.name = info[2]
+                it.posx = info[3]
+                it.posy = info[4]
+                it.posz = info[5]
+                it.scale = info[6]
+                it.facing = info[7]
+            end
+            arr[#arr+1] = it
+        end
+    end
+	table.sort(arr, function(a, b)
+        return (a.id or a[1] or "") < (b.id or b[1] or "")
+    end)
+    return arr
+end
+
+function Entity:AddRightHandItem(item)
+    local arrItems = self:GetRightHandItems() or {}
+    arrItems[#arrItems+1] = item
+    local newItemStr = serializeItems(arrItems)
+    self:SetRightHandItem(newItemStr or "")
+end
+
+function Entity:RemoveRightHandItem(itemName)
+    local arrItems = self:GetRightHandItems() or {}
+    local isUpdate = false
+    if arrItems and #arrItems > 0 then
+        local targetName = itemName or ""
+        for i = #arrItems, 1, -1 do
+            local v = arrItems[i]
+            local vname = v.name or v[2] or ""
+            if vname == targetName then
+                table.remove(arrItems, i)
+                isUpdate = true
+                break
+            end
+        end
+        if isUpdate then
+            local newItemStr = serializeItems(arrItems)
+            self:SetRightHandItem(newItemStr or "")
+        end
+    end
+end
+
+function Entity:UpdateRightHandItem(itemName,params)
+	local arrItems = self:GetRightHandItems() or {}
+    if arrItems and #arrItems > 0 then
+		local isUpdate = false
+        local targetName = itemName or ""
+        for i = #arrItems, 1, -1 do
+            local v = arrItems[i]
+            local vname = v.name or v[2] or ""
+            if vname == targetName then
+                commonlib.partialcopy(v, params)
+                isUpdate = true
+                break
+            end
+        end
+        if isUpdate then
+            local newItemStr = serializeItems(arrItems)
+            self:SetRightHandItem(newItemStr or "")	
+        end
+    end
+end
+
+function Entity:GetRightHandItems()
+    local itemStr = self:GetRightHandItem()
+    return deserializeItems(itemStr)
+end
+
+function Entity:GetRightHandItem()
+    return self.dataWatcher:GetField(self.dataFieldItemInHand, nil);
+end
+
+function Entity:SetRightHandItem(itemStr, bIgnoreSetRightHandItem)
+	if bIgnoreSetRightHandItem then
+		return
+	end
+	if itemStr == "" then
+		self.dataWatcher:SetField(self.dataFieldItemInHand, nil);
+	end
+    self.dataWatcher:SetField(self.dataFieldItemInHand, itemStr);
+end
+
+-- 宠物逻辑
+---"id,status,[asset];id2,status2" sort by id
+function Entity:SetPetItem(itemStr, bIgnoreSetPetItem)
+	if bIgnoreSetPetItem then
+		return
+	end
+	if itemStr == "" then
+		self.dataWatcher:SetField(self.dataFieldPetItem, nil);
+	end
+    self.dataWatcher:SetField(self.dataFieldPetItem, itemStr);
+end
+
+function Entity:GetPetItem()
+    return self.dataWatcher:GetField(self.dataFieldPetItem, nil);
 end

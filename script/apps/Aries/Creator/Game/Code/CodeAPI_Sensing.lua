@@ -43,6 +43,7 @@ end
 --  "@a" means nearby players. 
 --  "@tagname" means any entity that has the custom tag value, like live entity
 --  "block" or nil means scene blocks. if number string like "62", it means given block id. 
+--  "wall" is similar to "block", except it will not detect the ground block. 
 -- @return false if actor is not touching another object. Or return the side on which the actor is touching
 function env_imp:isTouching(objName)
 	local actor = self.actor;
@@ -64,6 +65,8 @@ function env_imp:isTouching(objName)
 				end
 			elseif(objName == "block") then
 				return actor:IsTouchingBlock();
+			elseif(objName == "wall") then
+				return actor:IsTouchingBlock(nil, 0.01);
 			elseif(objName:match("^%d+$")) then
 				local blockId = tonumber(objName);
 				return actor:IsTouchingBlock(blockId);

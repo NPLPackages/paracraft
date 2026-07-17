@@ -229,10 +229,10 @@ end
 function ParaWorldLesson:GetAllQuizes()
 	if(not self.quizes) then
 		self.quizes = {};
-		NPL.load("(gl)script/ide/System/Util/tinyyaml.lua");
-		local tinyyaml = commonlib.gettable("System.Util.tinyyaml");
+		NPL.load("(gl)script/ide/System/Util/YamlConverter.lua");
+    	local YamlConverter = commonlib.gettable("System.Util.YamlConverter");
 		for quiz in self.content:gmatch("\n```@[Qq]uiz([^`]+)") do
-			local docs = tinyyaml.parse(quiz);
+			local docs = YamlConverter.YAMLToLua(quiz);
 			if(docs and docs.quiz) then
 				self.quizes[#self.quizes+1] = docs.quiz;
 			end

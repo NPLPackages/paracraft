@@ -34,7 +34,7 @@ function CreateNewItem.ShowPage(itemStackArray, OnClose)
 	
 	local Screen = commonlib.gettable("System.Windows.Screen");
 	local x, y = ParaUI.GetMousePosition();
-	x = math.min(x, Screen:GetWidth() - 200);
+	x = math.min(x, Screen:GetWidth() - 220);
 	y = math.min(y, Screen:GetHeight() - 200);
 
 	local params = {
@@ -54,8 +54,8 @@ function CreateNewItem.ShowPage(itemStackArray, OnClose)
 				align = "_lt",
 				x = x,
 				y = y,
-				width = 400,
-				height = 400,
+				width = 220,
+				height = 200,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	

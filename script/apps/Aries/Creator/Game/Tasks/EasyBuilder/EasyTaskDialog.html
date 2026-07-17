@@ -1,0 +1,116 @@
+<!-- 
+Title: EasyBuilder Branch Task UI
+-->
+<!DOCTYPE HTML
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+    <script type="text/npl" src="EasyTaskDialog.lua" refresh="true">
+<![CDATA[
+EasyTaskDialog = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyTaskDialog");
+EasyTaskDialog.InitPage(Page);
+]]>
+</script>
+    <style>
+        .main_container {
+            padding: 20px;
+            background: url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);
+            color: #ffffff;
+            width: 400px;
+            height: 240px;
+        }
+
+        .circle_icon {
+            background: url(Texture/Aries/Dock/Action.png#0 0 38 38);
+            width: 64px;
+            height: 64px;
+            margin-right: 20px;
+            float: left;
+            border-radius: 32px;
+            background-color: #ff0000;
+        }
+
+        .btn {
+            font-size: 16px;
+            min-width: 70px;
+            width: 100px;
+            spacing: 10px;
+            height: 45px;
+            color: #000000;
+        }
+
+        .btn_start {
+            background: url(Texture/Aquarius/Button_Highlight_Large.png:15 15 15 15);
+        }
+
+        .btn_cancel {
+            background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        }
+    </style>
+    <pe:container onclick="dummy" class="main_container">
+        <div style="position:relative">
+            <input type="button" name="CloseBtn" onclick="EasyTaskDialog.OnClickClose" align="right"
+                style="position: relative; margin-right: -19px;margin-top: -18px;width: 56px;height: 56px;background: url(Texture/player/close.png);" />
+        </div>
+
+        <div style="margin-top:20px;margin-bottom:20px;height:100px;">
+            <!-- Placeholder for Circle Icon (using a div with border radius if supported or just an image) -->
+            <div
+                style="float:left;margin-top:0px;margin-left:15px;width:80px;height:80px;background:url(Texture/Aries/Friends/ChatWnd_Chatbox_32bits.png: 30 30 30 30);">
+                <pe:canvas3d name='canvas3d_copilot_role' DefaultRotY="1.2" IsInteractive="false" autoRotateSpeed="0"
+                    miniscenegraphname='canvas3d_copilot_role' RenderTargetSize="128" CameraObjectDist="5"
+                    LookAtHeight="0.45" value='<%=EasyTaskDialog.GetEntityParams()%>'
+                    style="position:relative;width:80px;height:80px;margin-top:0px;margin-left: 0px;" />
+            </div>
+
+            <div style="float:left;margin-left:15px;width:200px;">
+                <div style="font-size:18px;color:#ffcc00;margin-bottom:5px;font-weight: bold;">
+                    <%=EasyTaskDialog.GetTaskName()%>
+                </div>
+                <div style="font-size:16px;color:#cccccc;height:60px;font-weight: bold;">
+                    <%=EasyTaskDialog.GetTaskDescription()%>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:0px;">
+            <pe:if condition='<%=EasyTaskDialog.IsRunning()%>'>
+                <pe:if condition='<%=EasyTaskDialog.IsAccepted()%>'>
+                    <input type="button" name="pause" value='<%=L"暂停"%>' class="btn btn_cancel"
+                        style="float:left;margin-left:50px;font-size:16px;color: #333333; padding: 8px;font-weight: bold;"
+                        onclick="EasyTaskDialog.OnClickPause" />
+                    <input type="button" name="stop" value='<%=L"停止"%>' class="btn btn_cancel"
+                        style="float:left;margin-left:20px;font-size:16px;color: #333333; padding: 8px;font-weight: bold;"
+                        onclick="EasyTaskDialog.OnClickStop" />
+                </pe:if>
+                <pe:if condition='<%=not EasyTaskDialog.IsAccepted()%>'>
+                    <input type="button" name="start" value='<%=L"开始任务"%>' class="btn btn_start"
+                        style="float:left;margin-left:50px;font-size:16px;color: #333333; padding: 8px;font-weight: bold;"
+                        onclick="EasyTaskDialog.OnClickStart" />
+                    <input type="button" name="cancel" value='<%=L"关闭"%>' class="btn btn_cancel"
+                        style="float:left;margin-left:20px;font-size:16px;color: #333333; padding: 8px;font-weight: bold;"
+                        onclick="EasyTaskDialog.OnClickClose" />
+                </pe:if>
+            </pe:if>
+            <pe:if condition='<%=EasyTaskDialog.IsPaused()%>'>
+                <input type="button" name="resume" value='<%=L"继续"%>' class="btn btn_start"
+                    style="float:left;margin-left:50px;font-size:16px;color: #333333; padding: 8px;font-weight: bold;"
+                    onclick="EasyTaskDialog.OnClickResume" />
+                <input type="button" name="stop" value='<%=L"停止"%>' class="btn btn_cancel"
+                    style="float:left;margin-left:20px;font-size:16px;color: #333333; padding: 8px;font-weight: bold;"
+                    onclick="EasyTaskDialog.OnClickStop" />
+            </pe:if>
+            <pe:if condition='<%=not EasyTaskDialog.IsRunning() and not EasyTaskDialog.IsPaused()%>'>
+                <input type="button" name="start" value='<%=L"开始任务"%>' class="btn btn_start"
+                    style="float:left;margin-left:50px;font-size:16px;color: #333333; padding: 8px;font-weight: bold;"
+                    onclick="EasyTaskDialog.OnClickStart" />
+                <input type="button" name="cancel" value='<%=L"取消"%>' class="btn btn_cancel"
+                    style="float:left;margin-left:20px;font-size:16px;color: #333333; padding: 8px;font-weight: bold;"
+                    onclick="EasyTaskDialog.OnClickCancel" />
+            </pe:if>
+        </div>
+
+    </pe:container>
+</pe:mcml>
+
+</html>

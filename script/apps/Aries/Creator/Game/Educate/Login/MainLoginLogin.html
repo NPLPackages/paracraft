@@ -9,13 +9,15 @@
                     local MySchool = NPL.load('(gl)Mod/WorldShare/cellar/MySchool/MySchool.lua')
                     local RegisterModal = NPL.load('(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua')
                     local LoginModal = NPL.load('(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua')
-
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/MainLogin.lua")
+                    local GameMainLogin = commonlib.gettable('MyCompany.Aries.Game.MainLogin')
                     -- service
                     local KeepworkServiceSession = NPL.load('(gl)Mod/WorldShare/service/KeepWorkService/KeepworkServiceSession.lua')
                     local EventTrackingService = NPL.load('(gl)Mod/WorldShare/service/EventTracking.lua')
 
                     -- helper
                     local Validated = NPL.load('(gl)Mod/WorldShare/helper/Validated.lua')
+                    local OfflineAccountManager = NPL.load('(gl)Mod/WorldShare/cellar/OfflineAccount/OfflineAccountManager.lua')
 
                     -- database
                     local SessionsData = NPL.load('(gl)Mod/WorldShare/database/SessionsData.lua')
@@ -89,7 +91,7 @@
                     -- @param name: 'local', 'internet'
                     function use_offline()
                         MainLogin:Next(true)
-                        EventTrackingService:Send(1, 'click.main_login.offline_enter', { machineId = ParaEngine.GetAttributeObject():GetField('MachineID','') }, true)
+                        EventTrackingService:Send(1, 'click.main_login.offline_enter', { machineId = GameLogic.GetMachineID(ParaEngine.GetAttributeObject():GetField('MachineID','')) }, true)
                     end
 
                     function close()
@@ -152,7 +154,7 @@
                         local beSuccess = true
 
                         if not Validated:AccountCompatible(account) then
-                        beSuccess = false
+                            beSuccess = false
                         else
                             get_page():FindControl('account_field_error').visible = false
                         end
@@ -330,11 +332,9 @@
                         if session.autoLogin then
                             get_page():SetUIValue('auto_login_name', true)
                             get_page():SetUIBackground('login_button', 'Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24')
-                            _guihelper.SetUIColor(get_page():FindControl("login_button"),"#ffffff" )
                         else
                             get_page():SetUIValue('auto_login_name', false)
                             get_page():SetUIBackground('login_button', 'Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24')
-                            _guihelper.SetUIColor(get_page():FindControl("login_button"),"#55585d" )
                         end
 
                         get_page():SetUIValue('account_field_error_msg', '')
@@ -376,7 +376,10 @@
                         local update_password_button = get_page():FindControl('update_password_button')
 
                         if mode == 'account' then
-                            get_page():FindControl('login_button'):SetDefault(true)
+                            local loginBtn = get_page():FindControl('login_button')
+                            if loginBtn then
+                                loginBtn:SetDefault(true)
+                            end
 
                             if login_with_phone_number then
                                 login_with_phone_number.visible = false
@@ -402,7 +405,7 @@
                                 end
                             end
                         elseif mode == 'phone' then
-                            get_page():FindControl('phone_login_button'):SetDefault(true)
+                            --get_page():FindControl('phone_login_button'):SetDefault(true)
 
                             if login_with_phone_number then
                                 login_with_phone_number.visible = true
@@ -510,7 +513,7 @@
                                             if true then
                                                 local account = Mod.WorldShare.Store:Get('user/username')
                                                 get_page():SetUIValue('auto_username', account or '')
-                                                set_mode('auto_login')
+                                                --set_mode('auto_login')
                                                 commonlib.TimerManager.SetTimeout(function()  
                                                     MainLogin:Next()
                                                 end,0)
@@ -613,7 +616,7 @@
                         local phone_number = get_page():GetValue('phone_number')
 
                         if not Validated:Phone(phone_number) then
-                            _guihelper.MessageBox(L'*手机号格式错误')
+                            _guihelper.MessageBox(L'请输入5-11位手机号')
                             return
                         end
 
@@ -738,21 +741,19 @@
                         local isLogin = KeepworkServiceSession:IsSignedIn()
                         local lastLoginMode = GameLogic.GetPlayerController():LoadLocalData("lastLoginMode","")
                         if not isLogin then
-                            if System.options.isChannel_430 then
-                                set_account_mode()
-                            else
-                                if lastLoginMode == "account" then
-                                    set_account_mode()
-                                else
-                                    set_phone_mode()
-                                end
-                            end
+                            set_account_mode()
                         end
                     end, 0)
                 ]]>
 
                 function on_click_educate_net()
-                    ParaGlobal.ShellExecute("open", "https://edu.palaka.cn/", "", "", 1)
+                    local url = "https://edu.palaka.cn/"
+                    local platform = System.os.GetPlatform()
+                    if platform == "win32" or platform == "emscripten" then
+                        GameLogic.RunCommand("/open " .. url);
+                        return
+                    end
+                    GameLogic.RunCommand("/open -e "..url)
                 end
 
                 function onclickBackground()
@@ -768,6 +769,43 @@
 
             function GetEnterBgName(name)
                 return "enter_tip_"..name
+            end
+
+            function close()
+                if get_is_modal() then
+                    LoginModal:Close(false)
+                    return
+                end
+                get_page():CloseWindow()
+            end
+
+            function OnClickLocalMode()
+                close()
+                OfflineAccountManager.SetOfflineAppCommandLine()
+                local EducateOfflinePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Offline/EducateOfflinePage.lua")
+                EducateOfflinePage.ShowPage()
+            end
+
+            function show_class_code()
+                close()
+                local ClassCodeLogin = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/ClassCode/ClassCodeLogin.lua")
+                ClassCodeLogin.ShowView();
+            end
+
+
+            function IsShowUpdate()
+                local platform = System.os.GetPlatform();   
+                local isShowUpdate = GameMainLogin.m_bNeedUpdate == true and platform == "win32"  
+                return isShowUpdate
+            end
+
+            function OnClickUpdateBtn()
+                GameMainLogin:ShowUpdatePage(true)
+            end
+
+            function IsShowLocalMode()
+                local platform = System.os.GetPlatform();
+                return platform ~= "emscripten"
             end
             </script>
             <style type='text/mcss'>
@@ -788,15 +826,18 @@
             <pe:container alignment="_fi" zorder='-2' onclick = "onclickBackground" width="100%" height="100%" style="background-color:#E3EEFD00; ">
             </pe:container>
             <pe:container alignment='_rt' zorder='-1' style='width:120px;height:60px;position: relative; margin-top: 80px;margin-right: 100px;background-color:#fff60000;'>
-                <div  style='width: 120px;margin-left: 0px;'>
-                    <input type='button' onclick='on_click_educate_net' style='margin-left: 40px;width: 40px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login/wangzhan_40x40_32bits.png#0 0 40 40)'/>
-                    <div style = " width: 120px;text-align: center;font-size: 8px;color: #0E1627;">
-                        智慧教育平台
+                <pe:if condition="<%= not get_is_modal() and not System.options.isShenzhenAi5 %>">
+                    <div  style='width: 120px;margin-left: 0px;'>
+                        <input type='button' onclick='on_click_educate_net' style='margin-left: 40px;width: 40px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login/wangzhan_40x40_32bits.png#0 0 40 40)'/>
+                        <div style = " width: 120px;text-align: center;font-size: 8px;color: #0E1627;">
+                            <%=L"智慧教育平台"%>
+                        </div>
                     </div>
-                </div>
+                </pe:if>
+                
             </pe:container>
-            <pe:container alignment='_ct'
-                          style='width:360px;height: 400px;margin-left: -180px;margin-top: -200px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/dengludi_50x50_32bits.png#0 0 60 60:28 28 28 28);'>
+            <pe:container alignment='_ct' style='width:360px;height: 500px;margin-left: -180px;margin-top: -200px;background: url();'>
+                <div zorder='-1' style="position: relative;width:360px;height: 400px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/dengludi_50x50_32bits.png#0 0 60 60:28 28 28 28);"></div>
                 <div style="width:300px;height: 400px;margin-left:30px;background-color: #491ca300;">
                     <pe:container name='account_mode' visible='true' style='position: relative;background:;'>
                         <pe:container name='account_field_error'
@@ -824,33 +865,55 @@
                                    name='password_field_error_msg' />
                         </pe:container>
                         <div style = "height:40px;margin-top:30px">
-                            <div style="float:left;width:150px;">
-                                <div style='font-size: 18px;
-                                        base-font-size: 18px;
-                                        text-align: center;
-                                        color: #0e1627;
-                                        height: 26px;
-                                        line-height: 5px;
-                                        width: 150px;'>
-                                    <div>
-                                        <%= L'账号登录' %>
+                            <pe:if condition="<%= not (Game.is_started and System.options.isOffline)%>">
+                                <div style="float:left;width:150px;">
+                                    <div style='font-size: 18px;
+                                            base-font-size: 18px;
+                                            text-align: center;
+                                            color: #0e1627;
+                                            height: 26px;
+                                            line-height: 5px;
+                                            width: 150px;'>
+                                        <div>
+                                            <%= L'账号登录' %>
+                                        </div>
+                                        <div style="margin-top: 16px;width:150px;height:2px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/dengluxian_28x2_32bits.png#0 0 28 2);"/>
                                     </div>
-                                    <div style="margin-top: 16px;width:150px;height:2px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/dengluxian_28x2_32bits.png#0 0 28 2);"/>
                                 </div>
-                            </div>
-                            <div onclick='set_phone_mode'
-                                 style='float:left;font-size: 14px;
-                                        base-font-size: 14px;
-                                        text-align: center;
-                                        color: #b2b2b2;
-                                        height: 20px;
-                                        line-height: 5px;
-                                        width: 150px;'>
-                                <div>
-                                    <%= L'手机登录' %>
+                            </pe:if>
+                            <pe:if condition="<%=(Game.is_started and System.options.isOffline)%>">
+                                <div style="float:left;width:150px; margin-left: 80px;">
+                                    <div style='font-size: 18px;
+                                            base-font-size: 18px;
+                                            text-align: center;
+                                            color: #0e1627;
+                                            height: 26px;
+                                            line-height: 5px;
+                                            width: 150px;'>
+                                        <div>
+                                            <%= L'账号登录' %>
+                                        </div>
+                                        <div style="margin-top: 16px;width:150px;height:2px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/dengluxian_28x2_32bits.png#0 0 28 2);"/>
+                                    </div>
                                 </div>
-                            </div>
-                            <div style="width:300px;height:1px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/dengluhuixian_1x14_32bits.png#0 0 14 1);"/>
+                            </pe:if>
+                            
+                            <pe:if condition="<%= not (Game.is_started and System.options.isOffline)%>">
+                                <div onclick='set_phone_mode'
+                                        style='float:left;font-size: 14px;
+                                            base-font-size: 14px;
+                                            text-align: center;
+                                            color: #b2b2b2;
+                                            height: 20px;
+                                            line-height: 5px;
+                                            width: 150px;'>
+                                    <div>
+                                        <%= L'手机登录' %>
+                                    </div>
+                                </div>
+                                <div style="width:300px;height:1px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/dengluhuixian_1x14_32bits.png#0 0 14 1);"></div>
+                            </pe:if>
+                            
                         </div>
                         <div style='width: 300px;
                                     height: 150px;
@@ -975,13 +1038,29 @@
                                         onclick="click_set_show_password"/>
                             </div>
                         </div>
-                        <div style='margin-top:5px;margin-bottom:10px;'>
-                            <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:60px;width:240px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
-                                   name='login_button'
-                                   DefaultButton='true'
-                                   onclick='login()'
-                                   value='<%= L"登  录"%>' />
-                        </div>
+                        
+                        <pe:if condition="<%= not get_is_modal()%>">
+                            <div style='margin-top:5px;margin-bottom:10px;'>
+                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:60px;width:240px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
+                                       name='login_button'
+                                       DefaultButton='true'
+                                       onclick='login()'
+                                       value='<%= L"登  录"%>' />
+                            </div>
+
+                        </pe:if>
+                        <pe:if condition="<%= get_is_modal()%>">
+                            <div style='margin-top:5px;margin-bottom:10px;'>
+                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:0px;margin-top:60px;width:135px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
+                                        name='login_button'
+                                        DefaultButton='true'
+                                        onclick='login()'
+                                        value='<%= L"登  录"%>' />
+                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:60px;width:135px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
+                                        onclick='close()'
+                                        value='<%= L"取  消"%>' />
+                            </div>
+                        </pe:if>
                     </pe:container>
                     <pe:container name='phone_mode' visible='false' style='position: relative;background:;'>
                         <pe:container name='phone_field_error'
@@ -1094,13 +1173,25 @@
                                        EmptyText='<%= L"请输入验证码" %>' />
                             </div>
                         </div>
-                        <div style='margin-top:5px;margin-bottom:10px;'>
-                            <input type='button'
-                            style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:60px;width:240px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
-                                   name='phone_login_button'
-                                   onclick='login_with_phone()'
-                                   value='<%= L"登  录"%>' />
-                        </div>
+                        <pe:if condition="<%= not get_is_modal()%>">
+                            <div style='margin-top:5px;margin-bottom:10px;'>
+                                <input type='button' name='phone_login_button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:60px;width:240px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
+                                        DefaultButton='true'
+                                        onclick='login_with_phone()'
+                                        value='<%= L"登  录"%>' />
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%= get_is_modal()%>">
+                            <div style='margin-top:5px;margin-bottom:10px;'>
+                                <input type='button' name='phone_login_button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:0px;margin-top:60px;width:135px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
+                                        DefaultButton='true'
+                                        onclick='login_with_phone()'
+                                        value='<%= L"登  录"%>' />
+                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:60px;width:135px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
+                                       onclick='close()'
+                                       value='<%= L"取  消"%>' />
+                            </div>
+                        </pe:if>
                     </pe:container>
                     <pe:container name='auto_login_mode'
                                   visible='false'
@@ -1122,7 +1213,75 @@
                                    value='<%= L"开始"%>' />
                         </div>
                     </pe:container>
+                    <pe:container style="position: relative; margin-top: 240px; width: 547; height: 100px; background: url();">
+                        <div style="margin-left: 0px;">
+                            <div style="position: relative; width: 95px; height: 2px; background-color: #A8A7B0;"></div>
+                            <div style="position: relative; color: #A8A7B0; margin-left: 102px; margin-top: -10px;"><%=L'其他登录方式'%></div>
+                            <div style="position: relative; width: 95px; height: 2px; margin-left: 193px;background-color: #A8A7B0;"></div>
+                        </div>
+                        <div onclick="show_class_code" style="margin-left: 120px; margin-top: 23px; width: 50px; height: 50px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/code_50x50_32bits.png#0 0 50 50);"></div>
+                        <div style="color: #38374D; font-size: 11px; margin-left: 118px; margin-top: 10px;"><%=L"班级码登录"%></div>
+                    </pe:container>
                 </div>
+            </pe:container>
+
+            <pe:container alignment='_rb' style="background: url();">
+                <pe:if condition="<%= not get_is_modal()%>">
+                    <div style="width: 400px; height: 105px;">
+                        <pe:if condition="<%=IsShowUpdate()%>">
+                            <div style="float: left; 
+                                width: 116px; 
+                                margin-left: 60px;
+                                height: 60px;">
+                                <input type="button" 
+                                    icon="Texture/Aries/Creator/paracraft/Educate/Login/update_18x24_32bits.png;0 0 18 24"
+                                    icon_off_y="0"
+                                    icon_off_x="-22"
+                                    icon_width="21"
+                                    icon_height="26"
+                                    onclick="OnClickUpdateBtn" 
+                                    value='<%= L"更新" %>' 
+                                    style="position: relative;
+                                        spacing: 20px;                                        
+                                        height: 60px;
+                                        width: 116px;
+                                        text-offset-x:12;
+                                        font-size: 20px;
+                                        font-weight: bold;
+                                        color: #ffffff;
+                                        background:url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/daquedin_46x46_32bits.png#0 0 46 46:16 16 16 16)" />
+                                <kp:redtip style="position:relative;margin-left:106px;margin-top:-1px;" value="true" ></kp:redtip>
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%=not IsShowUpdate()%>">
+                            <div style="float: left; 
+                                margin-left: 60px;
+                                width: 116px; 
+                                height: 60px;">
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%=IsShowLocalMode()%>">
+                            <input type="button" 
+                                icon="Texture/Aries/Creator/paracraft/Educate/Login/icon_switch_21x26_32bits.png;0 0 21 26"
+                                icon_off_y="0"
+                                icon_off_x="-44"
+                                icon_width="21"
+                                icon_height="26"
+                                onclick="OnClickLocalMode" 
+                                value='<%= L"本地模式" %>' 
+                                style="float: left;
+                                    spacing: 20px;
+                                    margin-left: 20px;
+                                    height: 60px;
+                                    min-width: 160px;
+                                    text-offset-x:12;
+                                    font-size: 20px;
+                                    font-weight: bold;
+                                    color: #ffffff;
+                                    background:url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/daquedin_46x46_32bits.png#0 0 46 46:16 16 16 16)" />
+                        </pe:if>
+                    </div>
+                </pe:if>
             </pe:container>
         </pe:mcml>
     </body>

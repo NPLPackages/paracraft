@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local MiniGameSmileyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameSmileyPage.lua");
+    MiniGameSmileyPage.OnInit()
+    function ClosePage()
+        MiniGameSmileyPage.ClosePage()
+    end
+
+    function DS_Func_Items(index)
+        if index == nil then
+            return #MiniGameSmileyPage.pageSymbols
+        else
+            return MiniGameSmileyPage.pageSymbols[index]
+        end
+    end
+
+    function OnClickIcon(index)
+        MiniGameSmileyPage.OnClickIcon(index)
+    end
+]]></script>
+<div style=" width: 650px; height: 430px; background: url(Texture/Aries/Creator/keepwork/Community/confirmbg_858x696_32bits.png#0 0 858 696);">
+    <div style="width: 650px; height: 46px;">
+        <div style="position: relative; text-align: center; font-size: 18px; base-font-size: 18px; color: #FFFFFF; margin-top: 13px; font-weight: bold; text-shadow:true;shadow-quality:8;shadow-color:#1fffffff;"><%=L"动作表情"%></div>
+        <input onclick="ClosePage" align="right" type="button" style="position: relative; margin-right: 16px; margin-top: 16px; width: 18px; height: 18px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#4 394 34 36);"/>
+    </div>
+    <div style="width: 650px; height: 350px; margin-top:30px;">
+        <pe:gridview DataSource="<%=DS_Func_Items%>" name="DS_Func_Items" 
+            VerticalScrollBarStep="45" CellPadding="6"  DefaultNodeHeight = "128" ItemsPerLine="5" AllowPaging="false" pagesize="250">
+            <Columns>
+                <a width="120" height="120" style="padding:0px;background:Texture/Aries/Dock/Action_MouseOver_32bits.png:7 7 7 7;"
+                    onclick="OnClickIcon" param1='<%=Eval("index")%>'>
+                    <div style="margin:1px;padding-left:2px;width:116px;height:116px;" class="block">
+                        <img width="112" height="112" src='<%=Eval("icon")%>'/>
+                    </div>
+                </a>
+            </Columns>
+        </pe:gridview>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

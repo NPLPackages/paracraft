@@ -51,14 +51,19 @@ function ParacraftDebug:CheckSendCrashLog()
 	if not (keepwork and keepwork.burieddata and keepwork.burieddata.uploadLog) then
 		return
 	end
-	local path = "temp/log.crash.txt"
-	local bakPath = "temp/log.crash.txt.bak"
+	local writablePath = ParaIO.GetWritablePath()
+	local path = writablePath.."temp/log.crash.txt"
+	local bakPath = writablePath.."temp/log.crash.txt.bak"
 	if ParaIO.DoesFileExist(path) then
+		LOG.std(nil,"info","ParacraftDebug","proccessing and uploading temp/log.crash.txt")
 		local file = ParaIO.open(path,"r")
 		if not file:IsValid() then
 			return
 		end
-		local str = file:GetText()
+		local filesize = file:GetFileSize();
+		local trailingCharCount = 3000;
+		local str = file:GetText(math.max(0, filesize - trailingCharCount), math.max(-filesize, -trailingCharCount))
+		file:close();
 		local arr = commonlib.split(str,"\r\n")
 		
 		local uselessLines = {
@@ -91,7 +96,8 @@ function ParacraftDebug:CheckSendCrashLog()
 			logtxt = errlog
 		})
 
-		ParaIO.MoveFile(path,bakPath)  --备个份
+		-- backup the file
+		ParaIO.MoveFile(path,bakPath)
 	end
 end
 
@@ -124,7 +130,7 @@ function ParacraftDebug:SendErrorLog(logType,obj)
 	end
 
 	obj.ip = NPL.GetExternalIP()
-    obj.machineID = ParaEngine.GetAttributeObject():GetField('MachineID', '')
+    obj.machineID = GameLogic.GetMachineID(ParaEngine.GetAttributeObject():GetField('MachineID', ''))
     obj.version = GameLogic.options.GetClientVersion()
     obj.channelId = System.options.channelId
     obj.commandLine = ParaEngine.GetAppCommandLine()

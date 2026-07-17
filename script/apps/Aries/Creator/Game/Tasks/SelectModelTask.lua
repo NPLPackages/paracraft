@@ -490,8 +490,16 @@ end
 ------------------------
 local page;
 function SelectModel.ShowPage()
+	local x,y,width,height = 0,160,128,512
+	local pageUrl = "script/apps/Aries/Creator/Game/Tasks/SelectModelTask.html"
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if IsMobileUIEnabled then
+		pageUrl = "script/apps/Aries/Creator/Game/Tasks/SelectModelTask.mobile.html"
+		x = 60
+		width = 200
+	end
 	System.App.Commands.Call("File.MCMLWindowFrame", {
-			url = "script/apps/Aries/Creator/Game/Tasks/SelectModelTask.html", 
+			url = pageUrl, 
 			name = "SelectModelTask.ShowPage", 
 			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			isShowTitleBar = false,
@@ -502,10 +510,10 @@ function SelectModel.ShowPage()
 			click_through = true,
 			directPosition = true,
 				align = "_lt",
-				x = 0,
-				y = 160,
-				width = 128,
-				height = 512,
+				x = x,
+				y = y,
+				width = width,
+				height = height,
 		});
 	MyCompany.Aries.Creator.ToolTipsPage.ShowPage(false);
 end
@@ -610,8 +618,11 @@ function SelectModel.DoRemove()
 			if(self.entity:IsServerEntity() and self.entity:IsRemote()) then
 				GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketDestroyEntity:new():Init({self.entity.entityId}));
 			else
+				if self.entity:IsLocked() then
+					GameLogic.AddBBS(nil, L'模型被锁定无法删除', 5000, '0 255 0')
+				end
+
 				self.entity:Destroy();
-				--self.is_modified = true;
 			end
 			SelectModel.EndEditing(true);
 		else

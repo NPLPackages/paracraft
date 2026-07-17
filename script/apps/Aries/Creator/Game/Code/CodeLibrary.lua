@@ -51,6 +51,7 @@ function CodeLibrary:UpdateFiles()
 	local rootPath = "lib/"..self.libName.."/";
 	local files = Files:FindWorldFiles(nil, rootPath, 1, 500, "script");
 	if(#files == 0) then
+		-- TODO: search in bin folder as well: filepath = "bin/"..string.gsub(filename, "lua$", "o")
 		rootPath = "script/apps/Aries/Creator/Game/Code/"..rootPath;
 		files = Files:FindSystemFiles(nil, rootPath, 1, 500, "script");
 	end	

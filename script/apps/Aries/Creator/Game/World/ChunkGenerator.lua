@@ -54,6 +54,8 @@ NPL.load("(gl)script/ide/commonlib.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/ChunkGenerators.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/UniversalCoords.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/Chunk.lua");
+NPL.load("(gl)script/ide/System/Concurrent/ThreadPool.lua");
+local ThreadPool = commonlib.gettable("System.Concurrent.ThreadPool");
 local Chunk = commonlib.gettable("MyCompany.Aries.Game.World.Chunk");
 local ChunkGenerators = commonlib.gettable("MyCompany.Aries.Game.World.ChunkGenerators");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -345,10 +347,10 @@ function ChunkGenerator:GetFreeWorkerName(nIndex)
 	worker_index = ((nIndex or worker_index)+1) % (self.worker_count);
 	local worker_name = workers[worker_index];
 	if(not worker_name) then
-		local name = "gen"..worker_index;
+		local worker = ThreadPool.CreateGetWorker(worker_index + 1) -- AsyncTask use 1 based index. 
+		local name = worker:GetName();
 		worker_name = format("(%s)%s", name, "script/apps/Aries/Creator/Game/World/ChunkGenerator.lua");
 		workers[worker_index] = worker_name;
-		NPL.CreateRuntimeState(name, 0):Start();
 		local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
 		NPL.activate(worker_name, {cmd="InitBlockTypes", names = names});
 		LOG.std(nil, "info", "chunk generator", "generator worker thread `%s` created", name);

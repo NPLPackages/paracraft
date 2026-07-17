@@ -42,9 +42,9 @@ function CreateBlockMaterialTask:TryPaintSingleFace(x, y, z, faceId, materialId)
 		local lastMatId = BlockEngine:GetBlockExternalMaterial(x, y, z, faceId)
 		BlockEngine:SetBlockExternalMaterial(x, y, z, faceId, materialId)
 		if(materialId and materialId > 0) then
-			blockTemplate:play_create_sound();
+			blockTemplate:play_create_sound(blockTemplate:ComputeSoundVolumeByBlockPos(x, y, z));
 		else
-			blockTemplate:play_break_sound();
+			blockTemplate:play_break_sound(blockTemplate:ComputeSoundVolumeByBlockPos(x, y, z));
 
 			-- create some block pieces using diffuse texture
 			if(lastMatId and lastMatId > 0) then

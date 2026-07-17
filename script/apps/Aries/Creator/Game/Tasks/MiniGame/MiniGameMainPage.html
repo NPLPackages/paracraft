@@ -1,0 +1,180 @@
+<html>
+<body> 
+<pe:mcml>
+    <script type="text/npl">
+<![CDATA[
+TimeLimitPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/TimeLimitPage.lua")
+MiniGameMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameMainPage.lua")
+MiniGameMainPage.OnInit()
+
+function OnClickProfile()
+    MiniGameMainPage.OnClickProfile()
+end
+
+function OnClickSkin()
+    MiniGameMainPage.OnClickSkin()
+end
+
+function OnClickRecommendGames()
+    MiniGameMainPage.OnClickRecommendGames()
+end
+
+function OnClickMap()
+    MiniGameMainPage.OnClickMap()
+end
+
+function OnClickAISchool()
+    MiniGameMainPage.OnClickAISchool()
+end
+
+function OnClickVip()
+    MiniGameMainPage.StartWebGame("game_activities",{type="vip"}, true)
+end
+
+function OnClickMyPlannet()
+    MiniGameMainPage.OnClickMyPlannet()
+end
+
+function OnClickChangeMode()
+    MiniGameMainPage.OnClickChangeUIMode()
+end
+
+function OnClickDaily()
+    MiniGameMainPage.StartWebGame("dailytask", nil, true)
+end
+
+function OnClickSign()
+    MiniGameMainPage.StartWebGame("game_activities",nil, true)
+end
+
+function OnClickAction()
+    MiniGameMainPage.ShowBag("actions");
+end
+
+function OnClickSmiley()
+    MiniGameMainPage.ShowBag("expressions");
+end
+
+function OnClickBag()
+    MiniGameMainPage.ShowBag("costumes");
+end
+
+function OnClickMusic()
+    GameLogic.RunCommand("/sendevent click_minigame_music")
+end
+
+function OnClickTeleport()
+
+end
+
+function OnClickCloud()
+    MiniGameMainPage.OnClickCloud()
+end
+
+function OnClickSave()
+    MiniGameMainPage.OnClickSave()
+end
+function OnClickChat()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+    MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+end
+
+function OnClickPhone()
+    MiniGameMainPage.OnClickPhone()
+end
+
+function OnClickEmail()
+    local Email = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/Email.lua");
+    Email.Show();
+end
+
+function OnClickBean()
+    MiniGameMainPage.OnClickBean()
+end
+
+function OnClickUserItem()
+    MiniGameMainPage.OnClickUserItem();
+end
+]]>
+</script>
+<pe:container alignment="_ctb"  width="1100" height="160" ClickThrough='true' style="position:relative; background:url();">
+    <pe:container uiname="MiniGameMainPage.task_ct" ClickThrough='true' width="100%" height="100%" style="position:relative; background:url();">
+        <div style="width:600px;height:60px; margin-left: 310px; margin-top:25px;">
+        </div>
+        <div align="center" style="width:780px; height:120px; margin-top: -25px;" >
+            <div style="position: relative; margin-top: 50px; width: 700px; margin-left: 46px; height: 50px; background:url(Texture/Aries/Creator/keepwork/minigame/main/bg_16x16_32bits.png#0 0 16 16:6 6 6 6);"></div>
+            <input type="button" onclick="OnClickProfile" style="float:left; width: 64px; height: 64px; margin-left: 65px; margin-top:30px; background: url(Texture/Aries/Creator/keepwork/minigame/main/user_64x64_32bits.png#0 0 64 64);" />
+            <input uiname="minigame_skin" type="button" onclick="OnClickBag" style="float:left; width: 64px; height: 64px; margin-left: 18px; margin-top:30px; background: url(Texture/Aries/Creator/keepwork/minigame/main/bag_64x64_32bits.png#0 0 64 64);" />
+            <input type="button" onclick="OnClickRecommendGames" style="float:left; width: 64px; height: 64px; margin-left: 18px; margin-top:30px; background: url(Texture/Aries/Creator/keepwork/minigame/main/rec_64x64_32bits.png#0 0 64 64);" />
+            <input type="button" onclick="OnClickMap" style="float:left; width: 100px; height: 100px; margin-left: 18px; margin-top:-3px; background: url(Texture/Aries/Creator/keepwork/minigame/main/map_128x128_32bits.png#0 0 128 128);" />
+            <input type="button" onclick="OnClickAction" style="float:left; width: 64px; height: 64px; margin-left: 18px; margin-top:30px; background: url(Texture/Aries/Creator/keepwork/minigame/main/action_64x64_32bits.png#0 0 64 64);" />
+            <input type="button" onclick="OnClickSmiley" style="float:left; width: 64px; height: 64px; margin-left: 18px; margin-top:30px; background: url(Texture/Aries/Creator/keepwork/minigame/main/smiley_64x64_32bits.png#0 0 64 64);" />
+            <input type="button" onclick="OnClickMyPlannet" style="float:left; width: 64px; height: 64px; margin-left: 18px; margin-top:30px; background: url(Texture/Aries/Creator/keepwork/minigame/main/plannet_64x64_32bits.png#0 0 64 64);" />
+            <input type="button" name="minigame_music" onclick="OnClickMusic" style="float:left;margin-top:35px;margin-left:18px;width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/minigame/main/pause_music_32bits.png);"/>
+        </div>
+    </pe:container>
+    <input uiname="minigame_user_item"  type="button" onclick="OnClickUserItem" 
+        icon="Texture/Aries/Creator/keepwork/minigame/bag/item_64x64_32bits.png" 
+        icon_off_x="0" 
+        icon_off_y="0" 
+        icon_width="50" 
+        icon_height="50" 
+        style="position:relative; margin-left: 1020px; margin-top: 50px; width: 64px; height:64px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/caozuoqiu_56x56_32bits.png#0 0 56 56);" />
+</pe:container>
+<pe:container  alignment="_lt"  width="380" height="65" ClickThrough='true' style="position: relative; margin-top: 15px; background:url();">
+    <pe:container uiname="MiniGameMainPage.task_lt" ClickThrough='true' style="position:relative; background:url();">
+        <input type="button" uiname="minigame_change_mode_task" onclick="OnClickChangeMode" style="float:left; width: 64px; height: 64px; margin-left: 15px; background: url(Texture/Aries/Creator/keepwork/minigame/mode/task_64x64_32bits.png#0 0 64 64);" />
+        <input type="button" onclick="OnClickDaily" style="float:left; width: 64px; height: 64px; margin-left: 10px; background: url(Texture/Aries/Creator/keepwork/minigame/main/daily_64x64_32bits.png#0 0 64 64);" />
+        <input type="button" onclick="OnClickSign" style="float:left; width: 64px; height: 64px; margin-left: 10px; background: url(Texture/Aries/Creator/keepwork/minigame/main/activity_64x64_32bits.png#0 0 64 64);" />
+        <input type="button" onclick="OnClickVip" style="float:left; width: 64px; height: 64px; margin-left: 10px; background: url(Texture/Aries/Creator/keepwork/minigame/main/vip_64x64_32bits.png#0 0 64 64);" />
+        <input type="button" onclick="OnClickSkin" style="float:left; width: 64px; height: 64px; margin-left: 10px; background: url(Texture/Aries/Creator/keepwork/minigame/main/mall_64x64_32bits.png#0 0 64 64);" />
+    </pe:container>
+    <pe:container uiname="MiniGameMainPage.story_lt" ClickThrough='true' style="position:relative; background:url();">
+        <input type="button" uiname="minigame_change_mode_story" onclick="OnClickChangeMode" style="float:left; width: 64px; height: 64px; margin-left: 15px; background: url(Texture/Aries/Creator/keepwork/minigame/mode/story_64x64_32bits.png);" />
+        <input type="button" onclick="OnClickCloud" style="float:left; width: 64px; height: 64px; margin-left: 10px; background: url(Texture/Aries/Creator/keepwork/minigame/mode/cloud_64x64_32bits.png#0 0 64 64);" />
+        <input type="button" onclick="OnClickSave" style="float:left; width: 64px; height: 64px; margin-left: 10px; background: url(Texture/Aries/Creator/keepwork/minigame/mode/cundang_64x64_32bits.png#0 0 64 64);" />
+        <div style="position: relative; width: 400px; height: 70px; margin-left: 240px; margin-top: -48px;">
+            <pe:label name="minigame_edit_status" value='' style="font-size: 18px; text-singleline: true; color: #ffffffcc;  font-weight: bold; height: 22px;"></pe:label>
+            <br/>
+            <pe:label name="minigame_edit_statsText" value='' style="font-size: 12px; text-singleline: true; color: #ffffffcc; font-weight: bold; margin-top:0px;"></pe:label>
+        </div>
+    </pe:container>
+</pe:container>
+<pe:container alignment="_rt"  width="350" height="50" ClickThrough='true' style="position: relative; margin-top:10px;margin-right: 12px; background:url();">
+    <div align="right" style="position: relative; margin-right:0px; margin-top:0px;width:130px;height:50px;background-color:#fff60000">
+        <div style="margin-top:0px;margin-left:0px;width:130px;height:50px;background:url(https://qiniu-public.keepwork.com/paracraft-cdn-resource/Texture/Aries/Paracraft/Mod/MaiSi/bean_bg_1.png)">
+            <div style="position: relative; margin-left:35px;margin-top:15px;width:90px;height:50px;text-align:center;font-size:16px;font-weight:bold;color:#ffffff;">
+                <%=MiniGameMainPage.GetBeanNumber()%>
+            </div>
+            <div onclick="OnClickBean" tooltip="<%=L'获取更多知识豆'%>" style="position: relative; margin-left:5px;margin-top:5px;width:40px;height:40px;">
+                <div style="margin-top: 20px; margin-left: 20px; width: 18px; height: 18px; background: url(Texture/Aries/Common/ThemeTeen/combatpet/add_32bits.png);"></div>
+            </div>
+        </div>
+    </div>
+    <pe:container alignment="_rt" uiname="MiniGameMainPage.timeLimit" style="position:relative; margin-right: 140px; width: 90px; margin-top: 10px; height: 50px; background: url();">
+        <div style="position: relative;">
+            <pe:progressbar name="progressbar_stamina"
+                Minimum="0" 
+                Value="<%=TimeLimitPage.GetStamina()%>" 
+                Maximum="<%=TimeLimitPage.GetBaseStamina()%>" 
+                Step="1"
+                background="Texture/Aries/Inventory/Empty_slot_32bits.png;0 0 32 26: 14 13 14 12" 
+                blockimage="Texture/Aries/Inventory/green_fill_32bits.png;0 0 32 26: 14 13 14 12" 
+                style="position: relative; width:90px;height:30px;"/>
+        </div>
+        <div tooltip="<%=L'体力上限:'..TimeLimitPage.GetBaseStamina()%>" style="position: relative; margin-top: 4px;">
+            <pe:label name="minigame_timeLimit" value="<%=''..TimeLimitPage.GetStamina()%>" style="font-size: 12px; text-align: center; text-singleline: true; color: #ffffffcc;  font-weight: bold; height: 22px;"></pe:label>
+        </div>
+    </pe:container>
+    <div zorder="1" align="right" style="position: relative; margin-right: 210px; margin-top: 4px; width: 36px; height: 36px; background: url(Texture/Aries/Creator/keepwork/minigame/main/stamina.png);"></div>
+    <div align="right" style="position: relative; width:46px;height:46px;margin-right:258px; margin-top: 4px;">
+        <input type="button" name="friendsBtn"  onclick="OnClickPhone" style="color:#b321b8; font-size:14px;width: 46px; height: 46px; background-color:#ffffffcc;background: url(Texture/blocks/icons/blow_up.png);" />
+        <pe:container ClickThrough="true" visible="<%=MiniGameMainPage.isShowFriendRedTip == true%>" uiname="unreaded_friend_msg" style="position:relative;width: 12px; height: 12px; margin-left: 32px; margin-top: -46px; background:url();"> 
+            <div style="width: 12px; height: 12px; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#458 106 8 8)"></div>
+        </pe:container>
+    </div>
+    <input type="button" name="chatBtn" align="right" onclick="OnClickChat" style="position: relative; margin-right: 320px; margin-top: 4px; color:#2264b1; font-size:14px;width: 46px; height: 46px; background-color:#ffffffcc;background: url(Texture/blocks/icons/dialog.png);" />
+</pe:container>
+</pe:mcml>
+</body>
+</html>

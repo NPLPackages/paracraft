@@ -25,6 +25,7 @@ local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 -- this should be the same as the items per line. 
 QuickSelectBar.static_view_len = 9;
@@ -47,9 +48,14 @@ QuickSelectBar.progress_bar_width = 358;
 local custombtn_game_nodes = {}
 local custombtn_editor_nodes = {}
 
+-- Config parameters for button visibility
+QuickSelectBar.bShowInventoryButton = true;
+QuickSelectBar.bShowMallButton = true;
+
 -- whether the data is modified. 
 QuickSelectBar.IsModified = false;
 QuickSelectBar.IsMobile = false
+QuickSelectBar.pinned_slots = {};
 local page;
 
 local max_item_count = 32;
@@ -72,6 +78,10 @@ function QuickSelectBar.OnInit()
 	GameLogic.events:AddEventListener("game_mode_change", QuickSelectBar.OnGameModeChanged, QuickSelectBar, "QuickSelectBar");
 	GameLogic.events:AddEventListener("OnHintSelectBlock", QuickSelectBar.OnHintSelectBlock, QuickSelectBar, "QuickSelectBar");
 	GameLogic.events:AddEventListener("OnPlayerReplaced", QuickSelectBar.OnPlayerReplaced, QuickSelectBar, "QuickSelectBar");
+	GameLogic.events:AddEventListener("PinPlayerItemSlot", QuickSelectBar.OnPinPlayerItemSlot, QuickSelectBar, "QuickSelectBar");
+	
+	-- Register for WorldUnloaded event to reset button visibility
+	GameLogic:Connect("WorldUnloaded", QuickSelectBar, QuickSelectBar.OnWorldUnload, "UniqueConnection");
 end
 
 function QuickSelectBar.IsVisible()
@@ -79,6 +89,13 @@ function QuickSelectBar.IsVisible()
 		return page:IsVisible()
 	end
 	return false
+end
+
+-- Called when the world is unloaded to reset button visibility to default
+function QuickSelectBar.OnWorldUnload()
+	QuickSelectBar.bShowInventoryButton = true;
+	QuickSelectBar.bShowMallButton = true;
+	QuickSelectBar.pinned_slots = {};
 end
 
 ------------------------
@@ -185,6 +202,9 @@ function QuickSelectBar:OnSetBlockInRightHand(event)
 				local text;
 				if(item) then
 					text = item:GetDisplayName() or tostring(block_id);
+					if item:GetTooltip() and System.os.IsTouchMode() then
+						text = item:GetTooltip()
+					end
 				else
 					text = tostring(block_id);
 				end
@@ -222,9 +242,9 @@ function QuickSelectBar:OnHandToolIndexChanged(event)
 			local index = GameLogic.GetPlayerController():GetHandToolIndex()
 			if(index) then
 				if(QuickSelectBar.IsMobile) then
-					ctl.x = (index-1)*80 + 12;
+					ctl.x = (index-1)*80 + 13;
 				else
-					ctl.x = (index-1)*41;
+					ctl.x = (index-1)*41 + 1;
 				end
 			end
 		end
@@ -235,9 +255,10 @@ function QuickSelectBar.GetSelectControlPos()
 	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 	local Screen = commonlib.gettable("System.Windows.Screen");
 	local viewport = ViewportManager:GetSceneViewport();
+	local viewportUI = ViewportManager:GetGUIViewport();
 	local width ,height = Screen:GetWidth(),Screen:GetHeight()
-	local x_offset = -math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
-	local y_offset = -math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
+	local x_offset = -math.floor((viewport:GetMarginRight() - viewportUI:GetMarginRight()) / Screen:GetUIScaling()[1]);
+	local y_offset = -math.floor((viewport:GetMarginBottom() - viewportUI:GetMarginBottom())/ Screen:GetUIScaling()[2]);
 	local index = GameLogic.GetPlayerController():GetHandToolIndex()
 	if(page) then
 		local ctl = page:FindUIControl("handtool_highlight_bg");
@@ -268,12 +289,16 @@ function QuickSelectBar.ShowPage(bShow)
 	}
 	params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"QuickSelectBar");
 	QuickSelectBar.IsMobile = params.isMobile == true
+	if QuickSelectBar.IsMobile then
+		QuickSelectBar.progress_bar_width = 420
+	end
 	width = params.width;
 	height = params.height;
 	url = params.url 
 
 	local viewport = ViewportManager:GetSceneViewport();
-	local viewport_margin_bottom = viewport:GetMarginBottom();
+	local viewportUI = ViewportManager:GetGUIViewport();
+	local viewport_margin_bottom = viewport:GetMarginBottom() - viewportUI:GetMarginBottom();
 	if(not QuickSelectBar.viewportConnected) then
 		QuickSelectBar.viewportConnected = true;
 		viewport:Connect("sizeChanged", nil, function()
@@ -286,8 +311,8 @@ function QuickSelectBar.ShowPage(bShow)
 						if(obj) then
 							NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 							local Screen = commonlib.gettable("System.Windows.Screen");
-							obj.x = -math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]*0.5);
-							obj.y = -math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
+							obj.x = -math.floor((viewport:GetMarginRight() - viewportUI:GetMarginRight()) / Screen:GetUIScaling()[1]*0.5);
+							obj.y = -math.floor((viewport:GetMarginBottom() - viewportUI:GetMarginBottom()) / Screen:GetUIScaling()[2]);
 						end
 					end
 				end
@@ -295,24 +320,44 @@ function QuickSelectBar.ShowPage(bShow)
 		end)
 	end
 
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-			--url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.html", 
-			url = url,
-			name = "QuickSelectBar.ShowPage", 
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = false,
-			bShow = bShow,
-			zorder = -6,
-			click_through = true, 
-			directPosition = true,
-				align = "_ctb",
-				x = 0,
-				y = -viewport_margin_bottom,
-				width = width,
-				height = height,
-		});
+	local params = {
+		--url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.html", 
+		url = url,
+		name = "QuickSelectBar.ShowPage", 
+		isShowTitleBar = false,
+		DestroyOnClose = true,
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		allowDrag = false,
+		bShow = bShow,
+		zorder = -6,
+		click_through = true, 
+		-- we need to mark dirty when new model textures are prepared.
+		--SelfPaint = true, SelfPaintTextureName = "QuickSelectBar", 
+		directPosition = true,
+			align = "_ctb",
+			x = 0,
+			y = -viewport_margin_bottom,
+			width = width,
+			height = height,
+	}
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	if(params.SelfPaint) then
+		local Item = commonlib.gettable("MyCompany.Aries.Game.Items.Item");
+		local textureAtlas = Item:GetIconAtlas();
+		if(textureAtlas) then
+			textureAtlas:Connect("TextureUpdated", QuickSelectBar, QuickSelectBar.MarkDirty, "UniqueConnection");
+		end
+		local ModelTextureAtlas = commonlib.gettable("MyCompany.Aries.Game.Common.ModelTextureAtlas");
+		if(ModelTextureAtlas and ModelTextureAtlas.Connect) then
+			ModelTextureAtlas:Connect("TextureUpdated", QuickSelectBar, QuickSelectBar.MarkDirty, "UniqueConnection");
+		end
+	end
+end
+
+function QuickSelectBar:MarkDirty()
+	if(page) then
+		page:InvalidateRect()
+	end
 end
 
 function QuickSelectBar.Refresh(nDelayTime)
@@ -469,7 +514,6 @@ function QuickSelectBar.OnClickMall()
 	else
 		KeepWorkMallPage.Close()
 	end
-	
 end
 
 function QuickSelectBar.ShowTemplate()
@@ -489,5 +533,65 @@ function QuickSelectBar.OnClickTemplate()
 				WorldCommon.ReplaceWorld(projectId);
 			end
 		end, 0);
+	end
+end
+
+-- Show or hide the inventory button
+-- @param bShow: true to show, false to hide
+function QuickSelectBar.ShowInventoryButton(bShow)
+	QuickSelectBar.bShowInventoryButton = bShow;
+	if(page) then
+		page:Refresh(0.1);
+	end
+end
+
+-- Show or hide the mall button  
+-- @param bShow: true to show, false to hide
+function QuickSelectBar.ShowMallButton(bShow)
+	QuickSelectBar.bShowMallButton = bShow;
+	if(page) then
+		page:Refresh(0.1);
+	end
+end
+
+-- Show or hide both inventory and mall buttons
+-- @param bShowInventory: true to show inventory button, false to hide
+-- @param bShowMall: true to show mall button, false to hide
+function QuickSelectBar.ShowRightButtons(bShowInventory, bShowMall)
+	QuickSelectBar.ShowInventoryButton(bShowInventory);
+	QuickSelectBar.ShowMallButton(bShowMall);
+end
+
+-- Get the current visibility state of the inventory button
+-- @return: true if visible, false if hidden or not found
+function QuickSelectBar.IsInventoryButtonVisible()
+	return QuickSelectBar.bShowInventoryButton;
+end
+
+-- Get the current visibility state of the mall button
+-- @return: true if visible, false if hidden or not found
+function QuickSelectBar.IsMallButtonVisible()
+	return QuickSelectBar.bShowMallButton;
+end
+
+
+-- @param msg: {slot_index=number, is_pin=true}
+function QuickSelectBar.OnPinPlayerItemSlot(self, msg)
+	if(msg and msg.slot_index and type(msg.slot_index) == "number" and msg.slot_index >= 1 and msg.slot_index <= 36) then
+		LOG.std(nil, "info", "QuickSelectBar", "OnPinPlayerItemSlot: %d %s", msg.slot_index, tostring(msg.is_pin));
+		QuickSelectBar.pinned_slots = QuickSelectBar.pinned_slots or {};
+		if(msg.is_pin) then
+			QuickSelectBar.pinned_slots[msg.slot_index] = true;
+		else
+			QuickSelectBar.pinned_slots[msg.slot_index] = nil;
+		end
+
+		local playerEntity = EntityManager.GetPlayer();
+		if(playerEntity and playerEntity.inventory) then
+			local itemStack = playerEntity.inventory:GetItem(msg.slot_index);
+			if(itemStack) then
+				itemStack.is_pinned = msg.is_pin;
+			end
+		end
 	end
 end

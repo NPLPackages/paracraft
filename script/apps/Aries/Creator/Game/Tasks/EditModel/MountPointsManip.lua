@@ -17,6 +17,10 @@ NPL.load("(gl)script/ide/math/Plane.lua");
 NPL.load("(gl)script/ide/math/Quaternion.lua");
 NPL.load("(gl)script/ide/math/Matrix4.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/MountPoint.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditMountPointTask.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
+local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+local EditMountPointTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditMountPointTask");
 local MountPoint = commonlib.gettable("MyCompany.Aries.Game.Common.MountPoint");
 local Matrix4 = commonlib.gettable("mathlib.Matrix4");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
@@ -106,8 +110,11 @@ function MountPointsManip:SelectMountPointsByPickName(pickName)
 		end
 	end
 	if(selected_mountpoint) then
+		self:ExitTask()
 		self:SetField("SelectedMountPointName", selected_mountpoint:GetName());
 		self:SetSelectedMountPoint(selected_mountpoint, handleMode)
+		local task = EditMountPointTask:new({manip = self ,point = selected_mountpoint})
+		task:Run();
 	end
 end
 
@@ -119,6 +126,12 @@ function MountPointsManip:GetMountPointByPickName(pickingName)
 	end
 end
 
+function MountPointsManip:ExitTask()
+	local EditMountPointInstance = EditMountPointTask.GetInstance()
+	if EditMountPointInstance then
+		EditMountPointInstance:OnExit()
+	end
+end
 
 -- @return handleMode:  
 -- if "trans", mountpoint local translation mode is used, such as for lips and pelvis. 
@@ -163,6 +176,26 @@ function MountPointsManip:UpdateManipRadius(manip)
 	end
 	if(manip) then
 		manip.radius = radius * self:GetUIScaling();
+	end
+end
+
+function MountPointsManip:RefreshEditModelTask()
+	local EditModelInstance = EditModelTask.GetInstance()
+	if EditModelInstance then
+		EditModelInstance:RefreshPage()
+	end
+end
+
+function MountPointsManip:DeleteMountPoint(mountpoint)
+	if(mountpoint) then
+		self:UnselectAll()
+		if self.mpoints then
+			print("delete mount point",mountpoint, mountpoint.name)
+			self.mpoints:DeleteMountPoint(mountpoint)
+		end
+		self:UpdateMountPoints()
+		self:RefreshManipulator()
+		self:RefreshEditModelTask()
 	end
 end
 
@@ -298,7 +331,13 @@ end
 
 function MountPointsManip:init(parent)
 	MountPointsManip._super.init(self, parent);
+	self:ExitTask()
 	return self;
+end
+
+function MountPointsManip:Destroy()
+	MountPointsManip._super:Destroy(self);
+	self:ExitTask()
 end
 
 
@@ -321,12 +360,25 @@ end
 function MountPointsManip:ShowForEntity(entity)
 	self.entity = entity;
 	self.mpoints = entity:CreateGetMountPoints()
-	
 	local mountpoints = {};
 	for i = 1, self.mpoints:GetCount() do
 		mountpoints[#mountpoints+1] = self.mpoints:GetMountPoint(i);
 	end
 	self.mountpoints = mountpoints;
+end
+
+function MountPointsManip:UpdateMountPoints()
+	if self.mpoints then
+		local mountpoints = {};
+		for i = 1, self.mpoints:GetCount() do
+			mountpoints[#mountpoints+1] = self.mpoints:GetMountPoint(i);
+		end
+		self.mountpoints = mountpoints;
+	end
+end
+
+function MountPointsManip:GetMountPoints()
+	return self.mpoints
 end
 
 function MountPointsManip:GetMountPointCount()
@@ -394,6 +446,7 @@ function MountPointsManip:keyPressEvent(event)
 			-- cancel selection on esc key
 			event:accept();
 			self:UnselectAll();
+			self:ExitTask()
 		elseif(keyname == "DIK_2") then
 			-- toggle to translation mode. 
 			self:SetSelectedMountPoint(self.selectedMountPoint, "trans");
@@ -406,30 +459,35 @@ function MountPointsManip:keyPressEvent(event)
 			-- toggle to standard mountpoint scaling
 			self:SetSelectedMountPoint(self.selectedMountPoint, "scale");
 			event:accept();
-		elseif(keyname == "DIK_ADD" or keyname == "DIK_EQUALS") then
-			-- select first child mountpoint
-			local childMountPoint = self.selectedMountPoint:GetChildAt(1);
-			while(childMountPoint) do
-				if(childMountPoint:IsEditable()) then
-					self:SelectMountPointsByPickName(childMountPoint.pickName);
-					break;
-				else
-					childMountPoint = childMountPoint:GetChildAt(1);
-				end
-			end
+		-- elseif(keyname == "DIK_ADD" or keyname == "DIK_EQUALS") then
+		-- 	-- select first child mountpoint
+		-- 	local childMountPoint = self.selectedMountPoint:GetChildAt(1);
+		-- 	while(childMountPoint) do
+		-- 		if(childMountPoint:IsEditable()) then
+		-- 			self:SelectMountPointsByPickName(childMountPoint.pickName);
+		-- 			break;
+		-- 		else
+		-- 			childMountPoint = childMountPoint:GetChildAt(1);
+		-- 		end
+		-- 	end
+		-- 	event:accept();
+		elseif (keyname == "DIK_DELETE") then
+			-- delete selected mountpoint
+			self:ExitTask()
+			self:DeleteMountPoint(self.selectedMountPoint);
 			event:accept();
-		elseif(keyname == "DIK_SUBTRACT" or keyname == "DIK_MINUS") then
-			-- select parent mountpoint
-			local parentMountPoint = self.selectedMountPoint:GetParent();
-			while(parentMountPoint) do
-				if(parentMountPoint:IsEditable()) then
-					self:SelectMountPointsByPickName(parentMountPoint.pickName);
-					break;
-				else
-					parentMountPoint = parentMountPoint:GetParent();
-				end
-			end
-			event:accept();
+		-- elseif(keyname == "DIK_SUBTRACT" or keyname == "DIK_MINUS") then
+		-- 	-- select parent mountpoint
+		-- 	local parentMountPoint = self.selectedMountPoint:GetParent();
+		-- 	while(parentMountPoint) do
+		-- 		if(parentMountPoint:IsEditable()) then
+		-- 			self:SelectMountPointsByPickName(parentMountPoint.pickName);
+		-- 			break;
+		-- 		else
+		-- 			parentMountPoint = parentMountPoint:GetParent();
+		-- 		end
+		-- 	end
+		-- 	event:accept();
 		end
 	end
 	if(keyname == "DIK_LBRACKET" or keyname == "DIK_RBRACKET") then

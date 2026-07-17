@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyEditCheckPoint.lua" refresh="false">
+<![CDATA[
+EasyEditCheckPoint = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/EasyEditCheckPoint.lua")
+EasyEditCheckPoint.OnInit();
+
+function OnSave()
+    if EasyEditCheckPoint.ValidateInput() then
+        EasyEditCheckPoint.OnSave();
+    end
+end
+
+function OnCancel()
+    EasyEditCheckPoint.OnCancel();
+end
+
+function OnReset()
+    EasyEditCheckPoint.OnReset();
+end
+
+function OnSpawnPosChanged()
+    EasyEditCheckPoint.OnSpawnPosChanged();
+end
+
+function OnEditableRegionChanged()
+    EasyEditCheckPoint.OnEditableRegionChanged();
+end
+
+function OnClickUseSelectedBlock()
+    EasyEditCheckPoint.OnClickUseSelectedBlock();
+end
+]]>
+</script>
+
+<div style="background-color:#2c2c2c;color:#ffffff;padding:20px;width:460px;height:600px;">
+    <div style="text-align:center;">
+        <span style="font-size:18px;font-weight:bold;color:#50FA7B;"><%=L"编辑存档点属性"%></span>
+        <input type="button" name="CloseBtn" onclick="OnCancel" align="right" 
+               style="position:absolute;right:10px;top:10px;width:32px;height:32px;background:url(Texture/Aries/Creator/keepwork/Mall1/btn_close_32x32_32bits.png)" />
+    </div>
+
+    <div style="margin-top:10px;">
+        <div style="margin-bottom:15px;">
+            <span style="width:120px;color:#FFD700;font-weight:bold;"><%=L"存档点名称:"%></span>
+            <input type="text" name="actionname" value='<%=EasyEditCheckPoint.actionname or ""%>' 
+                   style="width:300px;height:25px; margin-left: 12px; background-color:#404040; color:#ffffff;padding:5px;" />
+        </div>
+
+        <!-- 子标签 -->
+        <div style="margin-bottom:15px;">
+            <span style="width:120px;color:#FFD700;font-weight:bold;"><%=L"子标签:"%></span>
+            <input type="text" name="subtag" value='<%=EasyEditCheckPoint.subtag or ""%>' 
+                   style="width:300px;height:25px; margin-left: 38px; background-color:#404040; color:#ffffff;padding:5px;" />
+            <div style="margin-left:80px;margin-top:5px;font-size:12px;color:#808080;">
+                <%=L"用于区分不同类型的存档点,使用英文或者数字的组合"%>
+            </div>
+        </div>
+        <div style="margin-bottom:15px;">
+            <span style="width:120px;color:#FFD700;font-weight:bold;"><%=L"允许玩家更改:"%></span>
+            <select name="allowEdit" style="width:300px;height:25px; margin-left: 26px; background-color:#404040; color:#ffffff;padding:5px;">
+                <option value="true" selected="selected" >允许</option>
+                <option value="false" >禁止</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <span style="width:120px;color:#FFD700;font-weight:bold;"><%=L"允许玩家安家:"%></span>
+            <select name="allowSetAsHome" style="width:300px;height:25px; margin-left: 26px; background-color:#404040; color:#ffffff;padding:5px;">
+                <option value="true" selected="selected" >允许</option>
+                <option value="false" >禁止</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <span style="width:120px;color:#FFD700;font-weight:bold;"><%=L"推荐存档:"%></span>
+            <input type="text" name="recommendModels" value='<%=EasyEditCheckPoint.recommendModels or ""%>' 
+                   style="width:300px;height:25px; margin-left: 26px; background-color:#404040; color:#ffffff;padding:5px;" />
+            <div style="margin-left:80px;margin-top:5px;font-size:12px;color:#808080;">
+                <%=L"推荐在此存档点使用的存档地址列表，多个存档用逗号分隔"%>
+            </div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <span style="width:120px;color:#FFD700;font-weight:bold;"><%=L"出生点相对位置:"%></span>
+            <input type="text" name="spawnRelativePos" value='<%=EasyEditCheckPoint.spawnRelativePos or "0,0,0"%>' onchange="OnSpawnPosChanged"
+                   style="width:300px;height:25px; margin-left: 0px; background-color:#404040; color:#ffffff;padding:5px;" />
+            <div style="margin-left:80px;margin-top:5px;font-size:12px;color:#808080;">
+                <%=L"格式: dx,dy,dz 例如: 0,1,0，最大30米"%>
+            </div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <span style="width:120px;color:#FFD700;font-weight:bold;"><%=L"出生点朝向:"%></span>
+            <input type="text" name="spawnFacing" value='<%=EasyEditCheckPoint.spawnFacing or "0"%>' 
+                   style="width:300px;height:25px; margin-left: 12px; background-color:#404040; color:#ffffff;padding:5px;" />
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <span style="width:120px;color:#FFD700;font-weight:bold;"><%=L"可编辑区域:"%></span>
+            <div style="float:left">
+                <input type="text" name="editableRegion" value='<%=EasyEditCheckPoint.editableRegion or ""%>' onchange="OnEditableRegionChanged"
+                   style="width:300px;height:25px; margin-left: 12px; background-color:#404040; color:#ffffff;padding:5px;" />
+                <input type="button" name="UseSelectedBlockBtn" onclick="OnClickUseSelectedBlock" value="<%=L'使用选中的方块'%>" 
+                    style="margin-left:10px;width:140px;height:35px;background-color:#4CAF50;color:#ffffff;font-weight:bold;" />
+            </div>
+        </div>
+    </div>
+
+    <!-- 按钮区域 -->
+    <div align="center" style=" width: 286px; margin-top:-5px;">
+        <input type="button" name="SaveBtn" class="mc_button_green" onclick="OnSave" value="<%=L'保存'%>" 
+               style="float: left; width:80px;height:35px; color:#000000;font-weight:bold;" />
+        <input type="button" name="ResetBtn" class="mc_button_orange" onclick="OnReset" value="<%=L'重置'%>" 
+               style="float: left; margin-left: 20px; width:80px;height:35px; color:#000000;font-weight:bold;" />
+        <input type="button" name="CancelBtn" class="mc_button_grey" onclick="OnCancel" value="<%=L'取消'%>" 
+               style="float: left; margin-left: 20px; width:80px;height:35px; color:#ffffff;font-weight:bold;" />
+    </div>
+</div>
+
+</pe:mcml>
+</html>

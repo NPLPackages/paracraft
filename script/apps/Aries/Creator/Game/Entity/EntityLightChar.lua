@@ -178,7 +178,7 @@ function Entity:SetAttenuation1(value)
 	if(commonlib.partialcompare(self.SetAttenuation1, value, 0.001)) then
 		return
 	end
-	self.SetAttenuation1 = value
+	self.Attenuation1 = value
 	local lightObject = self:GetInnerObject();
 	if(lightObject) then
 		lightObject:SetField("SetAttenuation1", self.SetAttenuation1);
@@ -190,7 +190,7 @@ function Entity:SetAttenuation2(value)
 	if(commonlib.partialcompare(self.SetAttenuation2, value, 0.001)) then
 		return
 	end
-	self.SetAttenuation2 = value
+	self.Attenuation2 = value
 	local lightObject = self:GetInnerObject();
 	if(lightObject) then
 		lightObject:SetField("SetAttenuation2", self.SetAttenuation2);
@@ -233,7 +233,7 @@ function Entity:CreateInnerObject()
 	lightObject:SetField("IsDeferredLightOnly", true);
 
 	-- update values from C++ object
-	self.Diffuse = lightObject:GetField("Specular", self.Diffuse);
+	self.Diffuse = lightObject:GetField("Diffuse", self.Diffuse);
 	self.Specular = lightObject:GetField("Specular", self.Specular);
 	self.Ambient = lightObject:GetField("Ambient", self.Ambient);
 

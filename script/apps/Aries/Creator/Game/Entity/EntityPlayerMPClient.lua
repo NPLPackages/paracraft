@@ -53,9 +53,9 @@ function Entity:init(world, netHandler, entityId)
 	local x, y, z = world:GetSpawnPoint();
 	self:SetLocationAndAngles(x, y, z, 0, 0);
 
-	local skin = CustomCharItems:GetSkinByAsset(self:GetMainAssetPath());
+	local skin,default_assets = CustomCharItems:GetSkinByAsset(self:GetMainAssetPath());
 	if (skin) then
-		self.mainAssetPath = CustomCharItems.defaultModelFile;
+		self.mainAssetPath = default_assets or CustomCharItems.defaultModelFile;
 		self.skin = skin;
 		self:GetDataWatcher():SetField(self.dataMainAsset, self:GetMainAssetPath());
 	end
@@ -180,7 +180,7 @@ function Entity:SendMotionUpdates()
 	-- send animation and action
 	-- the channel 0 of the animation is always the Entity action. channel 1,2,3,... are for PacketAnimation
     local curAnimID = obj:GetField("AnimID", 0);
-	self:SetAnimId(curAnimID);
+	self:SetAnimId(self.customAnimationId or curAnimID);
 
     if (self.dataWatcher:HasChanges()) then
 		self:AddToSendQueue(Packets.PacketEntityMetadata:new():Init(self.entityId, self.dataWatcher, false));

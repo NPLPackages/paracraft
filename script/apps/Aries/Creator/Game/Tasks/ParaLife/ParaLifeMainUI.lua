@@ -391,7 +391,7 @@ function ParaLifeMainUI.SetPlayerSkin(player,assetfile,skin)
 		print("isCustomModel===",isCustomModel,hasCustomGeosets)
 	end
 	if isCustomModel then
-		PlayerAssetFile:RefreshCustomModel(player, skin)
+		PlayerAssetFile:RefreshCustomModel(player, skin, assetfile)
 		return
 	end
 

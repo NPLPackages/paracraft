@@ -56,7 +56,7 @@ function OnClickEmptySlot(mcmlNode)
 end
 
 ]]></script>
-<aries:window mode="thin" style="width:200px;" title='<%=L"电影片段"%>' onhelp="MovieClipController.OnClickHelp" uiname_onclose="MovieClipController.OnClose" onclose="MovieClipController.OnClose">
+<aries:window mode="thin" style="width:200px;" title='<%=MovieClipController.GetTitle()%>' onhelp="MovieClipController.OnClickHelp" uiname_onclose="MovieClipController.OnClose" onclose="MovieClipController.OnClose">
     <pe:if condition='<%=not MovieClipController.IsPlayingMode()%>'>
     <div>
         <div>
@@ -66,20 +66,26 @@ end
             <div class="mc_item" style="float: left; width: 34px; height: 34px;">
                 <input type="button" zorder="1" uiname="MovieClipController.godview" name="godview" tooltip='<%=L"主角"%>' style="margin-left: 1px; margin-top: 1px; width: 32px; height: 32px; background: url(Texture/blocks/items/ts_char_off.png); " onclick="MovieClipController.OnClickGodMode()"/>
             </div>
+            <div class="mc_item" style="float: left; width: 34px; height: 34px;">
+                <input type="button" zorder="1" uiname="MovieClipController.cameraview" name="godview" tooltip='<%=L"摄影机窗口"%>' style="margin-left: 1px; margin-top: 1px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/camera_on.png); " onclick="MovieClipController.OnClickCameraView()"/>
+            </div>
+            <div class="mc_item" style="float: left; width: 34px; height: 34px;">
+                <input type="button" zorder="1" uiname="MovieClipController.globalconfig" name="globalconfig" tooltip='<%=L"全局设置"%>' style="margin-left: 1px; margin-top: 1px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_on.png); " onclick="MovieClipController.OnClickGlobalConfig()"/>
+            </div>
         </div>
-        <pe:gridview name="InventoryItems" style="height:104px;" VerticalScrollBarStep="34" DataSource="<%=DS_Actor_Inventory%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="512">
+        <pe:gridview name="MovieClipInventoryItems" style="height:104px;" VerticalScrollBarStep="34" DataSource="<%=DS_Actor_Inventory%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="512">
             <Columns>
                 <pe:if condition='<%=MovieClipController.IsCompareDiff(Eval("slotNumber"))%>'>
                     <pe:container uiname='<%="MovieClipController.slot_"..Eval("slotNumber") .. "_bg"%>' zorder="0" style="position: relative; margin-left: 1px; width: 32px;height: 32px;background-color: #00ff00;"></pe:container>
                 </pe:if>
                 <pe:if condition='<%=IsSelectedActor(Eval("slotNumber"))%>'>
                     <div style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">
-                        <pe:mc_slot ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                        <pe:mc_slot DisableClickDrag="true" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
                     </div>
                 </pe:if>
                 <pe:if condition='<%=not IsSelectedActor(Eval("slotNumber"))%>'>
                     <div class="mc_item">
-                        <pe:mc_slot class="mc_slot" onclick_empty="OnClickEmptySlot" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                        <pe:mc_slot DisableClickDrag="true" class="mc_slot" onclick_empty="OnClickEmptySlot" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
                     </div>
                 </pe:if>
 			</Columns>

@@ -52,5 +52,17 @@ function Map3DSystem_OnSystemEvent()
 	elseif (event_type == Sys_Event.SYS_RENDERER_RECREATED) then
 		--LOG.std(nil, "info", "system", "SYS_RENDERER_RECREATED received");
 		commonlib.EventSystem.getInstance():DispatchEvent({type = "RendererRecreated"});
+	elseif (event_type == Sys_Event.SYS_APP_PAUSE) then
+		LOG.std(nil, "info", "system", "SYS_APP_PAUSE received");
+		commonlib.EventSystem.getInstance():DispatchEvent({type = "OnAppPause"});
+	elseif (event_type == Sys_Event.SYS_APP_RESUME) then
+		LOG.std(nil, "info", "system", "SYS_APP_RESUME received");
+		commonlib.EventSystem.getInstance():DispatchEvent({type = "OnAppResume"});
+	elseif (event_type == Sys_Event.SYS_APP_STOP) then
+		LOG.std(nil, "info", "system", "SYS_APP_STOP received");
+		commonlib.EventSystem.getInstance():DispatchEvent({type = "OnAppStop"});
+	elseif (event_type == Sys_Event.SYS_APP_DESTROY) then
+		LOG.std(nil, "info", "system", "SYS_APP_DESTROY received");
+		commonlib.EventSystem.getInstance():DispatchEvent({type = "OnAppDestroy"});
 	end
 end

@@ -19,6 +19,8 @@ CodeIntelliSense.Show()
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpItem.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpWindow.lua");
+NPL.load("(gl)script/ide/System/Core/UniString.lua");
+local UniString = commonlib.gettable("System.Core.UniString");
 local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -84,7 +86,7 @@ local skipNames = {
 
 -- @param value: the class object 
 local function AddMemberFunctions(value, items, className, separator, memberName)
-	if(value and type(value) == "table" and #value == 0) then
+	if(value and type(value) == "table" and (#value == 0 or value.new)) then
 		if(memberName and memberName~="") then
 			local text = "^"..memberName
 			for name, value in pairs(value) do
@@ -111,7 +113,7 @@ local function AddMemberFunctions(value, items, className, separator, memberName
 end
 
 local function AddMemberFunctionsWithMeta(value, items, className, separator, memberName)
-	if(value and type(value) == "table" and #value == 0) then
+	if(value and type(value) == "table" and (#value == 0 or value.new)) then
 		AddMemberFunctions(value, items, className, separator, memberName)
 		-- also parse meta table methods, but just 1 level above
 		local metaTable = getmetatable(value)
@@ -304,6 +306,12 @@ function CodeIntelliSense.GuessClass(className)
 			value = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
 		elseif(className:match("[Aa]bb")) then
 			value = commonlib.gettable("mathlib.ShapeAABB");
+		elseif(className:match("^quat")) then
+			value = commonlib.gettable("mathlib.Quaternion");
+		elseif(className:match("^bones")) then
+			value = commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable");
+		elseif(className:match("^bone")) then
+			value = commonlib.gettable("MyCompany.Aries.Game.Movie.BoneVariable");
 		elseif(className == "event") then
 			-- likely to be a mouse event
 			value = commonlib.gettable("System.Windows.MouseEvent");
@@ -427,7 +435,7 @@ function CodeIntelliSense.OnTick(timer)
 		end
 		-- if cursor changed, we will disable auto completion
 		if(CodeIntelliSense.GetCount() > 0 and CodeIntelliSense.cursorPos) then
-			local cursorPos = CodeIntelliSense.textCtrl:CursorPos();
+			local cursorPos = CodeIntelliSense.textCtrl:GetInsertPos();
 			if(cursorPos.pos ~= CodeIntelliSense.cursorPos.pos or cursorPos.line ~= CodeIntelliSense.cursorPos.line) then
 				CodeIntelliSense.Close()
 			end
@@ -534,14 +542,31 @@ function CodeIntelliSense.DoAutoCompleteImp(textCtrl)
 					textCtrl:moveCursor(pos.line, from, false);
 					textCtrl:moveCursor(pos.line, to, true);
 
+					local includeParameter = true;
+					if(includeParameter) then
+						code = codeItem:GetNPLCode(CodeHelpWindow.codeLanguageType) or code;
+						code = code:gsub("%s*\r?\n$", "")
+					end
+
 					local headingSpaces = textCtrl:GetHeadingSpaces(pos.line)
 					if(headingSpaces) then
-						code = code:gsub("(\n)(.+)", "%1"..headingSpaces.."%2");
+						code = code:gsub("(\n)([^\r\n]+)", "%1"..headingSpaces.."%2");
+						if(code:match("\n$")) then
+							code = code .. headingSpaces;
+						end
 					end
 					textCtrl:InsertTextInCursorPos(code)
 					if(curPos) then
+						local paramLen = 0;
+						local bSelectFirstParam = true;
+						if(bSelectFirstParam) then
+							local fromPos, endPos = string.find(code, "^[^\r\n,%(%)]+[,%)]", curPos+1)
+							if(endPos) then
+								paramLen = endPos - fromPos;
+							end
+						end
 						textCtrl:moveCursor(pos.line, from+curPos, false);
-						textCtrl:moveCursor(pos.line, from+curPos, true);
+						textCtrl:moveCursor(pos.line, from+curPos+paramLen, true);
 					end
 					isProcessed = true;
 				end
@@ -563,7 +588,7 @@ function CodeIntelliSense.DoAutoCompleteImp(textCtrl)
 		if(name) then
 			local pos = textCtrl:CursorPos();
 			local text = textCtrl:GetLineText(pos.line);
-			local cursorOnBracket
+			
 			local word, from, to = CodeIntelliSense.GetWordToCursor(textCtrl)
 			if(word) then
 				textCtrl:moveCursor(pos.line, from, false);
@@ -661,6 +686,9 @@ end
 -- @return nil or function pointer 
 function CodeIntelliSense:GetFunctionByCursor(line, to)
 	if(line and to) then
+		if(type(line) == "string") then
+			line = UniString:new(line);
+		end
 		local cmdName = self:GetCommmandNameByWord(line, to)
 		if(cmdName) then
 			-- show command help?
@@ -674,11 +702,14 @@ function CodeIntelliSense:GetFunctionByCursor(line, to)
 			-- goto function definition
 			local fullFuncName = self:GetFunctionFullNameByWord(line, to)
 			local codeblock = CodeBlockWindow.GetCodeBlock()
-			if(codeblock and fullFuncName and fullFuncName ~= "") then
-				local env = codeblock:GetCodeEnv()
+			if(fullFuncName and fullFuncName ~= "") then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI.lua");
 				local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
-				local func = CodeAPI.GetAPIFunction(fullFuncName) or self:getfield(fullFuncName, env)
+				local func = CodeAPI.GetAPIFunction(fullFuncName);
+				if(not func and codeblock) then
+					local env = codeblock:GetCodeEnv()
+					func = self:getfield(fullFuncName, env)
+				end
 				if(not func) then
 					local classes, memberName = CodeIntelliSense.ParseIntoClassesAndMember(fullFuncName)
 					if(memberName) then
@@ -735,7 +766,19 @@ function CodeIntelliSense.OnMouseOverWordChange(word, line, from, to)
 	CodeIntelliSense.ShowMouseOverFuncTip(CodeIntelliSense.curMouseOverCodeItem)
 end
 
+function CodeIntelliSense.IsLockEdit()
+	local draggFilter = GameLogic.GetFilters():apply_filters('CodeBlockWindow.IsDragable')
+    if draggFilter == false then 
+		return true
+	end
+	return false
+end
+
+
 function CodeIntelliSense.ShowContextMenuForWord(word, line, from, to)
+	if CodeIntelliSense.IsLockEdit() then
+		return
+	end
 	local curMouseOverCodeItem;
 	if(line) then
 		curMouseOverCodeItem = CodeIntelliSense.GetCodeItemInText(word, line, from, to)
@@ -769,8 +812,21 @@ function CodeIntelliSense.ShowContextMenuForWord(word, line, from, to)
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"全选" .. "           Ctrl + A", Name = "SelectAll", Type = "Menuitem", onclick = nil, }))
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"撤销" .. "           Ctrl + Z", Name = "Undo", Type = "Menuitem", onclick = nil, }))
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"重做" .. "           Ctrl + Y", Name = "Redo", Type = "Menuitem", onclick = nil, }))
+
 		node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"编辑..." .. "", Name = "EditCode", Type = "Menuitem", onclick = nil, }))
+		if(System.os.GetPlatform() == "win32") then
+			node:AddChild(CommonCtrl.TreeNode:new({Text = L"用VsCode打开..." .. "", Name = "EditInVsCode", Type = "Menuitem", onclick = nil, }))
+		end
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"用网页打开..." .. "", Name = "EditCode", Type = "Menuitem", onclick = nil, }))
+
+		local codeblock = CodeBlockWindow.GetCodeBlock()
+		if(codeblock) then
+			local entity = codeblock:GetEntity()
+			if(entity and entity.GetIntermediateCode and entity:GetIntermediateCode()) then
+				node:AddChild(CommonCtrl.TreeNode:new({Text = L"打开中间代码...", Name = "OpenIntermediaryCode", Type = "Menuitem", onclick = nil, }))
+			end
+		end
+
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"格式化" .. "", Name = "FormatCode", Type = "Menuitem", onclick = nil, }))
 		if(word) then
 			node:AddChild(CommonCtrl.TreeNode:new({Text = L"查看定义...", tag = word, Name = "GotoDefinition", Type = "Menuitem", onclick = nil, }))
@@ -845,6 +901,31 @@ function CodeIntelliSense.OnClickContextMenuItem(node)
 		local codeblock = CodeBlockWindow.GetCodeBlock()
 		if(codeblock) then
 			GameLogic.RunCommand("open", "npl://editcode?src="..codeblock:GetFilename());
+		end
+	elseif(name == "EditInVsCode") then
+		local codeblock = CodeBlockWindow.GetCodeBlock()
+		if(codeblock) then
+			local entity = codeblock:GetEntity()
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockFileSync.lua");
+			local CodeBlockFileSync = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockFileSync");
+			CodeBlockFileSync:SyncEntityToFile(entity, true)
+			CodeBlockFileSync:OpenInVsCode(entity)
+		end
+	elseif(name == "OpenIntermediaryCode") then
+		local codeblock = CodeBlockWindow.GetCodeBlock()
+		if(codeblock) then
+			local entity = codeblock:GetEntity()
+			if(entity and entity.GetIntermediateCode and entity:GetIntermediateCode()) then
+				local filename = "temp/intermediaryCode.npl"
+				local file = ParaIO.open(filename, "w");
+				if(file:IsValid()) then
+					local text = entity:GetIntermediateCode()
+					text = CodeBlockWindow.PrettyCode(text) or text
+					file:WriteString(text);
+					file:close();
+					GameLogic.RunCommand("open", "npl://editcode?src="..filename);
+				end
+			end
 		end
 	elseif(name == "FormatCode") then
 		local codeblock = CodeBlockWindow.GetCodeBlock()
@@ -1041,7 +1122,8 @@ function CodeIntelliSense.DoCursorOnBracketImp(textCtrl)
 end
 
 function CodeIntelliSense.CursorOnBracketImp(textCtrl)
-	local pos = textCtrl:CursorPos();
+	local pos = textCtrl:GetInsertPos();
+	
 	local text = textCtrl:GetLineText(pos.line);
 	if(text and pos.pos) then
 		local curPos = pos.pos;

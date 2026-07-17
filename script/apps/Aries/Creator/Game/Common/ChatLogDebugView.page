@@ -1,0 +1,995 @@
+<?npl
+-- page layout (must be on top)
+PAGE_NO_HEADER = true; 
+PAGE_NO_SIDE_BAR = true;
+
+--[[
+Title: Chat Log Debug Viewer
+Author: LiXizhi
+Date: 2026/2/20
+Desc: Web-based viewer for AI chat log files (.copilotmd) in temp/aichat_logs/.
+  Supports very large files (10-50MB) via chunked reading.
+  Features:
+    - List all log files, browse by date
+    - Parse sessions from a file, navigate by session
+    - Auto-collapse <details> blocks
+    - Default to current day's log
+  AJAX endpoint: ajax/raw?file=script/apps/Aries/Creator/Game/Common/ChatLogDebugView.page&action=<action_name>
+]]
+if(not is_admin()) then
+  exit("access denied")
+end
+
+local logDir = "temp/aichat_logs/";
+
+if(is_ajax()) then
+
+    ---------------------------------------------------------
+    -- list_files: return all .copilotmd files with dates
+    ---------------------------------------------------------
+    add_action('wp_ajax_list_files', function()
+        local files = {};
+        local search_result = ParaIO.SearchFiles(logDir, "chat_*.copilotmd", "", 0, 1000, 0);
+        local nCount = search_result:GetNumOfResult();
+        for i = 0, nCount - 1 do
+            local fname = search_result:GetItem(i);
+            local year, month, day = fname:match("chat_(%d+)-(%d+)-(%d+)");
+            if year then
+                local fpath = logDir .. fname;
+                local f = ParaIO.open(fpath, "r");
+                local size = 0;
+                if f:IsValid() then
+                    size = f:GetFileSize();
+                    f:close();
+                end
+                files[#files+1] = {
+                    filename = fname,
+                    date = year.."-"..month.."-"..day,
+                    size = size,
+                };
+            end
+        end
+        -- sort descending by date
+        table.sort(files, function(a,b) return a.date > b.date end);
+        wp_send_json(files, true);
+    end)
+
+    ---------------------------------------------------------
+    -- get_sessions: scan file for # Session lines, return index
+    -- Reads only first bytes of each line – efficient for big files
+    ---------------------------------------------------------
+    add_action('wp_ajax_get_sessions', function()
+        local fname = request:get("logfile") or "";
+        local fpath = logDir .. fname;
+        local f = ParaIO.open(fpath, "r");
+        if not f:IsValid() then
+            wp_send_json({error="file not found"}, true); return;
+        end
+        local fileSize = f:GetFileSize();
+        local text = f:GetText(0, fileSize);
+        f:close();
+
+        local sessions = {};
+        local pos = 1;
+        local lineNum = 0;
+        local currentSession = nil;
+        -- Scan for "# Session - XXXX" lines and extract epoch/type from contents
+        for line in text:gmatch("([^\n]*)\n?") do
+            lineNum = lineNum + 1;
+            local sessionId = line:match("^# Session %- (%d+)");
+            if sessionId then
+                currentSession = {
+                    id = sessionId,
+                    offset = pos - 1, -- byte offset (0-based)
+                    line = lineNum,
+                    epoch = 0,
+                    reqCount = 0,
+                    respCount = 0,
+                };
+                sessions[#sessions+1] = currentSession;
+            elseif currentSession then
+                -- extract first epoch value seen in this session
+                if currentSession.epoch == 0 then
+                    local ep = line:match("^epoch%s+:%s+(%d+)");
+                    if ep then currentSession.epoch = tonumber(ep); end
+                end
+                -- count request/response blocks
+                local t = line:match("^type%s+:%s+(%a+)");
+                if t == "request" then currentSession.reqCount = currentSession.reqCount + 1;
+                elseif t == "response" then currentSession.respCount = currentSession.respCount + 1; end
+            end
+            pos = pos + #line + 1;
+        end
+        -- compute lengths and endLine
+        for i = 1, #sessions do
+            if i < #sessions then
+                sessions[i].length = sessions[i+1].offset - sessions[i].offset;
+                sessions[i].endLine = sessions[i+1].line - 1;
+            else
+                sessions[i].length = fileSize - sessions[i].offset;
+                sessions[i].endLine = lineNum;
+            end
+        end
+        wp_send_json({fileSize = fileSize, sessions = sessions}, true);
+    end)
+
+    ---------------------------------------------------------
+    -- get_chunk: return a byte range of the file
+    -- params: file, from (byte offset), length
+    ---------------------------------------------------------
+    add_action('wp_ajax_get_chunk', function()
+        local fname = request:get("logfile") or "";
+        local fpath = logDir .. fname;
+        local from = tonumber(request:get("from") or 0);
+        local length = tonumber(request:get("length") or 65536);
+        -- cap single read at 2MB
+        if length > 2*1024*1024 then length = 2*1024*1024; end
+
+        local f = ParaIO.open(fpath, "r");
+        if not f:IsValid() then
+            wp_send_json({error="file not found"}, true); return;
+        end
+        local fileSize = f:GetFileSize();
+        local text = f:GetText(from, length);
+        f:close();
+        wp_send_json({from=from, length=#text, fileSize=fileSize, text=text}, true);
+    end)
+
+    ---------------------------------------------------------
+    -- delete_before: truncate file, keeping only from a given byte offset
+    -- params: file, from (byte offset of the session to keep from)
+    ---------------------------------------------------------
+    add_action('wp_ajax_delete_before', function()
+        local fname = request:get("logfile") or "";
+        -- basic safety: only allow chat_*.copilotmd inside logDir
+        if not fname:match("^chat_%d+%-%d+%-%d+%.copilotmd$") then
+            wp_send_json({error="invalid filename"}, true); return;
+        end
+        local fpath = logDir .. fname;
+        local from = tonumber(request:get("from") or 0);
+        if from <= 0 then
+            wp_send_json({error="nothing to delete"}, true); return;
+        end
+        local f = ParaIO.open(fpath, "r");
+        if not f:IsValid() then
+            wp_send_json({error="file not found"}, true); return;
+        end
+        local fileSize = f:GetFileSize();
+        local kept = f:GetText(from, fileSize - from);
+        f:close();
+        local fw = ParaIO.open(fpath, "w");
+        if not fw:IsValid() then
+            wp_send_json({error="cannot write file"}, true); return;
+        end
+        fw:WriteString(kept);
+        fw:close();
+        wp_send_json({ok=true, deleted=from, newSize=#kept}, true);
+    end)
+
+    ---------------------------------------------------------
+    -- open_in_vscode: open a file at a given line in VS Code
+    -- params: file (path, relative or absolute), line
+    ---------------------------------------------------------
+    add_action('wp_ajax_open_in_vscode', function()
+        local file = request:get("filepath") or "";
+        local line = tonumber(request:get("line")) or 1;
+        if file == "" then
+            wp_send_json({error="no file specified"}, true); return;
+        end
+        -- Resolve relative paths to game root
+        if not file:match("^[A-Za-z]:[/\\]") and not file:match("^/") then
+            local root = ParaIO.GetWritablePath();
+            if root and root ~= "" then
+                file = root .. file;
+            end
+        end
+        local cmd = 'code --goto "' .. file .. ':' .. line .. '"';
+        LOG.std(nil, "info", "ChatLogDebugView", "VSCode cmd: %s", cmd);
+        os.execute(cmd);
+        wp_send_json({success=true, cmd=cmd}, true);
+    end)
+
+    return;
+end
+PAGE_NO_SIDE_BAR = true;
+PAGE_NO_HEADER = true;
+?>
+<script src="https://cdn.keepwork.com/keepwork/cdn/tailwindcss@3.4.16.js"></script>
+<script>
+tailwind.config = {
+    darkMode: 'class',
+    theme: {
+        extend: {
+            colors: {
+                base:    '#1e1e2e',
+                surface: '#282840',
+                card:    '#2a2a3e',
+                input:   '#1a1a2e',
+                border:  '#45475a',
+                txt:     '#cdd6f4',
+                txtsec:  '#a6adc8',
+                muted:   '#6c7086',
+                blue:    '#89b4fa',
+                green:   '#a6e3a1',
+                yellow:  '#f9e2af',
+                red:     '#f38ba8',
+                mauve:   '#cba6f7',
+            }
+        }
+    }
+}
+</script>
+<style>
+html{font-size:14px}
+*{box-sizing:border-box}
+body{margin:0;background:#1e1e2e;color:#cdd6f4;font-family:'Segoe UI',system-ui,sans-serif}
+/* App layout – fully explicit to avoid Bootstrap/WP interference */
+#cl-app{display:flex!important;flex-direction:row!important;height:100vh;overflow:hidden;background:#1e1e2e;color:#cdd6f4}
+#cl-sidebar{width:350px;min-width:240px;flex-shrink:0;background:#282840;border-right:1px solid #45475a;display:flex;flex-direction:column;overflow:hidden}
+#cl-main{flex:1 1 0;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+button:disabled{opacity:0.35;cursor:not-allowed}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#1e1e2e}
+::-webkit-scrollbar-thumb{background:#585b70;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#7f849c}
+/* search highlight */
+.search-hl{background:#614a19;color:#f9e2af;border-radius:2px}
+.search-hl-current{background:#9e6a03;color:#fff}
+/* session item active override */
+.sess-active{background:#294670!important;border-left:3px solid #89b4fa!important}
+/* rendered markdown content */
+.md-view{padding:12px 20px;font-size:13px;line-height:1.6;word-break:break-word;overflow-wrap:break-word}
+.md-view .entry-block{margin-bottom:18px;border:1px solid #45475a;border-radius:6px;overflow:hidden}
+.md-view .entry-sep{border:none;border-top:1px solid #45475a;margin:18px 0}
+.md-view h1.session-title{font-size:15px;font-weight:700;color:#cba6f7;padding:10px 14px;margin:0;background:#2a2a3e;border-bottom:1px solid #45475a;word-break:break-word}
+.md-view h2.section-head{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#a6adc8;padding:6px 14px;margin:0;background:#1e1e32;border-bottom:1px solid #45475a}
+.md-view h3.msg-role{font-size:12px;font-weight:600;color:#89b4fa;padding:5px 14px;margin:0;background:#24243c;border-bottom:1px dotted #45475a}
+.md-view h3.msg-role.role-system{color:#a6e3a1}
+.md-view h3.msg-role.role-user{color:#89dceb}
+.md-view h3.msg-role.role-assistant{color:#cba6f7}
+.md-view h3.msg-role.role-tool{color:#f9e2af}
+.md-view h3.msg-role.role-thinking{color:#fab387}
+.md-view pre.code-block{margin:0;padding:10px 14px;background:#181825;color:#cdd6f4;font-family:Consolas,monospace;font-size:12px;line-height:1.6;white-space:pre-wrap!important;word-break:break-word!important;overflow-wrap:break-word!important;overflow-x:hidden}
+.md-view pre.code-block.meta-block{background:#1a1a2e;color:#a6adc8}
+.md-view pre.code-block.json-block{color:#a6e3a1}
+.md-view .tool-line{padding:6px 14px;font-size:12px;font-family:'Segoe UI',sans-serif;word-break:break-word}
+.md-view details{margin:0;background:#1e1e2e}
+.md-view details summary{cursor:pointer;padding:5px 14px;font-size:11px;color:#a6adc8;background:#24243c;border-top:1px dotted #45475a;user-select:none}
+.md-view details summary:hover{color:#cdd6f4}
+.md-view details[open] summary{color:#89b4fa}
+.md-view details .det-body{padding:8px 14px;font-size:12px;font-family:Consolas,monospace;white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;color:#cdd6f4;background:#181825}
+.md-view .type-request .section-head{color:#89b4fa}
+.md-view .type-response .section-head{color:#a6e3a1}
+.md-view .type-tool .section-head{color:#f9e2af}
+.md-view .type-summary .section-head{color:#cba6f7}
+/* Rendered markdown inside ~~~md blocks */
+.md-view .md-h{margin:8px 0 4px;color:#cdd6f4}
+.md-view .md-h1{font-size:16px;font-weight:700;color:#cba6f7;border-bottom:1px solid #45475a;padding-bottom:4px}
+.md-view .md-h2{font-size:14px;font-weight:700;color:#89b4fa}
+.md-view .md-h3{font-size:13px;font-weight:600;color:#a6e3a1}
+.md-view .md-h4{font-size:12px;font-weight:600;color:#f9e2af}
+.md-view .md-h5,.md-view .md-h6{font-size:12px;font-weight:600;color:#a6adc8}
+.md-view .md-p{margin:3px 0;line-height:1.6}
+.md-view .md-ul,.md-view .md-ol{margin:4px 0;padding-left:24px}
+.md-view .md-ul li,.md-view .md-ol li{margin:2px 0;line-height:1.5}
+.md-view .md-blockquote{margin:6px 0;padding:4px 12px;border-left:3px solid #89b4fa;color:#a6adc8;background:rgba(137,180,250,.06)}
+.md-view .md-blockquote p{margin:2px 0}
+.md-view .md-hr{border:none;border-top:1px solid #45475a;margin:10px 0}
+.md-view .md-code-fence{margin:6px 0;padding:8px 12px;background:#181825;color:#cdd6f4;font-family:Consolas,monospace;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word;border-radius:4px;border:1px solid #45475a}
+.md-view .md-code-fence code{background:none;padding:0;font-size:inherit}
+.md-view .md-inline-code{background:#2a2a3e;padding:1px 4px;border-radius:3px;font-family:Consolas,monospace;font-size:12px;color:#f9e2af}
+.md-view .md-rendered{padding:10px 14px;background:#181825;font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;font-family:Consolas,monospace;color:#cdd6f4}
+</style>
+
+<!-- ==================== APP ==================== -->
+<div id="cl-app">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <div id="cl-sidebar">
+
+        <!-- Date picker header -->
+        <div style="padding:10px;border-bottom:1px solid #45475a;flex-shrink:0">
+            <div style="font-size:13px;font-weight:600;color:#a6adc8;margin-bottom:6px">&#128196; Chat Logs</div>
+            <div style="display:flex;align-items:center;gap:4px">
+                <button id="btn-prev-day" style="padding:3px 8px;background:rgba(137,180,250,.15);color:#89b4fa;border:none;border-radius:4px;font-size:11px;cursor:pointer" title="Previous day">&laquo;</button>
+                <input type="date" id="date-input" style="flex:1;background:#1a1a2e;color:#cdd6f4;border:1px solid #45475a;border-radius:4px;padding:3px 6px;font-size:11px" />
+                <button id="btn-next-day" style="padding:3px 8px;background:rgba(137,180,250,.15);color:#89b4fa;border:none;border-radius:4px;font-size:11px;cursor:pointer" title="Next day">&raquo;</button>
+            </div>
+            <div id="file-info" style="font-size:11px;color:#6c7086;margin-top:5px"></div>
+        </div>
+
+        <!-- Session list header -->
+        <div style="padding:6px 12px;font-size:11px;color:#a6adc8;border-bottom:1px solid #45475a;flex-shrink:0;display:flex;justify-content:space-between;align-items:center">
+            <span id="session-count">Sessions</span>
+        </div>
+
+        <!-- Session list -->
+        <div id="session-list" style="flex:1;overflow-y:auto">
+            <div style="text-align:center;padding:30px 0;color:#6c7086;font-size:13px">Loading&hellip;</div>
+        </div>
+    </div>
+
+    <!-- ===== RIGHT MAIN AREA ===== -->
+    <div id="cl-main">
+
+        <!-- Toolbar -->
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#2a2a3e;border-bottom:1px solid #45475a;flex-shrink:0;flex-wrap:wrap">
+            <button id="btn-prev" style="padding:3px 8px;background:rgba(137,180,250,.15);color:#89b4fa;border:none;border-radius:4px;font-size:11px;cursor:pointer" disabled>&laquo; Older</button>
+            <button id="btn-next" style="padding:3px 8px;background:rgba(137,180,250,.15);color:#89b4fa;border:none;border-radius:4px;font-size:11px;cursor:pointer" disabled>Newer &raquo;</button>
+            <div style="width:1px;height:18px;background:#45475a"></div>
+            <button id="btn-refresh" style="padding:3px 8px;background:rgba(166,227,161,.15);color:#a6e3a1;border:none;border-radius:4px;font-size:11px;cursor:pointer" title="Reload file and jump to latest session">&#8635; Refresh</button>
+            <button id="btn-delete-before" style="padding:3px 8px;background:rgba(243,139,168,.15);color:#f38ba8;border:none;border-radius:4px;font-size:11px;cursor:pointer" disabled title="Delete all sessions before the current one">&#128465; Delete Before</button>
+            <div style="width:1px;height:18px;background:#45475a"></div>
+            <input id="search-box" type="text" placeholder="Search in session... (Ctrl+F)" style="background:#1a1a2e;color:#cdd6f4;border:1px solid #45475a;border-radius:4px;padding:3px 8px;font-size:11px;width:220px" />
+            <div style="width:1px;height:18px;background:#45475a"></div>
+            <button id="btn-vscode" style="padding:3px 8px;background:rgba(203,166,247,.15);color:#cba6f7;border:none;border-radius:4px;font-size:11px;cursor:pointer" disabled title="Open current session in VS Code">&#x1F4C2; VSCode</button>
+            <span id="status-bar" style="font-size:11px;color:#6c7086;margin-left:auto;white-space:nowrap"></span>
+        </div>
+
+        <!-- Content area -->
+        <div id="content-wrap" style="flex:1;overflow:auto;background:#1e1e2e">
+            <div id="cl-content" class="md-view">
+                <p style="color:#6c7086;text-align:center;padding:40px 0">Select a date and session to view.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+console.log("[ChatLogViewer] Script loaded");
+
+// ======================== State ========================
+var logDir = "temp/aichat_logs/";
+var files = [];
+var currentFile = null;
+var sessions = [];
+var currentSessionIdx = -1;
+var totalFileSize = 0;
+
+// ======================== DOM refs ========================
+var $dateInput    = document.getElementById("date-input");
+var $btnPrevDay   = document.getElementById("btn-prev-day");
+var $btnNextDay   = document.getElementById("btn-next-day");
+var $fileInfo     = document.getElementById("file-info");
+var $sessionCount = document.getElementById("session-count");
+var $sessionList  = document.getElementById("session-list");
+var $content      = document.getElementById("cl-content");
+var $contentWrap  = document.getElementById("content-wrap");
+var $btnPrev         = document.getElementById("btn-prev");
+var $btnNext         = document.getElementById("btn-next");
+var $btnRefresh      = document.getElementById("btn-refresh");
+var $btnDeleteBefore = document.getElementById("btn-delete-before");
+var $searchBox       = document.getElementById("search-box");
+var $btnVSCode       = document.getElementById("btn-vscode");
+var $statusBar       = document.getElementById("status-bar");
+
+console.log("[ChatLogViewer] DOM refs:", {
+    dateInput: !!$dateInput, sessionList: !!$sessionList, content: !!$content,
+    sidebar: !!document.getElementById("cl-sidebar"), app: !!document.getElementById("cl-app")
+});
+
+// ======================== Helpers ========================
+function formatSize(n) {
+    if (n > 1048576) return (n/1048576).toFixed(1) + " MB";
+    if (n > 1024) return (n/1024).toFixed(0) + " KB";
+    return n + " B";
+}
+
+function getLocalDateStr(d) {
+    d = d || new Date();
+    var pad = function(n){ return n < 10 ? "0" + n : n; };
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+}
+
+function ajax(action, params, cb) {
+    var qs = "action=" + action;
+    if (params) for (var k in params) {
+        if (params.hasOwnProperty(k)) qs += "&" + k + "=" + encodeURIComponent(params[k]);
+    }
+    console.log("[ChatLogViewer] AJAX ->", action, params);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/ajax/raw?file=script/apps/Aries/Creator/Game/Common/ChatLogDebugView.page", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4) {
+            console.log("[ChatLogViewer] AJAX <-", action, "status:", xhr.status, "len:", xhr.responseText.length);
+            try { cb(JSON.parse(xhr.responseText)); }
+            catch(e){ console.error("[ChatLogViewer] AJAX parse error:", e, xhr.responseText.substring(0,200)); cb({error: xhr.statusText || "parse error"}); }
+        }
+    };
+    xhr.send(qs);
+}
+
+function shiftDate(dateStr, days) {
+    var d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + days);
+    return getLocalDateStr(d);
+}
+
+// ======================== File list ========================
+function loadFileList(cb) {
+    console.log("[ChatLogViewer] loadFileList()");
+    ajax("list_files", {}, function(data){
+        files = data || [];
+        console.log("[ChatLogViewer] Got", files.length, "files:", files.map(function(f){return f.date}));
+        if (cb) cb();
+    });
+}
+
+function findFileByDate(dateStr) {
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].date === dateStr) return files[i];
+    }
+    return null;
+}
+
+// ======================== Date navigation ========================
+function selectDate(dateStr) {
+    console.log("[ChatLogViewer] selectDate:", dateStr);
+    $dateInput.value = dateStr;
+    var fileEntry = findFileByDate(dateStr);
+    if (fileEntry) {
+        $fileInfo.textContent = fileEntry.filename + " (" + formatSize(fileEntry.size) + ")";
+        loadFileByName(fileEntry.filename);
+    } else {
+        console.log("[ChatLogViewer] No file for date:", dateStr);
+        $fileInfo.textContent = "No log file for " + dateStr;
+        currentFile = null;
+        sessions = [];
+        currentSessionIdx = -1;
+        $sessionCount.textContent = "Sessions";
+        $sessionList.innerHTML = '<div style="padding:12px;color:#6c7086;font-size:11px">No data for this date.</div>';
+        $content.innerHTML = '<p style="color:#6c7086;text-align:center;padding:40px 0">No log file found for ' + dateStr + '.</p>';
+        $statusBar.textContent = "";
+        updateNavButtons();
+    }
+}
+
+$dateInput.addEventListener("change", function(){
+    selectDate($dateInput.value);
+});
+
+$btnPrevDay.addEventListener("click", function(){
+    if ($dateInput.value) selectDate(shiftDate($dateInput.value, -1));
+});
+
+$btnNextDay.addEventListener("click", function(){
+    if ($dateInput.value) selectDate(shiftDate($dateInput.value, 1));
+});
+
+// ======================== Load file & sessions ========================
+function loadFileByName(fname) {
+    console.log("[ChatLogViewer] loadFileByName:", fname, "currentFile:", currentFile);
+    if (currentFile === fname) return;
+    currentFile = fname;
+    currentSessionIdx = -1;
+    $sessionList.innerHTML = '<div style="text-align:center;padding:30px 0;color:#6c7086;font-size:13px">Scanning&hellip;</div>';
+    $content.innerHTML = '<p style="color:#6c7086;text-align:center;padding:40px 0">Loading sessions&hellip;</p>';
+    $statusBar.textContent = "";
+
+    ajax("get_sessions", {logfile: fname}, function(data){
+        if (data.error) {
+            console.error("[ChatLogViewer] get_sessions error:", data.error);
+            $sessionList.innerHTML = '<div style="padding:12px;color:#f38ba8;font-size:11px">' + data.error + '</div>';
+            return;
+        }
+        sessions = data.sessions || [];
+        totalFileSize = data.fileSize || 0;
+        console.log("[ChatLogViewer] Got", sessions.length, "sessions, fileSize:", totalFileSize);
+        $sessionCount.textContent = sessions.length + " Sessions";
+        renderSessionList();
+
+        if (sessions.length > 0) {
+            selectSession(sessions.length - 1);
+        } else {
+            $content.innerHTML = '<div style="color:#6c7086;text-align:center;padding:40px 0">No sessions found in file.</div>';
+        }
+        $statusBar.textContent = sessions.length + " sessions | " + formatSize(totalFileSize);
+    });
+}
+
+// Map from display index (newest-first) to file index
+var sessionDisplayOrder = [];
+
+function formatEpoch(epoch) {
+    if (!epoch) return "";
+    var d = new Date(epoch * 1000);
+    var pad = function(n){ return n < 10 ? "0" + n : n; };
+    return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+}
+
+function renderSessionList() {
+    console.log("[ChatLogViewer] renderSessionList:", sessions.length, "sessions");
+    // Build display order: newest session first
+    sessionDisplayOrder = [];
+    for (var i = sessions.length - 1; i >= 0; i--) sessionDisplayOrder.push(i);
+
+    var html = "";
+    for (var di = 0; di < sessionDisplayOrder.length; di++) {
+        var i = sessionDisplayOrder[di];
+        var s = sessions[i];
+        var timeStr = formatEpoch(s.epoch);
+        var lineRange = "L" + s.line + "-L" + (s.endLine || "?");
+        var statsStr = s.reqCount + "req / " + s.respCount + "resp";
+        html += '<div class="session-item" style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid #1e1e2e;border-left:3px solid transparent" data-idx="' + i + '">'
+              + '<div style="font-weight:600;color:#89b4fa">'
+              + '#' + s.id
+              + (timeStr ? ' <span style="color:#f9e2af;font-weight:normal">: ' + timeStr + '</span>' : '')
+              + '</div>'
+              + '<div style="color:#6c7086;font-size:11px;margin-top:2px">' + statsStr + ' &middot; ' + lineRange + '</div>'
+              + '</div>';
+    }
+    $sessionList.innerHTML = html || '<div style="padding:12px;color:#6c7086;font-size:11px">No sessions.</div>';
+
+    var items = $sessionList.querySelectorAll(".session-item");
+    console.log("[ChatLogViewer] Session items in DOM:", items.length);
+    for (var di = 0; di < items.length; di++) {
+        (function(item, fileIdx) {
+            item.addEventListener("click", function(){ selectSession(fileIdx); });
+            item.addEventListener("mouseenter", function(){ if(item.style.background !== "rgb(41, 70, 112)") item.style.background="#2a2a3e"; });
+            item.addEventListener("mouseleave", function(){ if(item.style.background !== "rgb(41, 70, 112)") item.style.background=""; });
+        })(items[di], sessionDisplayOrder[di]);
+    }
+}
+
+// ======================== Select session ========================
+function selectSession(idx) {
+    if (idx < 0 || idx >= sessions.length) return;
+    console.log("[ChatLogViewer] selectSession:", idx);
+    currentSessionIdx = idx;
+    updateNavButtons();
+
+    // Highlight the correct item in the reversed display order
+    var items = $sessionList.querySelectorAll(".session-item");
+    for (var di = 0; di < items.length; di++) {
+        if (sessionDisplayOrder[di] === idx) {
+            items[di].style.background = "#294670";
+            items[di].style.borderLeftColor = "#89b4fa";
+            items[di].scrollIntoView({block:"nearest"});
+        } else {
+            items[di].style.background = "";
+            items[di].style.borderLeftColor = "transparent";
+        }
+    }
+
+    var s = sessions[idx];
+    $content.innerHTML = '<div style="color:#6c7086;text-align:center;padding:40px 0">Loading session #' + s.id + '&hellip;</div>';
+    $statusBar.textContent = "Loading session #" + s.id + "...";
+
+    loadSessionText(s, function(text) {
+        console.log("[ChatLogViewer] Session #" + s.id + " loaded, length:", text.length);
+        renderMarkdownView(text, s);
+        $statusBar.textContent = "Session #" + s.id + " | L" + s.line + "-L" + (s.endLine||"?") + " | " + formatSize(s.length);
+    });
+}
+
+function loadSessionText(session, cb) {
+    var chunkSize = 2 * 1024 * 1024;
+    if (session.length <= chunkSize) {
+        ajax("get_chunk", {logfile: currentFile, from: session.offset, length: session.length}, function(data){
+            cb(data.text || "");
+        });
+    } else {
+        var parts = [];
+        var loaded = 0;
+        var total = session.length;
+        var loadNext = function() {
+            var len = Math.min(chunkSize, total - loaded);
+            ajax("get_chunk", {logfile: currentFile, from: session.offset + loaded, length: len}, function(data){
+                parts.push(data.text || "");
+                loaded += data.length;
+                if (loaded < total) loadNext();
+                else cb(parts.join(""));
+            });
+        };
+        loadNext();
+    }
+}
+
+// ======================== Markdown Renderer ========================
+function escapeHtml(str) {
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// Render ~~~md content: plain text with [Image: URL] rendered as <img>
+function renderMdContent(text) {
+    text = text.replace(/\r/g, '');
+    var parts = text.split(/(\[Image:[^\]]+\])/g);
+    var out = [];
+    for (var i = 0; i < parts.length; i++) {
+        var m = parts[i].match(/^\[Image:\s*(.*?)\]$/);
+        if (m) {
+            var safeUrl = escapeHtml(m[1].trim());
+            out.push('<img src="' + safeUrl + '" style="max-width:100%;max-height:400px;display:block;margin:6px 0;border-radius:4px"><div style="font-size:11px;color:#6c7086;word-break:break-all;margin-bottom:6px">' + safeUrl + '</div>');
+        } else {
+            out.push(escapeHtml(parts[i]));
+        }
+    }
+    return out.join("");
+}
+
+function roleClass(role) {
+    var r = role.toLowerCase();
+    if (r === "system") return "role-system";
+    if (r === "user") return "role-user";
+    if (r.indexOf("assistant") !== -1) return r.indexOf("think") !== -1 ? "role-thinking" : "role-assistant";
+    if (r.indexOf("tool") !== -1) return "role-tool";
+    return "";
+}
+
+function entryTypeClass(typeStr) {
+    if (!typeStr) return "";
+    if (typeStr.indexOf("request") !== -1) return "type-request";
+    if (typeStr.indexOf("response") !== -1) return "type-response";
+    if (typeStr.indexOf("tool") !== -1) return "type-tool";
+    if (typeStr.indexOf("summary") !== -1) return "type-summary";
+    return "";
+}
+
+// Parse raw session text into rendered HTML
+function renderMarkdownView(text, session) {
+    // Split into blocks by --- separator, but only outside ~~~ fenced blocks
+    var lines = text.replace(/\r/g, '').split("\n");
+    var blocks = [];
+    var currentBlock = [];
+    var inFence = false;
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        if (/^~~~/.test(line)) {
+            inFence = !inFence;
+            currentBlock.push(line);
+        } else if (!inFence && /^---\s*$/.test(line)) {
+            // Block separator found outside fenced block
+            blocks.push(currentBlock.join("\n"));
+            currentBlock = [];
+        } else {
+            currentBlock.push(line);
+        }
+    }
+    if (currentBlock.length > 0) blocks.push(currentBlock.join("\n"));
+
+    var html = '';
+
+    for (var bi = 0; bi < blocks.length; bi++) {
+        var block = blocks[bi].trim();
+        if (!block) continue;
+        html += renderBlock(block);
+    }
+
+    $content.innerHTML = html || '<p style="color:#6c7086;text-align:center;padding:40px 0">Empty session.</p>';
+    $contentWrap.scrollTop = 0;
+
+    // Activate native <details> elements (they already work in browser)
+    // Add copy-on-click to pre.code-block
+    var pres = $content.querySelectorAll("pre.code-block");
+    for (var i = 0; i < pres.length; i++) {
+        pres[i].title = "Click to copy";
+        pres[i].style.cursor = "pointer";
+        pres[i].addEventListener("click", copyPre);
+    }
+}
+
+function copyPre(e) {
+    var text = e.currentTarget.textContent;
+    try { navigator.clipboard.writeText(text); } catch(ex) {}
+    var old = e.currentTarget.style.outline;
+    e.currentTarget.style.outline = "1px solid #a6e3a1";
+    setTimeout(function(){ e.currentTarget.style.outline = old; }, 600);
+}
+
+function renderBlock(block) {
+    block = block.replace(/\r/g, '');
+    var lines = block.split("\n");
+    var li = 0;
+    var html = '';
+
+    function peek() { return li < lines.length ? lines[li] : null; }
+    function next() { return li < lines.length ? lines[li++] : null; }
+
+    // Detect entry type (from first metadata block)
+    var typeStr = (block.match(/^type\s+:\s+(\w+)/m) || [])[1] || "";
+    var blockClass = "entry-block " + entryTypeClass(typeStr);
+
+    html += '<div class="' + blockClass + '">';
+
+    while (li < lines.length) {
+        var line = peek();
+        if (line === null) break;
+
+        // # Level-1 heading (Session title or Tool Call title)
+        if (/^# /.test(line)) {
+            next();
+            html += '<h1 class="session-title">' + escapeHtml(line.slice(2)) + '</h1>';
+            continue;
+        }
+
+        // ## Level-2 heading
+        if (/^## /.test(line)) {
+            next();
+            html += '<h2 class="section-head">' + escapeHtml(line.slice(3)) + '</h2>';
+            continue;
+        }
+
+        // ### Level-3 heading (message role)
+        if (/^### /.test(line)) {
+            next();
+            var role = line.slice(4);
+            html += '<h3 class="msg-role ' + roleClass(role) + '">' + escapeHtml(role) + '</h3>';
+            continue;
+        }
+
+        // ~~~ fenced code block
+        if (/^~~~/.test(line)) {
+            var fence = next(); // consume opening ~~~
+            var isJson = /json/i.test(fence) || typeStr === "";
+            var isMeta = fence === "~~~";
+            var isMd = /md/i.test(fence);
+            var codeLines = [];
+            while (li < lines.length && !/^~~~/.test(peek())) {
+                codeLines.push(next());
+            }
+            if (li < lines.length) next(); // consume closing ~~~
+            if (isMd) {
+                html += '<div class="md-rendered">' + renderMdContent(codeLines.join("\n")) + '</div>';
+            } else {
+                var cls = "code-block" + (isMeta ? " meta-block" : "") + (/json/i.test(fence) ? " json-block" : "");
+                html += '<pre class="' + cls + '">' + escapeHtml(codeLines.join("\n")) + '</pre>';
+            }
+            continue;
+        }
+
+        // ``` fenced code block (inside details)
+        if (/^```/.test(line)) {
+            var fence2 = next();
+            var codeLines2 = [];
+            while (li < lines.length && !/^```/.test(peek())) {
+                codeLines2.push(next());
+            }
+            if (li < lines.length) next();
+            var cls2 = "code-block" + (/json/i.test(fence2) ? " json-block" : "");
+            html += '<pre class="' + cls2 + '">' + escapeHtml(codeLines2.join("\n")) + '</pre>';
+            continue;
+        }
+
+        // <details> block – collect until </details> and render natively
+        if (/^<details>/.test(line)) {
+            var detLines = [];
+            while (li < lines.length) {
+                var dl = next();
+                detLines.push(dl);
+                if (/<\/details>/.test(dl)) break;
+            }
+            // Parse summary + body
+            var detRaw = detLines.join("\n");
+            var summaryMatch = detRaw.match(/<summary>([\s\S]*?)<\/summary>/);
+            var summaryText = summaryMatch ? summaryMatch[1] : "Details";
+            // Body: everything between </summary> and </details>, strip code fence if present
+            var bodyRaw = detRaw.replace(/<details>/, "").replace(/<\/details>/, "").replace(/<summary>[\s\S]*?<\/summary>/, "").trim();
+            // Render body lines through mini renderer (handles ``` blocks)
+            var bodyHtml = "";
+            var bLines = bodyRaw.split("\n");
+            var bi2 = 0;
+            while (bi2 < bLines.length) {
+                var bl = bLines[bi2];
+                if (/^```/.test(bl)) {
+                    var f3 = bLines[bi2++];
+                    var cl3 = [];
+                    while (bi2 < bLines.length && !/^```/.test(bLines[bi2])) cl3.push(bLines[bi2++]);
+                    if (bi2 < bLines.length) bi2++; // closing ```
+                    bodyHtml += '<pre class="code-block' + (/json/i.test(f3) ? ' json-block' : '') + '">' + escapeHtml(cl3.join("\n")) + '</pre>';
+                } else {
+                    if (bl.trim()) bodyHtml += '<div class="det-body">' + escapeHtml(bl) + '</div>';
+                    bi2++;
+                }
+            }
+            html += '<details><summary>' + escapeHtml(summaryText) + '</summary>' + bodyHtml + '</details>';
+            continue;
+        }
+
+        // Tool status lines: ⏳, ✓, ✗
+        if (/^[⏳✓✗]/.test(line)) {
+            next();
+            var colored = line.replace(/^⏳/, '<span style="color:#f9e2af">⏳</span>')
+                              .replace(/^✓/, '<span style="color:#a6e3a1">✓</span>')
+                              .replace(/^✗/, '<span style="color:#f38ba8">✗</span>')
+                              .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                              .replace(/`([^`]+)`/g, '<code style="background:#2a2a3e;padding:0 3px;border-radius:3px">$1</code>');
+            html += '<div class="tool-line">' + colored + '</div>';
+            continue;
+        }
+
+        // blank or other lines – skip
+        next();
+    }
+
+    html += '</div>';
+    return html;
+}
+
+// ======================== Search (works on rendered content) ========================
+
+// ======================== Navigation ========================
+function updateNavButtons() {
+    $btnPrev.disabled = currentSessionIdx <= 0;
+    $btnNext.disabled = currentSessionIdx >= sessions.length - 1;
+    $btnDeleteBefore.disabled = currentSessionIdx <= 0;
+    $btnVSCode.disabled = currentSessionIdx < 0 || !currentFile;
+}
+
+$btnPrev.addEventListener("click", function(){ selectSession(currentSessionIdx - 1); });
+$btnNext.addEventListener("click", function(){ selectSession(currentSessionIdx + 1); });
+
+// ======================== Refresh ========================
+$btnRefresh.addEventListener("click", function(){
+    var fname = currentFile;
+    if (!fname) {
+        // no file loaded yet – just reload file list and pick today
+        loadFileList(function(){
+            var today = getLocalDateStr();
+            if (!findFileByDate(today) && files.length > 0) today = files[0].date;
+            selectDate(today);
+        });
+        return;
+    }
+    $statusBar.textContent = "Refreshing\u2026";
+    // Reset so loadFileByName doesn't short-circuit
+    currentFile = null;
+    // Also refresh file-size info in sidebar
+    loadFileList(function(){
+        var entry = null;
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].filename === fname) { entry = files[i]; break; }
+        }
+        if (entry) $fileInfo.textContent = entry.filename + " (" + formatSize(entry.size) + ")";
+        loadFileByName(fname);
+    });
+});
+
+// ======================== Delete Before ========================
+// ======================== Open in VS Code ========================
+function openInVSCode() {
+    if (currentSessionIdx < 0 || !currentFile) return;
+    var file = logDir + currentFile;
+    var line = sessions[currentSessionIdx].line;
+    ajax("open_in_vscode", {filepath: file, line: line}, function(data){
+        if (data.error) alert("VSCode error: " + data.error);
+    });
+}
+
+$btnVSCode.addEventListener("click", openInVSCode);
+
+$btnDeleteBefore.addEventListener("click", function(){
+    if (currentSessionIdx <= 0 || !currentFile) return;
+    var s = sessions[currentSessionIdx];
+    var count = currentSessionIdx; // sessions before current
+    if (!confirm("Delete " + count + " session(s) before session #" + s.id + "?\nThis cannot be undone.")) return;
+    $statusBar.textContent = "Deleting\u2026";
+    $btnDeleteBefore.disabled = true;
+    ajax("delete_before", {logfile: currentFile, from: s.offset}, function(data){
+        if (data.error) {
+            alert("Error: " + data.error);
+            $statusBar.textContent = "Delete failed.";
+            updateNavButtons();
+            return;
+        }
+        $statusBar.textContent = "Deleted " + count + " session(s). Refreshing\u2026";
+        var fname = currentFile;
+        currentFile = null;
+        loadFileList(function(){
+            var entry = null;
+            for (var i = 0; i < files.length; i++) {
+                if (files[i].filename === fname) { entry = files[i]; break; }
+            }
+            if (entry) $fileInfo.textContent = entry.filename + " (" + formatSize(entry.size) + ")";
+            loadFileByName(fname);
+        });
+    });
+});
+
+// ======================== Search ========================
+var searchTimeout = null;
+$searchBox.addEventListener("input", function(){
+    if (searchTimeout) clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(doSearch, 300);
+});
+$searchBox.addEventListener("keydown", function(e){
+    if (e.key === "Enter") { e.preventDefault(); doSearch(); }
+});
+
+function doSearch() {
+    var query = $searchBox.value.trim();
+
+    // Clear previous highlights
+    var old = $content.querySelectorAll(".search-hl");
+    for (var i = 0; i < old.length; i++) {
+        var parent = old[i].parentNode;
+        parent.replaceChild(document.createTextNode(old[i].textContent), old[i]);
+        parent.normalize();
+    }
+    if (!query) {
+        if (currentSessionIdx >= 0) {
+            var s = sessions[currentSessionIdx];
+            $statusBar.textContent = "Session #" + s.id + " | L" + s.line + "-L" + (s.endLine||"?") + " | " + formatSize(s.length);
+        }
+        return;
+    }
+
+    var walker = document.createTreeWalker($content, NodeFilter.SHOW_TEXT, null, false);
+    var node, matches = [], queryLower = query.toLowerCase();
+    while (node = walker.nextNode()) {
+        var text = node.textContent, startIdx = 0, idx;
+        while ((idx = text.toLowerCase().indexOf(queryLower, startIdx)) !== -1) {
+            matches.push({node: node, idx: idx});
+            startIdx = idx + 1;
+        }
+    }
+
+    var limit = Math.min(matches.length, 1000);
+    for (var i = limit - 1; i >= 0; i--) {
+        var m = matches[i];
+        var curIdx = m.node.textContent.toLowerCase().indexOf(queryLower, m.idx > 0 ? m.idx : 0);
+        if (curIdx === -1) continue;
+        try {
+            var range = document.createRange();
+            range.setStart(m.node, curIdx);
+            range.setEnd(m.node, curIdx + query.length);
+            var span = document.createElement("span");
+            span.className = "search-hl";
+            range.surroundContents(span);
+        } catch(e) {}
+    }
+
+    var first = $content.querySelector(".search-hl");
+    if (first) {
+        first.classList.add("search-hl-current");
+        first.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+    $statusBar.textContent = (currentSessionIdx >= 0 ? "Session #" + sessions[currentSessionIdx].id + " | " : "") + matches.length + " matches" + (matches.length > 1000 ? " (showing 1000)" : "");
+}
+
+// ======================== Keyboard ========================
+document.addEventListener("keydown", function(e){
+    if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+        e.preventDefault();
+        $searchBox.focus();
+        $searchBox.select();
+    }
+    if (e.target.tagName !== "INPUT" && e.target.tagName !== "SELECT" && e.target.tagName !== "TEXTAREA") {
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); selectSession(currentSessionIdx - 1); }
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); selectSession(currentSessionIdx + 1); }
+    }
+});
+
+// ======================== postMessage API ========================
+// Accepts { type: "refresh" } from the parent frame (TestBackgroundAgent test page).
+// Reloads the file list and re-selects the currently-shown date so any new sessions
+// appended since last load become visible, jumping to the latest session.
+window.addEventListener("message", function(e) {
+    if (!e.data || e.data.type !== "refresh") return;
+    console.log("[ChatLogViewer] postMessage refresh received");
+    // Clear the file-loaded guard so loadFileByName re-fetches even for same file
+    currentFile = null;
+    var dateToReload = $dateInput.value || getLocalDateStr();
+    loadFileList(function() {
+        if (!findFileByDate(dateToReload) && files.length > 0) {
+            dateToReload = files[0].date;
+        }
+        selectDate(dateToReload);
+    });
+});
+
+// ======================== Init ========================
+console.log("[ChatLogViewer] Init: calling loadFileList");
+loadFileList(function(){
+    var today = getLocalDateStr();
+    console.log("[ChatLogViewer] Files loaded. Today:", today, "Available:", files.map(function(f){return f.date}));
+    if (!findFileByDate(today) && files.length > 0) {
+        today = files[0].date;
+    }
+    selectDate(today);
+});
+
+})();
+</script>

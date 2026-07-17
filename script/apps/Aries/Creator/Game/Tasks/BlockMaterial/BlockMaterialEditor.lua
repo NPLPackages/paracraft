@@ -344,6 +344,7 @@ end
 function BlockMaterialEditor:UpdateMaterial(material, isNewMaterial)
     if (not material) then return end
     local blockMaterial = ParaAsset.GetBlockMaterial(material.ID);
+    if not blockMaterial then return end
     local attr = blockMaterial:GetAttributeObject();
     if (not attr:IsValid()) then return end 
 

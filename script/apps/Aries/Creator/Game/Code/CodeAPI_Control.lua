@@ -9,6 +9,10 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Control.lua");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
+NPL.load("(gl)script/ide/System/Concurrent/AsyncTask.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPIMultiThreaded.lua");
+local CodeAPIMultiThreaded = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPIMultiThreaded");
+local AsyncTask = commonlib.gettable("System.Concurrent.AsyncTask");
 local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
@@ -97,12 +101,14 @@ end
 
 -- make the current actor an agent of input entity. 
 -- The entity could be current player or a network player on server.
--- @param entityName: "@p" means current player, or any valid player name or entity name. 
+-- @param entityName: "@p" means current player, or any valid player name or entity name. or the entity itself.
 function env_imp:becomeAgent(entityName)
 	if(self.actor) then
 		local entity;
 		if(entityName == "@p") then
 			entity = EntityManager.GetPlayer();
+		elseif(type(entityName) == "table") then
+			entity = entityName;
 		else
 			entity = EntityManager.GetEntity(entityName);
 		end
@@ -110,10 +116,15 @@ function env_imp:becomeAgent(entityName)
 			self.actor:BecomeAgent(entity);
 		end
 	else
-		local actor = self.codeblock:CloneMyself()
-		if(actor and self.co) then
-			self.co:SetActor(actor);
-			env_imp.becomeAgent(self, entityName);
+		local actor = self.codeblock:CloneMyself();
+		if(not actor) then
+			actor = self.codeblock:CreateEmptyActor()
+		end
+		if(actor) then
+			if(self.co) then
+				self.co:SetActor(actor);
+				env_imp.becomeAgent(self, entityName);
+			end
 		end
 	end
 end
@@ -130,13 +141,50 @@ end
 -- run function in a new coroutine
 function env_imp:run(mainFunc)
 	if(type(mainFunc) == "function") then
-		local last_co = self.co;
 		local co = CodeCoroutine:new():Init(self.codeblock);
 		co:SetActor(self.actor);
 		co:SetFunction(mainFunc);
 		co:Run();
-		if(last_co) then
-			last_co:SetCurrentCodeContext();
+	end
+end
+
+-- run a task and wait for its completion and return the task's return value if any
+-- @param mainFunc: function to run
+-- @param ...: arguments to pass to the function
+function env_imp:runTask(mainFunc, ...)
+	return env_imp.runTaskOn(self, nil, mainFunc, ...)
+end
+
+-- run a task on the given thread
+-- @param threadName: it can be "main" to run on main thread, or [1,2] for worker threads, or any thread name
+-- @param mainFunc: function to run
+-- @param ...: arguments to pass to the function
+-- @return the task object or direct result depending on whether we are in worker thread. one can use task:OnFinish(function(result) end) for result.
+function env_imp:runTaskOn(threadName, mainFunc, ...)
+	if(type(mainFunc) == "function") then
+		if(threadName == "main") then
+			local result = mainFunc(...);
+			return result;
+		else
+			local task = AsyncTask.CreateTask(mainFunc, ...);
+
+			CodeAPIMultiThreaded.RegisterCodeAPIMultiThreadedEnv()
+
+			task:Run(threadName, "CodeAPI"):OnFinish(self.co:MakeCallbackFunc(function(result)
+				env_imp.resume(self, result)
+			end)):OnError(self.co:MakeCallbackFunc(function(errMsg, msgType)
+				local msg;
+				if(msgType == "timeout") then
+					msg = format(L"runTask: 超时在%s", self.codeblock:GetFilename());
+				else
+					msg = format(L"runTask: 运行错误 %s \n在%s", self.codeblock:BeautifyRuntimeErrorMsg(tostring(errMsg)), self.codeblock:GetFilename());
+				end
+				LOG.std(nil, "error", "CodeAPI.runTask", msg);
+				self.codeblock:send_message(msg, "error");
+				env_imp.resume(self)
+			end))
+			local result = env_imp.yield(self);
+			return result
 		end
 	end
 end

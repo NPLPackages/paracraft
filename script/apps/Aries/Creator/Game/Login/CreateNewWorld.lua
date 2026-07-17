@@ -85,11 +85,12 @@ function CreateNewWorld.OnInit()
 end
 
 
-function CreateNewWorld.ShowView(is_only_close)
+function CreateNewWorld.ShowView(is_only_close,is_force_create)
 	CreateNewWorld.is_only_close = is_only_close
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
 	if (isCustomShow == "show") then
-		local url = System.options.channelId_431 and "script/apps/Aries/Creator/Game/Educate/Other/CreateNewWorld.html" or "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html"
+		local url = System.options.isEducatePlatform and "script/apps/Aries/Creator/Game/Educate/Other/CreateNewWorld.html" or "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html"
+		url = url .. "?is_only_close=".. tostring(is_only_close).. "&is_force_create=".. tostring(is_force_create)
 		local params = {
 			url = url,
 			name = "CreateMCNewWorld", 
@@ -116,7 +117,7 @@ end
 
 -- show page
 -- is_close:is only close page when click retturn button
-function CreateNewWorld.ShowPage(is_only_close)
+function CreateNewWorld.ShowPage(is_only_close,is_force_create)
 	if (GameLogic.GetFilters():apply_filters('is_signed_in')) then
 		if System.options.isPapaAdventure then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
@@ -124,15 +125,15 @@ function CreateNewWorld.ShowPage(is_only_close)
 			PapaAPI:CreateWorldInWorld()
 			return
 		end
-		if System.options.channelId_431 or System.options.channelId_tutorial then
-			CreateNewWorld.ShowView(is_only_close)
+		if System.options.isEducatePlatform or System.options.channelId_tutorial then
+			CreateNewWorld.ShowView(is_only_close,is_force_create)
 			return 
 		end
 		GameLogic.GetFilters():apply_filters("service.keepwork_service_world.limit_free_user",
             false,
             function(result)
                 if result then
-                    CreateNewWorld.ShowView(is_only_close)
+                    CreateNewWorld.ShowView(is_only_close,is_force_create)
                 else
                     GameLogic.ShowVipGuideTip("UnlimitWorldsNumber")
                 end
@@ -142,11 +143,11 @@ function CreateNewWorld.ShowPage(is_only_close)
 		if(System.options.DisableOfflineMode) then
 			GameLogic.CheckSignedIn(L"请先登录！", function(bSucceed)
 				if bSucceed then
-					CreateNewWorld.ShowPage(is_only_close);
+					CreateNewWorld.ShowPage(is_only_close,is_force_create);
 				end
 			end);
 		else
-			CreateNewWorld.ShowView(is_only_close)
+			CreateNewWorld.ShowView(is_only_close,is_force_create)
 		end
 	end
 end
@@ -305,7 +306,8 @@ function CreateNewWorld.OnClickLoadWorld()
 			CreateNewWorld.ClosePage();
 			WorldCommon.OpenWorld(world.worldpath, true)
 		else
-			_guihelper.MessageBox(L"无效的世界文件");
+			GameLogic.AddBBS(nil,"进入世界失败，请重试~~~")
+        	GameLogic.SendErrorLog("CreateNewWorld","load world failed","load world failed============")
 		end
 	end
 end

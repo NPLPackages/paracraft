@@ -123,7 +123,7 @@ end
 	funcName = "else",
 	func_description = 'else',
 	ToNPL = function(self)
-		return string.format('then\n');
+		return string.format('else\n');
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 if(distanceTo("mouse-pointer")<3) then
@@ -249,10 +249,10 @@ end
 	func_description = 'function %s()\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def %s():\n    %s\n', self:getFieldValue('name'), input);
+		return string.format('def %s():\n%s\n', self:getFieldValue('name'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('function %s()\n%send\n', self:getFieldValue('name'), self:getFieldAsString('input'));
@@ -362,10 +362,10 @@ end
 	func_description = 'for i_=1, %d do\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('for i_ in range(%d):\n    %s\n', self:getFieldValue('times'), input);
+		return string.format('for i_ in range(%d):\n%s\n', self:getFieldValue('times'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('for i=1, %d do\n    %s\nend\n', self:getFieldValue('times'), self:getFieldAsString('input'));
@@ -402,10 +402,10 @@ end
 	func_description = 'while(true) do\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('while True:\n    %s\n', input);
+		return string.format('while True:\n%s\n', input);
 	end,
 	ToNPL = function(self)
 		return string.format('while(true) do\n    %s\nend\n', self:getFieldAsString('input'));
@@ -455,10 +455,10 @@ end
 	func_description = 'for %s=%d, %d do\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('for %s in range(%d, %d):\n    %s\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), input);
+		return string.format('for %s in range(%d, %d+1):\n%s\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('for %s=%d, %d do\n    %s\nend\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), self:getFieldAsString('input'));
@@ -512,10 +512,10 @@ end
 	func_description = 'for %s=%d, %d, %d do\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('for %s in range(%d, %d, %d):\n    %s\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), self:getFieldValue('step'), input);
+		return string.format('for %s in range(%d, %d, %d):\n%s\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), self:getFieldValue('step'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('for %s=%d, %d, %d do\n    %s\nend\n', self:getFieldValue('var'),self:getFieldValue('start_index'),self:getFieldValue('end_index'), self:getFieldValue('step'), self:getFieldAsString('input'));
@@ -600,10 +600,11 @@ end
 	func_description = "repeat\\n%s\\nuntil(%s)",
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('while True:\n    %s\n    if %s:\n        break\n', input, self:getFieldAsString('expression'));
+		local block_indent = self:GetIndent();
+		return string.format('while True:\n%s\n%s    if %s:\n%s        break\n', input, block_indent, self:getFieldAsString('expression'), block_indent);
 	end,
 	ToNPL = function(self)
 		return string.format('repeat\n    %s\nuntil(%s)\n', self:getFieldAsString('input'), self:getFieldAsString('expression'));
@@ -636,7 +637,8 @@ until(i==3)
 	hide_in_toolbox = false,
 	func_description = "repeat wait(0.01) until(%s)",
 	ToPython = function(self)
-		return string.format('while True:\n    wait(0.01)\n    if %s:\n        break\n', self:getFieldAsString('expression'));
+		local block_indent = self:GetIndent();
+		return string.format('while True:\n%swait(0.01)\n%s    if %s:\n%s        break\n', block_indent, block_indent, self:getFieldAsString('expression'), block_indent);
 	end,
 	ToNPL = function(self)
 		return string.format('repeat wait(0.01) until(%s)\n', self:getFieldAsString('expression'));
@@ -682,10 +684,10 @@ repeat wait(0.01) until(current_level == 1)
 	func_description = 'while (%s) do\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input_true')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('while %s:\n    %s\n', self:getFieldAsString('expression'), input);
+		return string.format('while %s:\n%s\n', self:getFieldAsString('expression'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('while (%s) do\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'));
@@ -726,10 +728,10 @@ end
 	func_description = 'if(%s) then\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input_true')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('if %s:\n    %s\n', self:getFieldAsString('expression'), input);
+		return string.format('if %s:\n%s\n', self:getFieldAsString('expression'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('if(%s) then\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'));
@@ -774,13 +776,15 @@ end
 	ToPython = function(self)
 		local input_true = self:getFieldAsString('input_true')
 		local input_else = self:getFieldAsString('input_else')
-		if input_true == '' then
-			input_true = 'pass'
+		local block_indent = self:GetIndent();
+		
+		if input_true and input_true:match('^%s*$') then
+			input_true = input_true..'pass'
 		end
-		if input_else == '' then
-			input_else = 'pass'
+		if input_else and input_else:match('^%s*$') then
+			input_else = input_else..'pass'
 		end
-		return string.format('if %s:\n    %s\nelse:\n    %s\n', self:getFieldAsString('expression'), input_true, input_else);
+		return string.format('if %s:\n%s\n%selse:\n%s\n', self:getFieldAsString('expression'), input_true, block_indent, input_else);
 	end,
 	ToNPL = function(self)
 		return string.format('if(%s) then\n    %s\nelse\n    %s\nend\n', self:getFieldAsString('expression'), self:getFieldAsString('input_true'), self:getFieldAsString('input_else'));
@@ -837,10 +841,10 @@ end
 	func_description = 'for %s, %s in pairs(%s) do\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('for %s, %s in %s.items():\n    %s\n', self:getFieldAsString('key'), self:getFieldAsString('value'), self:getFieldAsString('data'), input);
+		return string.format('for %s, %s in %s.items():\n%s\n', self:getFieldAsString('key'), self:getFieldAsString('value'), self:getFieldAsString('data'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('for %s, %s in pairs(%s) do\n    %s\nend\n', self:getFieldAsString('key'), self:getFieldAsString('value'), self:getFieldAsString('data'), self:getFieldAsString('input'));
@@ -896,10 +900,10 @@ end
 	func_description = 'for %s, %s in ipairs(%s) do\\n%send',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('for %s, %s in enumerate(%s):\n    %s\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), input);
+		return string.format('for %s, %s in enumerate(%s):\n%s\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('for %s, %s in ipairs(%s) do\n    %s\nend\n', self:getFieldAsString('i'), self:getFieldAsString('item'), self:getFieldAsString('data'), self:getFieldAsString('input'));
@@ -937,10 +941,11 @@ end
 	func_description = 'run(function()\\n%send)',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		local block_indent = self:GetIndent();
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def run_func():\n    %s\nrun(run_func)\n', input);
+		return string.format('def run_func():\n%s\n%srun(run_func)\n', input, block_indent);
 	end,
 	ToNPL = function(self)
 		return string.format('run(function()\n    %s\nend)\n', self:getFieldAsString('input'));
@@ -960,6 +965,92 @@ run(function()
     while(true) do
         moveForward(0.02)
     end
+end)
+]]}},
+},
+
+{
+	type = "runTask", 
+	message0 = L"多线程执行",
+	message1 = L"%1",
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Control", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	funcName = "runTask",
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'runTask(function()\\n%send)',
+	ToPython = function(self)
+		local block_indent = self:GetIndent();
+		local input = self:getFieldAsString('input')
+		if input and input:match('^%s*$') then
+			input = input..'pass'
+		end
+		return string.format('def run_func():\n%s\n%srunTask(run_func)\n', input, block_indent);
+	end,
+	ToNPL = function(self)
+		return string.format('runTask(function()\n    %s\nend)\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+local result = runTask(function(param1)
+    return param1.." world"
+end, "hello")
+say(result)
+]]}},
+},
+
+{
+	type = "runTaskOn", 
+	message0 = L"在线程%1执行",
+	message1 = L"%1",
+	arg0 = {
+		{
+			name = "threadName",
+			type = "field_input",
+			text = "main",
+		},
+	},
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Control", 
+	color="#00cc00",
+	helpUrl = "", 
+	canRun = false,
+	funcName = "runTaskOn",
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'runTaskOn(%s, function()\\n%send)',
+	ToPython = function(self)
+		local block_indent = self:GetIndent();
+		local input = self:getFieldAsString('input')
+		if input and input:match('^%s*$') then
+			input = input..'pass'
+		end
+		return string.format('def run_func():\n%s\n%srunTaskOn("%s", run_func)\n', input, block_indent, self:getFieldAsString('threadName'));
+	end,
+	ToNPL = function(self)
+		return string.format('runTaskOn("%s", function()\n    %s\nend)\n', self:getFieldAsString('threadName'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+runTaskOn("main", function(param1)
+    return param1.." world"
+end, "hello"):OnFinish(function(result)
+	echo(result)
 end)
 ]]}},
 },
@@ -992,11 +1083,12 @@ end)
 	nextStatement = true,
 	func_description = 'runForActor(%s, function()\\n%send)',
 	ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def runForActor_func():\n    %s\nrunForActor("%s", runForActor_func)', input, self:getFieldAsString('actor'));
+		return string.format('def runForActor_func():\n%s\n%srunForActor("%s", runForActor_func)\n', input, block_indent, self:getFieldAsString('actor'));
 	end,
 	ToNPL = function(self)
 		return string.format('runForActor("%s", function()\n    %s\nend)\n', self:getFieldAsString('actor'), self:getFieldAsString('input'));

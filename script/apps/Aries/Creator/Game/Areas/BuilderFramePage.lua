@@ -92,12 +92,28 @@ function BuilderFramePage.OneTimeInit(uiversion)
 	BuilderFramePage.uiversion = uiversion;
 	BuilderFramePage.category_ds = nil;
 	
-	if(System.options.IsMobilePlatform) then
-		BuilderFramePage.category_ds = BuilderFramePage.category_ds_touch;
-	elseif(uiversion == 0) then
+	if(uiversion == 0) then
 		BuilderFramePage.category_ds = BuilderFramePage.category_ds_old;
 	elseif(uiversion == 1) then
 		BuilderFramePage.category_ds = BuilderFramePage.category_ds_new;
+	end
+end
+
+function BuilderFramePage.GetCategoryIndexByBlock(blockId)
+	if not blockId then
+		return
+	end
+	for i, category in ipairs(BuilderFramePage.category_ds) do
+		if category.name and category.enabled then
+			local ds = ItemClient.GetBlockDS(category.name)
+			if ds then
+				for index, item in ipairs(ds) do
+					if item.block_id == blockId or item.name == blockId then
+						return i, index
+					end
+				end
+			end
+		end
 	end
 end
 
@@ -137,6 +153,29 @@ function BuilderFramePage.OnHelpBlock(block_id)
 	GameLogic.RunCommand("/wiki "..tostring(block_id));
 end
 
+
+function BuilderFramePage.OnFilterBlock()
+	if System.options.isEducatePlatform or System.options.isPapaAdventure then
+		-- hide some game related blocks in educate platform
+		local blocked_ids = {
+			[10516] = true,
+			[10517] = true,
+			[10518] = true,
+			[10073] = true,
+			[10030] = true,
+			[271] = true,
+			[275] = true,
+			[10011] = true,
+			[10021] = true,
+			[20001] = true,
+		}
+		BuilderFramePage.Current_Item_DS = commonlib.filter(BuilderFramePage.Current_Item_DS, function(block)
+			return not (blocked_ids[block.block_id or 0])
+		end)
+	end
+end
+
+
 --- @param index number: category index
 --- @param bRefreshPage boolean: num false to stop refreshing the page
 function BuilderFramePage.OnChangeCategory(index, bRefreshPage)
@@ -145,11 +184,7 @@ function BuilderFramePage.OnChangeCategory(index, bRefreshPage)
 	if(category) then
 		BuilderFramePage.Current_Item_DS = ItemClient.GetBlockDS(category.name);
 		BuilderFramePage.category_name = category.name;
-		if System.options.channelId_431 then
-			BuilderFramePage.Current_Item_DS = commonlib.filter(BuilderFramePage.Current_Item_DS,function (block)
-				return block.block_id ~= 10516 and block.block_id ~= 10517 and block.block_id ~= 10518 and block.block_id ~= 10519 and block.block_id ~= 10073
-			end)
-		end
+		BuilderFramePage.OnFilterBlock()
 	end
 
 	BuilderFramePage.isSearching = false;
@@ -195,6 +230,7 @@ function BuilderFramePage.SearchBlockOrigin(search_text)
 			
 			BuilderFramePage.Current_Item_DS = ItemClient.SearchBlocks(block_tag,"all");
 		end
+		BuilderFramePage.OnFilterBlock()
 	end
 	local gvw_name = "new_builder_gvwItems";
 	local node = page:GetNode(gvw_name);

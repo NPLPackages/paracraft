@@ -1,23 +1,26 @@
 --[[
 Title: Main game loop
-Author(s): WangTian
-Company: ParaEnging Co. & Taomee Inc.
+Author(s): WangTian, LiXizhi
+Company: ParaEnging
 Date: 2009/4/6
 Desc: Entry point and game loop
 command line params
 | *name*| *desc* |
+| world | world path |
+| httpdebug | true for npl http debugger|
+| channelId | 431 |
+| browser_debug | bool true to enable webview2 browser debug |
+| keepworktoken | |
+| isSchool | true to disable games and url protocol install |
 | gateway | force the gateway to use, usually for debugging purposes. such as "1100" |
 | url  | from which url, this application is started |
-| httpdebug | true for npl http debugger|
-| isSchool | true to disable games and url protocol install |
-| keepworktoken | |
 | resolution | |
 
 e.g. 
-<verbatim>
-	paraworld.exe username="1100@paraengine.com" password="1100@paraengine.com" servermode="true" d3d="false" chatdomain="192.168.0.233" domain="test.pala5.cn"
-	paraworld.exe username="LiXizhi1" password="" gateway="1100"
-</verbatim>
+browser_debug="true"  channelId="431" httpdebug="true" bootstrapper="script/apps/Aries/bootstrapper.xml"  mc="true" world="worlds/DesignHouse/_user/lixizhi/bipedpose" 
+paraworld.exe username="1100@paraengine.com" password="1100@paraengine.com" servermode="true" d3d="false" chatdomain="192.168.0.233" domain="test.pala5.cn"
+paraworld.exe username="LiXizhi1" password="" gateway="1100"
+
 use the lib:
 ------------------------------------------------------------
 NPL.activate("(gl)script/apps/Aries/main_loop.lua");
@@ -26,26 +29,32 @@ Or run application with command line: bootstrapper = "script/apps/Aries/bootstra
 ------------------------------------------------------------
 ]]
 -- mainstate is just a dummy to set some ReleaseBuild=true
-
-_G.CHANNEL_CONFIG = {
-	CHANNEL_430 = "430",
-	CHANNEL_TUTORIAL = "tutorial",
-}
-
 NPL.load("(gl)script/mainstate.lua"); 
 NPL.load("(gl)script/ide/commonlib.lua"); 
 
--- let us see replace im server if command line contains imserver="game"
-local imserver = ParaEngine.GetAppCommandLineByParam("imserver", "game");
+local commandLine = ParaEngine.GetAppCommandLine();
+local isParacraftMC = (ParaEngine.GetAppCommandLineByParam("mc", "false") == "true");
+if (not isParacraftMC and commandLine and commandLine:match("mc=true")) then
+	-- just in case it is comming from the website url. 
+	isParacraftMC = true;
+end
 
-if (imserver == "game") then
-	NPL.load("(gl)script/apps/IMServer/IMserver_client.lua");
-	-- this will replace the default(real) jabber client with the one implemented by our own game server based IM server. Make sure this is done before you use it in the app code.
-	JabberClientManager = commonlib.gettable("IMServer.JabberClientManager");
+if (not isParacraftMC) then
+	-- let us see replace im server if command line contains imserver="game"
+	if(ParaEngine.GetAppCommandLineByParam("imserver", "game") == "game") then
+		NPL.load("(gl)script/apps/IMServer/IMserver_client.lua");
+		-- this will replace the default(real) jabber client with the one implemented by our own game server based IM server. Make sure this is done before you use it in the app code.
+		JabberClientManager = commonlib.gettable("IMServer.JabberClientManager");
+	end
 end
 
 NPL.load("(gl)script/kids/ParaWorldCore.lua"); -- ParaWorld platform includes
 NPL.load("(gl)script/ide/app_ipc.lua");
+
+-- check a secret file for whether it is running from AB. If not, disable some log. 
+System.options.isAB_SDK = ParaIO.DoesFileExist("character/Animation/script/dance_drum.lua", false)
+System.options.isDevMode = (ParaEngine.GetAppCommandLineByParam("isDevMode", "false") == "true");
+System.options.isDevEnv = (ParaEngine.GetAppCommandLineByParam("isDevEnv","false") == "true");
 
 -- load paracraft packages if any
 if (ParaEngine.GetAppCommandLineByParam("isDevEnv", "") == "" and
@@ -61,8 +70,6 @@ end
 -- main_state="logo";
 -- whether it is server mode, such as under linux without graphics rendering. 
 System.options.servermode = ParaEngine.GetAppCommandLineByParam("servermode", "false") == "true";
--- check a secret file for whether it is running from AB. If not, disable some log. 
-System.options.isAB_SDK = ParaIO.DoesFileExist("character/Animation/script/dance_drum.lua", false)
 
 System.options.is18_SDK = ParaIO.DoesFileExist("18+.txt", false)
 
@@ -71,23 +78,15 @@ System.options.disable_trading = nil;
 
 local commandLine = ParaEngine.GetAppCommandLine();
 -- whether it is mc version
-System.options.mc = (ParaEngine.GetAppCommandLineByParam("mc", "false") == "true");
-
-if (not System.options.mc and commandLine and commandLine:match("mc=true")) then
-	-- just in case it is comming from the website url. 
-	System.options.mc = true;
-end
+System.options.mc = isParacraftMC
 
 System.options.channelId = ParaEngine.GetAppCommandLineByParam("channelId","") --特殊发行版本，如 “430”版本
-
-System.options.isDevEnv = (ParaEngine.GetAppCommandLineByParam("isDevEnv","false") == "true");
-System.options.isDevMode = (ParaEngine.GetAppCommandLineByParam("isDevMode", "false") == "true");
 
 System.options.open_resolution = ParaEngine.GetAppCommandLineByParam("resolution",nil);
 
 System.options.cmdline_world = System.options.cmdline_world or ParaEngine.GetAppCommandLineByParam("world","");
 
-System.options.cmdline_username = System.options.cmdline_world or ParaEngine.GetAppCommandLineByParam("username","");
+System.options.cmdline_username = System.options.cmdline_username or ParaEngine.GetAppCommandLineByParam("username","");
 
 System.options.isCodepku = (ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true");
 
@@ -96,7 +95,13 @@ System.User = System.User or {};
 if (not System.User.keepworktoken) then
 	System.User.keepworktoken = ParaEngine.GetAppCommandLineByParam("keepworktoken",nil);
 end
-
+if (not System.User.keepworktoken) then
+	local cmdline_token = (commandLine and commandLine ~= "") and commandLine:match('usertoken="([%S]+)"') or ""
+	if (cmdline_token and cmdline_token ~= "") then
+		System.User.keepworktoken = cmdline_token;
+	end
+end
+LOG.std(nil, "info" , "System", "user token="..tostring(System.User.keepworktoken));
 System.options.default_ui_scaling = {};
 
 if (ParaEngine.GetAppCommandLineByParam("default_ui_scaling", "") ~= "") then
@@ -107,21 +112,54 @@ else
 	ParaUI.GetUIObject("root"):GetField("UIScale", System.options.default_ui_scaling);
 end
 
+--第三方登录 or 注册
+System.options.thirdpartytoken = ParaEngine.GetAppCommandLineByParam("thirdpartytoken", nil)
+System.options.clientId = ParaEngine.GetAppCommandLineByParam("client_id", nil)
+
+--是否内部用户
+System.options.isInternal = ParaEngine.GetAppCommandLineByParam("isInternal", "false") == "true"
+
 --430开关
 System.options.isChannel_430 = (System.options.channelId=="430");
 System.options.channelId_tutorial = System.options.channelId =="tutorial";
 System.options.channelId_431 = System.options.channelId =="431";
 System.options.isPapaAdventure = (System.options.channelId_tutorial and System.options.isDevMode) or System.options.channelId =="papa";
-
-if (System.options.isChannel_430 or System.options.channelId_431 or System.options.isPapaAdventure) then
+System.options.isEducatePlatform = System.options.channelId =="431" or System.options.channelId =="shenzhen_ai5"
+System.options.isShenzhenAi5 = System.options.channelId =="shenzhen_ai5"
+System.options.isCommunity = System.options.channelId ==""
+if (System.options.isChannel_430 
+	or System.options.isEducatePlatform 
+	or System.options.isPapaAdventure
+	or System.options.channelId_tutorial) then
 	System.options.isHideVip = true;
 end
+
+--隐私协议相关参数
+System.options.isShowPrivacyWindow = ParaEngine.GetAppCommandLineByParam("showprivacywindow", "false") == "true";
+System.options.isStrictGameMode = System.options.isShowPrivacyWindow
+--app名称
+System.options.appName = ParaEngine.GetAppCommandLineByParam("appName", "")
+
+--language
+System.options.language = ParaEngine.GetAppCommandLineByParam("lang", "");
+--theme color
+System.options.themeColor = ParaEngine.GetAppCommandLineByParam("themecolor","")
+--loading text
+System.options.loadingText = ParaEngine.GetAppCommandLineByParam("loadingText", nil);
 
 if (System.os.GetPlatform() == "mac" or System.os.GetPlatform() == "ios") then
 	System.options.isHideVip = true;
 end
 
-commonlib.setfield("System.options.isFromQQHall", ParaEngine.GetAppCommandLineByParam("isFromQQHall", "") == "true");
+-- iOS IDFA
+if (System.os.GetPlatform() == "ios" and System.os.CompareParaEngineVersion('1.6.1.0')) then
+	IDFA.requestTrackingAuthorization();
+end
+
+-- if (System.os.GetPlatform() == "android" and (not System.options.channelId or System.options.channelId == "") and System.os.GetAndroidFlavor() == "palaka") then
+-- 	System.options.isHideVip = true;
+-- end
+LOG.std(nil, "info", "System", "options==========="..tostring(System.options.isCommunity)..",chanelId========"..tostring(System.options.channelId));
 
 if (ParaEngine.GetAppCommandLineByParam("isSchool", "") == "true") then
 	commonlib.setfield("System.options.isSchool", true);
@@ -151,17 +189,9 @@ local function Aries_load_config(filename)
 
 	System.options.partner = System.options.partner:sub(1,10);
 
-	if (System.options.partner == "qq") then
-		-- if partner is qq we will show the qq login page by default. in most cases, it is in window mode. 
-		NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
-		local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
-		System.options.platform_id = Platforms.PLATS.QQ;
-		System.options.is_official = true;
-	elseif (System.options.partner == "keepwork") then
-		NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
-		local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
-		System.options.platform_id = Platforms.PLATS.KEEPWORK;
-	end
+	NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
+	local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
+	System.options.platform_id = Platforms.PLATS.KEEPWORK;
 
 	-- we will enter this world first 
 	-- format: "nid@homeland" or "nid@save_slot_id"
@@ -313,6 +343,11 @@ local function Aries_load_config(filename)
 	if (System.options.IsTouchDevice) then
 		-- NOTE: for now we will disable all system IME and use buildin virtual keyboard where possible. 
 		-- System.options.auto_virtual_keyboard = true
+		if (System.os.IsEmscripten()) then
+			ParaEngine.GetAttributeObject():SetField("LandscapeMode", "on");
+			local isLanscapeMode = ParaEngine.GetAttributeObject():GetField("IsScreenRotated", false)
+			LOG.std(nil, "info", "LandscapeMode", "LandscapeMode: %s", tostring(isLanscapeMode));
+		end
 	end
 
 	-- always use compression. The current compression method is super light-weighted and is mostly for data encrption purposes. 
@@ -342,8 +377,7 @@ local function Aries_load_config(filename)
 	end
 
 	local cmdVer = ParaEngine.GetAppCommandLineByParam("version", "kids");
-
-	if (not IsMobilePlatform and
+	if (not IsMobilePlatform and not System.os.IsEmscripten() and
 		cmdVer ~= client_ver_string and
 		not System.options.isAB_SDK and
 		not System.options.mc) then
@@ -442,9 +476,13 @@ local function Aries_load_config(filename)
 	node = commonlib.XPath.selectNodes(xmlRoot, "/GameClient/asset_server_addresses/address")[1];
 
 	if (node and node.attr) then
+		LOG.std("", "info", "aries", "Asset server: %s", node.attr.host)	
+		if(System.os.IsEmscripten()) then
+			-- replace http:// with https:// in emscripten
+			node.attr.host = string.gsub(node.attr.host, "^http://", "https://");
+		end	
 		-- if asset is not found locally, we will look in this place
 		ParaAsset.SetAssetServerUrl(node.attr.host);
-		LOG.std("", "system", "aries", "Asset server: %s", node.attr.host)
 	end
 	
 	local chat_domain
@@ -554,7 +592,7 @@ local function Aries_load_config(filename)
 				end);
 			end
 			local USE_NPL_GET_PID = false
-			if(USE_NPL_GET_PID or not ParaGlobal.IsPortAvailable) then
+			if(USE_NPL_GET_PID or not ParaGlobal.IsPortAvailable or System.os.GetPlatform() == 'mac') then
 				TestOpenNPLPort_();
 			else
 				for i = 1, 20 do
@@ -651,12 +689,12 @@ local function Aries_Init()
 	else
 		if(System.options.version == "kids") then
 			NPL.load("(gl)script/apps/Aries/DefaultTheme.lua");
-			System.options.MaxCharTriangles_show = 50000;
+			System.options.MaxCharTriangles_show = 150000;
 		else
 			NPL.load("(gl)script/apps/Aries/DefaultTheme.teen.lua");
 			-- some default settings
-			System.options.MaxCharTriangles_show = 50000;
-			System.options.MaxCharTriangles_hide = 20000;
+			System.options.MaxCharTriangles_show = 150000;
+			System.options.MaxCharTriangles_hide = 50000;
 		end
 
 		MyCompany.Aries.Theme.Default:Load();
@@ -719,7 +757,7 @@ local function Aries_Init()
 	-- in case back buffer is not big enough, we will use UI scaling. 
 	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 	local Screen = commonlib.gettable("System.Windows.Screen");
-
+	
 	if (System.options.mc) then
 		Screen:SetMinimumScreenSize(1280, 720, true);
 	else
@@ -773,21 +811,23 @@ local function Aries_Init()
 				paraworld.CreateRPCWrapper("paraworld.GetLoginNewsPage", login_news_page);
 			end
 
-			paraworld.GetLoginNewsPage(
-				-- added forbid_reuse to close the connection immediately after request, since we no longer needs a connection to this server any more. 
-				--{forbid_reuse=true},
-				{}, 
-				"default",
-				function(msg)
-					if (msg and msg.code==0 and msg.data and msg.rcode==200) then
-						-- msg.data contains the XML code. 
-						local xmlRoot = ParaXML.LuaXML_ParseString(msg.data);
-						System.SystemInfo.SetField("login_news_page_data", xmlRoot);
-						NPL.load("(gl)script/apps/Aries/Login/LocalUserSelectPage.lua");
-						MyCompany.Aries.LocalUserSelectPage:LoadNews();
+			if(not System.os.IsEmscripten()) then
+				paraworld.GetLoginNewsPage(
+					-- added forbid_reuse to close the connection immediately after request, since we no longer needs a connection to this server any more. 
+					--{forbid_reuse=true},
+					{}, 
+					"default",
+					function(msg)
+						if (msg and msg.code==0 and msg.data and msg.rcode==200) then
+							-- msg.data contains the XML code. 
+							local xmlRoot = ParaXML.LuaXML_ParseString(msg.data);
+							System.SystemInfo.SetField("login_news_page_data", xmlRoot);
+							NPL.load("(gl)script/apps/Aries/Login/LocalUserSelectPage.lua");
+							MyCompany.Aries.LocalUserSelectPage:LoadNews();
+						end
 					end
-				end
-			);
+				);
+			end
 		end
 	end
 
@@ -802,15 +842,22 @@ local function Aries_Init()
 	NPL.load("(gl)script/kids/3DMapSystemApp/DebugApp/app_main.lua");
 	Map3DSystem.App.Debug.DoLoadConfigFile();
 
+	--[[
+		例子：
+		-- paracraft-android_vivo_papa 
+		-- paracraft-mac_papa 
+		-- paracraft-ios_papa
+	]]
 	if (System.options.mc) then
-		local platform = System.os.GetPlatform();
-
-		if (platform == "win32") then
+		local platform =  System.os.GetPlatform();
+		local channelId = System.options.channelId
+		local android_channelId = ""
+		if (platform == "win32" or System.os.IsEmscripten()) then
 			System.options.appId = "paracraft";
 		else
 			if (platform ~= "mac" and platform ~= "ios") then
 				local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
-				System.options.channelId = PlatformBridge.getMobileChannelId();
+				android_channelId = PlatformBridge.getMobileChannelId();
 			end
 
 			if (platform == "android") then
@@ -822,9 +869,18 @@ local function Aries_Init()
 			end
 		end
 
-		if (System.options.channelId~=nil and System.options.channelId ~= "") then
-			System.options.appId = System.options.appId.."_"..System.options.channelId;
+		if (android_channelId~=nil and android_channelId ~= "") then
+			System.options.appId = System.options.appId.."_"..android_channelId
+			System.options.channelId = android_channelId
 		end 
+
+		if channelId and channelId~= "" then
+			System.options.appId = System.options.appId.."_"..channelId
+			System.options.channelId = channelId --channelId <----- config.txt
+		end
+		if System.options.isDevMode then
+			print("config========",System.options.channelId,System.options.appId)
+		end
 	end
 end
 
@@ -855,6 +911,9 @@ local function activate()
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Login/MainLogin.lua");
 				MyCompany.Aries.Game.MainLogin:start(Aries_Init);
 			else
+				System.options.appId = "haqi"
+				-- preload GSL for prevent recursive NPL.load
+				NPL.load("(gl)script/apps/GameServer/GSL.lua");
 				NPL.load("(gl)script/apps/Aries/Login/MainLogin.lua");
 				MyCompany.Aries.MainLogin:start(Aries_Init);
 			end

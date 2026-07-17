@@ -75,6 +75,12 @@ function ServerPage.OnChangeCategory(index, bRefreshPage)
 end
 
 function ServerPage.ShowPage()
+	local ServerSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/ServerSetting.lua')
+	if ServerSetting then
+		ServerSetting.ShowPage()
+		return
+	end
+
 	GameLogic.CheckSignedIn(
 		L"此功能需要登陆后才能使用",
 		function(result)
@@ -130,6 +136,11 @@ function ServerPage.ShowAddUserPage()
 end
 
 function ServerPage.ShowUserLoginPage(netClientHandler,info)
+	local ServerSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/ServerSetting.lua')
+	if ServerSetting then
+		ServerSetting.ShowUserLoginPage(netClientHandler,info)
+		return
+	end
 	ServerPage.netClientHandler = netClientHandler;
 	ServerPage.server_info = info;
 	ServerPage.server_name = info.name;
@@ -423,6 +434,10 @@ function ServerPage.IsClient()
 end
 
 function ServerPage.ResetClientInfo()
+	local ServerSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/ServerSetting.lua')
+	if ServerSetting then
+		ServerSetting.ResetClientInfo()
+	end
 	ServerPage.server_name = "";
 	ServerPage.server_creator = "";
 	ServerPage.server_detail = "";
@@ -438,6 +453,10 @@ end
 --ServerPage.server_creator = "";
 --ServerPage.server_detail = "";
 function ServerPage.GetServerInfo()
+	local ServerSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/ServerSetting.lua')
+	if ServerSetting then
+		return ServerSetting.GetServerInfo()
+	end
 	local serverInfo = {name = ServerPage.server_name, creator = ServerPage.server_creator, ip = ServerPage.server_ip, detail = ServerPage.server_detail};
 	return serverInfo;
 end

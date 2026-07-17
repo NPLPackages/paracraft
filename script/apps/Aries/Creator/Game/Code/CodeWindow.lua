@@ -10,12 +10,10 @@ local CodeWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow")
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Windows/Window.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeContext2d.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeCoroutine.lua");
 local CodeCoroutine = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Point = commonlib.gettable("mathlib.Point");
-local CodeContext2d = commonlib.gettable("MyCompany.Aries.Game.Code.CodeContext2d")
 
 local CodeWindow = commonlib.inherit(commonlib.gettable("System.Windows.Window"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow"));
 CodeWindow:Signal("mousePressEventReceived")
@@ -56,24 +54,6 @@ function CodeWindow:GetPageEventFilterFunc(pageEnv)
 	end
 end
 
-function CodeWindow:prepareCodeContext()
-	if(self.context2d) then
-		return
-	end
-	self:EnableSelfPaint(true);
-	self:SetAutoClearBackground(false);
-
-	self.context2d = CodeContext2d:new();
-	self.context2d:SetWindow(self);
-	self.context2d:clearRect();
-end
-
--- @param name: default to "2d"
-function CodeWindow:getContext(name)
-	self:prepareCodeContext()
-	return self.context2d;
-end
-
 -- only for use in code block API
 -- @param eventName: "onmousedown", "onmouseup", "onmousemove"
 function CodeWindow:registerEvent(eventName, callback)
@@ -83,6 +63,8 @@ function CodeWindow:registerEvent(eventName, callback)
 		self:Connect("mouseReleaseEventReceived", callback)
 	elseif(eventName == "onmousemove") then
 		self:Connect("mouseMoveEventReceived", callback)
+		-- tricky: disable touch translation when there is mouse move event, to make the UI more responsive in touch mode.
+		self:SetTouchTranslation(false);
 	end
 end
 
@@ -118,8 +100,7 @@ function CodeWindow:handleMouseEvent(event)
 	CodeWindow._super.handleMouseEvent(self, event);
 end
 
--- virtual
-function CodeWindow:Render(painterContext)
+function CodeWindow:RenderContext2D(painterContext)
 	if(self.context2d) then
 		local ok, msg = pcall(self.context2d.Render, self.context2d, painterContext)
 		if(not ok and msg) then
@@ -127,13 +108,12 @@ function CodeWindow:Render(painterContext)
 			painterContext:DrawText(0,20, msg);
 		end
 	end
-	return CodeWindow._super.Render(self, painterContext);
 end
 
 -- virtual function
 function CodeWindow:FilterImage(filename)
 	-- skip url and absolute path texture
-	if(not filename:match("^https?:") and not filename:match("^%w:")) then
+	if(not filename:match("^https?:") and not filename:match("^_miniscenegraph") and not filename:match("^_texture") and not filename:match("^%w:")) then
 		local filename_, params = filename:match("^([^;#:]+)(.*)$");
 		if(filename_) then
 			local filepath = Files.GetFilePath(filename_);

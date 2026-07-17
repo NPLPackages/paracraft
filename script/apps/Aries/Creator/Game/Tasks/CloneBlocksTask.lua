@@ -36,6 +36,7 @@ function CloneBlocks:Run()
 			if(#(self.history) > 0) then
 				UndoManager.PushCommand(self);
 				GameLogic.SetModified();
+				GameLogic.GetFilters():apply_filters("BatchModifyBlocks", self.history)
 			end
 		end
 	end

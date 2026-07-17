@@ -78,6 +78,12 @@ function ServerManager:GameMode()
 	return self.game_mode;	
 end
 
+function ServerManager:IsServerStarted()
+	local isServerStart = NPL.GetAttributeObject():GetField("IsServerStarted", false)
+	local isUDPServerStarted = NPL.GetAttributeObject():GetField("IsUDPServerStarted", false)
+	return isServerStart or isUDPServerStarted;
+end
+
 function ServerManager:CreateWorldServer(worldpath)
 	worldpath = worldpath or "worlds/multiplayer";
 	self.worlds = self.worlds or {};
@@ -101,14 +107,22 @@ function ServerManager:Init(host, port, username, tunnelClient)
 		local att = NPL.GetAttributeObject();
 		
 		local i = 0;
-		while NPL.Ping("127.0.0.1", tostring(port + i), 1000, true) ~= -1 and i <= 20 do
-			i = i + 1;
+		if not self:IsServerStarted() then
+			while NPL.Ping("127.0.0.1", tostring(port + i), 1000, true) ~= -1 and i <= 20 do
+				i = i + 1;
+			end
+		else
+			i = 0
+			local hostPort = att:GetField("HostPort")
+			hostPort = tonumber(hostPort)
+			port = (hostPort and hostPort >= 8099) and hostPort or 8099;
 		end
 		-- NPL.StopNetServer();
         NPL.StartNetServer(host, tostring(port + i));
 		self.curHost = host;
 		self.curPort = port + i;
 		LOG.std(nil, "Network", "ServerManager", "TCP listening on %s:%s", att:GetField("HostIP"), att:GetField("HostPort"));
+		LOG.std(nil, "Network", "ServerManager", "Server listening on %s:%s", self.curHost, self.curPort);
     end
 	local Connections = commonlib.gettable("MyCompany.Aries.Game.Network.Connections");
 	Connections:Init();
@@ -391,6 +405,13 @@ function ServerManager:GetStats(bUpdate)
 		stats[2] = {playerNames = names};
 	end
 	return self.stats;
+end
+
+-- get player count
+function ServerManager:GetPlayerCount()
+	if self.playerEntityList then
+		return #self.playerEntityList
+	end
 end
 
 -- Called when a player successfully logs in. Reads player data from disk and inserts the player into the world.

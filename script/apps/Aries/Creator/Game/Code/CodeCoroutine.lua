@@ -17,7 +17,6 @@ co:Run();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
 local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
 local CodeCoroutine = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeCoroutine"));
 CodeCoroutine:Signal("finished");
@@ -77,6 +76,9 @@ function CodeCoroutine:KillTimer(timer)
 	self:GetCodeBlock():KillTimer(timer);
 end
 
+-- make a callback function that shares the same code block context. 
+-- Like MakeCallbackFuncAsync, you can only resume, but not yield from the callback, since it is not inside any coroutine.
+-- If you want a callback function that may contain yield, always use MakeCallbackFuncAsyncRun, instead of this one. 
 -- @important: this function should be called inside coroutine, the caller must ensure that when callbackFunc called, 
 -- it should NOT be inside any coroutine. Otherwise one should use MakeCallbackFuncAsync instead. 
 function CodeCoroutine:MakeCallbackFunc(callbackFunc)
@@ -90,7 +92,11 @@ function CodeCoroutine:MakeCallbackFunc(callbackFunc)
 	end
 end
 
--- @important: this function should be called inside coroutine, the callbackFunc is gauranteed NOT to be inside any coroutine, because we use a timer for it. 
+-- make a callback function inside a timer that shares the same code block context.  
+-- the callback is guaranteed NOT to be inside any coroutine, which means it can ONLY resume(). you can not yield from it.
+-- @important: this function should be called inside coroutine and you control all code inside it. 
+-- If you want a callback function that may contain yield, always use MakeCallbackFuncAsyncRun, instead of this one. 
+-- @param callbackFunc: this callback function should either exit immediately or call resume(). 
 -- so it is always safe to call resume inside callbackFunc
 function CodeCoroutine:MakeCallbackFuncAsync(callbackFunc)
 	return function(p1, p2, p3, p4, p5)
@@ -105,9 +111,10 @@ function CodeCoroutine:MakeCallbackFuncAsync(callbackFunc)
 	end
 end
 
+-- make a true callbackFunc inside a new coroutine that shares the same code block context.
 -- this function is the recommended method to use in code block for callback to prevent yielding from C-Call boundary. 
 -- @important: this function should be called inside coroutine.
--- @param callbackFunc: this function is called with run(callbackFunc) in code block.
+-- @param callbackFunc: this callback can contain any code block code with resume/yield. e.g. this function can be called with run(callbackFunc) in code block. 
 function CodeCoroutine:MakeCallbackFuncAsyncRun(callbackFunc)
 	return function(p1, p2, p3, p4, p5)
 		if(type(callbackFunc) == "function") then
@@ -254,8 +261,9 @@ function CodeCoroutine:Run(msg, onFinishedCallback)
 			end
 			return result, r2, r3, r4;
 		end)
-			
+		local lastCo = GameLogic.GetCodeGlobal():GetCurrentCoroutine()
 		local ok, result, r2, r3, r4 = self:Resume();
+		GameLogic.GetCodeGlobal():SetCurrentCoroutine(lastCo);
 		if(ok and self.isFinished) then
 			return result, r2, r3, r4;
 		end
@@ -296,8 +304,9 @@ function CodeCoroutine:RunSingle(msg, onFinishedCallback)
 				end
 			end)
 		end
-
+		local lastCo = GameLogic.GetCodeGlobal():GetCurrentCoroutine()
 		local ok, result, r2, r3, r4 = self:Resume();
+		GameLogic.GetCodeGlobal():SetCurrentCoroutine(lastCo);
 		if(ok and self.isFinished) then
 			return result, r2, r3, r4;
 		end

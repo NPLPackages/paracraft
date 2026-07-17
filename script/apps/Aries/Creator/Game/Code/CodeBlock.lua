@@ -28,6 +28,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeLightActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPIMultiThreaded.lua");
+local CodeAPIMultiThreaded = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPIMultiThreaded");
 local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
@@ -250,7 +252,19 @@ function CodeBlock:GetFilename()
 end
 
 function CodeBlock:SetFilename(filename)
-	self.filename = filename;
+	if(self.filename ~= filename) then
+		self.filename = filename;
+		self.isGliaFile = nil;
+		if(filename and filename:find("^%(gl%)")) then
+			self.isGliaFile = true;
+		end
+	end
+end
+
+-- glia file is a kind of global file whose file name begins with (gl).
+-- glia is a convention for NPL neuron file. 
+function CodeBlock:IsGliaFile()
+	return self.isGliaFile;
 end
 
 function CodeBlock:IsLoaded()
@@ -426,7 +440,10 @@ function CodeBlock:FindNearbyActor()
 				return true;
 			end
 		end
-		self:GetEntity():ForEachNearbyCodeEntity(getLastActor_);
+		local entity = self:GetEntity()
+		if entity and type(entity.ForEachNearbyCodeEntity) == "function" then
+			entity:ForEachNearbyCodeEntity(getLastActor_)
+		end
 	end
 	return actor;
 end
@@ -446,19 +463,62 @@ end
 function CodeBlock:CreateActor()
 	local actor = self:CreateFirstActorInMovieBlock();
 	if(actor) then
-		actor:SetName(self.entityCode:GetDisplayName());
+		local isAgent = actor:IsAgent()
+		if(not isAgent) then
+			actor:SetName(self.entityCode:GetDisplayName());
+		end
 		self:AddActor(actor);
 		-- use time 0
 		actor:SetTime(0);
-		actor:FrameMove(0, false);
+		if(not isAgent) then
+			actor:FrameMove(0, false);
+		end
 		local parentCodeBlock = self:GetReferencedCodeBlock();
 		if(self:IsActorPickingEnabled()) then
 			actor:EnableActorPicking(true);
 			actor:Connect("clicked", parentCodeBlock, parentCodeBlock.OnClickActor);
 		else
-			actor:EnableActorPicking(false);
+			if(not isAgent) then
+				actor:EnableActorPicking(false);
+			end
 		end
 		actor:Connect("collided", parentCodeBlock, parentCodeBlock.OnCollideActor);
+		return actor;
+	end
+end
+
+-- create an empty code actor
+function CodeBlock:CreateEmptyActor()
+	local itemStack;
+	local movie_entity;
+	local actor = CodeActor:new():Init(itemStack, movie_entity, false, "codeblock");
+	if (actor) then
+		if(not actor:IsAgent()) then
+			actor:SetName(self.entityCode:GetDisplayName());
+		end
+		self:AddActor(actor);
+		local parentCodeBlock = self:GetReferencedCodeBlock();
+		if(self:IsActorPickingEnabled()) then
+			actor:EnableActorPicking(true);
+			actor:Connect("clicked", parentCodeBlock, parentCodeBlock.OnClickActor);
+		else
+			if(not actor:IsAgent()) then
+				actor:EnableActorPicking(false);
+			end
+		end
+		actor:Connect("collided", parentCodeBlock, parentCodeBlock.OnCollideActor);
+
+		-- tricky: we will make all nearby code blocks to reference this code block, since this code block just got an actor. 
+		local entity = self:GetEntity();
+		if entity and type(entity.ForEachNearbyCodeEntity) == "function" then
+			entity:ForEachNearbyCodeEntity(function(codeEntity)
+				local codeblock = codeEntity:GetCodeBlock(true)
+				local actor = codeblock:GetLastActor();
+				if(not actor and not codeblock:HasReferencedCodeBlock()) then
+					codeblock:SetReferencedCodeBlock(self);
+				end
+			end)
+		end
 		return actor;
 	end
 end
@@ -492,7 +552,7 @@ function CodeBlock:CreateFirstActorInMovieBlock(movie_entity)
 			local itemStack = movie_entity.inventory:GetItem(i)
 			if (itemStack and itemStack.count > 0) then
 				if (itemStack.id == block_types.names.TimeSeriesNPC) then
-					actor = CodeActor:new():Init(itemStack, movie_entity, false, "codeblock");
+					actor = CodeActor:new():Init(itemStack, movie_entity, nil, "codeblock");
 					break;
 				elseif (itemStack.id == block_types.names.TimeSeriesOverlay) then
 					actor = CodeUIActor:new():Init(itemStack, movie_entity);
@@ -673,7 +733,8 @@ function CodeBlock:RefreshAllInventoryAsMovieActors()
 end
 
 -- run code again 
-function CodeBlock:Run(onFinishedCallback)
+-- @param delayLoadTime: if delayLoadTime > 0, it will compile immediately but delay the code execution for delayLoadTime milliseconds.
+function CodeBlock:Run(onFinishedCallback, delayLoadTime)
 	self:GetEntity():ClearIncludedFiles();
 	self:RemoveAllInventoryMovieActors();
 	self:CompileCode(self:GetEntity():GetCommand());
@@ -686,16 +747,44 @@ function CodeBlock:Run(onFinishedCallback)
 		local actor = self:FindNearbyActor() or self:CreateActor();
 		co:SetActor(actor);
 		GameLogic.GetCodeGlobal():AddCodeBlock(self);
+		if(self:IsGliaFile()) then
+			CodeAPIMultiThreaded.AddAndUpdateCodeblock(self)
+		end
 		local inventory = self:GetEntity():GetInventory()
 		if(inventory and not inventory:IsEmpty()) then
-			return co:Run(nil, function(...)
-				self:RefreshAllInventoryActors();
-				if(onFinishedCallback) then
-					onFinishedCallback(...)
-				end
-			end);
+			if(not delayLoadTime or delayLoadTime <= 0) then
+				return co:Run(nil, function(...)
+					self:RefreshAllInventoryActors();
+					if(onFinishedCallback) then
+						onFinishedCallback(...)
+					end
+				end);
+			else
+				-- run in the next time tick
+				local code_func = self.code_func;
+				commonlib.TimerManager.SetTimeout(function()
+					if(self.isLoaded and code_func == self.code_func) then
+						co:Run(nil, function(...)
+							self:RefreshAllInventoryActors();
+							if(onFinishedCallback) then
+								onFinishedCallback(...)
+							end
+						end);
+					end
+				end, delayLoadTime);
+			end
 		else
-			return co:Run(nil, onFinishedCallback);
+			if(not delayLoadTime or delayLoadTime <= 0) then
+				return co:Run(nil, onFinishedCallback);
+			else
+				-- run in the next time tick
+				local code_func = self.code_func;
+				commonlib.TimerManager.SetTimeout(function()
+					if(self.isLoaded and code_func == self.code_func) then
+						co:Run(nil, onFinishedCallback);
+					end
+				end, delayLoadTime);
+			end
 		end
 		
 	else
@@ -705,6 +794,9 @@ function CodeBlock:Run(onFinishedCallback)
 		local actor = self:FindNearbyActor() or self:CreateActor();
 		self:RefreshAllInventoryActors();
 		GameLogic.GetCodeGlobal():AddCodeBlock(self);
+		if(onFinishedCallback) then
+			onFinishedCallback()
+		end
 		return false;
 	end
 end
@@ -1000,8 +1092,13 @@ function CodeBlock:RegisterAgentEvent(text, callbackFunc)
 	end
 	if(eventName == "GetIcon") then
 		local icon = callbackFunc();
-		icon = icon and Files.GetWorldFilePath(icon)
 		if(icon) then
+			if(icon:match("^https?://")) then
+				-- remote icon
+			else
+				icon = Files.GetWorldFilePath(icon)
+				print('icon = Files.GetWorldFilePath(icon)', icon)
+			end
 			itemDS.icon = icon;
 			if World2In1.GetIsWorld2In1() then
 				World2In1.AddAgentItem(itemDS)
@@ -1032,6 +1129,9 @@ end
 
 -- @param callbackFunc: if nil, it will unregister the call back function. 
 function CodeBlock:RegisterTextEvent(text, callbackFunc)
+	if(type(text) ~= "string") then
+		return;
+	end
 	if(not callbackFunc) then
 		self:UnRegisterEvent("onText"..text, nil, text);
 		return
@@ -1116,11 +1216,13 @@ function CodeBlock:UnRegisterEvent(eventname, callbackFunc, eventTag)
 					self.events[eventname] = nil;
 				end
 			else
-				 -- remove all event of eventname
-				for i, event in ipairs(events) do
-					event:Destroy();
+				-- remove all event of eventname
+				if(events) then
+					for i, event in ipairs(events) do
+						event:Destroy();
+					end
+					self.events[eventname] = nil;
 				end
-				self.events[eventname] = nil;
 			end
 		end
 	else
@@ -1279,6 +1381,23 @@ function CodeBlock:RunAsCodeBlockFunction(code_func, msg)
 	end
 end
 
+function CodeBlock:RunAsCodeBlock(code, msg, filename, onFinishedCallback)
+	local env = self:GetCodeEnv();
+	if(env) then
+		local code_func, errormsg = self:CompileCodeImp(code, filename or "tempcode");
+		if(not code_func and errormsg) then
+			LOG.std(nil, "error", "CodeBlock", errormsg);
+			local err_msg = errormsg;
+			err_msg = format(L"编译错误: %s\n在%s", self:BeautifyCompilerErrorMsg(err_msg), filename or "tempcode");
+			self:send_message(err_msg, "error");
+		else
+			local co = CodeCoroutine:new():Init(self);
+			co:SetFunction(code_func);
+			return co:Run(msg, onFinishedCallback)
+		end
+	end
+end
+
 -- usually from help window. There can only be one temp code running. 
 -- @param code: string
 function CodeBlock:RunTempCode(code, filename)
@@ -1395,7 +1514,9 @@ function CodeBlock:ImportCodeLibrary(libName)
 	end
 end
 
+-- file is included by running it right at the place of including within the containing codeblock. The logics is similar to c++ include.
 -- @param filename: include a file relative to current world directory
+-- if the filename is a lib name, we will also search for ./lib/filename/filename.lua or system lib folder for the lib. System lib folder is ..Game/Code/lib/filename/filename.lua folder.
 function CodeBlock:IncludeFile(filename)
 	local filepath = Files.WorldPathToFullPath(filename);
 	if(self:GetEntity()) then
@@ -1403,6 +1524,31 @@ function CodeBlock:IncludeFile(filename)
 	end
 
 	local file = ParaIO.open(filepath, "r")
+	if(not file:IsValid()) then
+		if(filename:match("^[%w_]+$")) then
+			-- we will also search for ./lib/filename/filename.lua in world directory
+			local filepath = Files.WorldPathToFullPath(string.format("lib/%s/%s.lua", filename, filename), true);
+			if(filepath) then
+				filename = filepath
+			else
+				-- now search in system lib folder
+				filepath = string.format("script/apps/Aries/Creator/Game/Code/lib/%s/%s.lua", filename, filename);
+				if(ParaIO.DoesFileExist(filepath, true)) then
+					filename = filepath
+				else
+					filepath = "bin/"..string.gsub(filepath, "lua$", "o")
+					if(ParaIO.DoesFileExist(filepath, true)) then
+						filename = filepath
+					else
+						filepath = nil;
+					end
+				end
+			end
+			if(filepath) then
+				file = ParaIO.open(filepath, "r")
+			end
+		end
+	end
 	if(file:IsValid()) then
 		local code = file:GetText();
 		file:close();
@@ -1415,6 +1561,7 @@ function CodeBlock:IncludeFile(filename)
 				self:send_message(msg, "error");
 			else
 				setfenv(code_func, self:GetCodeEnv());
+				if (System.os.IsEmscripten()) then return code_func() end
 				--local ok, result = xpcall(code_func, CodeBlock.handleError);
 				local arg = {xpcall(code_func, CodeBlock.handleError)};
 				local ok = arg[1];
@@ -1520,4 +1667,15 @@ end
 -- if this code block is being edited by the user
 function CodeBlock:IsEditing()
 	return CodeBlockWindow.GetCodeBlock() == self and CodeBlockWindow.IsVisible();
+end
+
+-- set whether the code has been copied to worker thread
+function CodeBlock:SetCopiedToWorkerThread(workerThreadName)
+	self.copiedWorkers = self.copiedWorkers or {};
+	self.copiedWorkers[workerThreadName] = true;
+end
+
+-- return whether the code has been copied to worker thread
+function CodeBlock:IsCopiedToWorkerThread(threadName)
+	return self.copiedWorkers and self.copiedWorkers[threadName]
 end

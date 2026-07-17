@@ -36,9 +36,10 @@ function ServerConfigManager.GetConfigData(callback)
     keepwork.config.all({},function(err, msg, data)
         if err == 200 then
             local configs = data.configs;
-
-            for key, v in pairs(configs) do
-                ServerConfigManager.Config[v.name] = v;
+            if configs then
+                for key, v in pairs(configs) do
+                    ServerConfigManager.Config[v.name] = v;
+                end
             end
 
             callback(ServerConfigManager.Config);

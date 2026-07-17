@@ -71,7 +71,7 @@ function goto_world(item)
     local info = string.format("是否立即进入【%s】",item.label or "");
     _guihelper.MessageBox(info, function(res)
 		if(res and res == _guihelper.DialogResult.OK) then
-            local command = string.format("/loadworld -s -force %s", id)
+            local command = string.format("/loadworld -s -auto -lesson %s", id)
             CommandManager:RunCommand(command)
 		end
 	end, _guihelper.MessageBoxButtons.OKCancel);
@@ -192,13 +192,13 @@ end
             <!--Vip-->
             <pe:container alignment="_rt" style="background:url();">
                 <!-- 文档按钮 -->
-                <input type='button'
+                <!-- <input type='button'
                     class='opus_bar_button'
                     DefaultButton='true'
                     style='width: 65px; height: 70px; base-font-size: 20px; margin-top:11px;margin-right:23px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/wendang_65x70_32bits.png#0 0 65 70)'
                     name='open_word'
                     onclick='OpenLink'
-                    value='' />   
+                    value='' />    -->
                 <!-- 小项目按钮 -->
                 <!-- <input type='button'
                     class='opus_bar_button'
@@ -210,14 +210,11 @@ end
                 
                 <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 11, "ShowVip")%>
                 <%=GameLogic.GetFilters():apply_filters('get_vip_btn_div',"margin-right:26px;margin-top:10px;","2D_course")%>
-                <!-- <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:26px;margin-top:10px;" /> -->
             </pe:container>
-            <!--Close-->
             <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
                 <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
             </pe:container>
             <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-340px;width:1280px;height:720px;background:url();">
-                <!--背景水印-->
                 <div style="margin-top: -20px;">
                     <div>
                         <div style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
@@ -229,7 +226,6 @@ end
                     <div style="margin-top: 62px;">
                         <div style="float:left;margin-left:18px;margin-top:-25px;width:498px;height:615px;background:url();">
                             <div style="float:left;margin-top: 3px;margin-left:3px;width: 490px;height: 52px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/kuangtou_490x52_32bits.png#0 0 490 52);">
-                                <!--大标题：推荐课程-->
                                 <div style="margin-top: 6px;margin-left:10px;width:138px;height:36px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/meirijiqiao_138x36_32bits.png#0 0 138 36);" />
                             </div>
                             <div style="width:491px;height:556px;margin-top: 0px;margin-left:2px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/kuangdi_166x188_32bits.png#0 0 166 188:30 30 40 40);">
@@ -299,15 +295,31 @@ end
                             </div>
                         </div>
                         <!--右边背景框-->
-                        <div style="float:left;margin-left:1px;margin-top:-25px;width:749px;height:615px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 53 72 135 : 30 60 30 60);">
-                            <div style="width:750px;height:615px;">
+                        <div style="float: left;
+                                    margin-left: 1px;
+                                    margin-top: -25px;
+                                    width: 749px;
+                                    height: 615px;
+                                    background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 53 72 135 : 30 60 30 60);">
+                            <div style="width: 750px;height: 615px;">
                                 <div style="float:left;margin-left:15px;margin-top:10px;">
                                     <!--大标题：每日课堂-->
-                                    <div style="width:145px;height:40px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/tuijianneirong_94x23_32bits.png#0 0 145 40);"></div>
-                                    <!--全部课程按钮-->
-                                    <pe:if condition='<%= not System.options.isChannel_430 %>'>
-                                        <input type='button' DefaultButton='true' style='width: 93px;height: 43px;margin-left:625px;margin-top: -40px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/quanbu_93x43_32bits.png#0 0 93 43);' name='open_word'onclick='open_all' />   
+                                    <pe:if condition="<%= System.os.GetAndroidFlavor() == 'huawei' %>">
+                                        <div style="width: 145px;
+                                                    height: 40px;
+                                                    color: #ffffff;
+                                                    font-size: 20px;
+                                                    base-font-size: 20px;">入门必看</div>
                                     </pe:if>
+                                    <pe:if condition="<%= System.os.GetAndroidFlavor() ~= 'huawei' %>">
+                                        <div style="width: 145px;
+                                                height: 40px;
+                                                background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/tuijianneirong_94x23_32bits.png#0 0 145 40);"></div>
+                                    </pe:if>
+                                    <!--全部课程按钮-->
+                                    <!-- <pe:if condition='<%= not System.options.isChannel_430 and not System.options.channelId_tutorial %>'>
+                                        <input type='button' DefaultButton='true' style='width: 93px;height: 43px;margin-left:625px;margin-top: -40px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/quanbu_93x43_32bits.png#0 0 93 43);' name='open_word'onclick='open_all' />   
+                                    </pe:if> -->
                                 </div>
                                 <div style="width:712px;height:526px;margin-left: 19px;margin-top:18px;">
                                     <pe:gridview style="margin-left:0x;width:712px;height:526px;" name="item_gridview_courses" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="12" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="175"

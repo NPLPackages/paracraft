@@ -38,6 +38,9 @@ function ParaWorldMinimapWnd:Show()
 		self.window2 = Window:new();
 		self.window2:SetCanHaveFocus(false);
 
+		self.window3 = Window:new();
+		self.window3:SetCanHaveFocus(false);
+
 		GameLogic.GetFilters():add_filter("OnEnterParaWorldGrid", ParaWorldMinimapWnd.OnEnterParaWorldGrid);
 	end
 
@@ -50,7 +53,13 @@ function ParaWorldMinimapWnd:Show()
 	self.window2:Show({
 		name="ParaWorldMinimapWnd2", 
 		url="script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.html?isSurface=false",
-		alignment="_rt", left=-202, top=10, width = 192, height = 248, zorder = -11
+		alignment="_rt", left=-202, top=10, width = 192, height = 220, zorder = -11
+	});
+
+	self.window3:Show({
+		name="ParaWorldMinimapWnd3", 
+		url="script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWndBack.html",
+		alignment="_rt", left=-205, top=7, width = 196, height = 220, zorder = -13
 	});
 	GameLogic.GetFilters():apply_filters("esc_map",true);
 end
@@ -97,6 +106,10 @@ function ParaWorldMinimapWnd.CloseWindow()
 
 		self.window2:CloseWindow(true)
 		self.window2 = nil;
+
+		self.window3:CloseWindow(true)
+		self.window3 = nil;
+
 		page = nil;
 		pageWnd = nil;
 	end

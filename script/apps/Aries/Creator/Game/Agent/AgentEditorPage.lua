@@ -120,6 +120,7 @@ function AgentEditorPage.OnClickOK()
 		if(agentName~=entity:GetAgentName()) then
 			bAgentChanged = true;
 			entity:SetAgentName(agentName);
+			entity:EndEdit()
 		end
 		entity:ResetAgentUrl()
 		

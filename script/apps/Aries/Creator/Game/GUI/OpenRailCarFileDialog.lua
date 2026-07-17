@@ -258,7 +258,7 @@ function OpenRailCarFileDialog.UpdateModel(modelName)
 		if(ctl) then
 			local ReplaceableTextures, CCSInfoStr, CustomGeosets;
 			if(PlayerAssetFile:IsCustomModel(filepath)) then
-				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
+				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString(filepath)
 			elseif(PlayerAssetFile:HasCustomGeosets(filepath)) then
 				CustomGeosets = PlayerAssetFile:GetDefaultCustomGeosets();
 			elseif(PlayerSkins:CheckModelHasSkin(filepath)) then

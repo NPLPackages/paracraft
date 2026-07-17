@@ -28,6 +28,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
 local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
 local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
 local AutoUpdater = NPL.load("AutoUpdater");
+local Android = NPL.load("(gl)script/apps/Aries/Creator/Game/Android/Android.lua");
+local iOS = NPL.load("(gl)script/apps/Aries/Creator/Game/iOS/iOS.lua");
 
 local ClientUpdater = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater"));
 
@@ -74,30 +76,72 @@ function ClientUpdater:ctor()
 			local State = AutoUpdater.State;
             if(state == State.PREDOWNLOAD_VERSION)then
                 DownloadWorld.UpdateProgressText(L"预下载版本号");
+                -- 发送热更新进度消息
+                if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=5, msg=System.Encoding.base64(L"预下载版本号")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=5, msg=System.Encoding.base64(L"预下载版本号")}, nil, nil, "external");
+                end
             elseif(state == State.DOWNLOADING_VERSION)then
                 DownloadWorld.UpdateProgressText(L"正在下载版本信息");
+                if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=10, msg=System.Encoding.base64(L"正在下载版本信息")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=10, msg=System.Encoding.base64(L"正在下载版本信息")}, nil, nil, "external");
+                end
             elseif(state == State.VERSION_CHECKED)then
                 DownloadWorld.UpdateProgressText(L"版本验证完毕");
+                if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=15, msg=System.Encoding.base64(L"版本验证完毕")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=15, msg=System.Encoding.base64(L"版本验证完毕")}, nil, nil, "external");
+                end
             elseif(state == State.VERSION_ERROR)then
                 ParaWorldLoginDocker.SetInstalling(false);
 				_guihelper.MessageBox(L"无法获取版本信息");
+				if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=0, msg=System.Encoding.base64(L"无法获取版本信息")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=0, msg=System.Encoding.base64(L"无法获取版本信息")}, nil, nil, "external");
+                end
 				if(callbackFunc) then
 					callbackFunc(false)
 				end
             elseif(state == State.PREDOWNLOAD_MANIFEST)then
                 DownloadWorld.UpdateProgressText(L"资源列表预下载");
+                if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=20, msg=System.Encoding.base64(L"资源列表预下载")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=20, msg=System.Encoding.base64(L"资源列表预下载")}, nil, nil, "external");
+                end
             elseif(state == State.DOWNLOADING_MANIFEST)then
                 DownloadWorld.UpdateProgressText(L"资源列表下载中");
+                if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=25, msg=System.Encoding.base64(L"资源列表下载中")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=25, msg=System.Encoding.base64(L"资源列表下载中")}, nil, nil, "external");
+                end
             elseif(state == State.MANIFEST_DOWNLOADED)then
 				DownloadWorld.UpdateProgressText(L"已经获取资源列表");
+				if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=30, msg=System.Encoding.base64(L"已经获取资源列表")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=30, msg=System.Encoding.base64(L"已经获取资源列表")}, nil, nil, "external");
+                end
             elseif(state == State.MANIFEST_ERROR)then
                 ParaWorldLoginDocker.SetInstalling(false);
 				_guihelper.MessageBox(L"无法获取资源列表");
+				Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=0, msg=System.Encoding.base64(L"无法获取资源列表")}, nil, nil, "external");
 				if(callbackFunc) then
 					callbackFunc(false)
 				end
             elseif(state == State.PREDOWNLOAD_ASSETS)then
 				DownloadWorld.UpdateProgressText(L"准备下载资源文件");
+				if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=35, msg=System.Encoding.base64(L"准备下载资源文件")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=35, msg=System.Encoding.base64(L"准备下载资源文件")}, nil, nil, "external");
+                end
 				local nowTime = 0
                 local lastTime = 0
                 local interval = 100
@@ -113,6 +157,13 @@ function ClientUpdater:ctor()
                         lastTime = nowTime
                         local tips = string.format("%.1f/%.1fMB(%.1fKB/S)", downloadedSize / 1024 / 1024, totalSize / 1024 / 1024, downloadSpeed / 1024)
 						DownloadWorld.UpdateProgressText(tips);
+						-- 计算下载进度，从35%到80%
+						local downloadProgress = 35 + math.floor((downloadedSize / (totalSize > 0 and totalSize or 1)) * 45)
+						if System.os.GetPlatform() == "android" then
+                            Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=downloadProgress, msg=System.Encoding.base64(tips)}, nil, nil, "external");
+                        elseif System.os.GetPlatform() == "ios" then
+                            iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=downloadProgress, msg=System.Encoding.base64(tips)}, nil, nil, "external");
+                        end
                     end
 					
 					if(not ParaWorldLoginDocker.IsInstalling()) then
@@ -124,6 +175,11 @@ function ClientUpdater:ctor()
                 -- DownloadWorld.UpdateProgressText(L"正在下载资源");
             elseif(state == State.ASSETS_DOWNLOADED)then
                 DownloadWorld.UpdateProgressText(L"全部资源下载完成");
+                if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=85, msg=System.Encoding.base64(L"全部资源下载完成")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=85, msg=System.Encoding.base64(L"全部资源下载完成")}, nil, nil, "external");
+                end
 				if(timer) then
 					timer:Change();
 				end
@@ -131,15 +187,34 @@ function ClientUpdater:ctor()
             elseif(state == State.ASSETS_ERROR)then
                 ParaWorldLoginDocker.SetInstalling(false);
 				_guihelper.MessageBox(L"无法获取资源");
+				if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=0, msg=System.Encoding.base64(L"无法获取资源")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=0, msg=System.Encoding.base64(L"无法获取资源")}, nil, nil, "external");
+                end
 				if(ClientUpdater.Download_callbackFunc) then
 					ClientUpdater.Download_callbackFunc(false)
 				end
             elseif(state == State.PREUPDATE)then
-                
+                if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=90, msg=System.Encoding.base64(L"准备安装更新")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=90, msg=System.Encoding.base64(L"准备安装更新")}, nil, nil, "external");
+                end
             elseif(state == State.UPDATING)then
                 DownloadWorld.UpdateProgressText(L"正在安装更新");
+                if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=95, msg=System.Encoding.base64(L"正在安装更新")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=95, msg=System.Encoding.base64(L"正在安装更新")}, nil, nil, "external");
+                end
             elseif(state == State.UPDATED)then
                 DownloadWorld.UpdateProgressText(L"安装完成");
+                if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=100, msg=System.Encoding.base64(L"安装完成")}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=100, msg=System.Encoding.base64(L"安装完成")}, nil, nil, "external");
+                end
 				ParaWorldLoginDocker.SetInstalling(false);
 				if(ClientUpdater.Download_callbackFunc) then
 					ClientUpdater.Download_callbackFunc(true);
@@ -147,15 +222,22 @@ function ClientUpdater:ctor()
             elseif(state == State.FAIL_TO_UPDATED)then
 				ParaWorldLoginDocker.SetInstalling(false);
 				local filename, errorCode = param1, param2;
+				local errorMsg = L"无法应用更新";
 				if(errorCode == AutoUpdater.UpdateFailedReason.MD5) then
-					_guihelper.MessageBox(format(L"文件MD5校验失败:%s, 请重新更新", filename or ""));
+					errorMsg = format(L"文件MD5校验失败:%s, 请重新更新", filename or "");
 				elseif(errorCode == AutoUpdater.UpdateFailedReason.Uncompress) then
-					_guihelper.MessageBox(format(L"无法解压文件:%s, 请重试", filename or ""));
+					errorMsg = format(L"无法解压文件:%s, 请重试", filename or "");
 				elseif(errorCode == AutoUpdater.UpdateFailedReason.Move) then
-					_guihelper.MessageBox(format(L"无法应用更新: 无法移动文件到%s.", filename or "")..L"请确保目前只有一个实例在运行");
+					errorMsg = format(L"无法应用更新: 无法移动文件到%s.", filename or "")..L"请确保目前只有一个实例在运行";
 				else
-					_guihelper.MessageBox(L"无法应用更新"..L"请确保目前只有一个实例在运行");
+					errorMsg = L"无法应用更新"..L"请确保目前只有一个实例在运行";
 				end
+				_guihelper.MessageBox(errorMsg);
+				if System.os.GetPlatform() == "android" then
+                    Android:SendMsgToJava("customLoader", {name="hotUpdate", progress=0, msg=System.Encoding.base64(errorMsg)}, nil, nil, "external");
+                elseif System.os.GetPlatform() == "ios" then
+                    iOS:SendMsgToObjectiveC("customLoader", {name="hotUpdate", progress=0, msg=System.Encoding.base64(errorMsg)}, nil, nil, "external");
+                end
 				if(ClientUpdater.Download_callbackFunc) then
 					ClientUpdater.Download_callbackFunc(false)
 				end
@@ -259,7 +341,14 @@ end
 -- @param callbackFunc: function(bSucceed)
 function ClientUpdater:Download(callbackFunc)
 	print("hyz update log--------ClientUpdater 132",self.appname)
-	ClientUpdater.Download_callbackFunc = callbackFunc
+	if (System.os.IsEmscripten()) then
+		ClientUpdater.Download_callbackFunc = function(...)
+			GameLogic.FlushDiskIO()
+			callbackFunc(...);
+		end
+	else
+		ClientUpdater.Download_callbackFunc = callbackFunc
+	end
 	if(self.autoUpdater:isNeedUpdate())then
 		ParaWorldLoginDocker.SetInstalling(true, ParaWorldLoginDocker.GetAppTitle(self.appname));
 		DownloadWorld.ShowPage(self.gamename);
@@ -307,6 +396,10 @@ function ClientUpdater:Restart()
 	end
 
 	restartCmd = restartCmd .. " default_ui_scaling=\"" .. System.options.default_ui_scaling[1] .. "\"";
+	
+	if (System.options.mc == false) then
+		restartCmd = restartCmd .. " mc=\"false\"";
+	end
 
 	LOG.std(nil, "info", "ClientUpdater", "%s %s %s", self.appname, "restartCmd: ", restartCmd);
 

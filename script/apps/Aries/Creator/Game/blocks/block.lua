@@ -942,7 +942,9 @@ function block:OnUserBreakItem(x,y,z, entityPlayer, lastBlockData)
 	local color = self:GetDiffuseColorByData(lastBlockData or 0);
 	GameLogic.GetWorld():CreateBlockPieces(self, x, y, z, nil, nil, nil, nil, nil, color);
 	local tx, ty, tz = BlockEngine:real(x,y,z);
-	GameLogic.PlayAnimation({animationName = "Break",facingTarget = {x=tx, y=ty, z=tz},});
+	if(entityPlayer == EntityManager.GetPlayer()) then
+		GameLogic.PlayAnimation({animationName = "Break",facingTarget = {x=tx, y=ty, z=tz},});
+	end
 end
 
 -- when ever this block is about to be destroyed and one may call this function to drop as an item first. 
@@ -996,7 +998,8 @@ function block:CanDestroyBlockAt(x,y,z)
 	else
 		bCanDestroy = GameLogic.GameMode:CanDestroyBlock();
 	end
-	return bCanDestroy;
+	local bCanDelete = GameLogic.CreateGetEditableWorld():GetBlockCanDestroy(x,y,z)
+	return bCanDestroy and bCanDelete;
 end
 
 -- set whether a given block can be placed onto another block. 
@@ -1314,16 +1317,48 @@ function block.GenerateUndergroundBlock(blockX, blockY, blockZ, block_id)
 	BlockEngine:SetBlock(blockX, blockY, blockZ, block_id);
 end
 
-function block:play_break_sound(x,y,z)
+function block:play_break_sound(volume)
 	if(self.break_sound) then
-		self.break_sound:play2d();
+		self.break_sound:play2d(volume);
 	end
 	SoundManager:Vibrate();
 end
 
-function block:play_create_sound(x,y,z)
+-- @return [0,1] according to distance from entity to current eye position
+function block:ComputeSoundVolumeByEntityPos(entity)
+	if(entity) then
+		local eyePos = GameLogic.GetEyePosition()
+		local volume = math.min(1, 1 * 9 / ((entity:GetDistanceSq(eyePos[1], eyePos[2], eyePos[3]) or 0) + 0.01));
+		return volume;
+	else
+		return 1;
+	end
+end
+
+function block:ComputeSoundVolumeByPos(x, y, z)
+	if(x) then
+		local eyePos = GameLogic.GetEyePosition()
+		local volume = math.min(1, 1 * 9 / ((((eyePos[1]-x)^2) + ((eyePos[2]-y)^2) + ((eyePos[3]-z)^2)) + 0.01));
+		return volume;
+	else
+		return 1;
+	end
+end
+
+function block:ComputeSoundVolumeByBlockPos(x, y, z)
+	if(x) then
+		x, y, z = BlockEngine:real(x, y, z);
+		local eyePos = GameLogic.GetEyePosition()
+		local volume = math.min(1, 1 * 9 / ((((eyePos[1]-x)^2) + ((eyePos[2]-y)^2) + ((eyePos[3]-z)^2)) + 0.01));
+		return volume;
+	else
+		return 1;
+	end
+end
+
+function block:play_create_sound(volume)
 	if(self.create_sound) then
-		self.create_sound:play2d();
+		self.create_sound:play2d(volume);
 	end
 end
 
@@ -1402,12 +1437,13 @@ function block:CreateBlockPieces(blockX, blockY, blockZ, granularity, texture_fi
 	if(granularity > 1) then
 		granularity = 1;
 	end
-	if(granularity == 1)then
-		self:play_break_sound();
-	end
-
+	
 	if(not cx) then
 		cx,cy,cz = BlockEngine:real(blockX, blockY, blockZ)
+	end
+
+	if(granularity == 1)then
+		self:play_break_sound(self:ComputeSoundVolumeByPos(cx, cy, cz));
 	end
 
 	if(not texture_filename) then
@@ -1864,3 +1900,12 @@ function block:SetTransparent(bEnabled)
 	self:UpdateAttribute("attFlag", self:RecomputeAttribute());
 end
 
+-- TODO: this is not working yet.
+function block:SetMirrorSurface(bEnabled)
+	self:BeginModify();
+	if(not self.lastCategoryID) then
+		self.lastCategoryID = self.categoryID or 0;
+	end
+	self.categoryID = bEnabled and 9 or self.lastCategoryID;
+	self:UpdateAttribute("categoryID", self.categoryID or 0);
+end

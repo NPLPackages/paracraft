@@ -1,0 +1,207 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/LearningSpeakingDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Learning Speaking Dialog</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/LearningToolUI.lua");
+local LearningToolUI = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.LearningToolUI");
+
+local page = document:GetPageCtrl();
+local lastTranscript = "";
+
+function GetParams()
+    return LearningToolUI.GetParams();
+end
+
+function GetWord()
+    local params = GetParams();
+    return params.word or "";
+end
+
+function GetPhonetic()
+    local params = GetParams();
+    return params.phonetic or "";
+end
+
+function GetTranslation()
+    local params = GetParams();
+    return params.translation or "";
+end
+
+function GetFeedback()
+    return LearningToolUI.GetFeedbackResult();
+end
+
+function IsFeedbackShowing()
+    local feedback = GetFeedback();
+    return feedback and feedback.show;
+end
+
+function GetFeedbackText()
+    local feedback = GetFeedback();
+    return feedback and feedback.text or "";
+end
+
+function GetFeedbackColor()
+    local feedback = GetFeedback();
+    return feedback and feedback.color or "#333333";
+end
+
+function GetAudioState()
+    return LearningToolUI.GetAudioState();
+end
+
+function IsRecording()
+    return LearningToolUI.IsRecording();
+end
+
+function IsSpeaking()
+    return LearningToolUI.IsSpeaking();
+end
+
+function GetRecordButtonText()
+    return LearningToolUI.GetRecordButtonText();
+end
+
+function IsRecordButtonEnabled()
+    return LearningToolUI.IsRecordButtonEnabled();
+end
+
+function GetRecordButtonColor()
+    if IsRecording() then
+        return "#F44336"; -- Red when recording
+    elseif IsSpeaking() then
+        return "#9E9E9E"; -- Gray when TTS playing
+    else
+        return "#4CAF50"; -- Green when idle
+    end
+end
+
+function GetLastTranscript()
+    return lastTranscript;
+end
+
+function OnPlayDemo()
+    if IsSpeaking() or IsRecording() then
+        return;
+    end
+    local word = GetWord();
+    LearningToolUI.PlayDemoAudio(word);
+end
+
+function OnToggleRecording()
+    if IsFeedbackShowing() then
+        return;
+    end
+    
+    if IsRecording() then
+        -- Stop recording
+        LearningToolUI.StopRecording();
+    elseif not IsSpeaking() then
+        -- Start recording
+        LearningToolUI.StartRecording(function(result)
+            if result.success and result.transcript then
+                lastTranscript = result.transcript;
+                
+                -- Compare with expected word
+                local word = GetWord();
+                local isCorrect, similarity = LearningToolUI.CompareSpeaking(word, result.transcript);
+                
+                LearningToolUI.SubmitAnswer(isCorrect, result.transcript, {
+                    expectedWord = word,
+                    similarity = similarity,
+                });
+            else
+                -- Recording failed or too short
+                page:Refresh(0.1);
+            end
+        end);
+    end
+end
+
+function OnClose()
+    LearningToolUI.Close({success = false, cancelled = true});
+end
+
+function GetPlayButtonText()
+    return IsSpeaking() and "播放中..." or "🔊 听示范";
+end
+
+function IsPlayButtonEnabled()
+    return not IsSpeaking() and not IsRecording();
+end
+]]></script>
+
+<div style="width:440px;background-color:#ffffff;">
+    <!-- Title Bar -->
+    <div style="width:440px;height:40px;background-color:#FF5722;position:relative;">
+        <div style="position:relative;left:15px;top:10px;color:#ffffff;font-size:16px;font-weight:bold;">
+            跟读练习
+        </div>
+        <div style="position:relative;left:402px;top:6px;">
+            <input type="button" value="✕" style="width:28px;height:28px;background-color:#E64A19;color:#ffffff;font-size:14px;background:url();" onclick="OnClose"/>
+        </div>
+    </div>
+    
+    <!-- Word Display -->
+    <div style="width:410px;margin:15px;text-align:center;">
+        <div style="font-size:32px;color:#333333;font-weight:bold;">
+            <%=GetWord()%>
+        </div>
+        
+        <pe:if condition='<%=GetPhonetic() ~= ""%>'>
+            <div style="font-size:16px;color:#666666;margin-top:5px;">
+                <%=GetPhonetic()%>
+            </div>
+        </pe:if>
+        
+        <pe:if condition='<%=GetTranslation() ~= ""%>'>
+            <div style="font-size:14px;color:#888888;margin-top:5px;">
+                <%=GetTranslation()%>
+            </div>
+        </pe:if>
+        
+        <!-- Play Demo Button -->
+        <div style="margin-top:15px;margin-left:145px;">
+            <input type="button" value="<%=GetPlayButtonText()%>" style="width:120px;height:34px;background-color:#2196F3;color:#ffffff;font-size:13px;" onclick="OnPlayDemo" enabled="<%=IsPlayButtonEnabled()%>"/>
+        </div>
+    </div>
+    
+    <!-- Waveform Container -->
+    <div style="width:400px;margin-left:20px;">
+        <div name="learning_waveform_container" style="width:400px;height:70px;background-color:#f5f5f5;">
+            <!-- Waveform drawn by Canvas -->
+        </div>
+    </div>
+    
+    <!-- Recording Button -->
+    <div style="width:410px;margin:15px;text-align:center;">
+        <div style="margin-left:130px;">
+            <input type="button" value="<%=GetRecordButtonText()%>" style="width:180px;height:45px;background-color:<%=GetRecordButtonColor()%>;color:#ffffff;font-size:16px;" onclick="OnToggleRecording"/>
+        </div>
+        
+        <!-- Last Transcript Display -->
+        <pe:if condition='<%=GetLastTranscript() ~= ""%>'>
+            <div style="margin-top:10px;font-size:13px;color:#666666;">
+                识别结果: <%=GetLastTranscript()%>
+            </div>
+        </pe:if>
+    </div>
+    
+    <!-- Feedback Overlay -->
+    <pe:if condition='<%=IsFeedbackShowing()%>'>
+        <div style="position:relative;width:440px;height:350px;margin-top:-350px;background-color:#00000080;">
+            <div style="margin-left:120px;margin-top:135px;width:200px;height:80px;background-color:#ffffff;text-align:center;">
+                <div style="margin-top:25px;font-size:20px;font-weight:bold;color:<%=GetFeedbackColor()%>;">
+                    <%=GetFeedbackText()%>
+                </div>
+            </div>
+        </div>
+    </pe:if>
+</div>
+</pe:mcml>

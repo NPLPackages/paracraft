@@ -198,7 +198,7 @@ function InfoWindow.CopyToClipboard(data_type)
 	if(text) then
 		ParaMisc.CopyTextToClipboard(text);
 		local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
-		BroadcastHelper.PushLabel({id="infowindow", label = text, max_duration=10000, color = "0 0 0", scaling=1, bold=true, shadow=true,});
+		BroadcastHelper.PushLabel({id="infowindow", label = text..L("，已复制到剪贴板。"), max_duration=10000, color = "0 0 0", scaling=1, bold=true, shadow=true,});
 	end
 end
 

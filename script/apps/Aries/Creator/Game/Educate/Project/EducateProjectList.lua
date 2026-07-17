@@ -13,6 +13,12 @@ function EducateProjectList.OnInit()
 end
 
 function EducateProjectList.ShowPage()
+    local isOffline = System.options.isOffline --智慧教育离线模式
+    if isOffline then
+        local OfflineEducateProjectList = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Offline/Project/EducateProjectList.lua")
+        OfflineEducateProjectList.ShowPage()
+        return
+    end
     if GameLogic.GetFilters():apply_filters('is_signed_in') then
         EducateProjectList.ShowView()
         return

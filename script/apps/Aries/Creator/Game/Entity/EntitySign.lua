@@ -104,8 +104,10 @@ function Entity:Refresh()
 				obj:SetFacing(0);
 				obj:SetRotation(Direction.GetQuaternionByData(data));
 			end
-			local text = self.cmd or ""
-			if(self:HasMCML()) then
+			local text = self:GetDisplayName() or "";
+			local cmd = text:match("^$%((.*)%)")
+			text = text:gsub("^$%(.*%)[\r\n]*", "");
+			if(self:HasMCML(text)) then
 				local xmlRoot = ParaXML.LuaXML_ParseString("<pe:mcml>"..text.."</pe:mcml>")
 				if(xmlRoot) then
 					local env = {
@@ -124,7 +126,6 @@ function Entity:Refresh()
 				end
 			else
 				self:SetHeadOnDisplay(nil)
-				text = self:GetDisplayName() or text;
 				Text3DDisplay.ShowText3DDisplay(true, obj, text, self.text_color, self.text_offset, -1.57);
 			end
 		else
@@ -175,11 +176,36 @@ end
 function Entity:FrameMove(deltaTime)
 end
 
-function Entity:OnClick(x, y, z, mouse_button, entity)
-	if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-		self:OpenEditor("entity", entity);
+
+-- self.cmd like "/loadworld 503"
+-- return nil, if inline command does not exist
+function Entity:GetInlineCommand()
+	if(self.cmd) then
+		local cmd = self.cmd:match("^$%((.*)%)")
+		if(cmd and cmd~="") then
+			return cmd
+		end
 	end
-	return true;
+end
+
+function Entity:RunCommand()
+	local cmd = self:GetInlineCommand()
+	if(cmd) then
+		-- TODO: isRemote() to run on server?
+		GameLogic.RunCommand(cmd);
+	end
+end
+
+function Entity:OnClick(x, y, z, mouse_button, entity)
+	if(mouse_button=="right") then
+		if(GameLogic.GameMode:CanEditBlock() and not self:IsLocked()) then
+			self:OpenEditor("entity", entity);
+			return true;
+		end
+	else
+		self:RunCommand()
+		return true;
+	end
 end
 
 function Entity:IsPowered()
@@ -193,9 +219,10 @@ function Entity:Restart()
 	self:Refresh()
 end
 
-function Entity:HasMCML()
-	if(self.cmd) then
-		return self.cmd:match("^%s*<.*</%w+>%s*$")~=nil;
+function Entity:HasMCML(text)
+	text = text or self.cmd;
+	if(text) then
+		return text:match("^%s*<.*</%w+>%s*$")~=nil;
 	end
 end
 
@@ -257,6 +284,7 @@ function Entity:OpenEditor(editor_name, entity)
 		self:OpenHtmlEditor()
 	end
 	GameLogic.SetModified();
+	return true;
 end
 
 function Entity:OpenHtmlEditor()
@@ -296,10 +324,11 @@ local EditorPanelMCML
 -- the title text to display (can be mcml)
 function Entity:GetCommandTitle()
 	EditorPanelMCML = EditorPanelMCML or string.format([[
-		<div style="float:left;margin-left:5px;margin-top:7px;">
+		<div style="float:left;margin-left:5px;margin-top:7px;text-align:left">
 			<input type="button" uiname="EditEntityPage.OpenHTMLEditor" value='<%%="%s"%%>' onclick="MyCompany.Aries.Game.EntityManager.EntitySign.OnClickAdvancedEditor" style="min-width:80px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+			<span style="margin-left:5px;">%s $(/tip hello)</span>
 		</div>
-	]], L"HTML编辑器...");
+	]], L"HTML编辑器...", L"首行可为命令，例如:");
 	return EditorPanelMCML;
 end
 

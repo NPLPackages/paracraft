@@ -416,8 +416,14 @@ function ShareBlocksPage.UpLoadFile(filename)
 					-- print("qiniu-public-temporary.keepwork.com/" .. key)
 					-- local key = "model-share-162199-97f741d183885f245c4534661cd0c2a7"
 					ShareBlocksPage.Close()
+					local base_template_url = "qiniu-public-temporary.keepwork.com/"
+					local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+					if HttpWrapper.GetDevVersion() == "STAGE" then
+						base_template_url = "qiniu-public-temporary-dev.keepwork.com/"
+					end
+					local template_url = base_template_url .. key
 					local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
-					FriendsPage.Show(2, {msg_type = 2, content = "qiniu-public-temporary.keepwork.com/" .. key})
+					FriendsPage.Show(2, {msg_type = 2, content = template_url})
 					if err ~= 200 then
 						return;
 					end

@@ -37,8 +37,15 @@ Macros.broadcast = Macros.Broadcast
 -- @param voiceType: voice type, default to play a kid's voice (4).  -1 to disable
 function Macros.Text(text, duration, position, voiceType)
 	MacroPlayer.ShowText(text, duration, position)
+	Macros.lastPlayTextTime = commonlib.TimerManager.GetCurrentTime();
 	if(voiceType ~= -1) then
-		SoundManager:PlayText(text,  voiceType)
+		SoundManager:PlayText(text, voiceType, nil, nil, function()
+			-- start play callback
+			Macros.isPlayingText = true
+		end, function()
+			-- end play callback
+			Macros.isPlayingText = false;
+		end)
 	end
 end
 Macros.text = Macros.Text;

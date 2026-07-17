@@ -107,7 +107,7 @@ end
 -- same as LocalLoadWorld.GetWorldFolderFullPath() by default
 function LocalLoadWorld.GetDefaultSaveWorldPath()
 	local saveWorldPath = LocalLoadWorld.GetWorldFolderFullPath();
-	LOG.std(nil, "info", "LocalLoadWorld", "default world path: %s", saveWorldPath);
+	-- LOG.std(nil, "info", "LocalLoadWorld", "default world path: %s", saveWorldPath);
 	return saveWorldPath
 end
 
@@ -472,7 +472,8 @@ function LocalLoadWorld.OnClickLoadWorld()
 			LocalLoadWorld.page:CloseWindow();
 			WorldCommon.OpenWorld(world.worldpath, true)
 		else
-			_guihelper.MessageBox(L"无效的世界文件");
+			GameLogic.AddBBS(nil,"进入世界失败，请重试~~~")
+        	GameLogic.SendErrorLog("LocalLoadWorld","load world failed","load world failed============")
 		end
 	end
 end

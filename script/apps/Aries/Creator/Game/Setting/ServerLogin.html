@@ -1,0 +1,72 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/ServerLogin.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="ServerSetting.lua"><![CDATA[
+ServerSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/ServerSetting.lua')
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnOK()
+    local username = Page:GetValue("username", "");
+    local password = ServerSetting.server_BasicAuthMethod=="UniversalPassword" and Page:GetValue("password2", "") or Page:GetValue("password1", "") 
+    if(ServerSetting.server_BasicAuthMethod=="UniversalPassword") then
+        username = "";
+        if(password == "") then
+            _guihelper.MessageBox(L"密码不能为空");
+            return;
+        end
+    else
+        if(username == "" or password == "") then
+            _guihelper.MessageBox(L"用户名或密码不能为空");
+            return;
+        end
+    end
+    ServerSetting.UserLogin(username, password)
+    ClosePage();
+end
+
+
+]]></script>
+<aries:window mode="thin" style="width:400px;height:140px;" title='<%=L"访问密码"%>' onclose="ClosePage">   
+    <div style="margin-top: 10px;">
+        <pe:if condition='<%=ServerSetting.server_BasicAuthMethod~="UniversalPassword"%>'>
+            <div style="float:left; margin-left: 27px; margin-top: 10px; color: #ffffff; ">
+                <%=L"用户名"%>
+            </div>
+            <div style="float:left;margin-left:10px;margin-top:10px;">
+                <input type="text" name="username" autofocus="true" value="" rows="1" style="margin-top:0px;margin-left:0px;width:100px;height:24px;" class="mc_text"/>
+            </div>
+            <div style="float:left; margin-left: 20px; margin-top: 10px; color: #ffffff; ">
+                <%=L"密码"%>
+            </div>
+            <div style="float:left;margin-left:10px;margin-top:10px;">
+                <input type="text" name="password1" value="" rows="1" style="margin-top:0px;margin-left:0px;width:100px;height:24px;" class="mc_text"/>
+            </div>
+        </pe:if>
+        <pe:if condition='<%=ServerSetting.server_BasicAuthMethod=="UniversalPassword"%>'>
+            <div style="float:left; margin-left: 50px; margin-top: 10px; color: #ffffff; ">
+                <%=L"请输入访问密码："%>
+            </div>
+            <div style="float:left;margin-left:10px;margin-top:10px;">
+                <input type="text" name="password2" value="" rows="1" style="margin-top:0px;margin-left:0px;width:150px;height:24px;" class="mc_text"/>
+            </div>
+        </pe:if>
+    </div>
+    <div style="height:50px; margin-top: 10px;">
+        <input type="button" value='<%=L"确定"%>' onclick="OnOK" style="margin-top: 10px; margin-left: 70px; width: 100px; height: 22px; color: #ffffff;" class="mc_light_grey_button_with_fillet" />
+        <input type="button" value='<%=L"取消"%>' onclick="ClosePage" style="margin-top: 10px; margin-left: 50px; width: 100px; height: 22px; color: #ffffff;" class="mc_light_grey_button_with_fillet" />
+    </div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

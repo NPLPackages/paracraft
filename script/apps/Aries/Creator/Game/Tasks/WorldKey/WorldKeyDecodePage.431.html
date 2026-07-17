@@ -1,0 +1,68 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="WorldKeyDecodePage.lua"><![CDATA[
+local WorldKeyDecodePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePage.lua");
+WorldKeyDecodePage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    WorldKeyDecodePage.CloseView()
+end
+
+function Paste()
+    WorldKeyDecodePage.Paste()
+end
+
+function GetTitle()
+    return WorldKeyDecodePage.title_text
+end
+
+function GetDesc()
+    return WorldKeyDecodePage.desc
+end
+
+function DecodeWorld()
+    WorldKeyDecodePage.DecodeWorld()
+end
+
+function ToBuy()
+    WorldKeyDecodePage.ToBuy()
+end
+
+function OnTextChange()
+    WorldKeyDecodePage.OnTextChange()
+end
+]]></script>
+<div style="width: 430px; height: 230px;">
+    <div style="width: 430px;height: 230px;">
+        <div style="width: 430px;height: 40px;margin-top: 0px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdin_54x60_32bits.png#0 0 54 60:20 20 20 20;">
+            <div style="float: left;margin-left: 20px;margin-top: 6px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;"><%=L"访问世界"%></div>
+            <div onclick="ClosePage()" style="float: left;margin-left: 400px;margin-top: -20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+        </div>
+        <div style="width: 430px;height: 190px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdi_54x60_32bits.png#0 0 54 54:25 25 25 25;">
+           <div style="position: relative; text-align: left; margin-left: 20px; font-size: 14px;base-font-size: 14px; margin-top: 20px;">
+                <div><%=L"访问密码"%></div>
+                
+                <div style="float: left; margin-top:12px;width:360px;height:36px;background:url(Texture/Aries/Creator/paracraft/Educate/Login1/name_58x36_32bits.png#0 0 58 36:26 14 26 14);">
+                    <input type="text" onchange="OnTextChange" EmptyText='<%=L"请输入访问密码"%>' name="key_text" style="font-size: 12px; margin-top:4px;margin-left:5px;height:24px;background:;" />
+                </div>
+           </div>
+           <div style="margin-left: 60px; margin-top: 120px;">
+                <input type="button" value='<%=L"确定"%>' onclick="DecodeWorld"  style="float: left; color: #404BF5; width: 140px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu_40x30_32bits.png#0 0 40 30:18 14 18 14);"/>
+                <input type="button" value='<%=L"取消"%>' onclick="ClosePage"  style="float: left; color: #333333; margin-left: 20px; width: 140px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/input2_51x32_32bits.png#0 0 51 32:22 14 22 14);"/>
+           </div>                     
+        </div>
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

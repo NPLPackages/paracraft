@@ -71,7 +71,7 @@ function ExamPaperPage.ShowPage(bShow)
 				height = 442,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
-
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "competition.choicequestion",{open=true,useNoId=true})
     GameLogic.AddBBS(nil,L"开始考试")
     ExamPaperPage.UpdateClock()
     ExamPaperPage.UpdateAnswerProgress()
@@ -101,17 +101,19 @@ function ExamPaperPage.CheckShow(rules,endTime,showScore)
         if err~=200 then
             return
         end
-        ExamPaperPage.timeDiff = os.time() - math.floor(data.timestamp/1000)
-        print("====time",os.time(),ExamPaperPage.timeDiff)
+        ExamPaperPage.timeDiff = ExamPaperPage.GetServerTime() - math.floor(data.timestamp/1000)
+        print("====time",ExamPaperPage.GetServerTime(),ExamPaperPage.timeDiff)
         auth.checkAuth(function()
             ExamPaperPage.rules = rules
             ExamPaperPage.GeneratePaper(function()
                 if ExamPaperPage.IsCommited() then --已经交卷了
                     print("交卷了")
+                    GameLogic.GetFilters():apply_filters("user_behavior", 1, "competition.choicequestion",{open=false,result="答题已结束", score=ExamPaperPage.paper_data.score, useNoId=true})
                     ExamPaperPage.showResultPage(ExamPaperPage.paper_data.score,L"答题已结束")
                 else
                     if #ExamPaperPage.paper_data.questions==0 then
                         GameLogic.AddBBS(nil,"试题为空")
+                        GameLogic.GetFilters():apply_filters("user_behavior", 1, "competition.choicequestion",{open=false,result="试题为空",useNoId=true})
                         return
                     end
                     ExamPaperPage.ShowPage(true)
@@ -125,6 +127,10 @@ end
 --是否可以重考
 function ExamPaperPage.CheckCanReExamine()
     return auth.max_commitTimes>auth.committedTimes
+end
+
+function ExamPaperPage.IsExamed()
+    return auth.committedTimes and auth.committedTimes > 0
 end
 
 --生成试卷的参数
@@ -223,7 +229,7 @@ function ExamPaperPage.UpdateClock()
             leftTime = ExamPaperPage.endTime - ExamPaperPage.GetServerTime() + ExamPaperPage.timeDiff
         else
             local start_stamp = commonlib.timehelp.GetTimeStampByDateTime(ExamPaperPage.paper_data.startAt)
-            leftTime = totalTime - (os.time()-start_stamp ) + ExamPaperPage.timeDiff
+            leftTime = totalTime - (ExamPaperPage.GetServerTime()-start_stamp ) + ExamPaperPage.timeDiff
         end
         ExamPaperPage.isTimeout = leftTime<0
         ExamPaperPage.curTimeVal = L"剩余时间".." "..os.date("%M:%S",math.max(leftTime,0))
@@ -502,13 +508,16 @@ function ExamPaperPage.DoCommit()
         -- print("--------交卷 err=",err,data)
         -- echo(data,true)
 
-        if err==200 then
+        if err==200 and data and data.data then
             ExamPaperPage.ShowPage(false)
             ExamPaperPage.paper_data = data.data
             auth.committedTimes = auth.committedTimes + 1
             
             ExamPaperPage.showResultPage(ExamPaperPage.paper_data.score,L"考试成绩已成功上传")
             auth.submit_score(ExamPaperPage.paper_data.score)
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "summit.competition.choicequestion",{score=ExamPaperPage.paper_data.score,useNoId=true})
+        else
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "summit.competition.choicequestion",{result="选择题提交失败",useNoId=true})
         end
     end)
 end
@@ -529,7 +538,10 @@ end
 --是否已经交卷了
 function ExamPaperPage.IsCommited()
     print("ExamPaperPage.paper_data.status",ExamPaperPage.paper_data.status)
-    return ExamPaperPage.paper_data.status==1
+    if ExamPaperPage.IsExamed() then
+        return ExamPaperPage.paper_data.status==1
+    end
+    return false
 end
 
 function ExamPaperPage.onBtnClick(name)
@@ -577,7 +589,7 @@ function ExamPaperPage.GetServerTime()
     if System.options.isDevMode then
         return os.time()
     end
-    local timp_stamp = GameLogic.GetFilters():apply_filters('store_get', 'world/currentServerTime')
+    local timp_stamp = GameLogic.GetFilters():apply_filters('service.session.get_current_server_time')
     return timp_stamp or os.time()
 end
 
@@ -856,8 +868,8 @@ function ExamPaperPage.UpLoadFile(filename,callback)
         return;
     end
     local size = file:GetFileSize();
-    if size>100*1024*1024 then
-        GameLogic.AddBBS(1,"上传的视频过大,请上传100M以内的视频")
+    if size>200*1024*1024 then
+        GameLogic.AddBBS(1,"上传的视频过大,请上传200M以内的视频")
         return
     end
 
@@ -916,5 +928,6 @@ function ExamPaperPage.UpLoadFile(filename,callback)
 				end
 			)
 		end
+        collectgarbage("collect");
     end)
 end

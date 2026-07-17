@@ -52,11 +52,11 @@ function OnLoadGame()
 end
 
 function OnUploadGame()
-    GameLogic.RunCommand("/menu file.uploadworld");
-end
-
-function OnFriendsPage()
-    System.App.Commands.Call("Profile.Aries.FriendsWnd");
+    GameLogic.QuickSave();
+    local isOffline = System.options.isOffline
+    if not isOffline then
+        GameLogic.RunCommand("/menu file.uploadworld");
+    end
 end
 
 function OnTextureModPage()
@@ -128,9 +128,6 @@ function OnClickButton(name,mcmlNode)
     elseif(name=="exitWorld") then
         OnLeave();
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.exit_world");
-    elseif(name=="friends") then
-        OnFriendsPage()
-        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.friends");
     elseif(name=="continueGame") then
         ClosePage();
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.continue_game");
@@ -175,6 +172,12 @@ function IsHomeWorkWorld()
     local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
     return isHomeWorkWorld
 end
+
+function IsCompete()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Competition/CompetitionManager.lua")
+    local CompetitionManager = commonlib.gettable("MyCompany.Aries.Game.Educate.Competete.Manager")
+    return CompetitionManager:CheckIsInCompete()
+end
 ]]></script>
 <div style="height:64px;width:370px;">
     <pe:if condition='<%=WorldStacks:GetReturnWorld() ~= nil%>'>
@@ -190,20 +193,39 @@ end
             <input type="button" value='...' style="margin-left:4px;font-size:14px;height:26px;color:#ffffff;" class="mc_button_blue"/>
         </div>
     </div>
-    <div style="margin-left:31px;">
-        <div style="margin-top:13px;">
-            <input type="button" value='<%=L"保存世界"%>' uiname="EscFramePage.shareWorld" name="shareWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
-            <input type="button" value='<%=L"新建世界"%>' uiname="EscFramePage.createNewWorld" name="createNewWorld"  style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+    <pe:if condition="<%= not IsCompete()%>">
+        <div style="margin-left:31px;">
+            <div style="margin-top:13px;">
+                <input type="button" value='<%=L"保存世界"%>' uiname="EscFramePage.shareWorld" name="shareWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                <input type="button" value='<%=L"更换材质"%>' name="changeTexture" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            </div>
+            <pe:if condition="<%= GameLogic.IsReadOnly() %>">
+                <div style="margin-top:8px;">
+                    <input type="button" value='<%=L"加载世界"%>' tooltip="Ctrl+O" uiname="EscFramePage.loadWorld" name= "loadWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                    <input type="button" value='<%=L"新建世界"%>' uiname="EscFramePage.createNewWorld" name="createNewWorld"  style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                </div>
+            </pe:if>
+            
+            <div style="margin-top:8px;">
+                <input type="button" value='<%=L"系统设置"%>' name= "systemSetting" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                <input type="button" value='<%=L"退出世界"%>' uiname="EscFramePage.exitWorld" name= "exitWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            </div>
         </div>
-        <div style="margin-top:8px;">
-            <input type="button" value='<%=L"加载世界"%>' tooltip="Ctrl+O" uiname="EscFramePage.loadWorld" name= "loadWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
-            <input type="button" value='<%=L"更换材质"%>' name="changeTexture" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+    </pe:if>
+
+    <pe:if condition="<%= IsCompete()%>">
+        <div style="margin-left:31px;">
+            <div style="margin-top:13px;">
+                <input type="button" value='<%=L"保存世界"%>' uiname="EscFramePage.shareWorld" name="shareWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                <input type="button" value='<%=L"更换材质"%>' name="changeTexture" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            </div>
+            <div style="margin-top:8px;">
+                <input type="button" value='<%=L"系统设置"%>' name= "systemSetting" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                <input type="button" value='<%=L"退出世界"%>' uiname="EscFramePage.exitWorld" name= "exitWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            </div>
         </div>
-        <div style="margin-top:8px;">
-            <input type="button" value='<%=L"系统设置"%>' name= "systemSetting" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
-            <input type="button" value='<%=L"退出世界"%>' uiname="EscFramePage.exitWorld" name= "exitWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
-        </div>
-    </div>
+    </pe:if>
+    
     <div style="margin-left:41px;margin-top:8px;">
         <!--<a tooltip='<%=L"打开官网"%>' href='<%=L"http://www.paracraft.cn/"%>' style="color:#CFCFCF;font-size:13px;" onclick='goto_url("http://www.paracraft.cn")'>www.paracraft.cn</a>-->
         <div style="float:left;align:right;margin-right:-16px;width:130px;color:#CFCFCF;font-size:17px;">

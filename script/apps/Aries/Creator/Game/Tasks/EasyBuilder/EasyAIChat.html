@@ -1,0 +1,258 @@
+<!-- 
+Title: EasyBuilder AI Chat UI
+Author(s): LiXizhi
+Date: 2025/11/22
+Desc: Bottom center dialog for chatting with character via LLM
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyAIChat.lua" refresh="false">
+<![CDATA[
+EasyAIChat = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyAIChat");
+EasyAIChat.InitPage(Page);
+function GetDisplayName()
+    return EasyAIChat.GetDisplayName();
+end
+function IsWaitingForResponse()
+    return EasyAIChat.IsWaitingForResponse();
+end
+function IsShowChatLog()
+    return EasyAIChat.IsShowChatLog();
+end
+function GetVisibleChatHistory()
+    return EasyAIChat.GetVisibleChatHistory();
+end
+function CanScrollUp()
+    return EasyAIChat.CanScrollUp();
+end
+function CanScrollDown()
+    return EasyAIChat.CanScrollDown();
+end
+function IsShowQuickReplies()
+    return EasyAIChat.IsShowQuickReplies();
+end
+
+function dummy()
+end
+]]>
+</script>
+<style>
+    .closebtn {
+        position: relative;
+        margin-right: -19px;
+        margin-top: -18px;
+        width: 56px;
+        height: 56px;
+        background: url(Texture/player/close.png);
+    }
+    .chatcontainer {
+        background: url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);
+        padding: 20px;
+        color: #ffffff;
+    }
+    .chattitle {
+        font-size: 16px;
+        color: #ffcc00;
+        margin-bottom: 5px;
+    }
+    .chatinput {
+        color: #ffffff;
+        padding: 8px;
+        margin-top:3px;
+        height:40px;
+        font-size: 18px;
+    }
+    .button {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        font-size: 14px;
+        min-width: 70px;
+        spacing:10px;
+        height: 45px;
+        color: #000000;
+        margin-left: 5px;
+    }
+    .waitingtext {
+        float:left;
+        color: #ffcc00;
+        font-size: 14px;
+        margin-left: 10px;
+    }
+    .chatlogcontainer {
+        background: ;
+        margin-bottom: 10px;
+        min-height: 100px;
+    }
+    .chatlogmessage {
+        font-size: 16px;
+        margin-bottom: 24px;
+    }
+    .chatloguser {
+        color: #000000;
+    }
+    .chatlogassistant {
+        color: #000000;
+    }
+    .chatloguserbubble {
+        float:right;
+        background: url(Texture/Aries/Creator/keepwork/friends/duihua2_32X32_32bits.png#0 0 32 32:12 22 12 6);
+        background-color: #ffffffa0;
+        padding: 8px;
+        padding-right: 16px;
+        margin-left:80px;
+    }
+    .chatlogassistantbubble {
+        float:left;
+        background: url(Texture/Aries/Creator/keepwork/friends/duihua1_32X32_32bits.png#0 0 32 32:12 22 12 6);
+        background-color: #ffffffa0;
+        padding: 8px;
+        padding-left: 16px;
+        margin-right:80px;
+    }
+    .scrollbtn {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        font-size: 18px;
+        width: 45px;
+        height: 45px;
+        color: #000000;
+        margin-left: 5px;
+    }
+    .quickreplycontainer {
+        background: url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);
+        padding: 20px;
+        min-height: 100px;
+    }
+    .highlightbutton {
+        background: url(Texture/Aquarius/Button_Highlight_Large.png:15 15 15 15);
+    }
+</style>
+
+<div style="margin-bottom:10px;">
+    <input type="button" class="button" name="showChatLogBtn" onclick="EasyAIChat.OnToggleShowChatLog" value='<%=IsShowChatLog() and L"隐藏记录" or L"聊天记录"%>' />
+    <pe:repeat DataSource='<%= EasyAIChat.GetQuickReplies() %>'>
+        <pe:repeatitem style="float:lef;margin-left: 60px;">
+            <input type="button" 
+                class="button" 
+                uiname="<%=Eval('uiname') or 'easy_ai_quick_reply_'..tostring(Eval('index'))%>"
+                name = '<%=tostring(Eval("index"))%>'
+                value='<%=tostring(Eval("text"))%>' 
+                onclick='EasyAIChat.OnClickQuickReply' 
+            />
+        </pe:repeatitem>
+    </pe:repeat>
+    <pe:if condition='<%= IsShowChatLog() %>'>
+        <pe:if condition='<%= EasyAIChat.GetTotalMessagesCount() >= 1 %>'>
+            <input type="button" class="button" name="clearChatLogBtn" onclick="EasyAIChat.OnClickClearChatLog" value='<%=L"清空"%>' />
+        </pe:if>
+        <pe:if condition='<%= EasyAIChat.GetTotalMessagesCount() > 5 %>'>
+            <input type="button" class="scrollbtn" name="scrollUpBtn" onclick="EasyAIChat.OnScrollChatLogUp" value='▲' />
+            <input type="button" class="scrollbtn" name="scrollDownBtn" onclick="EasyAIChat.OnScrollChatLogDown" value='▼' />
+        </pe:if>
+    </pe:if>
+</div>
+
+<!-- Quick Replies Popup -->
+<pe:if condition='<%= IsShowQuickReplies() %>'>
+    <pe:container zorder="1" class="quickreplycontainer" style="position:relative;width:560px;">
+        <div style="overflow-y:auto;">
+            <div style="float:left">
+                <input type="button" 
+                    name="backBtn" 
+                    value='<%=L"返回"%>' 
+                    class="button highlightbutton" 
+                    onclick="EasyAIChat.OnToggleShowQuickReplies"
+                />
+            </div>
+            <pe:repeat DataSource='<%= EasyAIChat.GetQuickReplies() %>'>
+                <pe:repeatitem style="float:left">
+                    <input type="button" 
+                        class="button" 
+                        name = '<%=tostring(Eval("index"))%>'
+                        value='<%=tostring(Eval("text"))%>' 
+                        onclick='EasyAIChat.OnClickQuickReply' 
+                    />
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+    </pe:container>
+</pe:if>
+
+<!-- Chat Log Display -->
+<pe:if condition='<%= IsShowChatLog() %>'>
+    <pe:container class="chatlogcontainer" ClickThrough="true" style="margin-bottom:200px;width:560px;float:left;vertical-align: bottom;position:relative">
+        <pe:repeat DataSource='<%= GetVisibleChatHistory() %>'>
+            <pe:repeatitem>
+                <pe:if condition='<%= Eval("role") == "user" %>'>
+                    <div class="chatlogmessage">
+                        <!-- <div style="position:relative;margin-right:0px;text-align:right;" class="chatloguser"><%=":"..L"我"%></div>-->
+                        <pe:container class="chatloguserbubble"><%=Eval("text")%></pe:container>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%= Eval("role") == "assistant" %>'>
+                    <div class="chatlogmessage">
+                        <!-- <div style="float:left" class="chatlogassistant"><%=GetDisplayName()..": "%></div> -->
+                        <div class="chatlogassistantbubble"><%=Eval("text")%></div>
+                    </div>
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+        <pe:if condition='<%= EasyAIChat.GetTotalMessagesCount() == 0 %>'>
+            <div style="color: #dfdede; text-align:left; margin-left:10px;font-size:18px;text-shadow: true;"><%=L"暂无聊天记录"%></div>
+        </pe:if>
+    </pe:container>
+</pe:if>
+
+<pe:if condition='<%= not IsShowQuickReplies() %>'>
+<pe:container onclick="dummy" class="chatcontainer" style="width:560px;">
+    <div style="position:relative">
+        <input type="button" name="CloseBtn" onclick="EasyAIChat.OnClickClose" align="right" class="closebtn" />
+    </div>
+    
+    <!-- Chat Title -->
+    <div class="chattitle">
+        <div style="float:left;"><%=string.format(L"与 %s 对话", GetDisplayName())%></div>
+        <pe:if condition='<%= IsWaitingForResponse() %>'>
+            <div class="waitingtext"><%=L"正在等待回复..."%></div>
+        </pe:if>
+    </div>
+    
+    <!-- Chat History Display (Removed) -->
+    
+    <!-- Input Area -->
+    <div style="margin-top:5px;margin-bottom:5px">
+        <div style="float:left;">
+            <input type="text" 
+                name="chatInput" 
+                class="chatinput" 
+                style="width:300px;" 
+                EmptyText='<%=L"输入消息..."%>'
+                MoveViewWhenAttachWithIME="true"
+                enabled='<%=not IsWaitingForResponse()%>'
+            />
+        </div>
+        <div style="float:left;">
+            <pe:if condition='<%= EasyAIChat.HasQuickReplies() %>'>
+                <input type="button" 
+                    name="quickRepliesBtn" 
+                    value='<%=L"常用语"%>' 
+                    class="button" 
+                    onclick="EasyAIChat.OnToggleShowQuickReplies"
+                    enabled='<%=not IsWaitingForResponse()%>'
+                />
+            </pe:if>
+            <input type="button" 
+                name="sendBtn" 
+                value='<%=L"发送"%>' 
+                class="button highlightbutton" 
+                onclick="EasyAIChat.OnClickSend" DefaultButton="true"
+                enabled='<%=not IsWaitingForResponse()%>'
+            />
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+
+</pe:container>
+</pe:if>
+    
+</pe:mcml>
+</html>

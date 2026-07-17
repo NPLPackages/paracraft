@@ -403,7 +403,9 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 				effect:SetTexture(0, "");
 		
 				-- composite 3 final: render back to render target. 
-				ParaEngine.SetRenderTarget(self.old_rt);
+				if(self.old_rt) then
+					ParaEngine.SetRenderTarget(self.old_rt);
+				end
 				self.old_rt = nil;
 				effect:BeginPass(3);
 					-- bloom color
@@ -429,7 +431,9 @@ function FancyV1:OnRenderHighWithHDR(ps_scene, nPass)
 				effect:SetTexture(0, "");
 
 				-- composite 3 final: render back to render target. 
-				ParaEngine.SetRenderTarget(self.old_rt);
+				if(self.old_rt) then
+					ParaEngine.SetRenderTarget(self.old_rt);
+				end
 				self.old_rt = nil;
 				effect:BeginPass(3);
 					-- composite texture

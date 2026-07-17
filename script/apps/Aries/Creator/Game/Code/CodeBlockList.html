@@ -1,48 +1,49 @@
 <!--script/apps/Aries/Creator/Game/Code/CodeBlockList.html-->
 <pe:mcml>
-<script type="text/npl" refresh="false" src="CodeBlockWindow.lua">
-<![CDATA[
-local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
-local blockList = CodeBlockWindow.GetBlockList();
+    <script type="text/npl" refresh="false" src="CodeBlockWindow.lua">
+        <![CDATA[
+        local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+        local blockList = CodeBlockWindow.GetBlockList();
 
-local items = {};
-for index = 1, #blockList do
-    local item = blockList[index]
-    if(item) then
-        items[#items+1] = {filename = item.filename, listIndex = index, selected = CodeBlockWindow.entity == item.entity, isExternal=false}
-        if(item.entity) then
-            if(item.entity:GetAllIncludedFiles()) then
-                local filenames = item.entity:GetAllIncludedFiles()
-                for i = 1, #filenames do
-                    items[#items+1] = {filename = filenames[i], displayName = filenames[i]:sub(-26, -1), listIndex = index, selected = false, isExternal=true}
+        local items = {};
+        for index = 1, #blockList do
+            local item = blockList[index]
+            if(item) then
+                items[#items+1] = {filename = item.filename, listIndex = index, selected = CodeBlockWindow.entity == item.entity, isExternal=false}
+                if(item.entity) then
+                    if(item.entity:GetAllIncludedFiles()) then
+                        local filenames = item.entity:GetAllIncludedFiles()
+                        for i = 1, #filenames do
+                            items[#items+1] = {filename = filenames[i], displayName = filenames[i]:sub(-26, -1), listIndex = index, selected = false, isExternal=true}
+                        end
+                    end
+                    -- only add language config file with file extensions
+                    local langFile = item.entity:GetLanguageConfigFile();
+                    if(langFile and langFile~="" and langFile:match("%.")) then
+                        items[#items+1] = {filename = langFile, listIndex = index, selected = false, isExternal=true}
+                    end
                 end
             end
-            local langFile = item.entity:GetLanguageConfigFile();
-            if(langFile and langFile~="") then
-                items[#items+1] = {filename = langFile, listIndex = index, selected = false, isExternal=true}
+        end
+
+        function ListDs(index)
+            if(not index) then
+                return #items;
+            else
+                return items[index]
             end
         end
-    end
-end
 
-function ListDs(index)
-    if(not index) then
-        return #items;
-    else
-        return items[index]
-    end
-end
-
-function OnSelectCodeBlock(index)
-    local item = blockList[items[index].listIndex]
-    if(item and CodeBlockWindow.entity~=item.entity and not items[index].isExternal) then
-        CodeBlockWindow.SetCodeEntity(item.entity);
-    end
-    if(items[index].isExternal) then
-        CodeBlockWindow.OpenExternalFile(items[index].filename)
-    end
-end
-]]></script>
+        function OnSelectCodeBlock(index)
+            local item = blockList[items[index].listIndex]
+            if(item and CodeBlockWindow.entity~=item.entity and not items[index].isExternal) then
+                CodeBlockWindow.SetCodeEntity(item.entity);
+            end
+            if(items[index].isExternal) then
+                CodeBlockWindow.OpenExternalFile(items[index].filename)
+            end
+        end
+        ]]></script>
 <div style="font-size:12px;padding:3px;background-color:#292929;" class="default">
     <div style="background-color:#dddede;">
         <pe:gridview style="margin:0px;" name="gvwBlockList" CellPadding="0" VerticalScrollBarStep="24" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="24" RememberScrollPos="true"

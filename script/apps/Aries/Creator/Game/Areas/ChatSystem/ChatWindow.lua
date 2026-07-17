@@ -49,6 +49,8 @@ local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
 local max_broadcast_message = 3;
 -- we will clear the broadcast message from the ui after this amount of time. 
 local max_broadcast_msg_show_time = 60000;
+-- we will refresh UI at most 500ms
+ChatWindow.maxRefreshInterval = 500;
 -- the default show positions.
 ChatWindow.DefaultUIPos = {
 	RestoreBtn = {alignment = "_lb", left = 2, top = -254+75, width = 21, height = 24, background = "Texture/Aries/ChatSystem/jiahao_32bits.png;0 0 21 24"},
@@ -83,7 +85,7 @@ function ChatWindow.ResetPosition(ggs_valid)
 
 	local _parentwnd = ChatWindow.CreateGetParentWnd();
 
-	if(_parentwnd and _parentwnd:IsValid())then
+	if(_parentwnd and _parentwnd:IsValid() and parent_wnd_pos_config)then
 		_parentwnd:Reposition(
 			parent_wnd_pos_config.alignment,
 			parent_wnd_pos_config.left,
@@ -98,7 +100,7 @@ function ChatWindow.ResetPosition(ggs_valid)
 
 	local edit_container = ParaUI.GetUIObject("ChatEditPage");
 
-	if (edit_container and edit_container:IsValid()) then
+	if (edit_container and edit_container:IsValid() and edit_wnd_pos_config) then
 		edit_container:Reposition(
 			edit_wnd_pos_config.alignment,
 			edit_wnd_pos_config.left,
@@ -128,6 +130,15 @@ function ChatWindow.InitSystem()
 		}
 	end
 
+	if System.options.isCommunity  then
+		ChatWindow.DefaultUIPos = {
+			RestoreBtn = {alignment = "_lb", left = 2, top = -254+75, width = 21, height = 24, background = "Texture/Aries/ChatSystem/jiahao_32bits.png;0 0 21 24"},
+			EditWnd = {alignment = "_lb", left = 2, top = -75, width = 640, height = 50},
+			LogWnd = {alignment = "_lb", left = 2, top = -360, width = 420, height = 300},
+			ParentWnd = {alignment = "_lb", left = 2, top = -310 , width = 700, height = 380},
+		}
+	end
+
 	ChatWindow.BeShowAll = false;
 	ChatWindow.IsInited = true;
 	ChatWindow.minimized = false; -- start minimized. 
@@ -138,17 +149,6 @@ function ChatWindow.InitSystem()
 
     NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
     local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
-
-	GameLogic.GetFilters():add_filter("ggs", function(msg)
-	    LOG.std("", "info", "ChatWindow recieve ggs filter", msg);
-        
-        msg = msg or {};
-
-        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-		KeepWorkItemManager.OnGGSMsg(msg);
-
-		return msg; -- 保证其它filter也能收到此消息
-    end)
 end
 
 -- if we are in ggs connected game server mode, in which chating is important. 
@@ -203,7 +203,6 @@ function ChatWindow.HideAll()
 	if (_parentwnd) then
 		_parentwnd.visible = false;
 	end
-
 	ChatWindow.CreateGetRestoreBtn().visible = false;
 end
 
@@ -299,7 +298,7 @@ function ChatWindow.CreateGetParentWnd()
 					ChatWindow.DefaultUIPos.ParentWnd.height
 				);
 			_parent.background = "";
-			_parent.zorder = -1;
+			_parent.zorder = 10;
 			_parent:GetAttributeObject():SetField("ClickThrough", true);
 			_parent:AttachToRoot();
 		end
@@ -367,11 +366,24 @@ function ChatWindow.ShowChatLogPage(bForceRefreshPage, alignment, left, top, wid
 		ChatWindow.DefaultUIPos.EditWnd_ggs_valid = {alignment = "_lb", left = 2, top = -40, width = 400, height = 50}
 		ChatWindow.DefaultUIPos.LogWnd = {alignment = "_lb", left = 2, top = -290, width = 400, height = 250}
 	end
+	if System.options.isCommunity  then
+		local marginBottom = 0;
+		ChatWindow.DefaultUIPos = {
+			RestoreBtn = {alignment = "_lb", left = 2, top = -179 - marginBottom, width = 21, height = 24, background = "Texture/Aries/ChatSystem/jiahao_32bits.png;0 0 21 24"},
+			EditWnd = {alignment = "_lb", left = 2, top = -75 - marginBottom, width = 640, height = 50},
+			LogWnd = {alignment = "_lb", left = 2, top = -380 - marginBottom, width = 420, height = 380},
+			ParentWnd = {alignment = "_lb", left = 2, top = -380 - marginBottom, width = 700, height = 380},
+		}
+	end
 
 	if (bForceRefreshPage or not ChatWindow.page) then
+		local htmlUrl = "script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.html";
+		if System.options.isCommunity  then
+			htmlUrl = "script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.community.html"
+		end
 		ChatWindow.page =
 			Map3DSystem.mcml.PageCtrl:new({
-				url = "script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.html", 
+				url = htmlUrl, 
 				click_through = true
 			});
 	end
@@ -411,7 +423,7 @@ function ChatWindow.ShowChatLogPage(bForceRefreshPage, alignment, left, top, wid
 		ChatWindow.page:Create("ChatWindow.page", _parent, "_fi", 0, 0, 0, 0);
 		ChatWindow.is_fade_out = nil;
 	end
-
+	
 	_parent.visible = true;
 	ChatWindow.is_shown = true;
 
@@ -500,36 +512,47 @@ end
 
 -- create the scroll bar
 function ChatWindow.CreateTreeViewScrollBar(param, mcmlNode)
-	local vscrollbar = ParaUI.CreateUIObject("scrollbar", "ChatWindow_CreateTreeView_VScrollBar","_lt", param.left,param.top,param.width,param.height);
+	local vscrollbar = ParaUI.CreateUIObject("scrollbar", "ChatWindow_CreateTreeView_VScrollBar","_lt", param.left + 5,param.top,param.width,param.height);
 	vscrollbar.visible = true;
 	vscrollbar:SetPageSize(param.height);
 	vscrollbar.onchange = ";MyCompany.Aries.ChatSystem.ChatWindow.OnScrollBarChange()";
 
 	local states = {[1] = "highlight", [2] = "pressed", [3] = "disabled", [4] = "normal"};
 	local i;
+	local track_texture = "Texture/Aries/ChatSystem/gundongtiaobg_32bits.png;0 0 16 32"
+	local up_left_texture = "Texture/Aries/ChatSystem/arrow1_32bits.png;6 6 16 16"
+	local down_right_texture = "Texture/Aries/ChatSystem/arrow2_32bits.png;6 6 16 20"
+	local thumb_texture = "Texture/Aries/ChatSystem/arrow3_32bits.png;0 0 16 31"
+	if System.options.isCommunity  then
+		up_left_texture = "Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png;242 145 10 8"
+		down_right_texture = "Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png;242 128 10 8"
+		thumb_texture = "Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png;225 128 8 17"
+	end
 	for i = 1, 4 do
 		vscrollbar:SetCurrentState(states[i]);
 		texture=vscrollbar:GetTexture("track");
-		texture.texture="Texture/Aries/ChatSystem/gundongtiaobg_32bits.png;0 0 16 32";
+		texture.texture = track_texture
 		texture=vscrollbar:GetTexture("up_left");
-		texture.texture="Texture/Aries/ChatSystem/arrow1_32bits.png;6 6 16 16";
+		texture.texture = up_left_texture
 		texture=vscrollbar:GetTexture("down_right");
-		texture.texture="Texture/Aries/ChatSystem/arrow2_32bits.png;6 6 16 20";
+		texture.texture = down_right_texture
 		texture=vscrollbar:GetTexture("thumb");
-		texture.texture="Texture/Aries/ChatSystem/arrow3_32bits.png;0 0 16 31";
+		texture.texture = thumb_texture
 	end
 	param.parent:AddChild(vscrollbar);
 end
 
+
 -- create the treeview for log display
 function ChatWindow.CreateTreeView(param, mcmlNode)
-    local _container = ParaUI.CreateUIObject("container", "chatwindow_tvcon", "_lt", param.left,param.top,param.width,param.height);
+	local container_width = param.width - 10;
+    local _container = ParaUI.CreateUIObject("container", "chatwindow_tvcon", "_lt", param.left,param.top,container_width,param.height);
 	_container.background = "";
 	_container:GetAttributeObject():SetField("ClickThrough", true);
 	param.parent:AddChild(_container);
 	
 	-- create get the inner tree view
-	local ctl = ChatWindow.GetTreeView(nil, _container, 0, 0, param.width, param.height);
+	local ctl = ChatWindow.GetTreeView(nil, _container, 0, 0, container_width, param.height);
 	ctl:Show(true, nil, true);
 	local _parentctl = ParaUI.GetUIObject(ctl.name);
 	_parentctl:GetChild("main").onmousewheel = string.format(";MyCompany.Aries.ChatSystem.ChatWindow.OnTreeViewMouseWheel()");
@@ -721,8 +744,8 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
 		nid = System.App.profiles.ProfileManager.GetNID();
 	end
 	if(chatdata.is_keepwork)then
-    local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
-       mcmlStr = KpChatChannel.CreateMcmlStrToChatWindow(chatdata);
+    	local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+       	mcmlStr = KpChatChannel.CreateMcmlStrToChatWindow(chatdata);
 	elseif(from==nid and chatdata.to)then
 		mcmlStr = string.format([[<div style="line-height:14px;font-size:12px;color:#%s;" %s>%s<div style="float:left;">你对[%s%s<a 
 				tooltip="%s" style="margin-left:0px;float:left;height:12px;background:url()" name="x"
@@ -780,6 +803,9 @@ function ChatWindow.DrawTextNodeHandler(_parent, treeNode)
 			myLayout:reset(0, 0, nodeWidth-5, height);
 			Map3DSystem.mcml_controls.create("bbs_lobby", xmlRoot, nil, _parent, 0, 0, nodeWidth-5, height,nil, myLayout);
 			local usedW, usedH = myLayout:GetUsedSize()
+			if System.options.isCommunity then
+				return math.max(usedH, height) + 12;
+			end
 			if(usedH>height) then
 				return usedH;
 			end
@@ -938,10 +964,51 @@ function ChatWindow.AppendChatMessage(chatdata, needrefresh)
 		rootNode:RemoveChildByIndex(1);
 	end
 
-	rootNode:AddChild(CommonCtrl.TreeNode:new({
-			Name = "text", 
-			chatdata = chatdata,
-		}));
+	-- the following handles bAppendToLast with \n in words for console output. 
+	local isAdded;
+	if(chatdata.bAppendToLast) then
+		chatdata.words = chatdata.words or ""
+		for line in string.gmatch(chatdata.words, "([^\r\n]*)\r?\n") do
+			local chatdata_ = commonlib.copy(chatdata);
+			isAdded = false;
+			if(line == "") then
+				local lastNode = rootNode:GetChild(rootNode:GetChildCount())
+				if(lastNode and lastNode.chatdata.bAppendToLast) then
+					lastNode.chatdata.bAppendToLast = nil;
+					isAdded = true;
+				end
+			end
+			if(not isAdded) then
+				chatdata_.words = line;
+				chatdata_.bAppendToLast = nil;
+				local lastNode = rootNode:GetChild(rootNode:GetChildCount())
+				if(lastNode and lastNode.chatdata.bAppendToLast) then
+					lastNode.chatdata.words = (lastNode.chatdata.words or "")..chatdata_.words;
+					lastNode.chatdata.bAppendToLast = nil;
+				else
+					rootNode:AddChild(CommonCtrl.TreeNode:new({Name = "text", chatdata = chatdata_,}));
+				end
+			end
+			isAdded = true;
+		end
+		if(isAdded) then
+			isAdded = false;
+			chatdata.words = chatdata.words:match("[^\r\n]+$");
+			if(not chatdata.words) then
+				isAdded = true;
+			end
+		end
+		if(not isAdded) then
+			local lastNode = rootNode:GetChild(rootNode:GetChildCount())
+			if(lastNode and lastNode.chatdata.bAppendToLast) then
+				lastNode.chatdata.words = (lastNode.chatdata.words or "")..chatdata.words;
+				isAdded = true;
+			end
+		end
+	end
+	if(not isAdded) then
+		rootNode:AddChild(CommonCtrl.TreeNode:new({Name = "text", chatdata = chatdata,}));
+	end
 
 	if(needrefresh)then
 		ChatWindow.RefreshTreeView();
@@ -973,7 +1040,10 @@ function ChatWindow.OnSwitchChannelDisplay(name)
 	local chatdata;
 	if(channel_index==ChatChannel.EnumChannels.All)then
 		-- exclude = 10(broadcast)
-		local channels = {1,2,3,4,5,6,7,8,9,11,12,13,14,21,22,23}
+		local channels = {1,2,3,4,5,6,7,8,9,11,12,13,14,21,22,23,26,27}
+		if System.options.mc then
+			channels = {21,22,23,26,27}
+		end
 		chatdata = ChatChannel.GetChat(channels);
 		ChatChannel.SetAppendEventCallbackFilter(channels);
 	elseif(channel_index==ChatChannel.EnumChannels.Region or channel_index==ChatChannel.EnumChannels.BroadCast)then
@@ -1009,19 +1079,31 @@ function ChatWindow.OnSwitchChannelDisplay(name)
 end
 
 -- refresh the tree view. 
+-- @param bImmediate: if nil, we will refresh at most 1 time per second
 -- TODO: only refresh whenever the tree view is visible, otherwise we will postpone until it is visible again. 
-function ChatWindow.RefreshTreeView()
-	if (ChatWindow.page) then
-		local ctl = ChatWindow.GetTreeView();
-		if(ctl) then
-			local parent = ParaUI.GetUIObject("chatwindow_tvcon");
-			if(parent:IsValid())then
-				ctl.parent = parent;
-				ctl:Update(true);
+function ChatWindow.RefreshTreeView(bImmediate)
+	if(bImmediate) then
+		if (ChatWindow.page) then
+			local ctl = ChatWindow.GetTreeView();
+			if(ctl) then
+				local parent = ParaUI.GetUIObject("chatwindow_tvcon");
+				if(parent:IsValid())then
+					ctl.parent = parent;
+					ctl:Update(true);
+				end
 			end
-		end
 
-		ChatWindow.RefreshScrollBar();
+			ChatWindow.RefreshScrollBar();
+		end
+	else
+		if(not ChatWindow.timer) then
+			ChatWindow.timer = commonlib.Timer:new({callbackFunc = function(timer)
+				ChatWindow.RefreshTreeView(true)
+				timer:SetEnabled(false);
+			end})
+			ChatWindow.timer:Change(0, ChatWindow.maxRefreshInterval);
+		end
+		ChatWindow.timer:SetEnabled(true);
 	end
 end
 
@@ -1185,6 +1267,9 @@ function ChatWindow.ChatCommandFilter(msgdata)
 		elseif(msgdata.ChannelIndex == ChatChannel.EnumChannels.Private)then
 			return;
 		elseif(string.sub(msgdata.words,1,1)=="#")then
+			if System.options.isCommunity  then
+				return msgdata;
+			end
 			msgdata.words = string.sub(msgdata.words,2,-1);
 			-- 这里添加#开头的命令行解析代码
 		else
@@ -1218,5 +1303,10 @@ function ChatWindow.OnClickName(strNidName)
 			MyCompany.Aries.NewProfileMain.OnShowContextMenu(nid);
 		end
 	end
+end
+
+function ChatWindow.OnExpandChatWindow()
+	local ChatChannelPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatChannelPage.lua");
+	ChatChannelPage.ShowPage()
 end
 

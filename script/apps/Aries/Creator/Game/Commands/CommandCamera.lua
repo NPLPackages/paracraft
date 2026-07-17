@@ -30,6 +30,7 @@ Commands["lookat"] = {
 	desc=[[look at a given direction or player
 Example:
 /lookat -1 ~ ~   lookat negative x direction
+/lookat ~6 ~-3 ~  lookat relative to current player position
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		if(cmd_text) then
@@ -78,8 +79,10 @@ Example:
 Commands["fov"] = {
 	name="fov", 
 	quick_ref="/fov [fieldofview:1.04] [animSpeed]", 
-	desc=[[change field of view with an animation. default value is 1.04. e.g.
+	desc=[[change field of view with an animation. default value is 1.04. e.g. If value is bigger than 3.14, it is in degrees.
 /fov   default field of view
+/fov 60 
+/fov 120
 /fov 0.5		zoomin
 /fov 0.4 0.01   zoomin with animation
 ]], 
@@ -90,6 +93,9 @@ Commands["fov"] = {
 			target_fov = target_fov or GameLogic.options.normal_fov;
 
 			if(target_fov) then
+				if(target_fov > 3.15) then
+					target_fov = target_fov / 180 * math.pi;
+				end
 				speed_fov, cmd_text = CmdParser.ParseInt(cmd_text);
 
 				NPL.load("(gl)script/apps/Aries/Creator/Game/World/CameraController.lua");
@@ -360,7 +366,7 @@ Commands["panorama"] = {
 
 Commands["camera"] = {
 	name="camera", 
-	quick_ref="/camera [-norestrict|clear|roomview|disable|enable|rotspeed] [-restrictPitch from [to]] [-restrictFacing from [to]] [-restrictDist from [to]] [-grid|nogrid yawGrid pitchGrid]", 
+	quick_ref="/camera [-norestrict|clear|roomview|disable|enable|rotspeed|rotspeedscale] [-restrictPitch from [to]] [-restrictFacing from [to]] [-restrictDist from [to]] [-grid|nogrid yawGrid pitchGrid] [-mode FirstPerson|ThirdPerson|ThirdPersonLookCamera|ThirdPersonLookAhead]", 
 	desc=[[adjust camera controller settings. Angle should be in range [-180, 180]
 /camera      : clear all camera settings
 /camera -roomview    : good for kids
@@ -372,9 +378,12 @@ Commands["camera"] = {
 /camera -restrictDist 15
 /camera -restrictFacing 45 135
 /camera -restrictFacing 90 -restrictDist 10 -restrictPitch 30 80
+/camera -restrictCameraEntity [on|off]  : also restrict camera entity, default to not. 
 /camera -disable
 /camera -enable
 /camera -rotspeed 0.001   change mouse rotation speed, default to 0.1
+/camera -rotspeedscale 0.5  scale rotation speed, default to 1
+/camera -mode FirstPerson|ThirdPerson|ThirdPersonLookCamera|ThirdPersonLookAhead   
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
@@ -404,6 +413,10 @@ Commands["camera"] = {
 				minDist, cmd_text = CmdParser.ParseInt(cmd_text);
 				maxDist, cmd_text = CmdParser.ParseInt(cmd_text);
 				maxDist = maxDist or minDist
+			elseif(option_name == "restrictCameraEntity") then
+				local bRestrictCameraEntity
+				bRestrictCameraEntity, cmd_text = CmdParser.ParseBool(cmd_text)
+				CameraController.SetRestrictCameraEntity(bRestrictCameraEntity)
 			elseif(option_name == "roomview") then
 				enableRoomView = true
 			elseif(option_name == "disable" or option_name == "enable") then
@@ -414,6 +427,13 @@ Commands["camera"] = {
 				rotSpeed = rotSpeed or 0.01
 				if(rotSpeed >= 0 and rotSpeed < 1) then
 					ParaCamera.GetAttributeObject():SetField("RotationScaler", rotSpeed)
+				end
+			elseif(option_name == "rotspeedscale") then
+				local scale;
+				scale, cmd_text = CmdParser.ParseInt(cmd_text);
+				scale = scale or 1
+				if(scale > 0) then
+					CameraController.SetRotationSpeedScale(scale)
 				end
 			elseif(option_name == "grid") then
 				local gridValueYaw, gridValuePitch;
@@ -428,6 +448,26 @@ Commands["camera"] = {
 				CameraController.EnableCameraRotationGrid(gridValueYaw, gridValuePitch)
 			elseif(option_name == "nogrid") then
 				CameraController.EnableCameraRotationGrid(nil, nil)
+			elseif(option_name == "mode") then
+				local mode;
+				mode, cmd_text = CmdParser.ParseString(cmd_text);
+				if(mode == "FirstPerson") then
+					mode = CameraController.CameraModes.FirstPerson;
+				elseif(mode == "ThirdPerson") then
+					mode = CameraController.CameraModes.ThirdPersonFreeLooking;
+				elseif(mode == "ThirdPersonLookCamera") then
+					mode = CameraController.CameraModes.ThirdPersonLookCamera;
+				elseif(mode == "ThirdPersonLookAhead") then
+					mode = CameraController.CameraModes.ThirdPersonLookAhead;
+				end
+				if(mode) then
+					CameraController.ChangeCameraMode(mode);
+					return
+				end
+			else
+				if(option_name and option_name ~= "") then
+					BroadcastHelper.PushLabel({label = "Unknown camera option: "..option_name, color = "255 0 0", bold=true, italics=true});
+				end
 			end
 		end
 		CameraController.EnableAutoRoomView(enableRoomView==true);

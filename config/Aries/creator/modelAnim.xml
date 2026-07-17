@@ -1,11 +1,10 @@
 
 <anims>
-  <model name="" text="人物" path="">
-    <anim id="以下动作主要适用于电影方块中的演员" desc=""/>
+  <model name="actor" name2="default" text="人物" path="" desc="以下动作主要适用于电影方块中的演员">
     <anim id="0" desc="待机"/>
     <anim id="1" desc="死亡静止"/>
-    <anim id="4" desc="弯腰走路"/>
-    <anim id="5" desc="走路"/>
+    <anim id="4" desc="走路"/>
+    <anim id="5" desc="快步走"/>
     <anim id="6" desc="攻击"/>
     <anim id="7" desc="被攻击"/>
     <anim id="10" desc="紧锁眉头"/>
@@ -46,7 +45,7 @@
     <anim id="73" desc="快速点头"/>
     <anim id="74" desc="快速摇头"/>
     <anim id="75" desc="跪着"/>
-    <anim id="76" desc="低头沉思"/>
+    <anim id="76" desc="仰头沉思"/>
     <anim id="77" desc="哭"/>
     <anim id="78" desc="思考者"/>
     <anim id="79" desc="挠头"/>
@@ -92,7 +91,7 @@
     <anim id="119" desc="闭眼跪着"/>
     <anim id="120" desc="甩右手"/>
     <anim id="121" desc="右手捂嘴"/>
-    <anim id="122" desc="跪着不说话"/>
+    <anim id="122" desc="直立跪着不说话"/>
     <anim id="123" desc="双手抱头仰卧"/>
     <anim id="124" desc="抱手斜靠"/>
     <anim id="125" desc="右手向前推"/>
@@ -103,8 +102,8 @@
     <anim id="130" desc="双手捂脸哭泣"/>
     <anim id="131" desc="坐着说话"/>
     <anim id="132" desc="屈膝坐着张开双臂"/>
-    <anim id="133" desc="屈膝坐着摇摆双臂"/>
-    <anim id="133" desc="屈膝坐着仰头"/>
+    <anim id="133" desc="屈膝坐着摇摆双臂"/>   
+    <anim id="134" desc="坐在凳子上仰头"/>
     <anim id="135" desc="右手抬起，左手捂嘴"/>
     <anim id="136" desc="左手侧方伸出"/>
     <anim id="137" desc="双手前伸"/>
@@ -112,5 +111,338 @@
     <anim id="139" desc="悬空抬右手"/>
     <anim id="143" desc="跑步"/>
     <anim id="153" desc="待机休息"/>
+    <anim id="200" desc="张嘴闭嘴说话"/>
+  </model>
+  <model name="customchar" text="可换装人物" path="character/CC/02human/CustomGeoset/actor.x" desc="以下动作主要适用于电影方块中的演员">
+      <anim id="0" desc="待机"/>
+      <anim id="4" desc="走路"/>
+      <anim id="5" desc="跑步"/>
+      <anim id="6" desc="单手武器攻击"/>
+      <anim id="31" desc="点头"/>
+      <anim id="32" desc="摇头"/>      
+      <anim id="34" desc="鞠躬"/>
+      <anim id="33" desc="站着不动"/>    
+      <anim id="35" desc="招手"/>
+      <anim id="37" desc="向上跳的起始动作"/>
+      <anim id="38" desc="飞行"/>
+
+      <anim id="41" desc="游泳待机"/>
+      <anim id="42" desc="游泳"/>
+      <anim id="45" desc="手持胜利姿势"/>
+      <anim id="46" desc="兴奋的叫朋友"/>
+
+      <anim id="71" desc="抬手"/>
+      <anim id="72" desc="坐下"/>
+      <anim id="75" desc="单膝下跪"/>
+      <anim id="77" desc="哭"/>
+      <anim id="78" desc="坐着思考"/>
+      <anim id="88" desc="侧躺"/>
+
+      <anim id="89" desc="齐步走"/>
+      <anim id="90" desc="快步走"/>
+      <anim id="91" desc="双手武器待机"/>
+      <anim id="92" desc="侧游"/>
+      <anim id="93" desc="双手武器跑步"/>
+      <anim id="94" desc="双手武器攻击"/>
+      <anim id="95" desc="前扑死亡"/>
+      <anim id="96" desc="持手枪走路"/>
+      <anim id="97" desc="持手枪跑步"/>
+      <anim id="98" desc="持手枪攻击"/>
+      <anim id="99" desc="向后仰死亡"/>
+
+      <anim id="100" desc="平躺"/>
+      <anim id="109" desc="抬单手施法"/>
+
+      <anim id="111" desc="战斗"/>
+      <anim id="116" desc="换武器"/>
+      <anim id="117" desc="双手持枪攻击"/>
+      <anim id="118" desc="换手枪弹夹"/>
+      <anim id="119" desc="换武器1"/>
+
+      <anim id="120" desc="双手持枪跑步"/>
+      <anim id="121" desc="双手持枪走路"/>
+      <anim id="122" desc="持枪攻击"/>
+      <anim id="123" desc="持枪待机"/>
+      <anim id="124" desc="后仰死亡1"/>
+      <anim id="125" desc="换弹夹1"/>
+      <anim id="126" desc="持枪攻击1"/>
+      <anim id="127" desc="持双手武器跳"/>
+
+      <anim id="130" desc="双手向前持物"/>
+      <anim id="131" desc="双手武器走路"/>
+
+      <anim id="144" desc="跳舞"/>
+      <anim id="145" desc="鼓掌"/>
+      <anim id="146" desc="侧躺死亡静止"/>
+      <anim id="147" desc="背书包走路"/>
+      <anim id="148" desc="打字"/>
+      <anim id="149" desc="叉腰"/>
+
+      <anim id="150" desc="双手撑栏杆"/>
+      <anim id="151" desc="打招呼"/>
+      <anim id="152" desc="向前摊开双手"/>
+      <anim id="153" desc="待机动画1"/>
+      <anim id="154" desc="待机动画2"/>
+      <anim id="157" desc="跑步2"/>
+      <anim id="158" desc="展示衣服1"/>
+      <anim id="159" desc="展示衣服2"/>
+
+      <anim id="160" desc="走路2"/>
+      <anim id="161" desc="打招呼"/>
+      <anim id="162" desc="打字2"/>
+      <anim id="163" desc="打字3"/>
+      <anim id="164" desc="展示衣服3"/>
+      <anim id="165" desc="展示衣服4"/>
+      <anim id="166" desc="快跑"/>
+      <anim id="167" desc="快跑2"/>
+      <anim id="168" desc="挥拳"/>
+      <anim id="169" desc="侧躺死亡"/>
+
+      <anim id="170" desc="掷骰子"/>
+      <anim id="171" desc="讲故事"/> 
+      <anim id="172" desc="飞"/> 
+      <anim id="174" desc="踢脚"/>
+      <anim id="175" desc="蹲下"/>
+      <anim id="176" desc="起飞"/>
+      <anim id="177" desc="挥镐"/>
+      <anim id="178" desc="持单手武器跑"/>
+      <anim id="179" desc="持单手武器走"/>
+
+      <anim id="180" desc="持炮开火"/>
+      <anim id="181" desc="大刷子"/>
+      <anim id="182" desc="持小水枪攻击"/>
+      <anim id="183" desc="小刷子"/>
+      <anim id="184" desc="滚筒"/>
+      <anim id="185" desc="大水枪"/>
+      <anim id="186" desc="待机1"/>
+      <anim id="187" desc="打坐"/>
+      <anim id="188" desc="俯卧撑"/>
+      <anim id="189" desc="眩晕"/>
+
+      <anim id="190" desc="三连击"/>
+      <anim id="191" desc="抬双手施法"/>
+      <anim id="192" desc="单膝下跪静止"/>
+      <anim id="193" desc="作揖"/>
+      <anim id="194" desc="作揖静止"/>
+      <anim id="195" desc="双膝跪地"/>
+      <anim id="196" desc="双膝跪地静止"/>
+      <anim id="197" desc="持手枪跳"/>
+      <anim id="198" desc="扇扇子"/>
+      <anim id="199" desc="拄拐走路"/>
+
+      <anim id="201" desc="持枪跳"/>
+      <anim id="202" desc="撸胡子"/>
+      <anim id="203" desc="挥扇"/>
+      <anim id="204" desc="挥扇静止"/>
+      <anim id="205" desc="平身"/>
+      <anim id="206" desc="乖巧跪"/>
+      <anim id="207" desc="乖巧跪静止"/>
+      <anim id="208" desc="侧持戈走路"/>
+      <anim id="209" desc="侧持戈走路静止"/>
+
+      <anim id="210" desc="正持戈走路"/>
+      <anim id="211" desc="正持戈走路静止"/>
+      <anim id="212" desc="胜利姿势静止"/>
+      <anim id="213" desc="操练全套"/>
+      <anim id="214" desc="操练1"/>
+      <anim id="215" desc="操练2"/>
+      <anim id="216" desc="操练3"/>
+      <anim id="217" desc="刺枪"/>
+      <anim id="218" desc="刺枪静止"/>
+      <anim id="219" desc="坐着扇扇子"/>   
+      <anim id="220" desc="卧式射击"/>
+      <anim id="221" desc="握枪快步走"/>
+      <anim id="222" desc="宣誓"/>
+      <anim id="223" desc="蹲式射击"/>
+      <anim id="224" desc="握枪跑步"/>
+      <anim id="225" desc="扑"/>
+      <anim id="226" desc="受击"/>
+      <anim id="227" desc="滑雪"/>
+      <anim id="228" desc="滑雪特技"/>
+      <anim id="229" desc="滑冰"/>
+      <anim id="230" desc="滑冰1"/>
+      <anim id="231" desc="伪装死亡"/>
+      <anim id="232" desc="后躺死亡"/>
+      <anim id="233" desc="快速飞行"/>
+      <anim id="234" desc="降落"/>
+      <anim id="235" desc="坐直"/>
+      <anim id="236" desc="指挥动作01"/> 
+      <anim id="237" desc="指挥动作02"/> 
+      <anim id="238" desc="指挥动作03"/> 
+      <anim id="239" desc="指挥动作04"/> 
+      <anim id="240" desc="指挥动作05"/> 
+      <anim id="241" desc="指挥动作06"/> 
+      <anim id="242" desc="指挥动作07"/> 
+      <anim id="243" desc="指挥动作08"/> 
+      <anim id="244" desc="指挥动作09"/> 
+      <anim id="245" desc="指挥动作10"/> 
+      <anim id="246" desc="指挥动作11"/>
+  </model>
+  <model name="newpapa" text="新帕帕" path="character/CC/02human/CustomGeoset/actor_papa.x" desc="以下动作主要适用于电影方块中的演员">
+      <anim id="0" desc="待机"/>
+      <anim id="4" desc="走路"/>
+      <anim id="5" desc="跑步"/>
+      <anim id="6" desc="单手武器攻击"/>
+      <anim id="31" desc="点头"/>
+      <anim id="32" desc="摇头"/>
+      <anim id="33" desc="站着不动"/>       
+      
+      <anim id="34" desc="鞠躬"/>
+      <anim id="35" desc="招手"/>
+      <anim id="37" desc="向上跳的起始动作"/>
+      <anim id="38" desc="飞行"/>
+
+      <anim id="41" desc="游泳待机"/>
+      <anim id="42" desc="游泳"/>
+      <anim id="45" desc="手持胜利姿势"/>
+      <anim id="46" desc="兴奋的叫朋友"/>
+
+      <anim id="71" desc="抬手"/>
+      <anim id="72" desc="坐下"/>
+      <anim id="75" desc="单膝下跪"/>
+      <anim id="77" desc="哭"/>
+      <anim id="78" desc="坐着思考"/>
+      <anim id="88" desc="侧躺"/>
+
+      <anim id="89" desc="齐步走"/>
+      <anim id="90" desc="快步走"/>
+      <anim id="91" desc="双手武器待机"/>
+      <anim id="92" desc="侧游"/>
+      <anim id="93" desc="双手武器跑步"/>
+      <anim id="94" desc="双手武器攻击"/>
+      <anim id="95" desc="前扑死亡"/>
+      <anim id="96" desc="持手枪走路"/>
+      <anim id="97" desc="持手枪跑步"/>
+      <anim id="98" desc="持手枪攻击"/>
+      <anim id="99" desc="向后仰死亡"/>
+
+      <anim id="100" desc="平躺"/>
+      <anim id="109" desc="抬单手施法"/>
+
+      <anim id="111" desc="战斗"/>
+      <anim id="116" desc="换武器"/>
+      <anim id="117" desc="双手持枪攻击"/>
+      <anim id="118" desc="换手枪弹夹"/>
+      <anim id="119" desc="换武器1"/>
+
+      <anim id="120" desc="双手持枪跑步"/>
+      <anim id="121" desc="双手持枪走路"/>
+      <anim id="122" desc="持枪攻击"/>
+      <anim id="123" desc="持枪待机"/>
+      <anim id="124" desc="后仰死亡1"/>
+      <anim id="125" desc="换弹夹1"/>
+      <anim id="126" desc="持枪攻击1"/>
+      <anim id="127" desc="持双手武器跳"/>
+
+      <anim id="130" desc="双手向前持物"/>
+      <anim id="131" desc="双手武器走路"/>
+
+      <anim id="144" desc="跳舞"/>
+      <anim id="145" desc="鼓掌"/>
+      <anim id="146" desc="侧躺死亡静止"/>
+      <anim id="147" desc="背书包走路"/>
+      <anim id="148" desc="打字"/>
+      <anim id="149" desc="叉腰"/>
+
+      <anim id="150" desc="双手撑栏杆"/>
+      <anim id="151" desc="打招呼"/>
+      <anim id="152" desc="向前摊开双手"/>
+      <anim id="153" desc="待机动画1"/>
+      <anim id="154" desc="待机动画2"/>
+      <anim id="157" desc="跑步2"/>
+      <anim id="158" desc="展示衣服1"/>
+      <anim id="159" desc="展示衣服2"/>
+
+      <anim id="160" desc="走路2"/>
+      <anim id="161" desc="打招呼"/>
+      <anim id="162" desc="打字2"/>
+      <anim id="163" desc="打字3"/>
+      <anim id="164" desc="展示衣服3"/>
+      <anim id="165" desc="展示衣服4"/>
+      <anim id="166" desc="快跑"/>
+      <anim id="167" desc="快跑2"/>
+      <anim id="168" desc="挥拳"/>
+      <anim id="169" desc="侧躺死亡"/>
+
+      <anim id="170" desc="掷骰子"/>
+      <anim id="171" desc="讲故事"/> 
+      <anim id="172" desc="飞"/> 
+      <anim id="174" desc="踢脚"/>
+      <anim id="175" desc="蹲下"/>
+      <anim id="176" desc="起飞"/>
+      <anim id="177" desc="挥镐"/>
+      <anim id="178" desc="持单手武器跑"/>
+      <anim id="179" desc="持单手武器走"/>
+
+      <anim id="180" desc="持炮开火"/>
+      <anim id="181" desc="大刷子"/>
+      <anim id="182" desc="持小水枪攻击"/>
+      <anim id="183" desc="小刷子"/>
+      <anim id="184" desc="滚筒"/>
+      <anim id="185" desc="大水枪"/>
+      <anim id="186" desc="待机1"/>
+      <anim id="187" desc="打坐"/>
+      <anim id="188" desc="俯卧撑"/>
+      <anim id="189" desc="眩晕"/>
+
+      <anim id="190" desc="三连击"/>
+      <anim id="191" desc="抬双手施法"/>
+      <anim id="192" desc="单膝下跪静止"/>
+      <anim id="193" desc="作揖"/>
+      <anim id="194" desc="作揖静止"/>
+      <anim id="195" desc="双膝跪地"/>
+      <anim id="196" desc="双膝跪地静止"/>
+      <anim id="197" desc="持手枪跳"/>
+      <anim id="198" desc="扇扇子"/>
+      <anim id="199" desc="拄拐走路"/>
+
+      <anim id="201" desc="持枪跳"/>
+      <anim id="202" desc="撸胡子"/>
+      <anim id="203" desc="挥扇"/>
+      <anim id="204" desc="挥扇静止"/>
+      <anim id="205" desc="平身"/>
+      <anim id="206" desc="乖巧跪"/>
+      <anim id="207" desc="乖巧跪静止"/>
+      <anim id="208" desc="侧持戈走路"/>
+      <anim id="209" desc="侧持戈走路静止"/>
+
+      <anim id="210" desc="正持戈走路"/>
+      <anim id="211" desc="正持戈走路静止"/>
+      <anim id="212" desc="胜利姿势静止"/>
+      <anim id="213" desc="操练全套"/>
+      <anim id="214" desc="操练1"/>
+      <anim id="215" desc="操练2"/>
+      <anim id="216" desc="操练3"/>
+      <anim id="217" desc="刺枪"/>
+      <anim id="218" desc="刺枪静止"/>
+      <anim id="219" desc="坐着扇扇子"/>   
+      <anim id="220" desc="卧式射击"/>
+      <anim id="221" desc="握枪快步走"/>
+      <anim id="222" desc="宣誓"/>
+      <anim id="223" desc="蹲式射击"/>
+      <anim id="224" desc="握枪跑步"/>
+      <anim id="225" desc="扑"/>
+      <anim id="226" desc="受击"/>
+      <anim id="227" desc="滑雪"/>
+      <anim id="228" desc="滑雪特技"/>
+      <anim id="229" desc="滑冰"/>
+      <anim id="230" desc="滑冰1"/>
+      <anim id="231" desc="伪装死亡"/>
+      <anim id="232" desc="后躺死亡"/>
+      <anim id="233" desc="快速飞行"/>
+      <anim id="234" desc="降落"/>
+      <anim id="235" desc="坐直"/>
+      <anim id="236" desc="指挥动作01"/> 
+      <anim id="237" desc="指挥动作02"/> 
+      <anim id="238" desc="指挥动作03"/> 
+      <anim id="239" desc="指挥动作04"/> 
+      <anim id="240" desc="指挥动作05"/> 
+      <anim id="241" desc="指挥动作06"/> 
+      <anim id="242" desc="指挥动作07"/> 
+      <anim id="243" desc="指挥动作08"/> 
+      <anim id="244" desc="指挥动作09"/> 
+      <anim id="245" desc="指挥动作10"/> 
+      <anim id="246" desc="指挥动作11"/>
+      
   </model>
 </anims>

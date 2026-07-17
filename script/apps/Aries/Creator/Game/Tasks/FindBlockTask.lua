@@ -12,6 +12,22 @@ local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
 task:Run();
 task:FindFile(text)
 task:ShowFindFile(text)
+task:ShowPage(true, nil, nil, function(entity)
+	return entity.isFromEditableWorld == true;
+end)
+
+task:ShowPage(true, nil, nil, function(entity)
+	if(entity:IsBlockEntity() and editableWorld:IsEditableBlock(entity:GetBlockPos())) then
+		-- this will include all editable block entities
+		return true;
+	end
+	return entity.isFromEditableWorld == true;
+end, L"全部物品", function(index)
+	FindBlockTask.SetSelectedIndexByResultIndex(index)
+	FindBlockTask.GotoItemAtIndex(index);
+	FindBlockTask.OnClose()
+	return true
+end)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
@@ -37,15 +53,25 @@ function FindBlockTask.OnInit()
 end
 
 -- @param callbackFunc: function(lastGotoItemIndex) end
-function FindBlockTask:ShowPage(bShow, entities, callbackFunc)
+-- @param filterFunc: function(entity) return true end
+-- @param onClickCallbackFunc: function(index)  return true end, return true to disable all default click action
+-- @param uiTheme: this can be "easy" for easy ui theme. default is nil
+function FindBlockTask:ShowPage(bShow, entities, onCloseCallbackFunc, filterFunc, titleText, onClickCallbackFunc, uiTheme)
 	curInstance = self;
 	FindBlockTask.filteredResultDS = nil;
 	FindBlockTask.resultDS = {};
 	FindBlockTask.selectedResultIndex = nil
 	FindBlockTask.lastGotoItemIndex = nil
+	FindBlockTask.titleText = titleText or (L"搜索"..L": 左键传送，右键预览，Alt吸取，Ctrl编辑");
+	FindBlockTask.onClickCallbackFunc = onClickCallbackFunc;
+	
+	local url = "script/apps/Aries/Creator/Game/Tasks/FindBlockTask.html"
+	if(uiTheme == "easy") then
+		url = "script/apps/Aries/Creator/Game/Tasks/FindBlockTask.easy.html"
+	end
 	local width, height = 512, 400;
 	local params = {
-		url = "script/apps/Aries/Creator/Game/Tasks/FindBlockTask.html", 
+		url = url, 
 		name = "FindBlockTask.ShowPage", 
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		isShowTitleBar = false,
@@ -65,13 +91,13 @@ function FindBlockTask:ShowPage(bShow, entities, callbackFunc)
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	params._page.OnClose = function()
 		page = nil;
-		if(callbackFunc) then
-			callbackFunc(FindBlockTask.lastGotoItemIndex)
+		if(onCloseCallbackFunc) then
+			onCloseCallbackFunc(FindBlockTask.lastGotoItemIndex)
 		end
 	end
 	if(bShow and not entities) then
 		self.mode = "goto_block";
-		FindBlockTask.FindAll();
+		FindBlockTask.FindAll(filterFunc);
 	else
 		self.mode = "text_search";
 	end
@@ -99,7 +125,7 @@ function FindBlockTask:FindFileImp(text, callbackFunc)
 		if(item and nCount < self.maxResultCount) then
 			nCount = nCount + 1;
 			results[nCount] = entity;
-			resultDS[nCount] =  {name="block", attr={index=nCount,name=filename, lowerText = string.lower(filename), icon = item:GetIcon()}};
+			resultDS[nCount] =  {name="block", attr={index=nCount,name=filename, lowerText = string.lower(filename), icon = item:GetIcon(), isLocked = entity:IsLocked()}};
 			return true;
 		end
 	end
@@ -171,9 +197,9 @@ function FindBlockTask:Run()
 	self:ShowPage(true);
 end
 
-function FindBlockTask.FindAll()
+function FindBlockTask.FindAll(filterFunc)
 	local entities = EntityManager.FindEntities({category="searchable", });
-	FindBlockTask.SetResults(entities)
+	FindBlockTask.SetResults(entities, filterFunc)
 	FindBlockTask.UpdateResult();
 end
 
@@ -268,48 +294,87 @@ function FindBlockTask.SetRegionHistory(x, y, entities)
 	history[x*1000+y] = entities;
 end
 
+function FindBlockTask.OnSortByDistance()
+	local player = EntityManager.GetFocus();
+	if(player) then
+		local px, py, pz = player:GetBlockPos();
+		local ds = FindBlockTask.GetDataSource();
+		if(ds) then
+			-- Calculate distance squared for each item first
+			for i, item in ipairs(ds) do
+				local entity = FindBlockTask.GetResultAt(item.attr.index);
+				if(entity and entity.GetBlockPos) then
+					local ax, ay, az = entity:GetBlockPos();
+					item.attr.distanceSq = (ax - px) * (ax - px) + (ay - py) * (ay - py) + (az - pz) * (az - pz);
+				else
+					item.attr.distanceSq = 999999999;
+				end
+			end
+			
+			-- Sort by pre-calculated distance
+			table.sort(ds, function(a, b)
+				return a.attr.distanceSq < b.attr.distanceSq;
+			end);
+			FindBlockTask.UpdateResult()
+		end
+	end
+end
 
 -- set the results and merge with local file for unloaded regions
-function FindBlockTask.SetResults(entities)
+function FindBlockTask.SetResults(entities, filterFunc)
 	if(entities) then
 		local resultDS = {};
 		local results = {};
 		local regions = {};
 		for i, entity in ipairs(entities) do
-			local item = entity:GetItemClass()
-			local name = tostring(entity:GetDisplayName() or "");
-			if(name == "") then
-				-- tricky: for unnamed, yet powered code block, we will list them
-				if(entity.isPowered) then
-					name = "(powered)"
-				end
-				local modelFilename = entity:GetModelFile();
-				if(modelFilename and modelFilename~="") then
-					name = modelFilename
-				end
-			end
-			if(item and name~="") then
-				name = name:gsub("\r?\n"," ")
-				local index = #resultDS+1
-				resultDS[index] = {name="block", attr={index=index,name=name, class_name = entity.class_name, lowerText = string.lower(name), icon = item:GetIcon()}};
-				results[index] = entity;
-				local x, y, z = entity:GetBlockPos();
-				local container = EntityManager.GetRegion(x, z);
-				if(container) then
-					local entitiesInRegion = regions[container];
-					if(not entitiesInRegion) then
-						entitiesInRegion = {}
-						regions[container] = entitiesInRegion
+			if(not filterFunc or filterFunc(entity)) then
+				local item = entity:GetItemClass()
+				local name = tostring(entity:GetDisplayName() or "");
+				if(name == "") then
+					-- tricky: for unnamed, yet powered code block, we will list them
+					if(entity.isPowered) then
+						name = "(powered)"
 					end
-					entitiesInRegion[#entitiesInRegion+1] = {text=name, x=x, y=y, z=z, id=item.id, 
-						sortKey = (x * 100000000 +  y * 1000000 + z)};
+					if(entity.GetMovieClipLength) then
+						-- in case of movie clip, we will show its block position and length
+						name = format("movie_%d_%d_%d (%ds)", entity.bx, entity.by, entity.bz, entity:GetMovieClipLength() or 0)
+					end
+					local modelFilename = entity:GetModelFile();
+					if(modelFilename and modelFilename~="") then
+						name = modelFilename
+					end
+					if(entity.isFromEditableWorld and name == "") then
+						name = "..."
+					end
+				end
+
+				if(item and name~="") then
+					name = name:gsub("\r?\n"," ")
+					local index = #resultDS+1
+					local invisible;
+					if(not entity:IsVisible()) then
+						invisible = true;
+					end
+					resultDS[index] = {name="block", attr={index=index,name=name, class_name = entity.class_name, invisible = invisible, lowerText = string.lower(name), isLocked = entity:IsLocked(), icon = item:GetIcon()}};
+					results[index] = entity;
+					local x, y, z = entity:GetBlockPos();
+					local container = EntityManager.GetRegion(x, z);
+					if(container) then
+						local entitiesInRegion = regions[container];
+						if(not entitiesInRegion) then
+							entitiesInRegion = {}
+							regions[container] = entitiesInRegion
+						end
+						entitiesInRegion[#entitiesInRegion+1] = {text=name, x=x, y=y, z=z, id=item.id, 
+							sortKey = (x * 100000000 +  y * 1000000 + z)};
+					end
 				end
 			end
 		end
 		FindBlockTask.resultDS = resultDS;
 		FindBlockTask.results = results;
 
-		if(not GameLogic.IsReadOnly() and not GameLogic.isRemote) then
+		if(not filterFunc and not GameLogic.IsReadOnly() and not GameLogic.isRemote) then
 			-- save to history file if anything in the region changes
 			local history = FindBlockTask.GetHistory()
 			if(history) then
@@ -343,7 +408,7 @@ function FindBlockTask.SetResults(entities)
 			end
 		end
 		local history = FindBlockTask.GetHistory()
-		if(history) then
+		if(not filterFunc and history) then
 			-- add entities that is in the history but not in regions
 			local ids = {}
 			for region, entities in pairs(regions) do
@@ -354,9 +419,9 @@ function FindBlockTask.SetResults(entities)
 					for _, entity in ipairs(entities) do
 						local item = ItemClient.GetItem(entity.id)
 						if(item) then
-							local i = #results+1;
-							results[i] = entity;
-							resultDS[#resultDS+1] = {name="block", attr={index=i,name=entity.text, lowerText = string.lower(entity.text), icon = item:GetIcon()}};
+							local index = #resultDS+1
+							resultDS[index] = {name="block", attr={index=index,name=entity.text, lowerText = string.lower(entity.text), icon = item:GetIcon()}};
+							results[index] = entity;
 						end
 					end
 				end
@@ -397,6 +462,7 @@ function FindBlockTask.UpdateResult()
 		if(page) then
 			page:CallMethod("result", "SetDataSource", FindBlockTask.GetDataSource());
 			page:CallMethod("result", "DataBind", true);
+			page:SetValue("itemCountLabel", string.format(L"(共%d个)", #FindBlockTask.GetDataSource()));
 		end
 	end})
 	FindBlockTask.timerResult:Change(10);
@@ -406,10 +472,26 @@ function FindBlockTask.GetDataSource()
 	return FindBlockTask.filteredResultDS or FindBlockTask.resultDS;
 end
 
-function FindBlockTask.OnClickItem(treenode)
-	local item = treenode.mcmlNode:GetPreValue("this")
+function FindBlockTask.OnClickUnLock(name, mcmlNode)
+	local item = mcmlNode:GetPreValue("this", true)
+	if(not item) then return end
+	local index = item.index;
+	local entity = FindBlockTask.GetResultAt(index);
+	if(entity) then
+		entity:SetLocked(false);
+		item.isLocked = nil;
+		FindBlockTask.UpdateResult();
+	end
+end
+
+function FindBlockTask.OnClickItem(name, mcmlNode)
+	local item = mcmlNode:GetPreValue("this", true)
+	if(not item) then return end
 	local index = item.index;
 
+	if(FindBlockTask.onClickCallbackFunc and FindBlockTask.onClickCallbackFunc(index)) then
+		return;
+	end
 	FindBlockTask.SetSelectedIndexByResultIndex(index)
 	FindBlockTask.GotoItemAtIndex(index);
 	

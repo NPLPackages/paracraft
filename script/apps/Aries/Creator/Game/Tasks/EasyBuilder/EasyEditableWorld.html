@@ -1,0 +1,284 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyEditableWorld.lua" refresh="false">
+<![CDATA[
+EasyEditableWorld = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyEditableWorld");
+EasyEditableWorld.InitPage(Page);
+function OnClickDummy() 
+end
+
+function getDisplayText(index)
+    local item = EasyEditableWorld.LocalWorlds_DS[index];
+    if item then
+        local remoteModel = EasyEditableWorld.GetRemoteData(item.slotIndex, item.subTag)
+        local displayName = item.displayname or item.name;
+        local showName
+        if (item.filename or "") ~= "" then
+            showName = displayName;
+        else
+            showName = displayName;
+        end
+        if remoteModel and remoteModel.id then
+            showName = showName .. string.format(" #%s", tostring(remoteModel.id))
+            if remoteModel.desc and remoteModel.desc ~= "" then
+                showName = showName .. string.format(" %s", tostring(remoteModel.desc))
+            else
+                showName = showName .. L" 未命名"
+            end
+        end
+        
+        return showName
+    end
+    return "";
+end
+
+function getTooltip(index)
+    local item = EasyEditableWorld.LocalWorlds_DS[index];
+    if item and item.writedate then
+        return string.format(L"最后保存时间: %s", item.writedate);
+    end
+    return L"空存档";
+end
+
+function OnClickRestoreArchive()
+    EasyEditableWorld.mode = 'Restore'; 
+    Page:Refresh(0.01);
+end
+
+function OnClickBackToSave()
+    EasyEditableWorld.mode = 'Save'; 
+    Page:Refresh(0.01);
+end
+
+function GetActionName(subTag)
+    if not subTag then
+        return ""
+    end
+    local actionName = GameLogic.EditableWorld:GetActionNameFromSubtag(subTag)
+    if actionName then
+        return actionName
+    end
+    return subTag
+end
+
+function isMineHome(index)
+    local item = EasyEditableWorld.LocalWorlds_DS[index];
+    if item then
+        local remoteModel = EasyEditableWorld.GetRemoteData(item.slotIndex, item.subTag)
+        if remoteModel and remoteModel.isMineHome then
+            return true
+        end
+    end
+    return false
+end
+
+
+
+function isCurrentSlot(filename)
+    return EasyEditableWorld.currentSlotFilename == filename and EasyEditableWorld.currentSlotFilename~=nil;
+end
+
+function GetLocalWorldDs(index)
+    if(index) then
+        return EasyEditableWorld.LocalWorlds_DS[index];
+    else
+        return #(EasyEditableWorld.LocalWorlds_DS);
+    end
+end
+function GetTitle()
+    if(EasyEditableWorld.subTag ~= nil) then
+        return string.format(L"我在#%s的存档", GetActionName(EasyEditableWorld.subTag));
+    else
+        return L"我的本地存档";
+    end
+end
+function GetSubtitle()
+    if(EasyEditableWorld.currentDisplayName == nil) then
+        return L"请选择一个存档槽";
+    else
+        return string.format(L"当前《%s》", EasyEditableWorld.currentDisplayName);
+    end
+end
+]]>
+</script>
+<style>
+    .closebtn {
+        position: relative;
+        margin-right: -19px;
+        margin-top: -17px;
+        width: 56px;
+        height: 56px;
+        background: url(Texture/player/close.png);
+    }
+    .actionbtn {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        font-size: 14px;
+        min-width: 100px;
+        spacing:10px;
+        height: 45px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        color: #000000;
+    }
+    .maincontainer {
+        padding: 20px;
+        background: url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);
+        color: #ffffff;
+    }
+    .linkbutton_yellow {
+        color: #FFD700;
+        text-decoration: underline;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+    .slot_bg {
+        background: url(Texture/Aries/Common/ThemeKid/monsterhandbook/fram_bg_32bits.png: 6 6 8 8);
+    }
+</style>
+<div class="maincontainer" style="float:left;margin-right:5px;width:200px;height:500px;">
+    <pe:if condition='<%=EasyEditableWorld.subTag == nil%>'>
+        <div style="margin-top:0px;font-size:18px;color:#FFD166;text-shadow:true;margin-bottom:8px;">存档点</div>
+        
+        <div style="margin:8px;color:#8BE9FD;">
+            <span>• 可以向世界添加新物品与新角色，但是不能修改已经存在的物体</span>
+        </div>
+        <div style="margin:8px;color:#50FA7B;">
+            <span>• 点击传送可以扮演多个角色</span>
+        </div>
+        <div style="margin:8px;color:#FFB86C;">
+            <span>• 可以加载多个别人的存档点，和好友做邻居</span>
+        </div>
+        <div style="margin:8px;color:#8BE9FD;">
+            <span>• 有蓝色标签的存档点会自动同步云端</span>
+        </div>    
+    </pe:if>
+    <pe:if condition='<%=EasyEditableWorld.subTag ~= nil%>'>
+        <div style="margin-top:0px;font-size:18px;color:#8BE9FD;text-shadow:true;margin-bottom:8px;"><%=L"标签存档点"%></div>
+        
+        <div style="margin:8px;color:#8BE9FD;">
+            <span>• 标签存档点会自动同步云端</span>
+        </div>
+        <div style="margin:8px;color:#50FA7B;">
+            <span>• 加载存档点可自动占领，离开一定距离自动释放</span>
+        </div>
+        <div>
+            <input type="button" class="actionbtn" value='<%=L"查看全部存档"%>' onclick="EasyEditableWorld.OnClickShowAllArchives"/>
+        </div>
+    </pe:if>
+    <div>
+        <input type="button" class="actionbtn" value='<%=L"找回存档"%>' onclick="OnClickRestoreArchive" />
+    </div>
+    <div>
+        <input type="button" class="actionbtn" value='<%=L"攻略视频"%>' onclick="EasyEditableWorld.OnClickShowTutorialVideo"/>
+    </div>
+</div>
+<div class="maincontainer" style="float:left;width:500px;height:500px;text-align:center;">
+    <div style="position:relative">
+        <input type="button" name="CloseBtn" onclick="EasyEditableWorld.OnClickCancel" align="right" class="closebtn" />
+    </div>
+    <!-- Save Mode -->
+    <pe:if condition='<%=EasyEditableWorld.mode ~= "Restore"%>'>
+        <div style="margin-top:0px;margin-bottom:10px;">
+            <div style="float:left;color:#50FA7B;text-align:left;">
+                <div style="font-size:20px;"><%=GetTitle()%></div>
+                <!--<div style="font-size:14px;margin-top:4px;color:#7e7b7b;"><%=GetSubtitle()%></div>-->
+            </div>
+            <!--
+            <pe:if condition='<%=EasyEditableWorld.GetCurrentSlotDSIndex()~=nil and EasyEditableWorld.subTag ~= nil%>'>
+                <div style="float:left;margin-top:5px;">
+                    <input type="button" onclick="EasyEditableWorld.OnClickUploadCurrent" value='<%=L"同步"%>' name="syncSlot" class="slot_bg"
+                        style="margin-left:20px;color:#8BE9FD;font-size:18px;min-width:90px;height:45px;" />
+                </div>
+            </pe:if>
+            -->
+        </div>
+        <pe:gridview uiname="EasyEditableWorld.tvwLocalWorldSlots" name="tvwLocalWorldsSlots" 
+            DataSource='<%=GetLocalWorldDs%>' ItemsPerLine="1" VerticalScrollBarStep="70" DefaultNodeHeight="74" AllowPaging="false" style="background:;">
+            <Columns>
+            <div style="padding-top:10px;height:70px">
+                
+                <div name='<%=Eval("index")%>' zorder="-1" tooltip='<%=getTooltip(Eval("index"))%>' onclick="EasyEditableWorld.OnClickLoadSlot" class="slot_bg"
+                    style="float:left;padding-left:10px;padding-top:7px;font-size:16px;font-weight:bold;width:320px;height:64px;margin:10px;margin-left:0px;margin-top:0px;">
+                    <!-- Highlight selected slot -->
+                    <div style='<%=string.format("color:%s;", isCurrentSlot(Eval("filename")) and "#ffff00" or "#ffffff")%>'>
+                        <%=getDisplayText(Eval("index"))%>
+                    </div>
+                    <div style="color:#d4d3d3;font-size:12px;margin-top:4px;">
+                        <pe:if condition='<%=(Eval("filesize") or 0) > 0%>'>
+                            <%=string.format(L"大小: %d ", Eval("filesize"))%>
+                            <span style="margin-left:10px;"><%=L"上次修改: " .. (Eval("writedate") or L"")%></span>
+                        </pe:if>
+                    </div>
+                </div>
+                <pe:if condition='<%=(Eval("subTag") or "") ~= ""%>'>
+                    <div style="position:relative;float:left;width:200px;margin-left:-200px;margin-top:-12px;" zorder="10">
+                        <pe:if condition='<%=isMineHome(Eval("index"))%>'>
+                            <input type="button" align="right" name='<%=Eval("subTag")%>' value='<%=L"我的家"%>' onclick="EasyEditableWorld.OnClickSetHome"
+                                style="float: left; background-color:#ee99ee;color:#f0f7f8;background:url(Texture/whitedot.png);font-size:14px;height:28px;padding:4px" />
+                        </pe:if>
+                        <pe:if condition='<%=not isMineHome(Eval("index"))%>'>
+                            <input type="button" align="right" name='<%=Eval("subTag")%>' value='<%=GetActionName(Eval("subTag"))%>' onclick="EasyEditableWorld.OnClickSetSubTag"
+                                style="float: left; background-color:#46c0e6;color:#f0f7f8;background:url(Texture/whitedot.png);font-size:14px;height:28px;padding:4px" />
+                        </pe:if>
+                        
+                    </div>
+                </pe:if>
+                <!-- function buttons -->
+                 <pe:if condition='<%=(Eval("filename") or "") ~= ""%>'>
+                    <input type="button" name='<%=Eval("index")%>' onclick="EasyEditableWorld.OnClickDeleteSlot" 
+                        style="color:#FF5555;background:url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/guanbi_43x43_32bits.png#0 0 43 43);font-size:16px;width:32px;height:32px;margin-left:10px;margin-top:12px;background-color:#808080" />
+                 </pe:if>
+                
+                <pe:if condition='<%=(Eval("subTag") or "") ~= "" and isCurrentSlot(Eval("filename"))%>'>
+                    <input type="button" onclick="EasyEditableWorld.OnClickUploadCurrent" value='<%=L"同步"%>' class="actionbtn" name="syncSlot" 
+                        style="position:relative;font-size:16px;width:50px;height:50px;margin-left:10px;margin-top:5px;" />
+                    <!--
+                    <input type="button" name='<%=Eval("index")%>' onclick="EasyEditableWorld.OnClickEditDescription" value='<%=L"改名"%>' class="slot_bg"
+                        style="position:relative;color:#F1FA8C;font-size:16px;width:50px;height:50px;margin-left:10px;margin-top:5px;" />
+                    -->
+                </pe:if>
+                <!-- 
+                <pe:if condition='<%=EasyEditableWorld.subTag == nil or EasyEditableWorld.subTag == ""%>'>
+                    <input type="button" name='<%=Eval("index")%>' onclick="EasyEditableWorld.OnClickSaveSlot" value='<%=L"保存"%>' class="slot_bg"
+                    style="color:#50FA7B;font-size:16px;width:80px;height:60px;margin-left:10px;margin-top:0px;" />
+                </pe:if> 
+                -->
+                
+            </div>
+            </Columns>
+        </pe:gridview>
+    </pe:if>
+    <pe:if condition='<%=EasyEditableWorld.mode == "Restore"%>'>
+        <div style="margin-top:10px;margin-bottom:10px;text-align:left;">
+            <span style="color:#50FA7B;font-size:14px;width:250px;">
+                <%=L"这里可以找回被误删或覆盖的存档" %>
+            </span>
+            <input type="button" style="margin-left:10px" name="BackBtn" onclick="OnClickBackToSave" value='<%=L"返回"%>' class="actionbtn" />
+            <input type="button" tooltip='<%=L"打开备份文件夹"%>' name="OpenFolderBtn" onclick="EasyEditableWorld.OnClickOpenBackupFolder" value="..." class="actionbtn" style="min-width:50px;" />
+        </div>
+        <pe:gridview uiname="EasyEditableWorld.tvwRestoreSlots" name="tvwRestoreSlots" 
+            DataSource='<%=EasyEditableWorld.DS_RestoreWorldItems%>' ItemsPerLine="1" VerticalScrollBarStep="70" DefaultNodeHeight="70" AllowPaging="false" style="background:;">
+            <Columns>
+            <div style="padding-top:10px;height:70px">
+                
+                <div name='<%=Eval("index")%>' zorder="-1" tooltip='<%=string.format(L"保存时间: %s", Eval("writedate") or "")%>' onclick="EasyEditableWorld.OnClickRestoreSlot" class="slot_bg"
+                    style="float:left;padding-left:10px;padding-top:7px;font-size:16px;font-weight:bold;width:360px;height:64px;margin:10px;margin-left:0px;margin-top:0px;">
+                    <div style="color:#ffffff;">
+                        <%=L"恢复: " .. (Eval("name") or L"未命名")%>
+                    </div>
+                    <div style="color:#d4d3d3;font-size:12px;margin-top:4px;">
+                        <pe:if condition='<%=(Eval("filesize") or 0) > 0%>'>
+                            <%=string.format(L"大小: %d ", Eval("filesize"))%>
+                            <span style="margin-left:10px;"><%=L"上次修改: " .. (Eval("writedate") or L"")%></span>
+                        </pe:if>
+                    </div>
+                </div>
+            </div>
+            </Columns>
+        </pe:gridview>
+    </pe:if>
+</div>
+</pe:mcml>
+</html>

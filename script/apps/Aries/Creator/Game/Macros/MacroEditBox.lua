@@ -13,6 +13,7 @@ local Macro = commonlib.gettable("MyCompany.Aries.Game.Macro");
 local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros");
+local Application = commonlib.gettable("System.Windows.Application");
 
 local ConvertToWebMode = NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/ConvertToWebMode/ConvertToWebMode.lua");
 
@@ -314,6 +315,51 @@ function Macros.EditBoxKeyupTrigger(uiName, keyname)
 	end
 end
 
+function Macros.TextAreaDragEnd(fromUiName, textAreaUiName, code, bForceNewLine, line, pos)
+	local textCtl = Application.GetUIObject(textAreaUiName);
+	if(textCtl) then
+		if(textCtl.Name == "MultiLineEditbox") then
+			textCtl = textCtl:ViewPort() or textCtl;
+		end
+		if(textCtl.moveCursor) then
+			textCtl:moveCursor(line, pos, false, true);
+			textCtl:DropTextAtCurrentLine(code, bForceNewLine)
+		end
+	end
+end
+
+function Macros.TextAreaDragEndTrigger(fromUiName, textAreaUiName, code, bForceNewLine, line, pos)
+	local obj = ParaUI.GetUIObject(fromUiName)
+	local textCtl = Application.GetUIObject(textAreaUiName);
+	if(textCtl and obj and obj:IsValid()) then
+		local x, y, width, height = obj:GetAbsPosition();
+		local startX = math.floor(x + width / 2 + 0.5);
+		local startY = math.floor(y + height / 2 + 0.5);
+
+		local offsetX, offsetY = 0, 0;
+		local ctlX, ctlY, ctlWidth, ctlHeight;
+		if(textCtl.Name == "MultiLineEditbox") then
+			offsetX = textCtl:ViewRegionOffsetX();
+			offsetY = textCtl:ViewRegionOffsetY();
+			ctlX, ctlY, ctlWidth, ctlHeight = textCtl:GetAbsPosition();
+			textCtl = textCtl:ViewPort() or textCtl;
+		else
+			ctlX, ctlY, ctlWidth, ctlHeight = textCtl:GetAbsPosition();
+		end
+		
+		-- we shall adjustCursor() so that line, pos are always visible. 
+		textCtl:moveCursor(line, pos, false, true);
+		
+		local cursorX, cursorY = textCtl:LinePosToXY(line, pos)
+		cursorX, cursorY = ctlX + cursorX + offsetX, ctlY + cursorY + math.floor(textCtl:GetLineHeight()*0.5) + offsetY;
+
+		local endX = math.min(math.max(cursorX, ctlX + 16), ctlX + ctlWidth - 16);
+		local endY = math.min(math.max(cursorY, ctlY + 16), ctlY + ctlHeight - 16);
+	
+		offsetX, offsetY = endX - x, endY - y;
+		return Macros.ContainerDragEndTrigger(fromUiName, offsetX, offsetY)
+	end
+end
 
 
 

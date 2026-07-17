@@ -1,0 +1,127 @@
+<!-- "script/apps/Aries/Creator/Game/Movie/MovieClipGlobalConfig.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl"><![CDATA[
+local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+
+function OnClose()
+    MovieClipController.ShowGlobalConfigPage(false);
+end
+
+function OnScaleActors()
+    local scale_factor = Page:GetUIValue("scale_factor");
+    scale_factor = tonumber(scale_factor);
+    if(not scale_factor) then
+        GameLogic.AddBBS(nil, L"请输入有效的数字", 3000, "255 0 0");
+        return;
+    end
+    if(scale_factor < 0.1 or scale_factor > 10) then
+        GameLogic.AddBBS(nil, L"放缩比例必须在0.1到10之间", 3000, "255 0 0");
+        return;
+    end
+    local movieClip = MovieManager:GetActiveMovieClip();
+    if(movieClip) then
+        local entity = movieClip:GetEntity();
+        if(entity and entity.ScaleActors) then
+            entity:ScaleActors(scale_factor);
+            movieClip:RefreshActors();
+            GameLogic.AddBBS(nil, format(L"已将所有演员放缩 %s 倍", tostring(scale_factor)), 3000, "0 255 0");
+        end
+    end
+end
+
+function OnOffsetActors()
+    local dx = tonumber(Page:GetUIValue("offset_dx")) or 0;
+    local dy = tonumber(Page:GetUIValue("offset_dy")) or 0;
+    local dz = tonumber(Page:GetUIValue("offset_dz")) or 0;
+    if(dx == 0 and dy == 0 and dz == 0) then
+        GameLogic.AddBBS(nil, L"位移值不能全为0", 3000, "255 0 0");
+        return;
+    end
+    local movieClip = MovieManager:GetActiveMovieClip();
+    if(movieClip) then
+        local entity = movieClip:GetEntity();
+        if(entity and entity.OffsetActorPositions) then
+            entity:OffsetActorPositions(dx, dy, dz);
+            movieClip:RefreshActors();
+            GameLogic.AddBBS(nil, format(L"已将所有演员位移 (%s, %s, %s)", tostring(dx), tostring(dy), tostring(dz)), 3000, "0 255 0");
+        end
+    end
+end
+
+function OnRotateActors()
+    local angle = tonumber(Page:GetUIValue("rotate_angle"));
+    if(not angle) then
+        GameLogic.AddBBS(nil, L"请输入有效的角度", 3000, "255 0 0");
+        return;
+    end
+    if(angle == 0) then
+        GameLogic.AddBBS(nil, L"旋转角度不能为0", 3000, "255 0 0");
+        return;
+    end
+    local movieClip = MovieManager:GetActiveMovieClip();
+    if(movieClip) then
+        local entity = movieClip:GetEntity();
+        if(entity and entity.OffsetActorFacing) then
+            entity:OffsetActorFacing(angle);
+            movieClip:RefreshActors();
+            GameLogic.AddBBS(nil, format(L"已将所有演员旋转 %s 弧度", tostring(angle)), 3000, "0 255 0");
+        end
+    end
+end
+
+]]></script>
+<aries:window mode="thin" style="" title='<%=L"电影方块全局设置"%>' onclose="OnClose">
+    <div style="padding:10px 10px 0px 10px;color:#999999;font-size:11px;">
+        <%=L"默认原点为第一个角色的首帧的位置"%>
+    </div>
+    <div style="padding:10px;margin-bottom:5px;">
+        <!-- Scale Actors Section -->
+        <div style="">
+            <div style="color:#cccccc;font-size:12px;margin-bottom:5px;">
+                <%=L"放缩所有角色(0.1-10)"%>
+            </div>
+            <div>
+                <input type="text" name="scale_factor" value="1.1" style="width:80px;height:25px;margin-right:10px;" EmptyText="1.0"/>
+                <input type="button" value='<%=L"全体放缩"%>' class="button" style="width:80px;height:25px;" onclick="OnScaleActors"/>
+            </div>
+        </div>
+        <!-- Offset Actors Section -->
+        <div style="margin-top:10px;">
+            <div style="color:#cccccc;font-size:12px;margin-bottom:5px;">
+                <%=L"位移所有角色"%>
+            </div>
+            <div>
+                <span style="color:#aaaaaa;">dx</span>
+                <input type="text" name="offset_dx" value="0" style="width:50px;height:25px;margin-right:5px;" EmptyText="0"/>
+                <span style="color:#aaaaaa;">dy</span>
+                <input type="text" name="offset_dy" value="0" style="width:50px;height:25px;margin-right:5px;" EmptyText="0"/>
+                <span style="color:#aaaaaa;">dz</span>
+                <input type="text" name="offset_dz" value="0" style="width:50px;height:25px;margin-right:10px;" EmptyText="0"/>
+                <input type="button" value='<%=L"位移"%>' class="button" style="width:60px;height:25px;" onclick="OnOffsetActors"/>
+            </div>
+        </div>
+        <!-- Rotate Actors Section -->
+        <div style="margin-top:10px;">
+            <div style="color:#cccccc;font-size:12px;margin-bottom:5px;">
+                <%=L"旋转所有角色"%>
+            </div>
+            <div>
+                <span style="color:#aaaaaa;"><%=L"角度"%></span>
+                <input type="text" name="rotate_angle" value="3.14" style="width:80px;height:25px;margin-right:10px;" EmptyText="3.14"/>
+                <input type="button" value='<%=L"旋转"%>' class="button" style="width:60px;height:25px;" onclick="OnRotateActors"/>
+            </div>
+        </div>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

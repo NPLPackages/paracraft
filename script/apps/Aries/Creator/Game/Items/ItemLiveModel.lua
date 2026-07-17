@@ -15,6 +15,10 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemToolBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ModelTextureAtlas.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BlockSound.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/pe_mc_slot.lua");
+local ShapesDrawer = commonlib.gettable("System.Scene.Overlays.ShapesDrawer");
+local Overlay = commonlib.gettable("System.Scene.Overlays.Overlay");
+local pe_mc_slot = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_slot");
 local BlockSound = commonlib.gettable("MyCompany.Aries.Game.Sound.BlockSound");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -59,6 +63,21 @@ function ItemLiveModel:ctor()
 	self.hp = tonumber(self.hp);
 	self.respawn_time = tonumber(self.respawn_time);
 	self.create_sound = BlockSound:new():Init({"cloth1", "cloth2", "cloth3",});
+	self.anchorPointMatchingTable = {};
+	self.anchorPointsCount = 0;
+	self.lastAnchorPointMatchingLoopSign = 0;
+	self.anchorPointMatchingLoopSign = 1;
+	self.anchorPointMatchingIndex1 = 0; -- for dragging entity self
+	self.anchorPointMatchingIndex2 = 0; -- for anchor point matching entity
+	self.lastAnchorPointMatchingIndex1 = 0;
+	self.lastAnchorPointMatchingIndex2 = 0;
+	self.anchorPointMatchingEntity = nil;
+	self.lastnchorPointMatchingEntity = nil;
+	self.bestMatchingAnchorPoint = nil;
+	self.anchorPointMatchingKeyPressListener = nil;
+	self.anchorPointMatchingMouseWheelListener = nil;
+	-- for render
+    self.pen = {width=0.02, color="#ffffff"};
 end
 
 function ItemLiveModel:HasFacing()
@@ -73,6 +92,11 @@ end
 -- virtual function: when selected in right hand
 function ItemLiveModel:OnSelect(itemStack)
 	ItemLiveModel._super.OnSelect(self, itemStack);
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if IsMobileUIEnabled then
+		GameLogic.SetStatus(L"按住可以拖动模型, 点击编辑模型");
+		return 
+	end
 	GameLogic.SetStatus(L"按住鼠标左键可以拖动模型, 右键点击编辑模型");
 	
 end
@@ -99,14 +123,14 @@ function ItemLiveModel:SetModelFileName(itemStack, filename)
 	if(itemStack) then
 		itemStack:SetDataField("tooltip", filename);
 		local xmlNode = itemStack:GetDataField("xmlNode");
-		local skin = CustomCharItems:GetSkinByAsset(filename)
+		local skin,default_assets = CustomCharItems:GetSkinByAsset(filename)
 		if skin then
 			if not xmlNode or not xmlNode.attr then
 				xmlNode = {name="entity",attr={yawOffset=0,anim=0,facing=3.14,stackHeight=0.2}}
 				itemStack:SetDataField("xmlNode",xmlNode);
 			end
 			xmlNode.attr.skin = skin
-			xmlNode.attr.filename = CustomCharItems.defaultModelFile
+			xmlNode.attr.filename = default_assets or CustomCharItems.defaultModelFile
 		else
 			itemStack:SetDataField("xmlNode", nil)
 		end
@@ -135,6 +159,8 @@ function ItemLiveModel:ConvertEntityToItem(entity, itemStack)
 			node.attr.useRealPhysics = true;
 		end
 		itemStack:SetDataField("xmlNode", node)
+		itemStack:SetDataField("customTooltip", entity:GetStaticBlockProperty("tooltip"))
+		itemStack:SetDataField("customIcon", entity:GetStaticBlockProperty("icon"))
 		return itemStack
 	end
 end
@@ -154,13 +180,27 @@ end
 function ItemLiveModel:DrawIcon(painter, width, height, itemStack)
 	local filename = self:GetModelFileName(itemStack);
 	if(filename and filename~="") then
-		itemStack.renderedTexturePath = ModelTextureAtlas:CreateGetModel(filename)
-		
-		if(itemStack.renderedTexturePath) then
+		local icon = itemStack:GetDataField("customIcon")
+		if(icon) then
 			painter:SetPen("#ffffff");
-			painter:DrawRectTexture(0, 0, width, height, itemStack.renderedTexturePath);
+			painter:DrawRectTexture(0, 0, width, height, icon);
 		else
-			ItemLiveModel._super.DrawIcon(self, painter, width, height, itemStack);
+			local xmlNode = itemStack:GetDataField("xmlNode");
+			local tempFilename = xmlNode and xmlNode.attr and xmlNode.attr.tempFilename;
+			if(tempFilename and not Files.FileExists(filename)) then
+				filename = tempFilename;
+			end
+			itemStack.renderedTexturePath = ModelTextureAtlas:CreateGetModel(filename)
+			if(itemStack.renderedTexturePath) then
+				painter:SetPen("#ffffff");
+				painter:DrawRectTexture(0, 0, width, height, itemStack.renderedTexturePath);
+			else
+				ItemLiveModel._super.DrawIcon(self, painter, width, height, itemStack);
+			end
+		end
+		local customName = itemStack:GetDataField("customTooltip")
+		if(customName) then
+			filename = customName
 		end
 		filename = filename:match("[^/]+$"):gsub("%..*$", "");
 		filename = filename:sub(1, 6);
@@ -188,7 +228,7 @@ end
 function ItemLiveModel:PickItemFromPosition(x,y,z)
 	local entity = self:GetBlock():GetBlockEntity(x,y,z);
 	if(entity) then
-		if(entity.GetModelFile) then
+		if(entity.GetModelFile and not entity:IsLocked()) then
 			local filename = entity:GetModelFile();
 			if(filename) then
 				local itemStack = ItemStack:new():Init(self.id, 1);
@@ -315,6 +355,7 @@ end
 
 function ItemLiveModel:MousePickBlockWithFilters(event, blockFilters)
 	local result
+	local lastBlockFilter = SelectionManager:GetBlockFilters()
 	SelectionManager:SetBlockFilters(blockFilters)
 	if(event and event:GetType() == "mousePressEvent") then
 		-- we shall use finger picking for live entity smaller than 0.3
@@ -346,7 +387,7 @@ function ItemLiveModel:MousePickBlockWithFilters(event, blockFilters)
 		end
 	end
 	result = result or SelectionManager:MousePickBlock(nil, nil, nil, nil, event and event.x, event and event.y);
-	SelectionManager:SetBlockFilters(nil)
+	SelectionManager:SetBlockFilters(lastBlockFilter)
 	return result;
 end
 
@@ -462,6 +503,50 @@ function ItemLiveModel:SetDraggingEntity(draggingEntity, event)
 		event.touchSession.draggingEntity = draggingEntity;
 	end
 	self.draggingEntity = draggingEntity;
+	self:UpdateAnchorOverlay()
+	if(draggingEntity and self.anchorOverlay) then
+		if(event.shift_pressed) then
+			-- Shift + drag to drag multiple entities(which it's anchor point matches the anchor point of the dragging entity)
+			self:CalcMatchedAnchorPoint()
+			local theLowestEntityInfo = draggingEntity:LinkAllMatchingAnchorEntities()
+			local _, y, _ = draggingEntity:GetPosition()
+			local theLowestPos = theLowestEntityInfo.position
+			if(theLowestPos and (y - theLowestPos.y) >= BlockEngine.blocksize / 6) then
+				draggingEntity:UnLinkAllMatchingAnchorEntities()
+				return true
+			end
+		else
+			-- clear the matched anchor points
+			local mountPoints = draggingEntity:GetMountPoints()
+			mountPoints:ForEachAnchorPoint(function(mp)
+				if(mp:GetMatchedAnchor()) then
+					mp:SetMatchedAnchor(nil)
+				end
+			end)
+		end
+		if(not self.anchorPointMatchingKeyPressListener) then
+			self.anchorPointMatchingKeyPressListener = function(_, event2)
+				if(event2.alt_pressed) then
+					self:RotateYAxis(45)
+					event2:accept()
+				end
+			end
+			GameLogic.GetFilters():add_filter("KeyPressEvent", self.anchorPointMatchingKeyPressListener)
+		end
+		if(not self.anchorPointMatchingMouseWheelListener) then
+			self.anchorPointMatchingMouseWheelListener = function(_, event2)
+				local mouseWheelValue = event2.mouse_wheel
+				if(mouseWheelValue == 1) then
+					self:RotateYAxis(-45)
+				elseif(mouseWheelValue == -1) then
+					self:RotateYAxis(45)
+				end
+				event2:accept()
+			end
+			GameLogic.GetFilters():add_filter("mouseWheelEvent", self.anchorPointMatchingMouseWheelListener)
+		end
+		GameLogic.SetStatus("按下ALT键或者使用鼠标滚轮转动模型")
+	end
 end
 
 function ItemLiveModel:GetDraggingEntity(event)
@@ -502,7 +587,7 @@ function ItemLiveModel:mousePressEvent(event)
 				if(task) then
 					task:UpdateValueToPage();
 				end
-			else
+			elseif(not result.entity:IsLocked()) then
 				GameLogic.GetPlayerController():PickItemByEntity(entity);
 			end
 		elseif(result.block_id) then
@@ -512,6 +597,21 @@ function ItemLiveModel:mousePressEvent(event)
 	elseif(self:CanDragDropEntity(entity, true) and (event:button() == "left")) then
 		-- only left button to drag and drop 
 		self:SetMousePressEntity(entity, event);
+		if(entity:GetCategory() == "staticblock") then
+			if(result.x) then
+				local x, y, z = entity:GetPosition()
+				if(not self.entityRelativeToMousePickPos) then
+					local dx, dy, dz = result.x - x, result.y - y, result.z - z
+					local function reverseRotatePoint(radian, newX, newY)
+						local oldX = newX * math.cos(radian) + newY * math.sin(radian)
+						local oldY = -newX * math.sin(radian) + newY * math.cos(radian)
+						return oldX, oldY
+					end
+					local dx0, dz0 = reverseRotatePoint(-entity:GetFacing(), dx, dz)
+					self.entityRelativeToMousePickPos = {dx0 = dx0, dz0 = dz0, dx = dx, dy = dy, dz = dz}
+				end
+			end
+		end
 		-- mouse left dragging only enabled when we are not dragging or clicking live model. simply accept this event to do this trick.
 		event:accept();
 	end
@@ -593,7 +693,7 @@ function ItemLiveModel:CalculateFreeFallDropLocation(srcEntity, dropLocation, ma
 			if(maxLength > BlockEngine.blocksize * 2) then
 				-- we need to check if the target block (hole) is big enough for the entity. 
 				local newY = self:GetFreeSpaceHeightBySize(x, y, z, maxLength)
-				if(newY) then
+				if(newY and srcEntity:GetCategory() ~= 'staticblock') then
 					y = newY;
 					dropLocation.y = math.max(dropLocation.y, newY);
 				end
@@ -1123,7 +1223,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 		end
 
 		-- finding a right location to put down.
-		if(targetEntity) then
+		if(draggingEntity:GetCategory() ~= "staticblock" and targetEntity) then
 			if(not hasFound and targetEntity:GetMountPointsCount() > 0) then
 				local bInside, mp, distance;
 				if(targetEntity:HasRealPhysics() and result.x) then
@@ -1287,6 +1387,11 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 						x, y, z = x1, y1, z1
 					else
 						x, y, z = result.physicalX or result.blockRealX or x, result.physicalY or result.blockRealY or y, result.physicalZ or result.blockRealZ or z;
+					end
+				end
+				if(draggingEntity:GetCategory() == "staticblock") then
+					if(self.entityRelativeToMousePickPos) then
+						x, y, z = x - self.entityRelativeToMousePickPos.dx, y - self.entityRelativeToMousePickPos.dy, z - self.entityRelativeToMousePickPos.dz
 					end
 				end
 			else
@@ -1558,6 +1663,7 @@ function ItemLiveModel:mouseMoveEvent(event)
 		Cameras:GetCurrent():ScheduleCameraMove(function()
 			self:handleMouseMoveEventImp(draggingEntity.lastDragMoveEvent)
 		end)
+		self:UpdateAnchorOverlay()
 	end
 end
 
@@ -1569,6 +1675,7 @@ function ItemLiveModel:handleMouseMoveEventImp(event)
 		local result, targetEntity = self:CheckMousePick(event)
 		self:UpdateDraggingEntity(draggingEntity, result, targetEntity, event)
 		self:UpdateOnHoverMousePointAABB(draggingEntity, event)
+		self:UpdateDragReceiverHighlight(draggingEntity)
 
 		commonlib.TimerManager.SetTimeout(function()
 			Cameras:GetCurrent():ScheduleCameraMove(function()
@@ -1588,7 +1695,10 @@ function ItemLiveModel:StartDraggingEntity(entity, event)
 	if(draggingEntity) then
 		self:DropDraggingEntity(draggingEntity, event)
 	end
-	self:SetDraggingEntity(entity, event);
+	local stopFlag = self:SetDraggingEntity(entity, event);
+	if(stopFlag) then
+		return
+	end
 	
 	if(GameLogic.GameMode:IsEditor()) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
@@ -1621,7 +1731,111 @@ function ItemLiveModel:MountEntityToTargetMountPoint(entity, mountTarget, mountP
 	end
 end
 
--- drop entity to the 3d scene or on other entity
+-- call this during framemove 
+function ItemLiveModel:UpdateDragReceiverHighlight(entity)
+	local m_x, m_y = ParaUI.GetMousePosition();
+	local temp = ParaUI.GetUIObjectAtPoint(m_x, m_y);
+	if(temp:IsValid()) then
+		local mcmlNode = pe_mc_slot.GetNodeByMousePosition(m_x, m_y, 2);
+		if(mcmlNode and mcmlNode.contView) then
+			local uiname = mcmlNode:GetAttributeWithCode("uiname") or ""
+			if(uiname:match("^MovieClipController") or uiname:match("^ChestPage")) then
+				pe_mc_slot.OnDragMove()
+				return
+			end
+		end
+	end
+	pe_mc_slot.HideGlobalDragTipBox()
+end
+
+-- drop to movieclip controller's slot ui if slot is empty or it will drop to the first non-empty slot in the slot container. 
+-- @return true if we are dropping on a UI slot. 
+function ItemLiveModel:HandleDroppingOnUISlot(entity, dragParams)
+	pe_mc_slot.HideGlobalDragTipBox()
+	local m_x, m_y = ParaUI.GetMousePosition();
+	local mcmlNode = pe_mc_slot.GetNodeByMousePosition(m_x, m_y, 2);
+	if(mcmlNode and mcmlNode.contView and dragParams and dragParams.pos) then
+		local uiname = mcmlNode:GetAttributeWithCode("uiname") or ""
+		if(uiname:match("^ChestPage")) then
+			local firstEmptyIndex;
+			for i = 1, mcmlNode.contView:GetSlotCount() do
+				local itemStack = mcmlNode.contView:GetSlotItemStack(i)
+				if (not itemStack or itemStack.count == 0) then
+					firstEmptyIndex = firstEmptyIndex or i;
+				end
+			end
+			local targetIndex;
+			local itemStack = mcmlNode.contView:GetSlotItemStack(mcmlNode.slot_index)
+			if (not (itemStack and itemStack.count > 0)) then
+				targetIndex = mcmlNode.slot_index
+			else
+				targetIndex = firstEmptyIndex
+			end
+			if(targetIndex) then
+				local slot = mcmlNode.contView:GetSlot(targetIndex);
+				if(not slot) then return; end
+				local item = entity:GetItemClass()
+				if(item) then
+					local item_stack = item:ConvertEntityToItem(entity);
+					slot:AddItem(item_stack);
+				end
+			end
+			return true;
+		elseif(uiname:match("^MovieClipController")) then
+			-- turn into an ItemTimeSeriesNPC
+			local firstEmptyIndex;
+			for i = 1, mcmlNode.contView:GetSlotCount() do
+				local itemStack = mcmlNode.contView:GetSlotItemStack(i)
+				if (itemStack and itemStack.count > 0) then
+					if (itemStack.id == block_types.names.TimeSeriesNPC) then
+						local timeseries = itemStack.serverdata and itemStack.serverdata.timeseries
+						if(timeseries) then
+							local name = timeseries.name and timeseries.name.data and timeseries.name.data[1]
+							if(name == entity:GetName()) then
+								return true
+							end
+						end
+					end
+				else
+					firstEmptyIndex = firstEmptyIndex or i;
+				end
+			end
+			local targetIndex;
+			local itemStack = mcmlNode.contView:GetSlotItemStack(mcmlNode.slot_index)
+			if (not (itemStack and itemStack.count > 0)) then
+				targetIndex = mcmlNode.slot_index
+			else
+				targetIndex = firstEmptyIndex
+			end
+			if(targetIndex) then
+				local slot = mcmlNode.contView:GetSlot(targetIndex);
+				if(not slot) then return; end
+				local x, y, z = unpack(dragParams.pos);
+				local facing = dragParams.facing;
+				local assetfile = entity:GetModelFile() or entity:GetMainAssetPath();
+				local skin = entity.GetSkin and entity:GetSkin()
+				local timeseries = {
+					name={times={0,},data={entity:GetName(),},ranges={{1,1,},},type="Discrete",name="name",},
+					isAgent={times={0,},data={true,},ranges={{1,1,},},type="Discrete",name="isAgent",},
+					x={times={0,},data={x,},ranges={{1,1,},},type="Linear",name="x",},
+					y={times={0,},data={y,},ranges={{1,1,},},type="Linear",name="y",},
+					z={times={0,},data={z,},ranges={{1,1,},},type="Linear",name="z",},
+					facing={times={0,},data={facing,},ranges={{1,1,},},type="LinearAngle",name="facing",},
+					scaling={times={0,},data={entity:GetScaling(),},ranges={{1,1,},},type="Linear",name="scaling",},
+					assetfile={times={0,},data={assetfile},ranges={{1,1,},},type="Discrete",name="assetfile",},
+				}
+				timeseries.skin = skin and {times={0,},data={skin,},ranges={{1,1,},},type="Discrete",name="skin",}
+				local liveEntityItem = ItemStack:new():Init(block_types.names.TimeSeriesNPC, 1, {timeseries = timeseries});
+				slot:AddItem(liveEntityItem);
+				-- TODO: shall we unlink? since it is controlled by movie block. 
+				-- entity:UnLink()
+			end
+			return true;
+		end
+	end
+end
+
+-- drop entity to the 3d scene or on other entity or on movie clip's <pe:slot> UI item. 
 -- @param callbackFunc: called when the drop operation ends. 
 -- @param restoreFunc: called if not nil when restore will happen
 function ItemLiveModel:DropEntity(entity, callbackFunc, restoreFunc)
@@ -1631,13 +1845,37 @@ function ItemLiveModel:DropEntity(entity, callbackFunc, restoreFunc)
 		local old_x, old_y, old_z, old_facing;
 		local old_linkTo;
 		entity.restoreDragParams = {pos = dragParams.pos, facing = dragParams.facing, linkTo = dragParams.linkTo ,restoreFunc = restoreFunc}
-		if(dragParams.dropLocation and dragParams.dropLocation.x and dragParams.dropLocation.dropX) then
+		local isDroppingOnUISlot = self:HandleDroppingOnUISlot(entity, dragParams)
+		if(not isDroppingOnUISlot and dragParams.dropLocation and dragParams.dropLocation.x and dragParams.dropLocation.dropX) then
 			dropLocation = dragParams.dropLocation
 		else
 			old_x, old_y, old_z = unpack(dragParams.pos);
 			old_facing = dragParams.facing;
 			old_linkTo = dragParams.linkTo;
 			dropLocation = {x=old_x, y=old_y, z=old_z, facing = old_facing, dropX = old_x, dropY = old_y, dropZ = old_z};
+		end
+
+		-- if self.bestMatchingAnchorPoint is set, change the drop behavior.
+		if(self.bestMatchingAnchorPoint and self.previewEntity) then
+			local targetMatchingPoint = self.bestMatchingAnchorPoint.to
+			local targetEntity = targetMatchingPoint:GetEntity()
+			local x, y, z = targetMatchingPoint.position.x, targetMatchingPoint.position.y, targetMatchingPoint.position.z
+			local dropX, dropY, dropZ = self.previewEntity:GetPosition()
+			local mountPointIndex = targetMatchingPoint.mountPointIndex
+			local facing = self:FormatFacing(targetMatchingPoint:GetFacing())
+			if(entity.GetYawOffset and facing) then
+				facing = facing + entity:GetYawOffset()
+			end
+			dropLocation.target = targetEntity
+			dropLocation.dropX = dropX
+			dropLocation.dropY = dropY
+			dropLocation.dropZ = dropZ
+			dropLocation.x = x
+			dropLocation.y = y
+			dropLocation.z = z
+			dropLocation.mountPointIndex = mountPointIndex
+			dropLocation.mountFacing = facing
+			dropLocation.mountBehavior = false
 		end
 		
 		self:StopSmoothMoveTo(entity);
@@ -1663,7 +1901,26 @@ function ItemLiveModel:DropEntity(entity, callbackFunc, restoreFunc)
 					-- only send mount event, without actually linking the dragging entity to target, the target will handle mount operation by itself. 
 					dropLocation.target:OnMount(nil, nil, entity)
 				elseif(dropLocation.mountPointIndex and dropLocation.target) then
-					self:MountEntityToTargetMountPoint(entity, dropLocation.target, dropLocation.mountPointIndex)
+					if(dropLocation.mountBehavior ~= false) then
+						self:MountEntityToTargetMountPoint(entity, dropLocation.target, dropLocation.mountPointIndex)
+					end
+				end
+				if(self.bestMatchingAnchorPoint and self.previewEntity) then
+					-- local mountPointsInDraggingEntity = self.bestMatchingAnchorPoint.from:GetEntity():GetMountPoints()
+					-- local mountPointsInTargetEntity = dropLocation.target:GetMountPoints()
+					-- -- match the anchor points
+					-- mountPointsInDraggingEntity:ForEachAnchorPoint(function(mp, mpIndex)
+					-- 	local from_x, from_y, from_z = mountPointsInDraggingEntity:GetMountPositionInWorldSpace(mpIndex)
+					-- 	mountPointsInTargetEntity:ForEachAnchorPoint(function (mp1, mpIndex1)
+					-- 		local to_x, to_y, to_z = mountPointsInTargetEntity:GetMountPositionInWorldSpace(mpIndex1)
+					-- 		local vector = mathlib.vector3d:new_from_pool(to_x - from_x, to_y - from_y, to_z - from_z)
+					-- 		if(vector:length() < math.sqrt(0.03)) then
+					-- 			mp:SetMatchedAnchor(mp1)
+					-- 		end
+					-- 	end)
+					-- end)
+					self.bestMatchingAnchorPoint = nil
+					self:DeletePreviewEntity()
 				end
 				timer:Change();
 				entity.dropAnimTimer = nil;
@@ -1678,9 +1935,10 @@ function ItemLiveModel:DropEntity(entity, callbackFunc, restoreFunc)
 					entity:SetFacing(old_facing);
 					if(old_linkTo) then
 						entity:LinkToEntityByName(old_linkTo)
-					end	
+					end
 				end
 				entity:EndDrag(dropLocation)
+				entity:UnLinkAllMatchingAnchorEntities()
 				
 				if(callbackFunc) then
 					callbackFunc(entity)
@@ -1702,7 +1960,9 @@ function ItemLiveModel:DropEntity(entity, callbackFunc, restoreFunc)
 		end
 
 		if(facing) then
-			entity:SetFacing(facing);
+			if(entity:GetCategory() ~= 'staticblock') then
+				entity:SetFacing(facing);
+			end
 		end
 	elseif(entity) then
 		-- just leave as it is
@@ -1762,28 +2022,29 @@ function ItemLiveModel:RestoreDraggingEntity(event)
 end
 
 -- only spawn entity if player is holding a LiveModel item in right hand. 
--- @param serverdata: default to item stack in player's hand item
-function ItemLiveModel:SpawnNewEntityModel(bx, by, bz, facing, serverdata)
-	local filename, xmlNode;
-	if(not serverdata) then
-		local itemStack = EntityManager.GetPlayer().inventory:GetItemInRightHand()
-		if(itemStack and itemStack.id == block_types.names.LiveModel) then
-			filename = itemStack:GetDataField("tooltip");
-			xmlNode = itemStack:GetDataField("xmlNode");
-			if(xmlNode and xmlNode.attr) then
-				xmlNode.attr.x = nil;
-				xmlNode.attr.y = nil;
-				xmlNode.attr.z = nil;
-				xmlNode.attr.bx = nil;
-				xmlNode.attr.by = nil;
-				xmlNode.attr.bz = nil;
-				xmlNode.attr.name = nil;
-				xmlNode.attr.linkTo = nil;
-				xmlNode.class = nil;
-				xmlNode.item_id = nil;
-			end
+-- @param itemStack: default to item stack in player's hand item
+function ItemLiveModel:SpawnNewEntityModel(bx, by, bz, facing, itemStack)
+	local filename, xmlNode, customTooltip, customIcon;
+	itemStack = itemStack or EntityManager.GetPlayer().inventory:GetItemInRightHand()
+	if(itemStack and itemStack.id == block_types.names.LiveModel) then
+		filename = itemStack:GetDataField("tooltip");
+		customTooltip = itemStack:GetDataField("customTooltip");
+		customIcon = itemStack:GetDataField("customIcon");
+		xmlNode = itemStack:GetDataField("xmlNode");
+		if(xmlNode and xmlNode.attr) then
+			xmlNode.attr.x = nil;
+			xmlNode.attr.y = nil;
+			xmlNode.attr.z = nil;
+			xmlNode.attr.bx = nil;
+			xmlNode.attr.by = nil;
+			xmlNode.attr.bz = nil;
+			xmlNode.attr.name = nil;
+			xmlNode.attr.linkTo = nil;
+			xmlNode.class = nil;
+			xmlNode.item_id = nil;
 		end
 	end
+	
 	if(not filename or filename == "") then
 		return;
 	end
@@ -1796,6 +2057,8 @@ function ItemLiveModel:SpawnNewEntityModel(bx, by, bz, facing, serverdata)
 	if(not xmlNode) then
 		entity:SetModelFile(filename)
 	end
+	entity:SetStaticBlockProperty("tooltip", customTooltip)
+	entity:SetStaticBlockProperty("icon", customIcon)
 	entity:Refresh();
 	entity:Attach();
 	return entity
@@ -1822,6 +2085,11 @@ function ItemLiveModel:CloneDraggingEntityAndRestore(entity)
 			return entity;
 		end
 	end
+end
+
+-- whether filename is a block template file. 
+function ItemLiveModel:IsBlockTemplate(filename)
+	return filename and filename:match("%.blocks%.xml$") and true;
 end
 
 function ItemLiveModel:mouseReleaseEvent(event)
@@ -1875,6 +2143,26 @@ function ItemLiveModel:mouseReleaseEvent(event)
 				if(clickEntity:OnClick(result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side)) then
 					event:accept();
 				end
+				if(clickEntity:GetCategory() == "staticblock") then
+					if(event.isTripleClick and not GameLogic.GetFilters():apply_filters("MobileUIRegister.IsMobileUIEnabled", false)) then
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua")
+						local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask")
+						if (not EditModelTask.GetInstance()) then
+							GameLogic.GetPlayerController():PickItemByEntity(clickEntity)
+						end
+						if (EditModelTask.GetInstance()) then
+							EditModelTask.GetInstance():SetTransformMode(true)
+							EditModelTask.GetInstance():SelectModel(clickEntity)
+						end
+						GameLogic.SetModified()
+						EditModelTask.GetInstance().modelManip.translateManip:SetVisible(false)
+						EditModelTask.GetInstance().modelManip.translateManip.enabled = false
+						EditModelTask.GetInstance().modelManip.scaleManip:SetVisible(false)
+						EditModelTask.GetInstance().modelManip.scaleManip.enabled = false
+						EditModelTask.GetInstance().modelManip.rotateManip:SetPitchEnabled(true)
+						EditModelTask.GetInstance().modelManip.rotateManip:SetRollEnabled(true)
+					end
+				end
 			elseif(event:button() == "right" or (event:button() == "left" and GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false))) then
 				if(result.block_id and result.block_id>0) then
 					-- if it is a right click, first try the game logics if it is processed. such as an action neuron block.
@@ -1896,6 +2184,26 @@ function ItemLiveModel:mouseReleaseEvent(event)
 								GameLogic.RunCommand(string.format("/loadtemplate -rename %s %d %d %d %s",true,bx,by,bz,loadPath))
 								event:accept();
 							else
+								local local_filename = itemStack:GetDataField("tooltip");
+								local filename = local_filename;
+								if (filename and not self:IsBlockTemplate(filename) and filename:match("^temp/onlinestore/")) then
+									filename = commonlib.Encoding.Utf8ToDefault(filename)
+									local _filename = "onlinestore/"..filename:match("[^/\\]+$")
+									if(ParaIO.DoesFileExist(Files.GetWritablePath()..filename, true)) then
+										if ParaIO.CopyFile(Files.GetWritablePath()..filename, Files.WorldPathToFullPath(_filename), true) then
+											itemStack:SetTooltip(commonlib.Encoding.DefaultToUtf8(_filename))
+											NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
+											local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+											if(EditModelTask.GetInstance()) then
+												EditModelTask.GetInstance():RefreshPage()
+											end
+											filename = _filename
+											local_filename = commonlib.Encoding.DefaultToUtf8(_filename)
+											Files.FindFile(filename);
+											filename = Files.WorldPathToFullPath(filename)
+										end
+									end
+								end
 								local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
 								local entity = self:SpawnNewEntityModel(bx, by, bz)
 								if(entity) then
@@ -1924,4 +2232,362 @@ function ItemLiveModel:mouseReleaseEvent(event)
 	end
 	Game.SelectionManager:SetEntityFilterFunction(nil)
 	self:SetHoverEntity(nil, event);
+	self.entityRelativeToMousePickPos = nil;
+end
+
+-- @return anchor overlay object if any
+function ItemLiveModel:UpdateAnchorOverlay()
+	if(not self.anchorPointMatchingTimer) then
+		local callbackFunc = function()
+			local hasAnchorPoint = false;
+			if(self.draggingEntity) then
+				local mountPoints = self.draggingEntity:GetMountPoints()
+				if(mountPoints and mountPoints:HasAnchorPoints()) then
+					if(not self.anchorOverlay) then
+						self.anchorOverlay = Overlay:new():init();
+						self.anchorOverlay.EnableZPass = true;
+						self.anchorOverlay:SetBoundRadius(2);
+						self.anchorOverlay.paintEvent = function(overlay, painter)
+							return self:OnRenderAnchorOverlay(painter, overlay);
+						end
+					end
+					local x, y, z = self.draggingEntity:GetPosition()
+					self.anchorOverlay:SetPosition(x, y, z)
+	
+					-- add nearby candidate points of different types
+					if(self.lastAnchorPointMatchingLoopSign == 0) then
+						self.anchorPoints = self:GetAllAnchorPointsOnScreen(self.draggingEntity)
+					end
+					
+					-- build anchor point matching table, it's an octree for each anchor point
+					local dist = 64
+					local i = 1
+					mountPoints:ForEachAnchorPoint(function(mp, mpIndex)
+						if(i > self.lastAnchorPointMatchingLoopSign and i <= self.anchorPointMatchingLoopSign) then
+							self.anchorPointMatchingTable[mpIndex] = commonlib.Octree:new(
+								commonlib.Octree:vector3(x - dist, y - dist, z - dist),
+								commonlib.Octree:vector3(x + dist, y + dist, z + dist)
+							)
+							local matchingPoints = self.anchorPointMatchingTable[mpIndex]
+							local x1, y1, z1 = mountPoints:GetMountPositionInWorldSpace(mpIndex)
+							for j = 1, self.anchorPoints:size() do
+								local ap = self.anchorPoints[j]
+								local x2, y2, z2 = ap.position.x, ap.position.y, ap.position.z
+								local vector = mathlib.vector3d:new_from_pool(x2 - x1, y2 - y1, z2 - z1)
+								if(vector:length() <= 1) then
+									if(mp:IsTwoAnchorMatched(ap)) then
+										matchingPoints:insert(ap)
+									end
+								end
+							end
+						elseif(i > self.anchorPointMatchingLoopSign) then
+							return true
+						end
+						i = i + 1
+					end)
+					self.lastAnchorPointMatchingLoopSign = self.anchorPointMatchingLoopSign
+					self.anchorPointMatchingLoopSign = math.min(self.anchorPointsCount, self.anchorPointMatchingLoopSign + 1)
+					if(self.anchorPointMatchingLoopSign == self.lastAnchorPointMatchingLoopSign) then
+						self.lastAnchorPointMatchingLoopSign = 0
+						self.anchorPointMatchingLoopSign = 1
+					end
+	
+					hasAnchorPoint = true
+				end
+			end
+			if(not hasAnchorPoint and self.anchorOverlay) then
+				self.anchorOverlay:Destroy();
+				self.anchorOverlay = nil;
+				self.anchorPoints = nil;
+				self.anchorPointMatchingTable = {};
+				self.anchorPointsCount = 0;
+				self.lastAnchorPointMatchingLoopSign = 0;
+				self.anchorPointMatchingLoopSign = 1;
+				self.anchorPointMatchingIndex1 = 0;
+				self.anchorPointMatchingIndex2 = 0;
+				self.anchorPointMatchingEntity = nil;
+				self.lastAnchorPointMatchingIndex1 = 0;
+				self.lastAnchorPointMatchingIndex2 = 0;
+				self.lastnchorPointMatchingEntity = nil;
+				self:DeletePreviewEntity()
+				if(self.anchorPointMatchingKeyPressListener) then
+					GameLogic.GetFilters():remove_filter("KeyPressEvent", self.anchorPointMatchingKeyPressListener);
+					self.anchorPointMatchingKeyPressListener = nil;
+				end
+				if(self.anchorPointMatchingMouseWheelListener) then
+					GameLogic.GetFilters():remove_filter("mouseWheelEvent", self.anchorPointMatchingMouseWheelListener);
+					self.anchorPointMatchingMouseWheelListener = nil;
+				end
+				if(self.anchorPointMatchingTimer) then
+					self.anchorPointMatchingTimer:Change();
+					self.anchorPointMatchingTimer = nil;
+				end
+				GameLogic.SetStatus(nil);
+			end
+		end
+		callbackFunc()
+		self.anchorPointMatchingTimer = commonlib.Timer:new({callbackFunc = callbackFunc})
+		self.anchorPointMatchingTimer:Change(10, 10)
+	end
+end
+
+function ItemLiveModel:GetAllAnchorPointsOnScreen(exceptEntity)
+	local entities = EntityManager.GetEntitiesInScreen(function(entity)
+		return entity ~= exceptEntity and entity:isa(EntityManager.EntityLiveModel) and entity:GetCategory() == "staticblock";
+	end)
+
+	if(self.anchorPointsCount == 0) then
+		local mps = exceptEntity:GetMountPoints()
+		if(mps) then
+			local n = 0
+			mps:ForEachAnchorPoint(function()
+				n = n + 1
+			end)
+			self.anchorPointsCount = n
+		end
+	end
+
+	local anchorPoints = commonlib.Array:new();
+	for i = 1, #entities do
+		local entity = entities[i];
+		if(entity.GetMountPoints) then
+			local mountPoints = entity:GetMountPoints()
+			if(mountPoints and mountPoints:HasAnchorPoints()) then
+				mountPoints:ForEachAnchorPoint(function(anchorPoint, mpIndex)
+					local x, y, z = mountPoints:GetMountPositionInWorldSpace(mpIndex)
+					anchorPoint.position = commonlib.Octree:vector3(x, y, z)
+					anchorPoints:add(anchorPoint)
+				end)
+			end
+		end
+	end
+	return anchorPoints;
+end
+
+-- anchor points are mount points whose name starts with "@"
+function ItemLiveModel:OnRenderAnchorOverlay(painter, overlay)
+	local draggingEntity = self.draggingEntity;
+	if(overlay:IsPickingPass() or not draggingEntity) then
+		return;
+	end
+    painter:Save()
+	painter:PushMatrix();
+	painter:SetPen(self.pen);
+	
+	local cx, cy, cz = overlay:GetPosition()
+	
+	-- show all anchor points on entity. 
+	local entity = draggingEntity;
+	local mountPoints = entity:GetMountPoints()
+	if(mountPoints and mountPoints:GetCount() > 0) then
+		-- find the best matching point, use octree to search
+		local index, MaxWeightMatchingPoint, theClosestDistance
+		mountPoints:ForEachAnchorPoint(function(_, mpIndex)
+			local x, y, z = mountPoints:GetMountPositionInWorldSpace(mpIndex)
+			local matchingPoints = self.anchorPointMatchingTable[mpIndex]
+			if(matchingPoints) then
+				local point = { position = commonlib.Octree:vector3(x, y, z) }
+				local closestPoint, closestDistance = matchingPoints:findClosestPoint(point)
+				if(closestPoint and (not theClosestDistance or closestDistance < theClosestDistance)) then
+					if(closestPoint:GetMatchedAnchor() == nil) then
+						local parentEntity = closestPoint:GetEntity()
+						if(parentEntity.linkInfo and parentEntity.linkInfo.entity == entity) then
+							-- skip the linked entity
+						else
+							index = mpIndex
+							MaxWeightMatchingPoint = closestPoint
+							theClosestDistance = closestDistance
+							self.lastAnchorPointMatchingIndex1 = self.anchorPointMatchingIndex1
+							self.anchorPointMatchingIndex1 = mpIndex
+							self.lastnchorPointMatchingEntity = self.anchorPointMatchingEntity
+							self.anchorPointMatchingEntity = closestPoint.entity
+						end
+					end
+				end
+			end
+		end)
+
+		if(index and MaxWeightMatchingPoint and theClosestDistance <= 1) then
+			if(MaxWeightMatchingPoint:GetMatchedAnchor() ~= nil) then
+				self.bestMatchingAnchorPoint = nil
+				self:DeletePreviewEntity()
+				return
+			end
+			
+			self.lastAnchorPointMatchingIndex2 = self.anchorPointMatchingIndex2
+			self.anchorPointMatchingIndex2 = MaxWeightMatchingPoint:GetIndex()
+			self.bestMatchingAnchorPoint = {
+				from = mountPoints:GetMountPoint(index),
+				to = MaxWeightMatchingPoint,
+			}
+
+			-- review the matching result
+			if(self.anchorPointMatchingIndex1 ~= self.lastAnchorPointMatchingIndex1 or
+				self.anchorPointMatchingIndex2 ~= self.lastAnchorPointMatchingIndex2 or
+				self.anchorPointMatchingEntity ~= self.lastnchorPointMatchingEntity) then
+				self:DeletePreviewEntity()
+			end
+			local px, py, pz = MaxWeightMatchingPoint.position.x, MaxWeightMatchingPoint.position.y, MaxWeightMatchingPoint.position.z
+			if(not self.previewEntity) then
+				local previewEntity = entity:CloneMe()
+				previewEntity:SetCanDrag(false)
+				previewEntity:SetOpacity(0.5)
+				previewEntity:SetSkipPicking(true)
+				previewEntity:EnablePhysics(false)
+				local startAnchorPoint = mountPoints:GetMountPoint(index)
+				local scaling = previewEntity:GetScaling()
+				local pivot = startAnchorPoint:GetPivot()
+				local dx, dy, dz = pivot[1] * scaling, pivot[2] * scaling, pivot[3] * scaling
+				local facing = previewEntity:GetFacing()
+				local function rotatePoint(oldX, oldY, radian)
+					local newX = oldX * math.cos(radian) - oldY * math.sin(radian)
+					local newY = oldX * math.sin(radian) + oldY * math.cos(radian)
+					return newX, newY
+				end
+				dx, dz = rotatePoint(dx, dz, -facing)
+				local dropX, dropY, dropZ = px - dx, py - dy, pz - dz
+				-- previewEntity:SetPosition(dropX, dropY, dropZ)
+				local ex,ey,ez = entity:GetPosition()
+				local x1, y1, z1 = mountPoints:GetMountPositionInWorldSpace(index)
+				local dx,dy,dz = ex - x1, ey - y1, ez - z1
+				local _x, _y, _z = px + dx, py + dy, pz + dz
+				previewEntity:SetPosition(_x, _y, _z)
+				self.previewEntity = previewEntity
+			end
+
+			-- draw line between the best matching point
+			local x1, y1, z1 = mountPoints:GetMountPositionInWorldSpace(index)
+			local from_x1, from_y1, from_z1 = x1 - cx, y1 - cy, z1 - cz
+			local to_x1, to_y1, to_z1 = px - cx, py - cy, pz - cz
+			local v1 = mathlib.vector3d:new_from_pool(x1 - px, y1 - py, z1 - pz)
+			local direction = mathlib.vector3d:new_from_pool(to_x1 - from_x1, to_y1 - from_y1, to_z1 - from_z1)
+			local fixedDistance = math.min(0.2, direction:length())
+			local x2 = from_x1 + direction[1] * fixedDistance
+			local y2 = from_y1 + direction[2] * fixedDistance
+			local z2 = from_z1 + direction[3] * fixedDistance
+			local x3 = from_x1 + direction[1] * fixedDistance * 2
+			local y3 = from_y1 + direction[2] * fixedDistance * 2
+			local z3 = from_z1 + direction[3] * fixedDistance * 2
+			painter:SetBrush("#ff0000")
+			ShapesDrawer.DrawLine(painter, from_x1, from_y1, from_z1, x2, y2, z2)
+			painter:SetBrush("#0000ff")
+			ShapesDrawer.DrawLine(painter, x2, y2, z2, x3, y3, z3)
+			painter:SetBrush("#00ff00")
+			ShapesDrawer.DrawLine(painter, x3, y3, z3, to_x1, to_y1, to_z1)
+
+			-- draw line between other matching points
+			mountPoints:ForEachAnchorPoint(function(_, mpIndex)
+				local x, y, z = mountPoints:GetMountPositionInWorldSpace(mpIndex)
+				local matchingPoints = self.anchorPointMatchingTable[mpIndex]
+				if(matchingPoints) then
+					local point = { position = commonlib.Octree:vector3(x, y, z) }
+					local closestPoint, _ = matchingPoints:findClosestPoint(point)
+					if(closestPoint and closestPoint ~= MaxWeightMatchingPoint) then
+						-- if(closestPoint:GetMatchedAnchor() ~= nil) then
+						-- 	self.bestMatchingAnchorPoint = nil
+						-- 	self:DeletePreviewEntity()
+						-- 	return true
+						-- end
+						local px, py, pz = closestPoint.position.x, closestPoint.position.y, closestPoint.position.z
+						local v2 = mathlib.vector3d:new_from_pool(x - px, y - py, z - pz)
+						-- check if v2 is equal to v1
+						if(v2:equals(v1, 0.03)) then
+							local from_x, from_y, from_z = x - cx, y - cy, z - cz
+							local to_x, to_y, to_z = px - cx, py - cy, pz - cz
+							direction = mathlib.vector3d:new_from_pool(to_x - from_x, to_y - from_y, to_z - from_z)
+							x2 = from_x + direction[1] * fixedDistance
+							y2 = from_y + direction[2] * fixedDistance
+							z2 = from_z + direction[3] * fixedDistance
+							x3 = from_x + direction[1] * fixedDistance * 2
+							y3 = from_y + direction[2] * fixedDistance * 2
+							z3 = from_z + direction[3] * fixedDistance * 2
+							painter:SetBrush("#ff0000")
+							ShapesDrawer.DrawLine(painter, from_x, from_y, from_z, x2, y2, z2)
+							painter:SetBrush("#0000ff")
+							ShapesDrawer.DrawLine(painter, x2, y2, z2, x3, y3, z3)
+							painter:SetBrush("#00ff00")
+							ShapesDrawer.DrawLine(painter, x3, y3, z3, to_x, to_y, to_z)
+						end
+					end
+				end
+			end)
+		else
+			self.bestMatchingAnchorPoint = nil
+			self:DeletePreviewEntity()
+		end
+	end
+
+	painter:PopMatrix();
+	painter:Restore()
+end
+
+function ItemLiveModel:FormatFacing(facing)
+	if(facing >= math.rad(360)) then
+		facing = facing - math.rad(360)
+	elseif(facing < 0) then
+		if(math.abs(facing) < 0.002) then
+			facing = 0
+		else
+			facing = facing + math.rad(360)
+		end
+	end
+	return facing
+end
+
+function ItemLiveModel:RotateYAxis(deg)
+	if(self.draggingEntity) then
+		local facing = self.draggingEntity:GetFacing()
+		facing = facing + math.rad(deg)
+		facing = self:FormatFacing(facing)
+		self.draggingEntity:SetFacing(facing)
+		if(self.previewEntity) then
+			self.previewEntity:SetFacing(facing)
+		end
+		if(self.entityRelativeToMousePickPos) then
+			local dx, dz = self.entityRelativeToMousePickPos.dx0, self.entityRelativeToMousePickPos.dz0
+			local function rotatePoint(oldX, oldY, radian)
+				local newX = oldX * math.cos(radian) - oldY * math.sin(radian)
+				local newY = oldX * math.sin(radian) + oldY * math.cos(radian)
+				return newX, newY
+			end
+			local new_dx, new_dz = rotatePoint(dx, dz, -facing)
+			self.entityRelativeToMousePickPos.dx = new_dx
+			self.entityRelativeToMousePickPos.dz = new_dz
+		end
+	end
+end
+
+function ItemLiveModel:DeletePreviewEntity()
+	if(self.previewEntity) then
+		self.previewEntity:Destroy()
+		self.previewEntity = nil
+	end
+end
+
+function ItemLiveModel:CalcMatchedAnchorPoint()
+	if(self.draggingEntity) then
+		local mountPoints = self.draggingEntity:GetMountPoints()
+		local allAnchorPoints = self.anchorPoints:clone()
+		mountPoints:ForEachAnchorPoint(function(ap, mpIndex)
+			local x, y, z = mountPoints:GetMountPositionInWorldSpace(mpIndex)
+			ap.position = commonlib.Octree:vector3(x, y, z)
+			allAnchorPoints:add(ap)
+		end)
+		for i = 1, allAnchorPoints:size() do
+			local ap1 = allAnchorPoints[i]
+			for j = i + 1, allAnchorPoints:size() do
+				local ap2 = allAnchorPoints[j]
+				local x1, y1, z1 = ap1.position.x, ap1.position.y, ap1.position.z
+				local x2, y2, z2 = ap2.position.x, ap2.position.y, ap2.position.z
+				local vector = mathlib.vector3d:new_from_pool(x2 - x1, y2 - y1, z2 - z1)
+				if(vector:length() < math.sqrt(0.03)) then
+					if(not ap1:GetMatchedAnchor() and not ap2:GetMatchedAnchor()) then
+						if(ap1:IsTwoAnchorMatched(ap2)) then
+							ap1:SetMatchedAnchor(ap2)
+						end
+					end
+				end
+			end
+		end
+	end
 end

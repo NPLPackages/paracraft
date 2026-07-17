@@ -38,19 +38,19 @@ function MsgTip.Show(un_read_num)
     if not MsgTip.HasBind then
         MsgTip.HasBind = true
 
-        GameLogic.GetFilters():add_filter("update_friend_unread_num", function()
-            local nums = FriendsPage.GetAllUnReadMsgNum()
-            if nums > 0 then
-                MsgTip.Show(nums)
+        GameLogic.GetFilters():add_filter("update_friend_unread_num", function(friendNum)
+            if friendNum and friendNum > 0 then
+                MsgTip.Show(friendNum)
             else
-                MsgTip.UpdateNum(nums)
+                MsgTip.UpdateNum(friendNum)
             end
+            return friendNum
         end);
     end
     MsgTip.IsOpenPage = true
     MsgTip.un_read_num = un_read_num or 0
 
-    if MsgTip.un_read_num > 0 then
+    if MsgTip.un_read_num > 0 and not System.options.isStrictGameMode then
         MsgTip.AddMsgDock()
     end
 end
@@ -64,8 +64,12 @@ function MsgTip.GetMsgTipConfig(dockKey)
 end
 
 function MsgTip.AddMsgDock()
+    local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
     local dockKey = GameLogic.DockManager:GetDockKey()
-    if dockKey == "E_DOCK_TUTORIAR" or System.options.channelId_431 or System.options.isPapaAdventure then
+    if dockKey == "E_DOCK_TUTORIAR" 
+        or System.options.isEducatePlatform 
+        or System.options.isPapaAdventure
+        or IsMobileUIEnabled then
         return
     end
     local isLittle,dockCnf = MsgTip.GetMsgTipConfig(dockKey)
@@ -147,10 +151,6 @@ function MsgTip.Check()
         else
             MsgTip.ClosePage()
         end
-
-        commonlib.TimerManager.SetTimeout(function()
-            MsgTip.Check()
-        end, 60000);
 	end, true);    
 end
 

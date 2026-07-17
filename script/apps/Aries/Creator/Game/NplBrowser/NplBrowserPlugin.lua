@@ -52,18 +52,22 @@ local WebView = commonlib.gettable("System.os.WebView");
 
 local default_window_title = default_window_title;
 local default_id = "nplbrowser_wnd";
+local cef3_dll_name = ""
 local default_dll_name = "cef3/NplCefPlugin.dll";
+local browser_debug = ParaEngine.GetAppCommandLineByParam("browser_debug", false);
 local debug = ParaEngine.GetAppCommandLineByParam("cef_debug", false);
 if(debug == true or debug =="true" or debug == "True")then
     default_dll_name = "cef3/NplCefPlugin_d.dll";
 end
+cef3_dll_name = default_dll_name
 local default_client_name = "cef3\\cefclient.exe";
 local callback_file = "script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua";
 local cefclient_config_filename = "cefclient_config.json"; -- same value in NplCefPlugin
 
 local DISABLE_WINDOW_WEBVIEW2 = false;
 local is_windows_webview2_found = false;
-local window_webview_dll_name = ParaEngine.IsDebugging() and "ParaWebView_d.dll" or "ParaWebView.dll";
+--local window_webview_dll_name = ParaEngine.IsDebugging() and "ParaWebView_d.dll" or "ParaWebView.dll";
+local window_webview_dll_name = "ParaWebView.dll";
 local window_webview_auto_install = true;
 
 NplBrowserPlugin.is_registered = false;
@@ -73,6 +77,16 @@ NplBrowserPlugin.window_states = {}; -- the states of window
 NplBrowserPlugin.messageLoopInterval = 0.2 * 1000;
 NplBrowserPlugin.webview = nil; -- webview instance
 NplBrowserPlugin.on_created_callback_map = {};
+NplBrowserPlugin.last_start_cmd = nil
+NplBrowserPlugin.about_blank_url = "https://webparacraft.keepwork.com/about_blank.html";  -- window webview 不支持 "about:blank"
+
+local about_blank_urls = {
+    ["ONLINE"] = "https://webparacraft.keepwork.com/about_blank.html",
+    ["RELEASE"] = "https://emscripten.keepwork.com/about_blank.html",
+    ["LOCAL"] = "http://127.0.0.1:8088/npl/webparacraft/about_blank.html",
+};
+local HttpEnv = ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE"); -- ONLINE -- RELEASE -- LOCAL
+NplBrowserPlugin.about_blank_url = about_blank_urls[string.upper(HttpEnv)];
 
 function NplBrowserPlugin.IsWindowWebView2Found()
 	NplBrowserPlugin.OneTimeInitWebview2()
@@ -130,7 +144,7 @@ function NplBrowserPlugin.PushBack(cmd)
 			end
 
 			if(bRemoveDuplicated) then
-				-- LOG.std(nil, "debug", "NplBrowserPlugin.RemoveDuplicated", "cmd:%s %s", cmd.cmd, cmd.id);
+				-- LOG.std(nil, "info", "NplBrowserPlugin.RemoveDuplicated", "cmd:%s %s", cmd.cmd, cmd.id);
 				NplBrowserPlugin.PopFront()
 			end
 		end
@@ -181,13 +195,28 @@ function NplBrowserPlugin.RunNextCmd()
 				NPL.activate(dll_name, cmd);
 			end
         elseif (System.os.IsEmscripten()) then
-            local uiScales = System.Windows.Screen:GetUIScaling();
+            local uiScales = System.Windows.Screen:GetUIScaling(true);
+            local width, height = cmd.width, cmd.height;
+            local x,y = cmd.x, cmd.y;
+            local isLandscapeMode = ParaEngine.GetAttributeObject():GetField("IsScreenRotated", false)
+            if isLandscapeMode then
+                LOG.std(nil, "info", "NplBrowserPlugin", "landscape mode : %s", tostring(isLandscapeMode));
+                if x and y and width and height then
+                    cmd.width = height
+                    cmd.height = width
+                    cmd.x = y
+                    cmd.y = x
+                end
+            end
             cmd.scale_x = uiScales[1];
             cmd.scale_y = uiScales[2];
             cmd.from_filename = callback_file;
             cmd.to_filename = "";
             cmd.target = "webview";
+            echo("send msg to javascript=============")
+            echo(commonlib.Json.Encode(cmd))
             ParaEngine.GetAttributeObject():SetField("SendMsgToJS", commonlib.Json.Encode(cmd));
+            echo("===================================")
         elseif (System.os.GetPlatform() == 'mac' or
                 System.os.GetPlatform() == 'ios' or
                 System.os.GetPlatform() == 'android') then
@@ -260,10 +289,6 @@ function NplBrowserPlugin.RunNextCmd()
     
                         if (x and y) then
                             webview:move(x, y);
-                        end
-    
-                        if (cmd and cmd.url) then
-                            webview:loadUrl(cmd.url);
                         end
     
                         webview:setVisible(cmd.visible);
@@ -375,6 +400,12 @@ function NplBrowserPlugin.GetWindowState(id)
     end
 end
 
+function NplBrowserPlugin.ClearWindowState(id)
+    if(id and NplBrowserPlugin.window_states and NplBrowserPlugin.window_states[id])then
+        NplBrowserPlugin.window_states[id] = nil;
+    end
+end
+
 -- sync cached window states from meomory to webview, such as position, size and visibility. This is usually called after window is created. 
 -- @param id: window id.
 function NplBrowserPlugin.SynchronizeWindowState(id)
@@ -428,11 +459,15 @@ function NplBrowserPlugin.NPL_Activate(browserId, filename, params)
 			local dll_name = default_dll_name;
 			NPL.activate(dll_name, input);
 		end
-    elseif (System.os.GetPlatform() == "mac" ) then
+    elseif (System.os.GetPlatform() == "mac" or
+            System.os.GetPlatform() == "ios" or
+            System.os.GetPlatform() == "android") then
+        local state = NplBrowserPlugin.GetWindowState(browserId);
         local filepath = message.file;
         local msg = message.params;
-        if NplBrowserPlugin.isLoadWebview then
-            NplBrowserPlugin.webview:activate(filepath, msg);
+
+        if state and state.isLoadWebview then
+            state.webview:activate(filepath, msg);
         end
     elseif (System.os.IsEmscripten()) then
         ParaEngine.GetAttributeObject():SetField("SendMsgToJS", commonlib.Json.Encode({
@@ -440,6 +475,7 @@ function NplBrowserPlugin.NPL_Activate(browserId, filename, params)
             from_filename = "script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua",
             to_filename = message.file,
             params = message.params,
+            cmd = "PostMessage",
         }));
     end
 end
@@ -453,7 +489,20 @@ end
 
 -- create a webview window
 function NplBrowserPlugin.Start(p)
-	NplBrowserPlugin.OneTimeInitWebview2()
+    if not NplBrowserPlugin.IsInValidWebView2 and NplBrowserPlugin.IsWindowWebView2Found() then
+	    NplBrowserPlugin.OneTimeInitWebview2()
+        commonlib.TimerManager.SetTimeout(function()
+            if(not NplBrowserPlugin.IsInValidWebView2 and not NplBrowserPlugin.IsWebView2Created) then
+                NplBrowserPlugin.Activate({
+                    cmd="WebViewStarted",
+                    ok = false;
+                    id = p.id or default_id,
+                    istimeout=true,
+                })
+            end
+        end,10*1000)
+
+    end
 
     if (System.os.GetPlatform() == 'win32') then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
@@ -464,6 +513,8 @@ function NplBrowserPlugin.Start(p)
         if (not NplBrowserLoaderPage.IsLoaded()) then
             return false
         end
+    else
+        NplBrowserPlugin.IsInValidWebView2 = true
     end
 
     local window_title = p.window_title or default_window_title;
@@ -474,7 +525,9 @@ function NplBrowserPlugin.Start(p)
         return false;
     end
 
-    if (System.os.GetPlatform() == 'win32' and not NplBrowserPlugin.CheckCefClientExist()) then
+    if (System.os.GetPlatform() == 'win32' 
+        and not NplBrowserPlugin.CheckCefClientExist()
+        and NplBrowserPlugin.IsInValidWebView2) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 		local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 		NplBrowserLoaderPage.SetChecked(false);
@@ -485,17 +538,6 @@ function NplBrowserPlugin.Start(p)
                 NplBrowserPlugin.Start(p)
             end
         end, true)
-		-- _guihelper.MessageBox(L"NPL Chrome浏览器插件丢失，是否重新安装?", function(res)
-		-- 	if(res and res == _guihelper.DialogResult.Yes) then
-		-- 		local bForceReinstall = true
-				
-		-- 		NplBrowserLoaderPage.Check(function(loaded)
-		-- 			if(loaded) then
-		-- 				NplBrowserPlugin.Start(p)
-		-- 			end
-		-- 		end, bForceReinstall)
-		-- 	end
-		-- end, _guihelper.MessageBoxButtons.YesNo);
 		LOG.std(nil, "warn", "NplBrowserPlugin.Start", "the client [%s] does not exist, cannot start npl browser", default_client_name);
         return false;
     end
@@ -557,7 +599,7 @@ function NplBrowserPlugin.Start(p)
         callback_file = callback_file,
         cefclient_config_filename = cefclient_config_filename,
         pid = pid,
-        debug = System.options.isPapaAdventure
+        debug = browser_debug == true or browser_debug == "true" or System.options.isPapaAdventure
     };
 
     LOG.std(nil, "info", "NplBrowserPlugin.Start", "the window [%s] requests to launch %s", id, url or "");
@@ -566,10 +608,9 @@ function NplBrowserPlugin.Start(p)
 		-- assume window is immediately created except for cef3, which we need to check periodically. 
 		NplBrowserPlugin.UpdateWindowState(id, {state="WindowCreated"});
 	end
-
     NplBrowserPlugin.UpdateWindowState(id, input);
 	NplBrowserPlugin.PushBack(input);
-	
+	NplBrowserPlugin.last_start_cmd = commonlib.copy(input)
     NplBrowserPlugin.RunMessageloopTimer();
 end
 
@@ -824,6 +865,7 @@ function NplBrowserPlugin.OnReceiveWebView2Support(msg)
 			echo("========= webview2 is found ==========")
 		else
 			echo("========= webview2 NOT installed ==========")
+            NplBrowserPlugin.IsInValidWebView2 = true
 		end
 
 		if(NplBrowserPlugin.WebviewInitCallback) then
@@ -837,17 +879,16 @@ end
 -- it does not init cef3 only check for local installation of webview2 in the OS. 
 -- @return true if support webview2
 function NplBrowserPlugin.OneTimeInitWebview2()
+    if NplBrowserPlugin.IsInValidWebView2 then
+        return false
+    end
 	if (not NplBrowserPlugin.hasCheckedWebview2)  then
 		NplBrowserPlugin.hasCheckedWebview2 = true
 		if(System.os.GetPlatform() == 'win32') then
 			local isFileExist = ParaIO.DoesFileExist(window_webview_dll_name)
 			if not isFileExist then
 				is_windows_webview2_found = false
-				if callback then
-					callback()
-				end
 			else
-				NplBrowserPlugin.WebviewInitCallback = callback;
 				NPL.call(window_webview_dll_name, {
 					cmd = "Support",
 					callback_file = callback_file,
@@ -860,8 +901,8 @@ function NplBrowserPlugin.OneTimeInitWebview2()
 	return is_windows_webview2_found;
 end
 
-local function activate()
-	local msg = msg;
+function NplBrowserPlugin.Activate(recvMsg)
+    local msg = recvMsg or msg;
     if msg then
         local cmd = msg["cmd"];
         local id = msg["id"] or "";
@@ -873,37 +914,37 @@ local function activate()
 		elseif(cmd == "CheckCefWindow")then
 			-- callback message for each "Start" for cef3.dll
             local json_config = NplBrowserPlugin.ReadCefClientJsonConfg(cefclient_config_filename);
-
             if json_config then
                 local key = string.format("%s_%s",id,parent_handle);
                 local value = json_config[key];
 
                 if value == true then
 					NplBrowserPlugin.UpdateWindowState(id, {state="WindowCreated"});
-                    LOG.std(nil, "info", "NplBrowserPlugin", "============= webview window created: %s ================", id);
+                    LOG.std(nil, "info", "NplBrowserPlugin", "============= cef3 window created: %s ================", id);
                     -- send a message after created window
                     local callback = NplBrowserPlugin.on_created_callback_map[id];
                     if(callback)then
                         callback(msg);
                     end
                     NplBrowserPlugin.on_created_callback_map[id] = nil;
-
 					NplBrowserPlugin.SynchronizeWindowState(id)
+                    GameLogic.GetFilters():apply_filters('nplbrowser_checked')                    
                 end
             end
         elseif(cmd == "WebViewStarted")then
             -- callback message for each "Start" for parawebview.dll
             local ok = msg["ok"];
 			local id = msg["id"];
+            local istimeout = msg["istimeout"] or false
 			if not ok then
 				LOG.std(nil, "error", "NplBrowserPlugin", "failed to create webview2 window when we report to support webview2");
-				local NplBrowserDialog = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserDialog.lua");
-                NplBrowserDialog.ShowPage()
+				NplBrowserPlugin.SetWebView2NotValid(istimeout)
             else
 				if(id) then
 					NplBrowserPlugin.UpdateWindowState(id, {state="WindowCreated"});
 					LOG.std(nil, "info", "NplBrowserPlugin", "============= webview window created: %s ================", id);
 					NplBrowserPlugin.SynchronizeWindowState(id)
+                    NplBrowserPlugin.IsWebView2Created = true
                 end
             end
 		elseif(cmd == "Quit")then
@@ -911,6 +952,39 @@ local function activate()
             NplBrowserPlugin.UpdateWindowState(id, {state="Quit"});
         end
     end
+end
+
+function NplBrowserPlugin.SetWebView2NotValid(istimeout)
+    if NplBrowserPlugin.IsInValidWebView2 == true then
+        return
+    end
+    commonlib.SendErrorLog("NplBrowserPlugin","load webview2 err=====","istimeout======="..tostring(istimeout))
+    if not NplBrowserPlugin.last_start_cmd then
+        return
+    end
+    local id = NplBrowserPlugin.last_start_cmd.id
+    NplBrowserPlugin.IsInValidWebView2 = true
+    NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+    local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+    NplBrowserPlugin.Show({id = id, visible = false})
+    NplBrowserPlugin.Open({id = id, url = NplBrowserPlugin.about_blank_url, resize = true});
+    is_windows_webview2_found = false
+    --only install chrome cef3 and webview2 is valid
+    commonlib.TimerManager.SetTimeout(function()
+        NplBrowserLoaderPage.CheckCef3(function(loaded)
+            if(loaded) then
+                NplBrowserPlugin.UpdateWindowState(id,{state="",visible=true})
+                default_dll_name = cef3_dll_name
+                NplBrowserPlugin.last_start_cmd.dll_name = default_dll_name
+                NplBrowserPlugin.Start(NplBrowserPlugin.last_start_cmd)
+            end
+        end, true)
+    end,1000)
+    
+end
+
+local function activate()
+	NplBrowserPlugin.Activate()
 end
 
 NPL.this(activate);
@@ -922,7 +996,9 @@ function NplBrowserPlugin.TranslateJsMessage(msg)
     local message = msg.msg
     if type(message) == "string" and message ~= "" then
         local message_data = commonlib.Json.Decode(message)
-		if (System.os.GetPlatform() == "mac") then
+		if (System.os.GetPlatform() == "mac" or
+            System.os.GetPlatform() == "ios" or
+            System.os.GetPlatform() == "android") then
             message_data = { msg = message_data }
         end
         if message_data and message_data.msg then

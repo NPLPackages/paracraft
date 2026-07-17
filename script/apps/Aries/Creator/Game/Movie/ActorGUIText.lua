@@ -18,6 +18,7 @@ local Screen = commonlib.gettable("System.Windows.Screen");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
+local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -202,8 +203,9 @@ end
 function Actor.OnScreenSizeChange()
 	local _parent = ParaUI.GetUIObject("MovieGUIRoot");
 	local viewport = ViewportManager:GetSceneViewport();
-	local margin_right = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
-	local margin_bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2])
+	local viewportUI = ViewportManager:GetGUIViewport();
+	local margin_right = math.floor((viewport:GetMarginRight()  - viewportUI:GetMarginRight()) / Screen:GetUIScaling()[1]);
+	local margin_bottom = math.floor((viewport:GetMarginBottom()  - viewportUI:GetMarginBottom())/ Screen:GetUIScaling()[2])
 	_parent.height = margin_bottom;
 	_parent.width = margin_right;
 
@@ -215,7 +217,7 @@ function Actor.OnScreenSizeChange()
 	textCtrl.scalingx = Actor.textScaling * Actor.defaultTextScaling;
 	textCtrl.scalingy = Actor.textScaling * Actor.defaultTextScaling;
 	if(Actor.textpos ~= "center") then
-		textCtrl:Reposition("_mb", 0, 45 * (Actor.textScaling or 1), 0, 50 * (Actor.textScaling or 1));
+		textCtrl:Reposition("_mb", 0, Actor:GetMarginBottom() * (Actor.textScaling or 1), 0, 50 * (Actor.textScaling or 1));
 	end
 end
 
@@ -239,7 +241,7 @@ function Actor:GetTextObj(bCreateIfNotExist)
 			local viewport = ViewportManager:GetSceneViewport();
 			viewport:Connect("sizeChanged", Actor, Actor.OnScreenSizeChange, "UniqueConnection");
 			
-			local _this = ParaUI.CreateUIObject("button", "text", "_mb", 0, 45, 0, 50);
+			local _this = ParaUI.CreateUIObject("button", "text", "_mb", 0, self:GetMarginBottom(), 0, 50);
 			_this.background = "";
 			_this.font = "System;20;bold";
 			_guihelper.SetFontColor(_this, "#ffffffff");
@@ -274,6 +276,17 @@ function Actor:GetTextImagePathByName(filename)
 	end
 end
 
+function Actor:GetMarginBottom()
+	return QuickSelectBar.IsMobile and 85 or 45;
+end
+
+function Actor:GetText(text)
+	local text = text or ""
+	--'<phoneme[^>]+>(.-)</phoneme>' , replace the reg if need
+	text = string.gsub(text, "<[^>]+>", "")
+	return text
+end
+
 -- update UI text with given values. 
 function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha, textalpha, bgcolor, values)
 	local obj = self:GetTextObj(true);
@@ -288,7 +301,7 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha,
 		GameLogic.GetFilters():apply_filters("OnPlayMovieText")
 		local play_text = GameLogic:GetText(text)
 		if voicenarrator and voicenarrator >= 0 then
-			if obj.text ~= text or not obj.visible or self.voicenarrator ~= voicenarrator then
+			if obj.text ~= self:GetText(text) or not obj.visible or self.voicenarrator ~= voicenarrator then
 				if voicebelongto and voicebelongto ~= "" then
 					local movie_clip = self:GetMovieClip()
 					local voice_actor = movie_clip:FindActor(voicebelongto)
@@ -305,7 +318,7 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha,
 			end
 			self.voicenarrator = voicenarrator
 		else
-			if obj.text ~= text then
+			if obj.text ~= self:GetText(text) then
 				local movie_clip = self:GetMovieClip()
 				if self.last_voicebelongto and self.last_voicebelongto ~= "" and voicebelongto ~= self.last_voicebelongto then
 					self:SetActorLipSync(self.last_voicebelongto, false)
@@ -341,7 +354,7 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha,
 			voicebelongto = self.last_voicebelongto
 		end
 		
-		if text ~= obj.text and (not voicenarrator or voicenarrator == 0) and voicebelongto and voicebelongto ~= "" then
+		if self:GetText(text) ~= obj.text and (not voicenarrator or voicenarrator == 0) and voicebelongto and voicebelongto ~= "" then
 			local movie_clip = self:GetMovieClip()
 			local voice_actor = movie_clip:FindActor(voicebelongto)
 			if voice_actor and voice_actor.SetVoiceMouthSkin then
@@ -350,13 +363,13 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha,
 		end
 	end
 	
-	obj.text = text;
+	obj.text = self:GetText(text);
 	self.last_voicebelongto = voicebelongto
 	Actor.textpos = textpos;
 	if(textpos == "center") then
 		obj:Reposition("_ct", -480, -100, 960, 200);
 	else
-		obj:Reposition("_mb", 0, 45 * (Actor.textScaling or 1), 0, 50 * (Actor.textScaling or 1));
+		obj:Reposition("_mb", 0, self:GetMarginBottom() * (Actor.textScaling or 1), 0, 50 * (Actor.textScaling or 1));
 	end
 
 	-- for headon display. use the first NPC actor or the specified voice narrator. 

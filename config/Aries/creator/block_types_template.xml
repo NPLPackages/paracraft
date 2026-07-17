@@ -45,6 +45,14 @@ e.g.
     <model id_data="0" />
     <model id_data="1" />
   </block>
+  <block name="DataSlab" cubeMode="true" customModel="true">
+    <model id_data="0" />
+    <model id_data="1" />
+    <model id_data="2" />
+    <model id_data="3" />
+    <model id_data="4" />
+    <model id_data="5" />
+  </block>
   <!-- a flat plane snapping to one of th six neighbour surfaces -->
   <block name="vine" shape="vine" modelName="vine" cubeMode="true" customModel="true">
     <model id_data="0" />
@@ -138,7 +146,7 @@ e.g.
     <model id_data="6" sides="4" assetfile="[filename]_ceiling.x" facing="0" condition="{[0]='solid',}"></model>
     <model id_data="5" assetfile="[filename]_ground.x" facing="0" condition="{[5]='obstruction'}"></model>
   </block>
-  <block name="Stairs" shape="stairs" class="BlockStair" texture="" customBlockModel="true" modelName="stairs" obstruction="true" blockcamera="true" customModel="true">
+  <block name="Stairs" shape="stairs" class="BlockStair" item_class="ItemStair" texture="" customBlockModel="true" modelName="stairs" obstruction="true" blockcamera="true" customModel="true">
   
     <!--  corner:    -->
     <model id_data="14" assetfile="[filename]_corner.x" facing="1.57" transform="1,0,0,0,-1,0,0,0,-1,0,0,0"  condition="{[2]=1,[4]=1,[6]=0,[8]=0,[0]='solid'}"></model>

@@ -36,7 +36,9 @@ function MiniWorldUserInfo.ShowInMiniWorld()
 	local id = GameLogic.options:GetProjectId();
 	id = tonumber(id);
 	if (not id) then return end
-
+	if true then --不显示迷你世界用户信息
+		return
+	end
 	if (page) then
 		page:CloseWindow();
 	end

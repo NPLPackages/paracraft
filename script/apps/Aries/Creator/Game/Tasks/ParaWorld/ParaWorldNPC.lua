@@ -11,7 +11,6 @@ ParaWorldNPC.ShowPage();
 ]]
 local TeachingQuestLinkPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/TeachingQuestLinkPage.lua");
 local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityNPC.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.rawfile.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.npc.lua");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")

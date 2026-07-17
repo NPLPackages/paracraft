@@ -18,6 +18,9 @@ GameLogic.Init();
 ]]
 NPL.load("(gl)script/ide/STL.lua");
 NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
+
+NPL.PostLoad(function()
+NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
@@ -26,6 +29,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/PhysicsWorld.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/ide/TooltipHelper.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/AI/LocalNPC.lua");
@@ -46,14 +50,13 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldRevision.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NetworkMain.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/PlayerController.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Ticks.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
-NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/FolderManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockManager.lua") 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tutorial/Assessment.lua")
+end)
+
 local Assessment = commonlib.gettable("MyCompany.Aries.Creator.Game.Tutorial.Assessment")
 local DockManager = commonlib.gettable("MyCompany.Aries.Game.DockManager")
 local FolderManager = commonlib.gettable("MyCompany.Aries.Game.GameLogic.FolderManager")
@@ -99,7 +102,7 @@ local names;
 -- TODO: testing only, replace this with 
 -- local BlockTerrain = ParaTerrain;
 local BlockTerrain = commonlib.gettable("MyCompany.Aries.Game.Fake_ParaTerrain")
-local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
+
 -- expose to global environment
 _G["GameLogic"] = commonlib.gettable("MyCompany.Aries.Game.GameLogic"); 
 _G["Game"] = commonlib.gettable("MyCompany.Aries.Game");
@@ -107,6 +110,7 @@ _G["Game"] = commonlib.gettable("MyCompany.Aries.Game");
 -- create class
 local GameLogic = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.GameLogic"));
 GameLogic:Signal("WorldLoaded");
+GameLogic:Signal("WorldInitialRegionsLoaded");
 GameLogic:Signal("WorldUnloaded");
 GameLogic:Signal("beforeWorldSaved");
 GameLogic:Signal("WorldSaved");
@@ -145,6 +149,7 @@ GameLogic.current_worlddir = "temp/emptyworld/";
 -- one time singleton init
 function GameLogic:ctor()
 	self:InitAPIPath();
+	NPL.load("(gl)Mod/GeneralGameServerMod/UI/Page.lua") -- preload to prevent too deep load recursion
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
 	local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
 	DefaultFilters:Install();
@@ -184,6 +189,8 @@ function GameLogic:ctor()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWork.lua");
 	NPL.load("script/ide/System/UI/Page/Macro/MacrosExtend.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+	MyCompany.Aries.ChatSystem.ChatWindow.InitSystem();
 end
 
 
@@ -197,9 +204,11 @@ function GameLogic:InitAPIPath()
     GameLogic.QuestAction = QuestAction;
 	GameLogic.SelectionManager = SelectionManager;
 	GameLogic.Assessment = Assessment
-	GameLogic.Assessment:GetAllData() --获取商城数据
 	GameLogic.DockManager = DockManager:InitSingleton()
 	GameLogic.DockManager:OnInit()
+	-- for all defer loaded objects. 
+	GameLogic.All = NPL.load("(gl)script/apps/Aries/Creator/Game/Common/DeferredGlobalObjects.lua");
+	
 	_G["GameLogic"] = GameLogic; 
 
 
@@ -215,9 +224,8 @@ function GameLogic:InitAPIPath()
 	DOM.AddDOM("EntityManager", function() return TableAttribute:create(GameLogic.EntityManager) end);
 	DOM.AddDOM("System", function() return TableAttribute:create(System) end);
 	DOM.AddDOM("commonlib", function() return TableAttribute:create(commonlib) end);
+	DOM.AddDOM("WorldCommon", function() return TableAttribute:create(WorldCommon) end);
 	GameLogic.gameFRC = DOM.GetDOM("gameFRC");
-
-	
 end
 
 -- static method called at the very beginning when paracraft start
@@ -241,7 +249,7 @@ function GameLogic.InitCommon()
 
 	GameLogic.InitMod();
 	GameLogic:InitSingleton();
-	
+
 	if(not GameLogic.theParticleManager) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/ParticlePoolManager.lua");
 		local ParticlePoolManager = commonlib.gettable("MyCompany.Aries.Game.Effects.ParticlePoolManager");
@@ -264,6 +272,8 @@ function GameLogic.InitCommon()
 
 	GameLogic.CreateGetAutoSaver();
 
+	GameLogic.CreateGetEditableWorld();
+	
 	if (not System.options.isCodepku) then
 		local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 		KpChatChannel.StaticInit();
@@ -283,6 +293,14 @@ function GameLogic.InitCommon()
 	
 		--local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 		--ClassManager.StaticInit();
+		if System.options.isCommunity then
+			local ChatManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatManager.lua");
+			ChatManager.StaticInit();
+		end
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameMgr.lua")
+		GameLogic.MiniGameMgr = commonlib.gettable("MyCompany.Aries.Game.Tasks.MiniGame.MiniGameMgr")
+		NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/PersonalPageStore.lua");
+		GameLogic.PersonalPageStore = commonlib.gettable("MyCompany.Aries.Creator.Game.KeepWork.PersonalPageStore");
 	end
 
 	local SchoolCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolCenter/SchoolCenter.lua")
@@ -292,6 +310,10 @@ function GameLogic.InitCommon()
 	local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 
 	PhysicsWorld:StaticInit()
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockFileSync.lua");
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ActionNameDetector.lua");
 end
 
 -- for checking desktop state after activate desktop
@@ -318,7 +340,7 @@ function GameLogic.After_OnActivateDesktop()
 	end
 end
 -- call this when user first enters a game world.
-function GameLogic.Init(worldObj)
+function GameLogic.Init(worldObj, callbackFunc)
 	GameLogic.InitCommon();
 	GameLogic.IsStarted = true;
 	if(not GameLogic.is_one_time_inited) then
@@ -365,46 +387,51 @@ function GameLogic.Init(worldObj)
 	
 	PhysicsWorld:Init()
 
-	GameLogic.OnBeforeBlockWorldLoaded();
-
-	local sun_light = math.min(1, 1.1-math.abs(ParaScene.GetTimeOfDaySTD()));
-	ParaTerrain.SetBlockWorldSunIntensity(sun_light);
-
-	block_types.block_history = commonlib.List:new();
-	names = block_types.names;
-
-	GameLogic.Pause();
-
-	local bEnableGlobalTerrain = WorldCommon.GetWorldTag("global_terrain") == "true";
-	local attr = ParaTerrain.GetAttributeObject()
-	if(attr:GetField("EnableTerrain", true) ~= bEnableGlobalTerrain) then
-		attr:SetField("EnableTerrain", bEnableGlobalTerrain)
-		attr:SetField("RenderTerrain", bEnableGlobalTerrain)
-	end
-
-	BlockEngine:Connect();
-	BlockEngine:SetGameLogic(GameLogic);
-	GameLogic.SetBlockWorld(ParaBlockWorld.GetWorld(""));
-
-	NeuronSimulator.Init();
+	GameLogic.OnBeforeBlockWorldLoaded(function()
 	
-	GameLogic.LoadGame();
 
-	GameLogic.is_started = true;
+		local sun_light = math.min(1, 1.1-math.abs(ParaScene.GetTimeOfDaySTD()));
+		ParaTerrain.SetBlockWorldSunIntensity(sun_light);
 
-	GameLogic.GetEvents();
+		block_types.block_history = commonlib.List:new();
+		names = block_types.names;
 
-	LOG.std(nil, "system", "GameLogic", "Game Logics is initialized for the current world");
+		GameLogic.Pause();
 
-	collectgarbage("collect");
-	if System.options.isPapaAdventure then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
-		local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
-		PapaAPI:EnterWorld()
-	end
+		local bEnableGlobalTerrain = WorldCommon.GetWorldTag("global_terrain") == "true";
+		local attr = ParaTerrain.GetAttributeObject()
+		if(attr:GetField("EnableTerrain", true) ~= bEnableGlobalTerrain) then
+			attr:SetField("EnableTerrain", bEnableGlobalTerrain)
+			attr:SetField("RenderTerrain", bEnableGlobalTerrain)
+		end
+
+		BlockEngine:Connect();
+		BlockEngine:SetGameLogic(GameLogic);
+		GameLogic.SetBlockWorld(ParaBlockWorld.GetWorld(""));
+
+		NeuronSimulator.Init();
+	
+		GameLogic.LoadGame();
+
+		GameLogic.is_started = true;
+
+		GameLogic.GetEvents();
+
+		LOG.std(nil, "system", "GameLogic", "Game Logics is initialized for the current world");
+
+		collectgarbage("collect");
+		if System.options.isPapaAdventure then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
+			local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+			PapaAPI:EnterWorld()
+		end
+		if(callbackFunc) then
+			callbackFunc();
+		end
+	end);
 end
 
-function GameLogic.OnBeforeBlockWorldLoaded()
+function GameLogic.OnBeforeBlockWorldLoaded(callbackFunc)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/Image3DDisplay.lua");
 	local Image3DDisplay = commonlib.gettable("MyCompany.Aries.Game.Effects.Image3DDisplay");
 	Image3DDisplay.Reset();
@@ -412,6 +439,19 @@ function GameLogic.OnBeforeBlockWorldLoaded()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/Text3DDisplay.lua");
 	local Text3DDisplay = commonlib.gettable("MyCompany.Aries.Game.Effects.Text3DDisplay");
 	Text3DDisplay.InitHeadOnTemplates(true);
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/SwfLoadingBar.lua");
+	local SwfLoadingBar = commonlib.gettable("MyCompany.Aries.Game.GUI.SwfLoadingBar");
+	local isAlreadyPrepared
+	WorldCommon.PrepareAssetUrl(nil, function()
+		if(callbackFunc) then
+			callbackFunc();
+		end	
+		isAlreadyPrepared = true
+	end)
+	if(not isAlreadyPrepared) then
+		SwfLoadingBar.ShowPrepareWorldAsset()
+	end
 end
 
 -- get the current world. 
@@ -420,7 +460,7 @@ function GameLogic.GetWorld()
 end
 
 function GameLogic.getCurrentWorldId( ... )
-	local world  	= GameLogic.world
+	local world = GameLogic.world
 	return world.projectId or world.kpProjectId
 end
 
@@ -444,6 +484,15 @@ function GameLogic.CreateGetAutoSaver()
 	return GameLogic.auto_saver;
 end
 
+function GameLogic.CreateGetEditableWorld()
+	if(not GameLogic.EditableWorld) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/EditableWorld.lua");
+		local EditableWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.EditableWorld");
+		GameLogic.EditableWorld = EditableWorld:new();
+	end
+	return GameLogic.EditableWorld;
+end
+
 -- @return false to disable loading region from file
 function GameLogic.OnBeforeLoadBlockRegion(bContinue, region_x, region_y)
 	-- LOG.std(nil, "system", "BlockEngine", "before load block region %d %d", region_x, region_y);
@@ -459,6 +508,7 @@ function GameLogic.OnLoadBlockRegion(bContinue, region_x, region_y)
 					GameLogic.IsRegionLoadedFired = true
 					LOG.std(nil, "system", "GameLogic", "OnWorldInitialRegionsLoaded");
 					GameLogic.GetFilters():apply_filters("OnWorldInitialRegionsLoaded", true);
+					GameLogic:WorldInitialRegionsLoaded();
 				else
 					timer:Change(500);
 				end
@@ -657,14 +707,23 @@ function GameLogic.GetWorldDirectoryAt(bx, bz)
 	return GameLogic.current_worlddir;
 end
 
+-- only called in the worker thread
+function GameLogic.MultiThreadedInit()
+	if(not NPL.IsMainThread()) then
+		GameLogic.current_worlddir = ParaWorld.GetWorldDirectory();
+
+		GameLogic:InitAPIPath();
+		ItemClient.LoadFromCurrentWorld()
+	end
+end
+
 -- load from the current world directory. 
 function GameLogic.LoadGame()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-	Files:ClearFindFileCache();
 	-- Files:UnloadAllWorldAssets();
 	Files:SafeUnloadAllAssets();
-
+	
 	GameLogic.IsRegionLoadedFired = nil;
 	GameLogic.tickCount = 0;
 
@@ -672,6 +731,8 @@ function GameLogic.LoadGame()
 
 	GameLogic.current_worlddir = ParaWorld.GetWorldDirectory();
 	-- GameLogic.script_dir = GameLogic.current_worlddir.."script/blocks/";
+
+	Files:LoadWorldAssetManifestFile()
 
 	LOG.std(nil, "system", "GameLogic", "loading block world for %s", GameLogic.current_worlddir);
 	
@@ -725,7 +786,8 @@ function GameLogic.LoadGame()
 	ModManager:OnWorldLoad();
 	GameLogic:WorldLoaded()
 	GameLogic.GetFilters():apply_filters("OnWorldLoaded");
-
+	GameLogic.FlushDiskIO()
+	
 	local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
 	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "enter:"..tostring(worldname), 3, nil);
 
@@ -756,6 +818,22 @@ function GameLogic.LoadGame()
 			end
 		end
 	end
+	--check mobilepad model
+	GameLogic.CheckMobilePad()
+end
+
+function GameLogic.CheckMobilePad()
+	if System.os.IsMobilePlatform() or System.options.IsTouchDevice then
+		return 
+	end
+	local key = "Paracraft_System_Touch_Model";
+	local isMobilePad = GameLogic.GetPlayerController():LoadLocalData(key,nil,true);
+	if isMobilePad then
+		GameLogic.RunCommand("/show mobilepad")
+	else
+		GameLogic.RunCommand("/hide mobilepad")
+	end
+	return isMobilePad
 end
 
 function GameLogic.LocalRaceWorldSubmited(data)
@@ -826,10 +904,17 @@ function GameLogic.ToggleGameMode()
 end
 
 function GameLogic.ToggleFly()
-	if(GameMode:CanFly()) then
+	if(GameMode:CanFly() or GameLogic.IsVip()) then
 		GameLogic.GetPlayerController().force_can_fly = true;
 		local entity = EntityManager.GetFocus();
-		if(entity) then
+		if(entity) then	
+			if entity.HasFollowTarget and entity:HasFollowTarget() then
+				entity:SetFollowTarget()
+			end
+			if(entity.IsPlayingMovieFile and entity:IsPlayingMovieFile()) then
+				-- cancel any movie animation. 
+				entity:PlayMovieFile(nil);
+			end
 			if(entity.disable_toggle_fly) then
 				return;
 			end
@@ -870,11 +955,12 @@ end
 -- @param bForceSave: default to nil, if true, we will save regardless the world is readonly or remote. 
 function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 	if(not bForceSave and (System.World.readonly or GameLogic.isRemote)) then
-		_guihelper.MessageBox(format(L"您打开的是只读世界，无法保存。是否另存为本地世界?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
-			if(res and res == _guihelper.DialogResult.Yes) then
-				WorldCommon.SaveWorldAs()
-			end
-		end, _guihelper.MessageBoxButtons.YesNo);
+		-- _guihelper.MessageBox(format(L"您打开的是只读世界，无法保存。是否另存为本地世界?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
+		-- 	if(res and res == _guihelper.DialogResult.Yes) then
+		-- 		WorldCommon.SaveWorldAs()
+		-- 	end
+		-- end, _guihelper.MessageBoxButtons.YesNo);
+		_guihelper.MessageBox(L"您无法保存只读世界。")
 		return false;
 	end
 	if(not EnterGamePage.CheckRight("savegame")) then
@@ -926,7 +1012,9 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 
 	GameLogic.GetFilters():apply_filters("OnSaveWrold");
 	-- GameLogic.SysncHomeWorkWorld()
-	ParaEngine.GetAttributeObject():CallField("FlushDiskIO");
+	GameLogic.FlushDiskIO()
+
+	GameLogic.world_revision:SetUnModified()
 end
 
 -- let a given character to play an animation. 
@@ -950,6 +1038,9 @@ function GameLogic.BeforeRestart(appName)
 end
 
 function GameLogic.Exit(bSoft)
+	if(not GameLogic.is_one_time_inited) then
+		return;
+	end
 	GameLogic.GetFilters():apply_filters("OnWillUnloadWorld");
 	ModManager:OnWillLeaveWorld();
 
@@ -1026,6 +1117,19 @@ function GameLogic.Exit(bSoft)
 
 	GameLogic.current_worlddir = "temp/emptyworld/";
 
+	GameLogic.DisableSaveWorldTip()
+	WorldCommon.CloseWorldAssetUrl()
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+	Files:ClearFindFileCache();
+
+	NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+	ViewportManager:RemoveAllUserDefinedViewports();
+end
+
+function GameLogic.DisableSaveWorldTip()
 	if(GameLogic.saveWorldTipTimer) then
 		GameLogic.saveWorldTipTimer:Change();
 		GameLogic.saveWorldTipTimer = nil;
@@ -1478,6 +1582,13 @@ end
 function GameLogic.WalkForward()
 	local player = EntityManager.GetFocus();
 	if(player) then
+		if player.HasFollowTarget and player:HasFollowTarget() then
+			player:SetFollowTarget(nil)
+		end
+		if(player:IsPlayingMovieFile()) then
+			-- cancel any movie animation. 
+			player:PlayMovieFile(nil);
+		end
 		if(not player:IsControlledExternally()) then
 			if(player.MoveForward) then
 				player:MoveForward(0.2);
@@ -1502,19 +1613,29 @@ local jump_key_timer;
 function GameLogic.DoJump()
 	local player = EntityManager.GetFocus();
 	if(player and player:IsControlledExternally()) then
-		return 
-	end
-	if(GameMode:HasJumpRestriction()) then
-		if(GameLogic.GetPlayerController():IsInWater()) then
-			if(not GameLogic.options.CanJumpInWater) then
-				return false;
-			end
+		if player.HasFollowTarget and player:HasFollowTarget() then
+			player:SetFollowTarget(nil)
+		end
+		if(player:IsPlayingMovieFile()) then
+			-- jump will cancel any movie animation. 
+			player:PlayMovieFile(nil);
 		else
-			if(not GameLogic.options.CanJump) then
-				return false;
-			elseif(not GameLogic.options.CanJumpInAir) then
- 				if(GameLogic.GetPlayerController():IsInAir()) then
+			return;
+		end
+	end
+	if(not player:IsFlying()) then
+		if(GameMode:HasJumpRestriction()) then
+			if(GameLogic.GetPlayerController():IsInWater()) then
+				if(not GameLogic.options.CanJumpInWater) then
 					return false;
+				end
+			else
+				if(not GameLogic.options.CanJump) then
+					return false;
+				elseif(not GameLogic.options.CanJumpInAir) then
+					if(GameLogic.GetPlayerController():IsInAir()) then
+						return false;
+					end
 				end
 			end
 		end
@@ -1588,6 +1709,19 @@ function GameLogic.GetDesktopEntity()
 	end
 end
 
+-- create get global bag entity, which can be shared across multiple worlds.
+function GameLogic.GetGlobalBagEntity()
+	if(GameLogic.globalBagEntity) then
+		return GameLogic.globalBagEntity;
+	else
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/Entity.lua");
+		local Entity = commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity");
+		GameLogic.globalBagEntity = Entity:new():init();
+		GameLogic.globalBagEntity:SetBagSize(16)
+		return GameLogic.globalBagEntity;
+	end
+end
+
 
 -- create get sky entity
 function GameLogic.GetSkyEntity()
@@ -1634,15 +1768,15 @@ end
 
 -- append chat message
 -- @param entity: if not nil, entity display name is prepended
-function GameLogic.AppendChat(text, entity)
+-- @param bAppendToLast: if true, the message is appended to the last message. usually used in console log. 
+function GameLogic.AppendChat(text, entity, bAppendToLast)
 	if(entity) then
 		local name = entity:GetDisplayName();
 		if(name and name~="") then
 			text = name..":"..(text or "");
 		end
 	end
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-	MyCompany.Aries.ChatSystem.ChatWindow.InitSystem();
+	
 	ChatChannel.AppendChat({
 			ChannelIndex=ChatChannel.EnumChannels.NearBy, 
 			words=text,
@@ -1652,6 +1786,7 @@ function GameLogic.AppendChat(text, entity)
 			bHideSubject = true,
 			bHideTooltip = true,
 			bHideColon = true,
+			bAppendToLast = bAppendToLast,
 		});
 end
 
@@ -1734,6 +1869,23 @@ function GameLogic.GetShaderManager()
 	return GameLogic.shader_manager;
 end
 
+-- @param bShow: true to show, false to hide. nil to toggle
+function GameLogic.ShowBuilder(bShow)
+	if(GameMode:IsUseCreatorBag()) then
+		local draggFilter = GameLogic.GetFilters():apply_filters('CodeBlockWindow.IsDragable')
+		if draggFilter == false then 
+			return
+		end
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua");
+		local CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
+		CreatorDesktop.ShowNewPage(bShow);
+	else
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InventoryPage.lua");
+		local InventoryPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InventoryPage");
+		InventoryPage.ShowPage(bShow);
+	end
+end
+
 -- toggle desktop view
 function GameLogic.ToggleDesktop(name)
 	if(name == "esc") then
@@ -1747,15 +1899,7 @@ function GameLogic.ToggleDesktop(name)
 			EscFramePage.ShowPage();
 		end
 	elseif(name == "builder") then
-		if(GameMode:IsUseCreatorBag()) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua");
-			local CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
-			CreatorDesktop.ShowNewPage();
-		else
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InventoryPage.lua");
-			local InventoryPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InventoryPage");
-			InventoryPage.ShowPage();
-		end
+		GameLogic.ShowBuilder();
 	elseif(name == "bag") then
 		if(EntityManager.GetPlayer() ~= EntityManager.GetFocus()) then
 			local player = EntityManager.GetFocus();
@@ -1868,6 +2012,11 @@ function GameLogic.SignIn(title, callbackFunc)
 	end
 end
 
+-- whether the user is signed in
+function GameLogic.IsSignedIn()
+	return GameLogic.GetFilters():apply_filters('is_signed_in')
+end
+
 function GameLogic.CheckSignedIn(desc, callback)
 	GameLogic.GetFilters():apply_filters(
 		"LoginModal.CheckSignedIn",
@@ -1953,7 +2102,7 @@ local errorCount = 1;
 function GameLogic.OnCodeError(errorMessage, stackInfo)
 	errorCount=errorCount+1;
 	if(errorMessage and errorCount < 10000) then
-		if GameLogic.Macros.IsDevMode() then
+		if GameLogic.IsDevMode() then
 			GameLogic.AddBBS("nplError"..(errorCount%3), errorMessage:sub(1, 100), 5000, "255 0 0");
 		else
 			GameLogic.AddBBS("nplError"..(errorCount%3), L"遇到一个未知错误，请稍后再尝试", 5000, "255 0 0");
@@ -2224,7 +2373,7 @@ end
 
 -- @param params: {username=string, userId = id, tabName="skin|honor|nil"} or just username
 function GameLogic.ShowUserInfoPage(params)
-	if System.options.isPapaAdventure or System.options.channelId_431 then
+	if System.options.isPapaAdventure or System.options.isEducatePlatform then
 		--GameLogic.AddBBS(nil,"")
 		return
 	end
@@ -2254,4 +2403,40 @@ end
 
 function GameLogic.SetModified()
 	GameLogic.world_revision:SetModified()
+end
+
+function GameLogic.SendErrorLog(errorTag,errorDesc,errorMessage)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ParacraftDebug.lua");
+	local ParacraftDebug = commonlib.gettable("MyCompany.Aries.Game.Common.ParacraftDebug");
+	ParacraftDebug:SendErrorLog("DevDebugLog", {
+		desc = errorDesc or "SendErrorLog",
+		errorMessage = errorMessage or "SendErrorLog=========",
+		debugTag = errorTag or "commonlib",
+		stackInfo = commonlib.debugstack()
+	})
+end
+commonlib.SendErrorLog = GameLogic.SendErrorLog
+
+function GameLogic.GetMachineID(oldId,bForce)
+	if System.os.GetPlatform()~="android" then
+        return oldId
+    end
+	if oldId and oldId == "" then
+		if bForce then
+			return ParaEngine.GetAttributeObject():GetField('MachineID', '')
+		end
+		local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
+		if PlatformBridge and PlatformBridge.IsAgreePrivacy() then
+			PlatformBridge.onAgreeUserPrivacy()
+			oldId= ParaEngine.GetAttributeObject():GetField('MachineID', '')
+		end
+	end
+	return oldId
+end
+
+function GameLogic.FlushDiskIO()
+	-- emscripten 同步到磁盘
+    if (System.os.IsEmscripten()) then
+        ParaEngine.GetAttributeObject():CallField("FlushDiskIO");
+    end
 end

@@ -30,11 +30,12 @@ Commands["block"] = {
 	desc=[[set a block template's attribute 
 @param block_id: block id or name
 @param attr_name: "speedReduction", "visible", "light", "lightvalue", 
-"obstruction", "blockcamera", "climbable", "solid", "transparent", etc 
+"obstruction", "blockcamera", "climbable", "solid", "transparent", "mirror", etc 
 e.g.
 /block MovieClip visible false     :hide all movie blocks
 /block 8 speedReduction 0.3
 /block 62 light true
+/block 62 mirror true    :requires /shader 3 or above
 /block 52 lightvalue 8
 /block ColorBlock blockcamera false
 /block ColorBlock climbable true
@@ -83,6 +84,9 @@ e.g.
 					elseif(name == "transparent") then
 						value, cmd_text = CmdParser.ParseBool(cmd_text);
 						block_template:SetTransparent(value)
+					elseif(name == "mirror") then
+						value, cmd_text = CmdParser.ParseBool(cmd_text);
+						block_template:SetMirrorSurface(value)
 					elseif(name == "walkSound") then
 						value, cmd_text = CmdParser.ParseString(cmd_text);
 						if value == nil or value == "" then

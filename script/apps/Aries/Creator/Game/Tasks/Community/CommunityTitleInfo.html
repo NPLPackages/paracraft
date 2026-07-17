@@ -1,0 +1,425 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="CommunityTitleInfo.lua">
+<![CDATA[
+CommunityTitleInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityTitleInfo.lua")
+CommunityTitleInfo.OnInit()
+local isGotoWorld = false
+local page = document:GetPageCtrl();
+function ClosePage()
+    CommunityTitleInfo.OnClose()
+end
+
+function GetHeadUrl()
+    return CommunityTitleInfo.GetHeadUrl();
+end
+
+function GetUserData(name)
+    return CommunityTitleInfo.GetUserData(name)
+end
+
+function need_show_login()
+    return  not GameLogic.GetFilters():apply_filters('is_signed_in')
+end
+
+function on_click_login()
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.title_page.click_login", {useNoId=true},true,true);
+    GameLogic.GetFilters():apply_filters('check_signed_in', "请登录", function(result)
+        if result == true then
+            commonlib.TimerManager.SetTimeout(function()
+                CommunityTitleInfo.RefreshPage()
+            end, 500)
+        end
+    end)
+end
+
+function open()
+    if not isGotoWorld then
+        local opus_content = page:GetValue('opus_content', '')
+
+        local pid = get_project_id(opus_content)
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.title_page.loadworld", {content=opus_content,useNoId=true},nil,true);
+        if pid then
+            GameLogic.RunCommand("/loadworld " .. pid)
+
+            if pid and tonumber(pid) == "number" then
+                GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.main_worldID_open', {useNoId = true})
+            end
+        else
+            GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.go_to_url', opus_content)
+        end
+        isGotoWorld = true
+        commonlib.TimerManager.SetTimeout(function()
+            isGotoWorld = false
+        end,2000)
+    end
+end
+
+function get_project_id(opus_content)
+    if (tonumber(opus_content or '') or 9999999) < 9999999 then
+        return opus_content
+    end
+
+    local pid = string.match(opus_content or '', "^p(%d+)$")
+
+    if not pid then
+        pid = string.match(opus_content or '', "/pbl/project/(%d+)")
+    end
+
+    return pid or false
+end
+
+function IsOffline()
+    local offline = not GameLogic.GetFilters():apply_filters('is_signed_in')
+    return false
+end
+
+function ShowRoleInfoPanel()
+    CommunityTitleInfo.ShowRoleInfoPanel()
+end
+
+function OpenVip()
+    CommunityTitleInfo.OnClickVip()
+end
+
+function OpenWebDisk()
+    CommunityTitleInfo.OnClickWebDisk()
+end
+
+function OnLogOut()
+    CommunityTitleInfo.OnClickLogOut()
+end
+
+
+function OpenUserInfo()
+    CommunityTitleInfo.OpenUserInfo()
+end
+
+function OpenMessage()
+    CommunityTitleInfo.OpenMessage()
+end
+
+function get_notice_style()
+    local right = 18
+    local style = "position: relative; width: 60px; height: 30px; margin-top: 14px; margin-right: %dpx;"
+    if Mod.WorldShare.Utils.IsEnglish() then
+        right = 28
+    end
+    if CommunityTitleInfo.IsGameStarted() then
+        right = right + (Mod.WorldShare.Utils.IsEnglish() and 36 or 30)
+    end
+    style = string.format(style, right)
+    return style
+    
+end
+
+function get_msg_style()
+    local right = 96
+    local style = "position: relative; width: 60px; height: 30px; margin-top: 14px; margin-right: %dpx;"
+    if Mod.WorldShare.Utils.IsEnglish() then
+        right = 126
+    end
+    if CommunityTitleInfo.IsGameStarted() then
+        right = right + (Mod.WorldShare.Utils.IsEnglish() and 36 or 30)
+    end
+    style = string.format(style, right)
+    return style
+end
+
+function get_realname_style()
+    local right = 176
+    local style = "position: relative; margin-right: %dpx; margin-top: 18px; width: 18px; height: 19px;"
+    if Mod.WorldShare.Utils.IsEnglish() then
+        right = 206
+    end
+    if CommunityTitleInfo.IsGameStarted() then
+        right = right + (Mod.WorldShare.Utils.IsEnglish() and 36 or 30)
+    end
+    style = string.format(style, right)
+    return style
+end
+
+function OnClickRealname()
+    CommunityTitleInfo.OnClickRealname()
+end
+
+function OnNicknameMouseEnter(name,mcmlNode)
+    local text = page:FindControl("user_nickname")
+    if text then
+        _guihelper.SetFontColor(text, "#FFFFFF")
+    end
+end
+
+function OnNicknameMouseLeave(name,mcmlNode)
+    local text = page:FindControl("user_nickname")
+    if text then
+        _guihelper.SetFontColor(text, "#d3d3d3")
+    end
+end
+
+function GetMenuData()
+    return CommunityTitleInfo.MenuData
+end
+
+function OnClickMenu(name,mcmlNode)
+    CommunityTitleInfo.OnClickMenu(name,mcmlNode)
+end
+
+function OpenImMessage()
+    CommunityTitleInfo.OpenImMessage()
+end
+
+]]>
+</script>
+<style type="text/mcss">
+    {
+        opus_bar_button = {
+            background = 'Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#205 112 86 46',
+        },
+        head_text = {
+            ["base-font-size"] = 14,
+            ["font-size"] = 14,
+            ["font-weight"] = "bold",
+            float = "left",
+            color = "#d3d3d3",
+        },
+    }
+</style>
+    <pe:container zorder="1" alignment="_mt" ClickThrough="true" width="0" style="position: relative; height: 56px; background-color: #262626;">
+        <div style="position: relative; width: 600px; height: 55px;">
+            <div style='float: left; height: 56px;'>
+                <input zorder="2" tooltip='<%=GetUserData("nickname")%>' onmouseenter="OnNicknameMouseEnter()" onmouseleave="OnNicknameMouseLeave()"  type="button" value="" onclick="ShowRoleInfoPanel()" style="position: relative; width: 188px; height: 56px; background: url();"/>
+                <div style="float: left;margin-left: 16px;margin-top: 8px; width: 40px;height: 40px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/touxiang3_96X96_32bits.png#0 0 96 96:16 16 16 16);">
+                    <pe:mc_player name="main_user_player" miniscenegraphname="AvatarUserCharacter" style="width:42px;height:42px;margin-left: -2px; margin-top: -8px;" IsInteractive="false" NoFrameMove="false" RenderTargetSize="44" DefaultCameraObjectDist="3.2" />
+                </div>
+                
+                <div style="float: left;margin-left: 10px;">
+                    <div style="margin-top: 18px;height: 20px;">        
+                        <input type="button" enabled="false" name="user_nickname" value='<%=GetUserData("limit_nickname")%>' style="float: left; text-align: left; background: url(); color: #d3d3d3; font-size: 14px; base-font-size:14px; font-weight: bold;margin-top: 0px;"/>
+                        <pe:if condition='<%= CommunityTitleInfo.IsVip() and not System.options.isHideVip %>'>
+                            <img src="<%=CommunityTitleInfo.GetVipIcon()%>"  style="float: left; width: 48px; height: 16px; margin-top: 4px; margin-left: 0px; "/>
+                        </pe:if>             
+                        
+                    </div>             
+                </div>
+                <pe:if condition='<%= need_show_login()  %>'>
+                    <div zorder="3" style="float: left; margin-left: 5px;margin-top: 18px;">
+                        <div zorder="3" onclick="on_click_login" style="width: 46px;height: 23px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn1_46X23_32bits.png#0 0 46 23)"></div>
+                    </div>
+                </pe:if>
+            </div>
+    
+            <div style='float: left; margin-top: 0px; margin-left: 14px; '>
+                <!-- seach bar -->
+                <div style='background-color: #1a1a1a; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);
+                            width: 300px;
+                            height: 40px;
+                            margin-left: 10px;
+                            margin-top: 10px;'>
+                    <div style='width: 300px;'>
+                        <input type='text'
+                                name='opus_content'
+                                spacing='10'
+                                EmptyText='<%= L"输入作品ID或作品链接" %>'
+                                EmptyTextColor='#ffffffff'
+                                textcolor='#d3d3d3FF'
+                                style='width: 246px;
+                                        height: 40px;
+                                        font-size: 12px;
+                                        base-font-size: 12px;
+                                        text-valign: center;
+                                        background:;'/>
+                        <input type='button'
+                                DefaultButton='true'
+                                style='width: 50px;
+                                        height: 32px;
+                                        text-offset-y: -3px;
+                                        font-weight: bold;
+                                        font-size: 14px;
+                                        base-font-size: 14px;
+                                        margin-top: 4px;
+                                        color: #d3d3d3FF;
+                                        background-color: #333333; 
+                                        background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)'
+                                name='open_button'
+                                onclick='open'
+                                value='<%= L"打开" %>' />
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+        <div style="position: relative; margin-top: 55px; width: 2560px; height: 1px; background-color: #313131ff"></div>
+        <pe:container zorder="1" alignment="_rt" ClickThrough="true" style="position: relative; width: 300px; height: 56px;  background: url();">
+            <pe:if condition="<%=not CommunityTitleInfo.IsVerified() and not CommunityTitleInfo.IsGameStarted() %>">
+                <div align="right" style="<%= get_realname_style() %>">
+                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                        <div onclick="OnClickRealname()" tooltip="<%=L'实名认证'%>" style="width: 18px; height: 19px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#391 151 18 19)"></div>
+                    </pe:if>
+                    <pe:if condition='<%=not Mod.WorldShare.Utils.IsEnglish() %>'>
+                        <div onclick="OnClickRealname()" tooltip="<%=L'实名认证'%>" style="width: 18px; height: 19px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#391 151 18 19)"></div>
+                    </pe:if>
+                </div>
+            </pe:if>
+            <div align="right" style="<%= get_msg_style() %>">
+                <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                    <input type='button' style='
+                                position: relative;
+                                width: 60px;
+                                height: 30px;
+                                text-offset-y: -4px;
+                                font-weight: bold;
+                                font-size: 14px;
+                                base-font-size: 14px;
+                                text-offset-x: 22;
+                                color: #d3d3d3;
+                                background: url();'
+                        icon="Texture/Aries/Creator/keepwork/community_32bits.png#898 108 24 24" 
+                        icon_width="20" 
+                        icon_height="20" 
+                        icon_off_x="-20"        
+                        name='notice_button'
+                        onclick='OpenImMessage()'
+                        value='<%= L"好友" %>' />
+                </pe:if>
+                <pe:if condition='<%=not Mod.WorldShare.Utils.IsEnglish() %>'>
+                    <input type='button' style='
+                            position: relative;
+                            width: 60px;
+                            height: 30px;
+                            text-offset-y: -3px;
+                            font-weight: bold;
+                            font-size: 14px;
+                            base-font-size: 14px;
+                            text-offset-x: 12;
+                            color: #d3d3d3;
+                            background: url();'
+                        icon="Texture/Aries/Creator/keepwork/community_32bits.png#898 108 24 24" 
+                        icon_width="20" 
+                        icon_height="20" 
+                        icon_off_x="-18"        
+                        name='notice_button'
+                        onclick='OpenImMessage()'
+                        value='<%= L"好友" %>' />
+                </pe:if>
+                
+                <pe:container ClickThrough="true" visible="false" uiname="unreaded_msg" style="width: 20px; height: 20px; margin-left: 14px; margin-top: 2px; background: url();"> 
+                    <div style="width: 12px; height: 12px; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#458 106 8 8)">
+                    </div>
+                </pe:container>
+            </div>
+            <div align="right" style="<%= get_notice_style() %>">
+                <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                    <input type='button' style='
+                                position: relative;
+                                width: 60px;
+                                height: 30px;
+                                text-offset-y: -4px;
+                                font-weight: bold;
+                                font-size: 14px;
+                                base-font-size: 14px;
+                                text-offset-x: 22;
+                                color: #d3d3d3;
+                                background: url();'
+                        icon="Texture/Aries/Creator/keepwork/community_32bits.png#956 69 20 20" 
+                        icon_width="20" 
+                        icon_height="20" 
+                        icon_off_x="-20"        
+                        name='notice_button'
+                        onclick='OpenMessage()'
+                        value='<%= L"notice" %>' />
+                </pe:if>
+                <pe:if condition='<%=not Mod.WorldShare.Utils.IsEnglish() %>'>
+                    <input type='button' style='
+                            position: relative;
+                            width: 60px;
+                            height: 30px;
+                            text-offset-y: -3px;
+                            font-weight: bold;
+                            font-size: 14px;
+                            base-font-size: 14px;
+                            text-offset-x: 12;
+                            color: #d3d3d3;
+                            background: url();'
+                        icon="Texture/Aries/Creator/keepwork/community_32bits.png#956 69 20 20" 
+                        icon_width="20" 
+                        icon_height="20" 
+                        icon_off_x="-18"        
+                        name='notice_button'
+                        onclick='OpenMessage()'
+                        value='<%= L"通知" %>' />
+                </pe:if>
+                
+                <pe:container ClickThrough="true" visible="false" uiname="unreaded_notice" style="width: 20px; height: 20px; margin-left: 14px; margin-top: 2px; background: url();"> 
+                    <div style="width: 12px; height: 12px; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#458 106 8 8)">
+                    </div>
+                </pe:container>
+            </div>
+            
+            <pe:if condition="<%=CommunityTitleInfo.IsGameStarted()%>">
+                <div align="right" onclick="ClosePage()" style="position: relative; margin-right: 20px; margin-top: 22px; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#246 238 16 16)"></div>
+            </pe:if>
+        </pe:container>
+        
+        
+    </pe:container>
+    <pe:if condition="<%=not System.options.isHideVip%>">
+        <pe:container  uiname="main_role_panel" zorder="2" visible="false" style="position: relative; width: 164px; height: 374px; margin-top: 50px; margin-left: 20px; background-color: #353536; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+            <div style="float: left; height: 40px; width: 164px;">
+                <pe:if condition="<%=CommunityTitleInfo.IsVip() %>">
+                    <img src="<%=CommunityTitleInfo.GetVipIcon()%>"  style="float: left; width: 48px; height: 16px; margin-top: 10px; margin-left: 10px; "/>
+                    <div onclick="OpenVip()" style="float: left; width: 50px; margin-left: 42px;margin-top: 10px; height: 14px;">
+                        <div style="float: left; color: #75A6FF; font-size: 10px; base-font-size: 10px;"><%=L"去续费"%></div>
+                        <div style="float: left; width: 12px; height: 12px; margin-top: 3px; background-color: #75A6FF; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#486 238 16 16);"></div>
+                    </div>
+                    <div style="color: #7B7A8A; font-size: 10px; base-font-size: 10px; margin-left: 10px; margin-top: 6px;"><%=L"有效期至: "..(CommunityTitleInfo.GetVipDeadLine() or "")%></div>
+                </pe:if>
+                <pe:if condition="<%=not CommunityTitleInfo.IsVip() %>">
+                    <div style="float: left;  margin-top: 10px; margin-left: 10px; width: 48; height: 16px; background-color: #d3d3d333; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#138 238 48 16);"></div>
+                    <div onclick="OpenVip()" style="float: left; width: 70px; margin-left: 28px;margin-top: 10px; height: 14px;">
+                        <div style="float: left; color: #75A6FF; font-size: 10px; base-font-size: 10px;"><%=L"开通会员"%></div>
+                        <div style="float: left; width: 12px; height: 12px; margin-top: 3px; background-color: #75A6FF; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#486 238 16 16);"></div>
+                    </div>
+                    <div style="color: #7B7A8A; font-size: 10px; base-font-size: 10px; margin-left: 10px; margin-top: 6px;"><%=CommunityTitleInfo.GetVipDeadLine()%></div>
+                </pe:if>
+            </div>
+            <div style="margin-top: 12px; margin-left: 12px; width: 140px; height: 1px; background-color: #A8A7B033"></div>
+            <pe:repeat DataSource="<%=GetMenuData()%>" >
+                <pe:repeatitem style="float:left;min-width:140px; ">
+                    <pe:if condition='<%=Eval("name") ~= "logout" %>'>
+                        <input type="button" value='<%=Eval("text")%>' name='<%=Eval("name")%>'  icon="<%=Eval('icon')%>" icon_width="14" icon_height="14" icon_off_x="-62"  onclick="OnClickMenu" style="text-align: left; margin-top: 16px; text-offset-x:32; text-offset-y:1; margin-left: 12px;color:#A8A7B0;font-size:14px; base-font-size:14px; font-weight: bold; min-width:140px;height:20px; background:url()" />
+                    </pe:if>
+                    <pe:if condition='<%=Eval("name") == "logout" %>'>
+                        <div style="margin-top: 16px; margin-left: 12px; width: 140px; height: 1px; background-color: #3B3B3B"></div>
+                        <input type="button" value='<%=Eval("text")%>' name='<%=Eval("name")%>'  icon="<%=Eval('icon')%>" icon_width="14" icon_height="14" icon_off_x="-62"  onclick="OnClickMenu" style="text-align: left; margin-top: 16px; text-offset-x:32; text-offset-y:1; margin-left: 12px;color:#A8A7B0;font-size:14px; base-font-size:14px; font-weight: bold; min-width:140px;height:20px; background:url()" />
+                    </pe:if>
+                </pe:repeatitem>
+            </pe:repeat>
+        </pe:container>
+    </pe:if>
+    <pe:if condition="<%= System.options.isHideVip%>">
+        <pe:container  uiname="main_role_panel" zorder="1" visible="false" style="position: relative; width: 164px; height: 280px; margin-top: 50px; margin-left: 20px; background-color: #353536; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+            <pe:repeat DataSource="<%=GetMenuData()%>" >
+                <pe:repeatitem style="float:left;min-width:140px; ">
+                    <pe:if condition='<%=Eval("name") ~= "logout" %>'>
+                        <input type="button" value='<%=Eval("text")%>' name='<%=Eval("name")%>'  icon="<%=Eval('icon')%>" icon_width="14" icon_height="14" icon_off_x="-62"  onclick="OnClickMenu" style="text-align: left; margin-top: 16px; text-offset-x:32; text-offset-y:1; margin-left: 12px;color:#A8A7B0;font-size:14px; base-font-size:14px; font-weight: bold; min-width:140px;height:20px; background:url()" />
+                    </pe:if>
+                    <pe:if condition='<%=Eval("name") == "logout" %>'>
+                        <div style="margin-top: 16px; margin-left: 12px; width: 140px; height: 1px; background-color: #3B3B3B"></div>
+                        <input type="button" value='<%=Eval("text")%>' name='<%=Eval("name")%>'  icon="<%=Eval('icon')%>" icon_width="14" icon_height="14" icon_off_x="-62"  onclick="OnClickMenu" style="text-align: left; margin-top: 16px; text-offset-x:32; text-offset-y:1; margin-left: 12px;color:#A8A7B0;font-size:14px; base-font-size:14px; font-weight: bold; min-width:140px;height:20px; background:url()" />
+                    </pe:if>
+                </pe:repeatitem>
+            </pe:repeat>
+        </pe:container>
+    </pe:if>
+</pe:mcml>
+</body>
+</html>
+

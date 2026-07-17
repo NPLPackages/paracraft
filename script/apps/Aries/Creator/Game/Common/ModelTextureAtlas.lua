@@ -12,6 +12,7 @@ ModelTextureAtlas:Refresh(filename)
 -------------------------------------------------------
 ]]
 local ModelTextureAtlas = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Common.ModelTextureAtlas"))
+ModelTextureAtlas:Signal("TextureUpdated");
 
 function ModelTextureAtlas:ctor()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/TextureAtlas.lua");
@@ -19,6 +20,7 @@ function ModelTextureAtlas:ctor()
 	self.modelTextureAtlas = TextureAtlas:new():init("model_texture_atlas", 512, 512, 64);
 	LOG.std(nil, "info", "ModelTextureAtlas", "initialized");
 	GameLogic:Connect("WorldUnloaded", ModelTextureAtlas, ModelTextureAtlas.Clear, "UniqueConnection");
+	self.modelTextureAtlas:Connect("TextureUpdated", self, self.TextureUpdated, "UniqueConnection");
 end
 
 function ModelTextureAtlas:Clear()

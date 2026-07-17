@@ -1,0 +1,103 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="OpenAssetFileDialog.lua"><![CDATA[
+OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+OpenAssetFileDialog.OnInit()
+function OnClose()
+    Page:CloseWindow();
+end
+
+function OnSelectFile(treenode)
+    local filename = treenode.mcmlNode:GetPreValue("this").filename;
+    if(filename) then
+        OpenAssetFileDialog.SetText(filename);
+    end
+end
+
+function OnSelectAnim(treenode)
+    local id = treenode.mcmlNode:GetPreValue("this").id;
+    if(id) then
+        OpenAssetFileDialog.OnSelectAnimId(id)
+    end
+end
+]]></script>
+<aries:window mode="thin" title='<%=L"选择一个模型"%>' style="width:1020px;" uiname_onclose="OpenAssetFileDialog.OnClose" onclose="OnClose">
+    <div style="margin-left:0px;margin-top:16px;">
+        <pe:repeat DataSource="<%=OpenAssetFileDialog.GetCategoryButtons()%>">
+            <pe:repeatitem style="float:left;">
+                <pe:if condition='<%=OpenAssetFileDialog.category_index == Eval("index") %>'>
+                    <input type="button" value='<%=Eval("text")%>' uiname='<%="OpenAssetFileDialog.category_"..Eval("name")%>' name='<%=Eval("index")%>' style="margin-right:8px;color:#ffffff; font-weight: bold; font-size:18px;base-font-size:18px;min-width:65px;height:33px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
+                </pe:if>
+                <pe:if condition='<%=OpenAssetFileDialog.category_index ~= Eval("index") %>'>
+                    <input type="button" value='<%=Eval("text")%>' uiname='<%="OpenAssetFileDialog.category_"..Eval("name")%>' name='<%=Eval("index")%>' onclick="OpenAssetFileDialog.OnChangeCategory" style="margin-right:8px;color:#ffffff; font-weight: bold; font-size:18px;base-font-size:18px;min-width:65px;height:33px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+    <div style="margin-top:5px;" class="default">
+        <div style="float:left;width:300px;padding-left:5px;">
+            <div style="width:278px;height:278px;margin-bottom:5px;background-color:#00000080">
+                <pe:canvas3d name="AssetPreview" DefaultRotY="-1.57" DefaultCameraObjectDist="7" autoRotateSpeed="0.12" miniscenegraphname="AssetPreview" RenderTargetSize="512" style="width:278px;height:278px;" />
+                <div style="position:relative;margin-top:-270px;margin-left:5px;height:40px;width:180px;color:#808080;font-size:12px">
+                    <input uiname="OpenAssetFileDialog.btnTakeShapshot" name="btnTakeShapshot" tooltip='<%=L"生成缩略图"%>' type="button" style="margin-right:5px;margin-top:2px;width:16px;height:16px;background:url(Texture/3DMapSystem/common/page_white_camera.png)" onclick="OpenAssetFileDialog.OnTakeSnapShot"/>
+                    <%=L"面数:"%><pe:label name="PolyCount" style="margin-left:5px;margin-top:1px"></pe:label>
+                </div>
+            </div>
+            <pe:treeview ShowIcon="false" name="tvwAnimIds" VerticalScrollBarStep="20" DataSource='<%=OpenAssetFileDialog.GetModelAnimDs()%>' DefaultNodeHeight="30" style="background:url();height:165px;margin-right:15px;">
+                <NodeTemplates>
+                    <NodeTemplate DataType="anim">
+                        <pe:treenode style="height:30px;font-size:18px;base-font-size:18px;font-weight: 400;color:#ffffff" OnClick="OnSelectAnim" can_select="true" text='<%=XPath("this|text") or tostring(XPath("this|id"))%>'></pe:treenode>
+                    </NodeTemplate>
+                </NodeTemplates>
+                <DataNodePlaceholder xpath="*" />
+            </pe:treeview>
+        </div>
+        <div style="float:left;width:675px">
+            <div class="mc_paper_panel" style="padding-top:3px;padding-bottom:3px;">
+                <pe:treeview ShowIcon="false" uiname="OpenAssetFileDialog.tvwFiles" name="tvwFiles" VerticalScrollBarStep="30" DataSource='<%=OpenAssetFileDialog.GetAllFilesWithFilters()%>' DefaultNodeHeight="30" style="height:450px;background:;">
+                    <NodeTemplates>
+                        <NodeTemplate DataType="file">
+                            <pe:treenode uiname='<%="OpenAssetFileDialog.sel."..XPath("this|filename")%>'  style="font-size: 18px; base-font-size:18px;font-weight: 400; height:30px;" indent="15" OnClick="OnSelectFile" can_select="true" text='<%=string.format("%s (%dKB) %s", commonlib.Encoding.DefaultToUtf8(XPath("this|filename")), math.ceil(XPath("this|filesize")/1000), XPath("this|writedate"))%>'></pe:treenode>
+                        </NodeTemplate>
+                        <NodeTemplate DataType="commonfile">
+                            <pe:treenode style="font-size: 18px; base-font-size:18px;font-weight: 400; height:30px;" uiname='<%="OpenAssetFileDialog.sel."..XPath("this|text")%>' indent="15" OnClick="OnSelectFile" can_select="true" text='<%=XPath("this|text")%>'></pe:treenode>
+                        </NodeTemplate>
+                        <NodeTemplate DataType="category">
+                            <pe:treenode style="font-size: 18px; base-font-size:18px;font-weight: 400; height:30px;color:#0066c8" expanded='<%=XPath("this|expanded")%>' text='<%=format("%s (%d)", XPath("this|text"), XPath("this|count") or 0)%>'></pe:treenode>
+                        </NodeTemplate>
+                    </NodeTemplates>
+                    <DataNodePlaceholder xpath="*" />
+                </pe:treeview>
+            </div>
+        </div>
+    </div>
+    <div style="margin-bottom:25px;">
+        <div style="color:#ffffff;margin:8px; font-size: 18px; base-font-size:18px;">
+            <%=OpenAssetFileDialog.GetText()%>
+        </div>
+        <div>
+            <input type="text"
+                   enable_ime="true"
+                   SkipAutoBadWordFilter="true"
+                   MoveViewWhenAttachWithIME="true"
+                   uiname="OpenAssetFileDialog.text"
+                   EmptyText='<%=L"以/或?开头可搜索文件"%>'
+                   name="text"
+                   style="height:36px;width:480px;font-size: 18px; base-font-size:18px;"
+                   onchange="OpenAssetFileDialog.OnTextChange"/>
+            <input type="button" class="mc_light_grey_button_with_fillet" uiname="OpenAssetFileDialog.openfile" name="openfile" value='...' style="font-size: 18px; base-font-size:18px;min-width:45px;height:36px;margin-left:5px;" onclick="OpenAssetFileDialog.OnOpenAssetFileDialog"/>
+            <input type="button" uiname="OpenAssetFileDialog.OK" name="OK" DefaultButton="true" style="font-size: 18px; base-font-size:18px;margin-left:30px;min-width:100px;height:36px;" class="mc_light_grey_button_with_fillet" onclick="OpenAssetFileDialog.OnOK" value='<%=L"确定"%>' />
+            <input type="button" uiname="OpenAssetFileDialog.Cancel" name="Cancel" DefaultButton="true" style="font-size: 18px; base-font-size:18px;margin-left:15px;min-width:100px;height:36px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='<%=L"取消"%>' />
+        </div>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

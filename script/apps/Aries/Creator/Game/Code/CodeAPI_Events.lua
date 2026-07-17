@@ -17,8 +17,15 @@ local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 -- @param name: if nil or "myself", it means clone myself
 -- @param msg: any mesage that is forwarded to clone event
 function env_imp:clone(name, msg)
-	self.codeblock:CreateClone(name, msg)
-	env_imp.checkyield(self);
+	if(not GameLogic.GetCodeGlobal():IsTooManyActors()) then
+		self.codeblock:CreateClone(name, msg)
+		env_imp.checkyield(self);
+	else
+		GameLogic.AddBBS("tooManyActors", L"你创建了太多角色", 5000, "255 0 0")
+		env_imp.checkyield(self);
+		env_imp.log(self, "error: too many actors are created");
+		env_imp.exit(self)
+	end
 end
 
 -- delete current cloned actor
@@ -104,6 +111,17 @@ end
 
 function env_imp:registerClickEvent(callbackFunc)
 	self.codeblock:RegisterClickEvent(callbackFunc);
+
+	if(self.actor and self.actor:IsAgent()) then
+		-- tricky, we will connect entity click to actor connect if it is agent. 
+		if(self.actor:IsActorPickingEnabled()) then
+			local entity = self.actor:GetEntity()
+			if(entity) then
+				entity:Connect("clicked", self.actor, self.actor.OnClick, "UniqueConnection");
+			end
+			self.actor:EnableActorPicking(true)
+		end
+	end
 end
 
 function env_imp:registerBlockClickEvent(blockid, callbackFunc)
@@ -145,13 +163,18 @@ function env_imp:cmd(cmd, p1, p2, p3, p4)
 			end
 		end
 	end
---	if(self.actor) then
---		local entity = self.actor:GetEntity();
---		if(entity:isa(EntityManager.EntityNPC)) then
---			EntityManager.SetLastTriggerEntity(entity);
---		end
---	end
-	return self.codeblock:RunCommand(cmd)
+
+	local result, p1, p2 = self.codeblock:RunCommand(cmd)
+	if(type(result) == "table" and result.callback ~= nil) then
+		-- await for call back function 
+		result.callback = self.co:MakeCallbackFuncAsync(function(result, p1)
+			env_imp.resume(self, result, p1);
+		end)
+		local result, p1 = env_imp.yield(self)
+		return result, p1;
+ 	else
+		return result, p1, p2
+	end
 end
 
 

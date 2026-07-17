@@ -52,6 +52,8 @@ end
 
 
 function RedSummerCampParentsPage.IsHideCharge()
-	local isHide= System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios'
+	local isHide= System.os.GetPlatform() == 'mac' 
+		or System.os.GetPlatform() == 'ios'
+		or System.options.isHideVip
 	return isHide
 end

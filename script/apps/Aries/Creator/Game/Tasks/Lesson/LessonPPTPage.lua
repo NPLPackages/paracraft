@@ -14,6 +14,7 @@ NPL.load("(gl)script/ide/math/StringUtil.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local StringUtil = commonlib.gettable("mathlib.StringUtil");
+local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
 local LessonPPTPage = NPL.export()
 local ppt_file_path = "currentPPT.md"
@@ -115,7 +116,7 @@ end
 function LessonPPTPage.HideBrowser()
     if LessonPPTPage.IsNPLBrowserVisible() then
         page:CallMethod("nplbrowser_pptpage","SetVisible",false)
-        page:CallMethod("nplbrowser_pptpage","Reload","about:blank");
+        page:CallMethod("nplbrowser_pptpage","Reload", NplBrowserPlugin.about_blank_url);
     end
 end
 

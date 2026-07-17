@@ -1,0 +1,821 @@
+<?npl
+-- URL: http://localhost:8099/raw?file=script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/bg_agent.page
+-- page layout (must be on top)
+PAGE_NO_HEADER = true; 
+PAGE_NO_SIDE_BAR = true;
+--[[
+Title: Background Agent Debugger
+Author: LiXizhi
+Date: 2026/2/19
+Desc: Web-based debugger UI for BackgroundAgent.
+  Most UI and logic is in bg_agent.js.
+  WebSocket endpoint: ws://<host>/ajax/raw?file=script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/bg_agent.page&action=handshake
+  Legacy AJAX endpoint: /ajax/raw?file=script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/bg_agent.page&action=<action_name> (still available)
+]]
+
+if(is_ajax()) then
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/BackgroundAgent.lua");
+    local BackgroundAgent = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.BackgroundAgent");
+    local agent = BackgroundAgent:GetInstance();
+
+    -- Reject all AJAX calls if the game world is not yet fully loaded.
+    local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+    if not GameLogic or not GameLogic.IsRegionLoadedFired then
+        wp_send_json({error = "game not ready"}, true);
+        return;
+    end
+
+    -----------------------------------------------------------
+    -- WebSocket handshake  (action=handshake)
+    -----------------------------------------------------------
+    add_action('wp_ajax_handshake', function()
+        NPL.load("(gl)script/ide/System/Encoding/sha1.lua");
+        local Encoding = commonlib.gettable("System.Encoding");
+
+        local key = request:header("Sec-WebSocket-Key");
+        if not key or key == "" then
+            response:status(400):send("missing Sec-WebSocket-Key");
+            return;
+        end
+
+        key = key .. "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+        key = Encoding.sha1(key, "base64");
+
+        response.headers = {};
+        response:add_header("status", "101 Switching Protocols");
+        response:set_header("Connection", "Upgrade");
+        response:set_header("Upgrade", "websocket");
+        response:set_header("Sec-WebSocket-Accept", key);
+        response:send_headers();
+
+        local tid = request.nid;
+        NPL.load("(gl)script/ide/System/os/network/WebSocket/WebSocketServer.lua");
+        local WebSocketServer = commonlib.gettable("System.os.network.WebSocketServer");
+
+        local nid = "ws_bgagent_" .. tostring(tid);
+        WebSocketServer:AddClient(tid, nid);
+
+        -- Send initial snapshot of agent state to the new client.
+        -- NPL.load returns the exported module table (BgAgentWS singleton).
+        local BgAgentWS = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/bg_agent_ws_server.lua");
+        if BgAgentWS and BgAgentWS.HandleConnect then
+            BgAgentWS:HandleConnect(nid);
+        end
+    end)
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/BackgroundAgent.lua");
+    local BackgroundAgent = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.BackgroundAgent");
+
+    -- Helper: get singleton instance (may be nil if not yet created)
+    local function GetAgent()
+        return BackgroundAgent:GetInstance();
+    end
+
+    -----------------------------------------------------------
+    -- Polling / status
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_status', function()
+        local agent = GetAgent();
+        local ttsStatus = agent:GetTTSQueueStatus();
+        local status = {
+            playbackState    = agent:GetPlaybackState(),
+            debugEnabled     = agent:IsDebugEnabled(),
+            stepInProgress   = agent:IsStepInProgress(),
+            isEnabled        = agent:IsEnabled(),
+            isObservationMode = agent:IsObservationMode(),
+            autoSpeakEnabled = agent:IsAutoSpeakEnabled(),
+            isTTSPlaying     = ttsStatus and ttsStatus.isPlaying or false,
+            hasTask          = agent:GetPrimaryLearningTask() ~= nil,
+            chatCount        = agent:GetChatMessageCount(),
+            llmCount         = agent:GetLLMHistoryCount(),
+            voicePending     = agent:GetPendingVoiceCount(),
+            tts              = ttsStatus,
+            uiToolQueue      = agent:GetUIToolQueueStatus(),
+        };
+        do
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/SceneVisionManager.lua");
+            local SVM = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.SceneVisionManager");
+            status.sceneVisionPassiveMode = SVM.passiveMode or false;
+        end
+        local task = agent:GetPrimaryLearningTask();
+        if task then
+            status.taskId   = task.id;
+            status.taskText = task.text;
+        end
+        local progress = agent:GetLearningProgress();
+        if progress then
+            status.learningPercentage = progress.learningPercentage;
+            status.totalAttempts      = progress.totalAttempts;
+            status.totalCorrect       = progress.totalCorrect;
+        end
+        wp_send_json(status, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Playback controls
+    -----------------------------------------------------------
+    add_action('wp_ajax_play', function()
+        local agent = GetAgent();
+        agent:Play();
+        wp_send_json({success = true, state = agent:GetPlaybackState()}, true);
+    end)
+
+    add_action('wp_ajax_pause', function()
+        local agent = GetAgent();
+        agent:Pause();
+        wp_send_json({success = true, state = agent:GetPlaybackState()}, true);
+    end)
+
+    add_action('wp_ajax_stop', function()
+        local agent = GetAgent();
+        agent:Stop();
+        wp_send_json({success = true, state = agent:GetPlaybackState()}, true);
+    end)
+
+    add_action('wp_ajax_step', function()
+        local agent = GetAgent();
+        agent:Step();
+        wp_send_json({success = true, stepping = true}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Chat history
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_chat_history', function()
+        local agent = GetAgent();
+        local msgs = agent:GetChatMessageHistory() or {};
+        local out = {};
+        for i, m in ipairs(msgs) do
+            out[#out+1] = {role = m.role, content = m.content, timestamp = m.timestamp, isComplete = m.isComplete};
+        end
+        wp_send_json({messages = out}, true);
+    end)
+
+    add_action('wp_ajax_send_message', function()
+        local text = request:get("text");
+        if not text or text == "" then
+            wp_send_json({error = "empty message"}, true);
+            return;
+        end
+        local agent = GetAgent();
+        agent:ProcessWithLLM(text, function(result)
+            -- response already sent; result processed asynchronously
+        end);
+        wp_send_json({success = true, queued = true}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- LLM call history
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_llm_history', function()
+        local agent = GetAgent();
+        local count = agent:GetLLMHistoryCount();
+        local maxEntries = tonumber(request:get("max")) or 20;
+        local entries = {};
+        for i = 1, math.min(count, maxEntries) do
+            local e = agent:GetFormattedLLMEntry(i);
+            if e then entries[#entries+1] = e; end
+        end
+        wp_send_json({count = count, entries = entries}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Context history (scene vision + voice combined)
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_context_history', function()
+        local agent = GetAgent();
+        local maxEntries = tonumber(request:get("max")) or 20;
+        local entries = agent:GetFormattedContextHistory(maxEntries);
+        wp_send_json({entries = entries or {}}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Learning progress
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_learning_progress', function()
+        local agent = GetAgent();
+        local progress = agent:GetLearningProgress();
+        local summary  = agent:GetLearningProgressSummary();
+        wp_send_json({progress = progress, summary = summary}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Discovered copilots
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_copilots', function()
+        local agent = GetAgent();
+        local copilots = agent:GetDiscoveredCopilots() or {};
+        local out = {};
+        for _, c in ipairs(copilots) do
+            out[#out+1] = {name = c.name, displayName = c.displayName, toolCount = c.tools and #c.tools or 0};
+        end
+        wp_send_json({copilots = out}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Registered tools
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_tools', function()
+        local agent = GetAgent();
+        local defs = agent:GetAllToolDefinitions() or {};
+        wp_send_json({tools = defs}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- User profile
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_user_profile', function()
+        local agent = GetAgent();
+        wp_send_json({profile = agent:GetUserProfile()}, true);
+    end)
+
+    add_action('wp_ajax_set_user_profile', function()
+        local agent = GetAgent();
+        local age  = tonumber(request:get("age"));
+        local name = request:get("name");
+        local primary   = request:get("primaryLanguage");
+        local secondary = request:get("secondaryLanguage");
+        agent:SetUserProfile({age = age, name = name, primaryLanguage = primary, secondaryLanguage = secondary});
+        wp_send_json({success = true, profile = agent:GetUserProfile()}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Primary learning task
+    -----------------------------------------------------------
+    add_action('wp_ajax_set_task', function()
+        local text = request:get("text");
+        local agent = GetAgent();
+        agent:SetPrimaryLearningTask(text);
+        wp_send_json({success = true}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Dialog debug info
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_dialog_debug', function()
+        local agent = GetAgent();
+        local info = agent:GetDialogDebugInfo();
+        wp_send_json({info = info or {}}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- System prompt
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_system_prompt', function()
+        local agent = GetAgent();
+        local prompt = agent:GetCachedSystemPrompt();
+        wp_send_json({prompt = prompt or ""}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Scene text context (lightweight, no screenshot)
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_scene_context', function()
+        local agent = GetAgent();
+        local ctx = agent:GetSceneTextContext();
+        wp_send_json({context = ctx or {}}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- TTS controls
+    -----------------------------------------------------------
+    add_action('wp_ajax_tts_stop', function()
+        local agent = GetAgent();
+        agent:StopTTS();
+        wp_send_json({success = true}, true);
+    end)
+
+    add_action('wp_ajax_tts_clear_queue', function()
+        local agent = GetAgent();
+        agent:ClearTTSQueue();
+        wp_send_json({success = true}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Clear histories
+    -----------------------------------------------------------
+    add_action('wp_ajax_clear_chat', function()
+        local agent = GetAgent();
+        agent:ClearChatHistory();
+        wp_send_json({success = true}, true);
+    end)
+
+    add_action('wp_ajax_clear_llm_history', function()
+        local agent = GetAgent();
+        agent:ClearLLMHistory();
+        wp_send_json({success = true}, true);
+    end)
+
+    add_action('wp_ajax_clear_voice_history', function()
+        local agent = GetAgent();
+        agent:ClearVoiceHistory();
+        wp_send_json({success = true}, true);
+    end)
+
+    add_action('wp_ajax_clear_scene_vision', function()
+        local agent = GetAgent();
+        agent:ClearSceneVisionHistory();
+        wp_send_json({success = true}, true);
+    end)
+
+    add_action('wp_ajax_set_scene_vision_passive', function()
+        local val = request:get("enabled");
+        local enabled = (val == "1" or val == "true");
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/SceneVisionManager.lua");
+        local SVM = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.SceneVisionManager");
+        SVM:SetPassiveMode(enabled);
+        wp_send_json({success = true, passiveMode = SVM.passiveMode or false}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Refresh copilots
+    -----------------------------------------------------------
+    add_action('wp_ajax_refresh_copilots', function()
+        local agent = GetAgent();
+        agent:RefreshCopilots();
+        local copilots = agent:GetDiscoveredCopilots() or {};
+        wp_send_json({success = true, count = #copilots}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Debug mode toggle
+    -----------------------------------------------------------
+    add_action('wp_ajax_set_debug_enabled', function()
+        local val = request:get("enabled");
+        local enabled = (val == "1" or val == "true");
+        local agent = GetAgent();
+        agent:SetDebugEnabled(enabled);
+        wp_send_json({success = true, debugEnabled = agent:IsDebugEnabled()}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Observation mode
+    -----------------------------------------------------------
+    add_action('wp_ajax_set_observation_mode', function()
+        local val = request:get("enabled");
+        local enabled = (val == "1" or val == "true");
+        local agent = GetAgent();
+        agent:SetObservationMode(enabled);
+        wp_send_json({success = true, observationMode = agent:IsObservationMode()}, true);
+    end)
+
+    add_action('wp_ajax_trigger_observation', function()
+        local agent = GetAgent();
+        agent:TriggerProactiveObservation();
+        wp_send_json({success = true}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Auto-speak (TTS)
+    -----------------------------------------------------------
+    add_action('wp_ajax_set_auto_speak', function()
+        local val = request:get("enabled");
+        local enabled = (val == "1" or val == "true");
+        local agent = GetAgent();
+        agent:SetAutoSpeakEnabled(enabled);
+        wp_send_json({success = true, autoSpeakEnabled = agent:IsAutoSpeakEnabled()}, true);
+    end)
+
+    add_action('wp_ajax_get_tts_buffer', function()
+        local agent = GetAgent();
+        wp_send_json({buffer = agent:GetTTSBufferContent() or ""}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Scene vision history
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_scene_vision_history', function()
+        local agent = GetAgent();
+        local history = agent:GetSceneVisionHistory() or {};
+        local maxEntries = tonumber(request:get("max")) or 20;
+        local out = {};
+        local startIdx = math.max(1, #history - maxEntries + 1);
+        for i = startIdx, #history do
+            local e = history[i];
+            if e then
+                out[#out+1] = {timestamp = e.timestamp, imageUrl = e.imageUrl, description = e.description, imagePath = e.imagePath};
+            end
+        end
+        wp_send_json({entries = out, total = #history}, true);
+    end)
+
+    add_action('wp_ajax_get_latest_scene_vision', function()
+        local agent = GetAgent();
+        local e = agent:GetLatestSceneVision();
+        if e then
+            wp_send_json({entry = {timestamp = e.timestamp, imageUrl = e.imageUrl, description = e.description}}, true);
+        else
+            wp_send_json({entry = nil}, true);
+        end
+    end)
+
+    -----------------------------------------------------------
+    -- Voice history
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_voice_history', function()
+        local agent = GetAgent();
+        local history = agent:GetVoiceHistory() or {};
+        local maxEntries = tonumber(request:get("max")) or 20;
+        local out = {};
+        local startIdx = math.max(1, #history - maxEntries + 1);
+        for i = startIdx, #history do
+            local e = history[i];
+            if e then
+                out[#out+1] = {timestamp = e.timestamp, transcript = e.transcript, confidence = e.confidence};
+            end
+        end
+        wp_send_json({entries = out, total = #history}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Learning state persistence
+    -----------------------------------------------------------
+    add_action('wp_ajax_reset_learning_progress', function()
+        local agent = GetAgent();
+        agent:ResetLearningProgress();
+        wp_send_json({success = true}, true);
+    end)
+
+    add_action('wp_ajax_save_learning_state', function()
+        local agent = GetAgent();
+        agent:SaveLearningState();
+        wp_send_json({success = true}, true);
+    end)
+
+    add_action('wp_ajax_load_learning_state', function()
+        local taskId = request:get("taskId");
+        if taskId == "" then taskId = nil; end
+        local agent = GetAgent();
+        local ok = agent:LoadLearningState(taskId);
+        wp_send_json({success = ok}, true);
+    end)
+
+    add_action('wp_ajax_clear_learning_state', function()
+        local taskId = request:get("taskId");
+        if taskId == "" then taskId = nil; end
+        local agent = GetAgent();
+        agent:ClearLearningState(taskId);
+        wp_send_json({success = true}, true);
+    end)
+
+    add_action('wp_ajax_list_saved_tasks', function()
+        local agent = GetAgent();
+        local tasks = agent:ListSavedLearningTasks() or {};
+        wp_send_json({tasks = tasks}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Update interval
+    -----------------------------------------------------------
+    add_action('wp_ajax_set_update_interval', function()
+        local interval = tonumber(request:get("interval"));
+        if not interval or interval < 100 then
+            wp_send_json({error = "invalid interval (min 100ms)"}, true);
+            return;
+        end
+        local agent = GetAgent();
+        agent:SetUpdateInterval(interval);
+        wp_send_json({success = true, interval = interval}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Context summary / scene changes
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_context_summary', function()
+        local agent = GetAgent();
+        wp_send_json({summary = agent:GetContextHistorySummary() or ""}, true);
+    end)
+
+    add_action('wp_ajax_get_recent_scene_changes', function()
+        local agent = GetAgent();
+        wp_send_json({summary = agent:GetRecentSceneChangesSummary() or ""}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- System prompt management
+    -----------------------------------------------------------
+    add_action('wp_ajax_set_system_prompt', function()
+        local prompt = request:get("prompt") or "";
+        local agent = GetAgent();
+        agent:SetSystemPrompt(prompt);
+        wp_send_json({success = true}, true);
+    end)
+
+    add_action('wp_ajax_invalidate_system_prompt', function()
+        local agent = GetAgent();
+        agent:InvalidateSystemPromptCache();
+        wp_send_json({success = true}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- UI tool queue
+    -----------------------------------------------------------
+    add_action('wp_ajax_clear_uitool_queue', function()
+        local agent = GetAgent();
+        agent:ClearUIToolQueue();
+        wp_send_json({success = true}, true);
+    end)
+
+    -----------------------------------------------------------
+    -- Last step inspection
+    -----------------------------------------------------------
+    add_action('wp_ajax_get_last_step', function()
+        local agent = GetAgent();
+        local ctx    = agent:GetLastStepContext();
+        local result = agent:GetLastStepResult();
+        wp_send_json({context = ctx, result = result}, true);
+    end)
+
+    return;
+end
+?>
+<script src="https://cdn.keepwork.com/sdk/keepworkSDK.iife.js?v=1.0.21d"></script>
+<script src="https://cdn.keepwork.com/keepwork/cdn/tailwindcss@3.4.16.js"></script>
+<script>
+tailwind.config = {
+    darkMode: 'class',
+    theme: {
+        extend: {
+            colors: {
+                base:    '#1e1e2e',
+                surface: '#282840',
+                card:    '#2a2a3e',
+                input:   '#1a1a2e',
+                border:  '#45475a',
+                txt:     '#cdd6f4',
+                txtsec:  '#a6adc8',
+                muted:   '#6c7086',
+                blue:    '#89b4fa',
+                green:   '#a6e3a1',
+                yellow:  '#f9e2af',
+                red:     '#f38ba8',
+                mauve:   '#cba6f7',
+            }
+        }
+    }
+}
+</script>
+<script>
+// Override theme viewport so the page is not scaled down in small windows
+(function(){
+    var m = document.querySelector('meta[name="viewport"]');
+    if(m) m.setAttribute('content','width=device-width, initial-scale=1.0');
+    else { m = document.createElement('meta'); m.name='viewport'; m.content='width=device-width, initial-scale=1.0'; document.head.appendChild(m); }
+})();
+</script>
+<style>
+html{font-size:min(14px, 1.5625vw)}
+*{box-sizing:border-box}
+body{margin:0;background:#1e1e2e;color:#cdd6f4;font-family:'Segoe UI',system-ui,sans-serif;font-size:1rem}
+::-webkit-scrollbar{width:0.4rem}
+::-webkit-scrollbar-track{background:#313244}
+::-webkit-scrollbar-thumb{background:#585b70;border-radius:0.2rem}
+#app{overflow:hidden}
+#imgPreview{position:fixed;z-index:9999;pointer-events:none;display:none;max-width:340px;background:#1a1a2e;border:1px solid #45475a;border-radius:6px;padding:3px;box-shadow:0 4px 24px rgba(0,0,0,.75)}
+#imgPreview img{max-width:334px;max-height:220px;object-fit:contain;border-radius:4px;display:block}
+#imgPreviewUrl{margin-top:4px;padding:2px 4px;font-size:10px;color:#89b4fa;word-break:break-all;white-space:normal;line-height:1.3}
+</style>
+<script>
+(function(){
+    function fitApp(){
+        var app = document.getElementById('app');
+        if(!app) return;
+        var top = app.getBoundingClientRect().top + window.pageYOffset;
+        app.style.height = (window.innerHeight - top) + 'px';
+    }
+    document.addEventListener('DOMContentLoaded', fitApp);
+    window.addEventListener('resize', fitApp);
+    // Also run immediately in case DOM is already ready
+    fitApp();
+})();
+</script>
+
+<div id="app" class="flex flex-col gap-2">
+
+    <!-- Toolbar -->
+    <div class="flex items-center gap-1.5 px-3 py-1.5 bg-surface rounded-lg border border-border flex-shrink-0 flex-wrap">
+        <span class="font-bold text-mauve text-sm mr-2">&#x1F916;Agent</span>
+        <span class="w-px h-5 bg-border mx-1"></span>
+        <span id="stateBadge" class="px-2 py-0.5 rounded-full text-xs font-semibold uppercase"></span>
+        <span class="w-px h-5 bg-border mx-1"></span>
+        <button onclick="Agent.play()" class="px-2.5 py-1 text-xs rounded bg-blue text-base font-medium hover:opacity-85">&#9654; Play</button>
+        <button onclick="Agent.pause()" class="px-2.5 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#10074;&#10074; Pause</button>
+        <button onclick="Agent.stop()" class="px-2.5 py-1 text-xs rounded bg-red text-base font-medium hover:opacity-85">&#9632; Stop</button>
+        <button onclick="Agent.step()" class="px-2.5 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x21B3; Step</button>
+        <span class="w-px h-5 bg-border mx-1"></span>
+        <span id="llmCount" class="text-xs text-muted">LLM: 0</span>
+        <span id="chatCount" class="text-xs text-muted ml-1">Chat: 0</span>
+        <span class="w-px h-5 bg-border mx-1"></span>
+        <button onclick="Agent.refreshAll()" class="px-2 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x21BB; Refresh</button>
+        <span class="w-px h-5 bg-border mx-1"></span>
+        <button id="debugBtn" onclick="Agent.toggleDebug()" class="px-2.5 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border">Debug: OFF</button>
+        <button id="obsBtn" onclick="Agent.toggleObservationMode()" class="px-2.5 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border">Obs: OFF</button>
+        <button id="autoSpeakBtn" onclick="Agent.toggleAutoSpeak()" class="px-2.5 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x1F50A; AutoSpeak: OFF</button>
+        <button id="visionPassiveBtn" onclick="Agent.toggleVisionPassive()" class="px-2.5 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x1F4F7; Vision: Active</button>
+        <button onclick="Agent.triggerObservation()" class="px-2.5 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x1F441; Observe</button>
+        <button onclick="Agent.clearUIToolQueue()" class="px-2.5 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x1F9F9; UIQ</button>
+        <span id="wsBadge" class="ml-auto px-2 py-0.5 rounded-full text-xs font-semibold bg-surface text-muted" title="WebSocket connection status">WS: &#x25CF; connecting</span>
+        <button id="btn-open-logs" onclick="toggleLogDrawer()" class="px-2.5 py-1 text-xs rounded bg-card text-txt border border-border hover:bg-border" title="Open Chat Log Viewer (slide in)">&#x1F4DC; Logs</button>
+    </div>
+
+    <!-- Main 3-column -->
+    <div class="flex flex-1 gap-2 min-h-0">
+
+        <!-- Left Column -->
+        <div class="w-80 flex-shrink-0 flex flex-col gap-2">
+            <!-- Status -->
+            <div class="bg-card border border-border rounded-lg flex flex-col">
+                <div class="px-2.5 py-1.5 text-xs font-semibold text-blue border-b border-border">Status</div>
+                <div id="statusPanel" class="p-2 text-xs space-y-0.5"></div>
+            </div>
+            <!-- Left Tabs -->
+            <div class="bg-card border border-border rounded-lg flex-1 flex flex-col min-h-0">
+                <div class="flex border-b border-border flex-shrink-0">
+                    <button onclick="Agent.setLeftTab('tools')" data-ltab="tools" class="ltab px-3 py-1.5 text-xs text-muted border-b-2 border-transparent">Tools <span id="toolsBadge" class="text-xs bg-surface px-1.5 rounded-full">0</span></button>
+                    <button onclick="Agent.setLeftTab('copilots')" data-ltab="copilots" class="ltab px-3 py-1.5 text-xs text-muted border-b-2 border-transparent">Copilots <span id="copilotsBadge" class="text-xs bg-surface px-1.5 rounded-full">0</span></button>
+                    <button onclick="Agent.setLeftTab('task')" data-ltab="task" class="ltab px-3 py-1.5 text-xs text-muted border-b-2 border-transparent">Task</button>
+                    <button onclick="Agent.setLeftTab('vision')" data-ltab="vision" class="ltab px-3 py-1.5 text-xs text-muted border-b-2 border-transparent">Vision <span id="visionBadge" class="text-xs bg-surface px-1.5 rounded-full">0</span></button>
+                </div>
+                <div id="leftTabTools" class="flex-1 overflow-y-auto p-1 hidden"></div>
+                <div id="leftTabCopilots" class="flex-1 overflow-y-auto p-1 hidden">
+                    <button onclick="Agent.refreshCopilots()" class="mb-1 px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x21BB; Refresh</button>
+                    <div id="copilotsList"></div>
+                </div>
+                <div id="leftTabTask" class="flex-1 overflow-y-auto p-2 hidden">
+                    <div class="text-xs text-muted mb-1">Primary Learning Task</div>
+                    <textarea id="taskInput" rows="6" class="w-full bg-input text-txt border border-border rounded p-1.5 text-xs resize-y outline-none focus:border-blue"></textarea>
+                    <button onclick="Agent.setTask()" class="mt-1.5 px-2.5 py-1 text-xs rounded bg-blue text-base font-medium hover:opacity-85">Set Task</button>
+                </div>
+                <div id="leftTabVision" class="flex-1 overflow-y-auto p-1 hidden">
+                    <div class="flex gap-1 mb-1.5 flex-wrap">
+                        <button onclick="Agent.fetchVision()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x21BB; Refresh</button>
+                        <button onclick="Agent.clearSceneVision()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Clear Vision</button>
+                        <button onclick="Agent.clearVoiceHistory()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Clear Voice</button>
+                    </div>
+                    <div id="visionList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center: Chat -->
+        <div class="flex-1 flex flex-col bg-card border border-border rounded-lg min-w-0">
+            <div class="px-2.5 py-1.5 text-xs font-semibold text-blue border-b border-border flex justify-between items-center flex-shrink-0">
+                <span>Chat</span>
+                <span class="flex items-center gap-1">
+                    <span id="chatBadge" class="text-xs bg-surface px-1.5 rounded-full text-muted">0</span>
+                    <button onclick="Agent.clearChat()" class="px-1.5 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Clear</button>
+                </span>
+            </div>
+            <div id="chatScroll" class="flex-1 overflow-y-auto p-1.5 min-h-0"></div>
+            <div class="flex gap-1.5 p-1.5 border-t border-border flex-shrink-0">
+                <input id="chatInput" type="text" placeholder="Send a message..." class="flex-1 bg-input border border-border rounded px-2 py-1.5 text-xs text-txt outline-none focus:border-blue">
+                <button onclick="Agent.sendMessage()" class="px-3 py-1 text-xs rounded bg-blue text-base font-medium hover:opacity-85">Send</button>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="w-[21rem] flex-shrink-0 flex flex-col gap-2">
+            <!-- LLM History -->
+            <div class="flex-1 flex flex-col bg-card border border-border rounded-lg min-h-0">
+                <div class="px-2.5 py-1.5 text-xs font-semibold text-blue border-b border-border flex justify-between items-center flex-shrink-0">
+                    <span>LLM History</span>
+                    <span class="flex items-center gap-1">
+                        <span id="llmBadge" class="text-xs bg-surface px-1.5 rounded-full text-muted">0</span>
+                        <button onclick="Agent.clearLLMHistory()" class="px-1.5 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Clear</button>
+                    </span>
+                </div>
+                <div id="llmList" class="flex-1 overflow-y-auto p-1 min-h-0"></div>
+            </div>
+            <!-- Right Tabs: Context / Progress / Prompt -->
+            <div class="flex-1 flex flex-col bg-card border border-border rounded-lg min-h-0">
+                <div class="flex border-b border-border flex-shrink-0 flex-wrap">
+                    <button onclick="Agent.setRightTab('context')" data-rtab="context" class="rtab px-3 py-1.5 text-xs text-muted border-b-2 border-transparent">Context</button>
+                    <button onclick="Agent.setRightTab('progress')" data-rtab="progress" class="rtab px-3 py-1.5 text-xs text-muted border-b-2 border-transparent">Progress</button>
+                    <button onclick="Agent.setRightTab('prompt')" data-rtab="prompt" class="rtab px-3 py-1.5 text-xs text-muted border-b-2 border-transparent">Prompt</button>
+                    <button onclick="Agent.setRightTab('voice')" data-rtab="voice" class="rtab px-3 py-1.5 text-xs text-muted border-b-2 border-transparent">Voice <span id="voiceBadge" class="text-xs bg-surface px-1.5 rounded-full">0</span></button>
+                    <button onclick="Agent.setRightTab('step')" data-rtab="step" class="rtab px-3 py-1.5 text-xs text-muted border-b-2 border-transparent">Last Step</button>
+                </div>
+                <div id="rightTabContext" class="flex-1 overflow-y-auto p-1 hidden"></div>
+                <div id="rightTabProgress" class="flex-1 overflow-y-auto p-2 hidden">
+                    <div class="flex gap-1 flex-wrap mb-2">
+                        <button onclick="Agent.resetLearningProgress()" class="px-2 py-0.5 text-xs rounded bg-red/20 text-red border border-red/40 hover:bg-red/30">Reset</button>
+                        <button onclick="Agent.saveLearningState()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Save</button>
+                        <button onclick="Agent.loadLearningState()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Load</button>
+                        <button onclick="Agent.clearLearningState()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Clear State</button>
+                    </div>
+                    <pre id="progressPre" class="whitespace-pre-wrap text-txtsec text-xs">No learning progress data</pre>
+                </div>
+                <div id="rightTabPrompt" class="flex-1 overflow-y-auto p-1.5 hidden">
+                    <div class="flex gap-1 mb-1.5 flex-wrap">
+                        <button onclick="Agent.loadSystemPrompt()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Load</button>
+                        <button onclick="Agent.invalidateSystemPrompt()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Invalidate Cache</button>
+                    </div>
+                    <pre id="promptPre" class="whitespace-pre-wrap text-txtsec text-xs mb-2">Click Load to fetch system prompt</pre>
+                    <div class="text-xs text-muted mb-1">Override system prompt:</div>
+                    <textarea id="promptInput" rows="4" class="w-full bg-input text-txt border border-border rounded p-1.5 text-xs resize-y outline-none focus:border-blue" placeholder="Paste custom system prompt here..."></textarea>
+                    <button onclick="Agent.setSystemPrompt()" class="mt-1 px-2.5 py-1 text-xs rounded bg-blue text-base font-medium hover:opacity-85">Set Prompt</button>
+                </div>
+                <div id="rightTabVoice" class="flex-1 overflow-y-auto p-1 hidden">
+                    <div class="flex gap-1 mb-1.5">
+                        <button onclick="Agent.fetchVoiceHistory()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x21BB; Refresh</button>
+                        <button onclick="Agent.clearVoiceHistory()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">Clear</button>
+                    </div>
+                    <div id="voiceList"></div>
+                </div>
+                <div id="rightTabStep" class="flex-1 overflow-y-auto p-1.5 hidden">
+                    <button onclick="Agent.fetchLastStep()" class="mb-1.5 px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x21BB; Refresh</button>
+                    <div id="stepPanel"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image hover preview -->
+<div id="imgPreview"><img id="imgPreviewImg" src="" alt="screenshot"><div id="imgPreviewUrl"></div></div>
+
+<!-- Log Drawer -->
+<div id="log-drawer-backdrop"
+     style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40;opacity:0;pointer-events:none;transition:opacity 0.3s ease;"
+     onclick="closeLogDrawer()"></div>
+<div id="log-drawer"
+     style="position:fixed;top:0;right:0;height:100vh;width:min(80vw,1024px);z-index:50;
+            background:#1e1e2e;border-left:1px solid #45475a;display:flex;flex-direction:column;
+            transform:translateX(100%);transition:transform 0.32s cubic-bezier(.4,0,.2,1);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;
+                background:#282840;border-bottom:1px solid #45475a;flex-shrink:0;">
+        <span style="font-size:13px;font-weight:600;color:#a6adc8;">&#x1F4DC; Chat Log Viewer</span>
+        <button onclick="closeLogDrawer()" title="Close (Esc)"
+                style="font-size:18px;line-height:1;color:#6c7086;background:none;border:none;
+                       cursor:pointer;padding:0 4px;transition:color 0.15s;"
+                onmouseover="this.style.color='#f38ba8'" onmouseout="this.style.color='#6c7086'">&times;</button>
+    </div>
+    <iframe id="log-drawer-iframe" src="about:blank"
+            style="flex:1;border:none;width:100%;background:#1e1e2e;"></iframe>
+</div>
+
+<!-- LLM Detail Modal -->
+<div id="llmModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" onclick="Agent.closeModal(event)">
+    <div class="bg-card border border-border rounded-lg p-4 max-w-[43rem] w-[90%] max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
+        <div class="flex justify-between mb-2.5">
+            <span class="font-bold text-blue">LLM Call Detail</span>
+            <button onclick="Agent.closeModal()" class="px-2 py-0.5 text-xs rounded bg-card text-txt border border-border hover:bg-border">&#x2715; Close</button>
+        </div>
+        <div id="llmModalBody"></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var _open = false;
+    var _iframeReady = false;
+
+    function openLogDrawer() {
+        var drawer   = document.getElementById('log-drawer');
+        var backdrop = document.getElementById('log-drawer-backdrop');
+        var iframe   = document.getElementById('log-drawer-iframe');
+        if (!_iframeReady) {
+            _iframeReady = true;
+            iframe.addEventListener('load', function() {
+                try { iframe.contentWindow.postMessage({ type: 'refresh' }, '*'); } catch(e) {}
+            });
+            iframe.src = '/raw?file=script/apps/Aries/Creator/Game/Common/ChatLogDebugView.page';
+        } else {
+            try { iframe.contentWindow.postMessage({ type: 'refresh' }, '*'); } catch(e) {}
+        }
+        drawer.style.transform        = 'translateX(0)';
+        backdrop.style.opacity        = '1';
+        backdrop.style.pointerEvents  = 'auto';
+        var btn = document.getElementById('btn-open-logs');
+        if (btn) { btn.style.borderColor = '#89b4fa'; btn.style.color = '#89b4fa'; }
+        _open = true;
+    }
+
+    function closeLogDrawer() {
+        var drawer   = document.getElementById('log-drawer');
+        var backdrop = document.getElementById('log-drawer-backdrop');
+        drawer.style.transform        = 'translateX(100%)';
+        backdrop.style.opacity        = '0';
+        backdrop.style.pointerEvents  = 'none';
+        var btn = document.getElementById('btn-open-logs');
+        if (btn) { btn.style.borderColor = ''; btn.style.color = ''; }
+        _open = false;
+    }
+
+    function toggleLogDrawer() {
+        if (_open) closeLogDrawer(); else openLogDrawer();
+    }
+
+    window.openLogDrawer  = openLogDrawer;
+    window.closeLogDrawer = closeLogDrawer;
+    window.toggleLogDrawer = toggleLogDrawer;
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && _open) closeLogDrawer();
+    });
+})();
+</script>
+
+<?npl
+wp_enqueue_script("bg_agent", "/script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/bg_agent.js"); 
+?>

@@ -18,6 +18,13 @@ local SwfLoadingBar = commonlib.gettable("MyCompany.Aries.Game.GUI.SwfLoadingBar
 SwfLoadingBar.percentage = 0;
 SwfLoadingBar.lighting_tickcount = 0;
 
+-- only called when there is external asset url for this world. 
+function SwfLoadingBar.ShowPrepareWorldAsset()
+	SwfLoadingBarPage.ShowPage({ top = -50, show_background = true, worldname = WorldCommon.GetWorldTag("name") });
+	SwfLoadingBar.ShowProgress(L"正在准备世界资源, 请耐心等待...", 50);
+	SwfLoadingBar.tracking_target = "PrepareWorldAsset";
+end
+
 -- precalculate lighting for some seconds before presenting the world to the user. 
 -- call this function immediately when block engine is enabled. 
 function SwfLoadingBar.ShowForLightCalculation(onFinishCallback)
@@ -154,11 +161,28 @@ function SwfLoadingBar.ShowProgress(msg, percentage, step)
 	else
 		SwfLoadingBarPage.ShowPage({top = -50});
 	end
+	SwfLoadingBar.SendProgressMsg(msg,percentage)
 	p = p / 100;
 	SwfLoadingBarPage.Update(p);
 	SwfLoadingBarPage.UpdateText(msg);
 	if(p == 1)then
 		SwfLoadingBar.ClosePage();
+	end
+end
+
+function SwfLoadingBar.SendProgressMsg(msg,percentage)
+	if (type(System.os.IsEmscripten) == "function" and System.os.IsEmscripten()) then 
+		local msg = msg or "";
+		local Emscripten = NPL.load("(gl)script/apps/Aries/Creator/Game/Emscripten/Emscripten.lua");
+        Emscripten:SendMsg("customLoader", {name="gameLoading" , progress=percentage or 100 , msg= System.Encoding.base64(msg)} , nil , nil ,"external")
+    elseif (System.os.GetPlatform() == 'android') then
+		local msg = msg or "";
+		local Android = NPL.load("(gl)script/apps/Aries/Creator/Game/Android/Android.lua");
+		Android:SendMsgToJava("customLoader", {name="gameLoading" , progress=percentage or 100 , msg= System.Encoding.base64(msg)} , nil , nil ,"external");
+	elseif (System.os.GetPlatform() == 'ios') then
+		local msg = msg or "";
+		local iOS = NPL.load("(gl)script/apps/Aries/Creator/Game/iOS/iOS.lua");
+		iOS:SendMsgToObjectiveC("customLoader", {name="gameLoading" , progress=percentage or 100 , msg= System.Encoding.base64(msg)} , nil , nil ,"external");
 	end
 end
 

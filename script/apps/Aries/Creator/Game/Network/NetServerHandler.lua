@@ -172,7 +172,9 @@ function NetServerHandler:handleMove(packet_move)
 
 		self.playerEntity:OnUpdateEntity();
 		self.playerEntity:SetPositionAndRotation(self.lastPosX, self.lastPosY, self.lastPosZ, rotYaw, rotPitch);
-
+		if not posX or not posZ or not posY then
+			return
+		end
         local dx = posX - self.playerEntity.x;
         local dy = posY - self.playerEntity.y;
         local dz = posZ - self.playerEntity.z;

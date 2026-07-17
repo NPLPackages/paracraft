@@ -11,7 +11,9 @@ NOTE:
 config cmd line "httpwrapper_version" to get different environment
 local httpwrapper_version = ParaEngine.GetAppCommandLineByParam("httpwrapper_version", "ONLINE");  - "ONLINE" or "STAGE" or "RELEASE" or "LOCAL"
 ]]
+NPL.load("(gl)script/ide/System/localserver/localserver.lua");
 NPL.load("(gl)script/ide/System/os/GetUrl.lua");
+local HttpRequest = NPL.load('(gl)Mod/WorldShare/service/HttpRequest.lua')
 local UrlConverter = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/UrlConverter.lua");
 
 local HttpWrapper = NPL.export()
@@ -41,7 +43,6 @@ end
 function HttpWrapper.GetUrl(key)
     key = key or "keepworkServerList";
     local httpwrapper_version = HttpWrapper.GetDevVersion();
-    local url;
     local url  = HttpWrapper[key][httpwrapper_version];
     if(not url)then
 	    LOG.std(nil, "error", "HttpWrapper", "read url failed key = '%s' , httpwrapper_version = '%s'", key, httpwrapper_version);
@@ -55,28 +56,53 @@ function HttpWrapper.GetToken()
     local token = commonlib.getfield("System.User.keepworktoken")
     return token;
 end
+
+-- check if user is logged in (has valid token)
+function HttpWrapper.IsUserLoggedIn()
+    local token = HttpWrapper.GetToken();
+    return token ~= nil and token ~= "";
+end
+
+-- resolve tokenRequired value
+-- @param tokenRequired: true, false, nil, or "auto"
+--   - true: always require token (will warn if not logged in)
+--   - false/nil: never use token
+--   - "auto": use token if logged in, otherwise don't use token
+-- @return shouldUseToken, shouldWarnIfNoToken
+function HttpWrapper.ResolveTokenRequired(tokenRequired)
+    if tokenRequired == "auto" then
+        -- auto mode: use token if available, no warning if not
+        return HttpWrapper.IsUserLoggedIn(), false;
+    elseif tokenRequired then
+        -- required mode: always try to use token, warn if not available
+        return true, true;
+    else
+        -- not required: never use token
+        return false, false;
+    end
+end
 local default_cache_policy = System.localserver.CachePolicy:new("access plus 12 hour");
 
 function HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option)
-    cache_policy = inputParams.cache_policy or default_cache_policy;
-    if(type(cache_policy) == "string") then
+    local cache_policy = inputParams.cache_policy or default_cache_policy;
+    if (cache_policy and type(cache_policy) == "string") then
 		cache_policy = System.localserver.CachePolicy:new(cache_policy);
 	end
 
     local ls = System.localserver.CreateStore(nil, 3);
-	if(not ls) then
+	if (not ls) then
 		return 
 	end
     -- make url
 	local url = self.input_cache_url;
 	local item = ls:GetItem(url)
-	if(item and item.entry and item.payload) then
-		if(not cache_policy:IsExpired(item.payload.creation_date)) then
+	if (item and item.entry and item.payload) then
+		if (not cache_policy:IsExpired(item.payload.creation_date)) then
 			-- make output msg
 			local output_msg = commonlib.LoadTableFromString(item.payload.data);
             local fullname = self.fullname or "";
 		    LOG.std("", "info",fullname, "loaded from local server: %s", url);
-			if(callbackFunc) then
+			if (callbackFunc) then
 				callbackFunc(200, {}, output_msg);
 			end	
             return true;
@@ -123,10 +149,15 @@ function HttpWrapper.EncodeInputToUniqueURL(input)
     input = input or {};
     local url = input.url or "";
     local url_queries = { "method", input.method };
-    if(input.headers)then
+    if (input.headers) then
         for k,v in pairs(input.headers) do
-            table.insert(url_queries,k);
-            table.insert(url_queries,v);
+            if (k == "Authorization") then
+                k = "username"
+                v = System.User.username;
+            end
+
+            table.insert(url_queries, k);
+            table.insert(url_queries, v);
         end
     end
 	local input_cache_url = NPL.EncodeURLQuery(url, url_queries);
@@ -156,9 +187,11 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         ["router_params"] = true,
     }
     local function activate(self, inputParams, callbackFunc, option)
-		if(tokenRequired and not HttpWrapper.GetToken())then
-			LOG.std(nil, "warn","HttpWrapper", "token is required for request: (%s)%s", fullname, static_url);
-		end
+        -- resolve tokenRequired: support true, false, nil, or "auto"
+        local shouldUseToken, shouldWarnIfNoToken = HttpWrapper.ResolveTokenRequired(tokenRequired);
+        if shouldWarnIfNoToken and not HttpWrapper.GetToken() then
+            LOG.std(nil, "warn","HttpWrapper", "token is required for request: (%s)%s", fullname, static_url);
+        end
         local url = static_url;
         inputParams = inputParams or {};
         self.inputParams = inputParams;
@@ -186,39 +219,65 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
             input.url = url;
             input.method = method;
             input.form = raw_input;
+            if(type(raw_input) == "table") then
+                if(raw_input.dataStreaming) then
+                    input.dataStreaming = true;
+                    raw_input.dataStreaming = nil;
+                end
+                if(raw_input.signal) then
+                    input.signal = raw_input.signal;
+					raw_input.signal = nil;
+				end
+            end
         end
         if(input.json == nil)then
             input.json = true;
         end
         -- set headers
         local headers = raw_input.headers or {};
-        if(tokenRequired)then
-            headers["Authorization"] = string.format("Bearer %s",HttpWrapper.GetToken() or "");
+        if shouldUseToken then
+            local token = HttpWrapper.GetToken();
+            if token and token ~= "" then
+                headers["Authorization"] = string.format("Bearer %s", token);
+            end
         end
         input.headers = headers;
-
 		
         local input_cache_url = HttpWrapper.EncodeInputToUniqueURL(input);
         self.input_cache_url  = input_cache_url;
         LOG.std(nil, "debug","HttpWrapper input.url", input.url);
-        LOG.std(nil, "debug","HttpWrapper input_cache_url", input_cache_url);
+        if(prepFunc or postFunc) then
+            LOG.std(nil, "debug","HttpWrapper input_cache_url", input_cache_url);
+        end
         local res;
         -- only cache method == "GET"
         if(method == "GET" and prepFunc)then
 			res = prepFunc(self, inputParams, callbackFunc, option);
         end
         if(not res)then
-            LOG.std(nil, "debug","HttpWrapper input", input);
-            System.os.GetUrl(input, function(err, msg, data)
-				HttpWrapper.ShowErrorTip(err, input);  
-                -- only cache method == "GET"
-                if(method == "GET" and postFunc)then
-                    postFunc(self, err, msg, data);
-                end
-                if(callbackFunc)then
-                    callbackFunc(err, msg, data);
-                end
-            end, option)
+            if(method == "POSTFIELDS")then
+                HttpRequest:PostFields(url, raw_input, headers, function(data, err, msg)
+                    if(callbackFunc)then
+                        callbackFunc(err, msg, data);
+                    end
+                end, function(data, err, msg)
+                    if(callbackFunc)then
+                        callbackFunc(err, msg, data);
+                    end
+                end)
+            else
+                -- LOG.std(nil, "debug","HttpWrapper input", input);
+                System.os.GetUrl(input, function(err, msg, data)
+                    HttpWrapper.ShowErrorTip(err, input);  
+                    -- only cache method == "GET"
+                    if(method == "GET" and postFunc)then
+                        postFunc(self, err, msg, data);
+                    end
+                    if(callbackFunc)then
+                        callbackFunc(err, msg, data);
+                    end
+                end, option)
+            end
         end
 	end
     o = setmetatable({
@@ -236,15 +295,21 @@ end
 
 -- should follow rule of silence, only write to log
 function HttpWrapper.ShowErrorTip(err, input)
-    NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
-    local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-    if err == 401 then
-		LOG.std(nil, "info", "HttpWrapper input", "用户凭据失效 for %s", input and input.url or "");
+    if(err) then
+        if err == 401 then
+            LOG.std(nil, "info", "HttpWrapper input", "用户凭据失效 for %s", input and input.url or "");
+        elseif err == 404 then
+            LOG.std(nil, "info", "HttpWrapper input", "请求的资源不存在 for %s", input and input.url or "");
+        elseif err == 500 then
+            LOG.std(nil, "info", "HttpWrapper input", "服务器内部错误 for %s", input and input.url or "");
+        elseif err ~= 200 then
+            LOG.std(nil, "info", "HttpWrapper input", "请求错误(%d) for %s", err, input and input.url or "");
+        end
+        if(err ~= 0)then
+            return
+        end
+	    LOG.std(nil, "info", "HttpWrapper input", "网络异常 for %s", input and input.url or "");
     end
-    if(err ~= 0)then
-        return
-    end
-	LOG.std(nil, "info", "HttpWrapper input", "网络异常 for %s", input and input.url or "");
 end
 
 -- get cache from localserver

@@ -452,9 +452,24 @@ function Macros.ConfirmNextMessageBoxClick()
 	end
 end
 
-
-
 function Macros.WindowTextControlClickTrigger(btnName, button, localX, localY, line, pos)
+	local textCtl = Application.GetUIObject(btnName);
+	if(textCtl) then
+		local offsetX, offsetY = 0, 0;
+		if(textCtl.Name == "MultiLineEditbox") then
+			offsetX = textCtl:ViewRegionOffsetX();
+			offsetY = textCtl:ViewRegionOffsetY();
+			textCtl = textCtl:ViewPort() or textCtl;
+		end
+		if(line and pos) then
+			local ctlX, ctlY, ctlWidth, ctlHeight = textCtl:GetAbsPosition();
+			-- we shall adjustCursor() so that line, pos are always visible. 
+			textCtl:moveCursor(line, pos, false, true);
+
+			local x, y = textCtl:LinePosToXY(line, pos)
+			localX, localY = x + offsetX, y + math.floor(textCtl:GetLineHeight()*0.5) + offsetY;
+		end
+	end
 	local callback = Macros.WindowClickTrigger(btnName, button, localX, localY)	
 	return callback;
 end

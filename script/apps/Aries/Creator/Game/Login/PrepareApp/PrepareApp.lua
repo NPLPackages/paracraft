@@ -18,7 +18,7 @@ local FileLoader = commonlib.gettable("CommonCtrl.FileLoader")
 
 local PrepareApp = commonlib.gettable("MyCompany.Aries.Game.PrepareApp");
 
-local _assetsList = {}
+local _assetsList
 local _this = PrepareApp
 local page
 function PrepareApp.OnInit()
@@ -38,7 +38,9 @@ end
 
 function PrepareApp.ShowPage()
     local url = "script/apps/Aries/Creator/Game/Login/PrepareApp/PrepareAppPage.html"
-
+    if System.options.isCommunity then
+        url = "script/apps/Aries/Creator/Game/Tasks/Community/Setting/PrepareAppPage.html"
+    end
 	local params = {
 		url = url, 
 		name = "PrepareApp.ShowPage", 
@@ -74,6 +76,14 @@ function PrepareApp.start()
     PrepareApp.StopProgressTimer()
     PrepareApp._progressTimer = commonlib.Timer:new({callbackFunc=PrepareApp.OnFrameMove})
     PrepareApp._progressTimer:Change(0,30)
+
+    PrepareApp.AdjustUIScalling()
+end
+
+function PrepareApp.AdjustUIScalling()
+    if System.os.GetPlatform() == "win32" then
+        ParaEngine.GetAttributeObject():SetField("LandscapeMode", "auto");
+    end
 end
 
 function PrepareApp.StopProgressTimer()
@@ -284,7 +294,8 @@ end
 function PrepareApp.CheckAssetWithoutNetwork()
     if not _this._hasNetWork then 
         local count = 0
-        for _,key in ipairs(_loginAssetsList) do
+        local list = PrepareApp.GetLoginAssetsList();
+        for _,key in ipairs(list) do
             local status = ParaIO.CheckAssetFile(key)
             if status==1 then
                 count = count + 1
@@ -292,7 +303,7 @@ function PrepareApp.CheckAssetWithoutNetwork()
                 -- print(key,"status",status)
             end
         end
-        local len = #_loginAssetsList
+        local len = #list
         print("-----xx-len",len,"count",count)
         if len>0 and count/len>0.6 then --大部分登录界面的图已经缓存过了
             _this._curProgress = 100
@@ -328,9 +339,10 @@ function PrepareApp.CheckAsset()
     end
     
     -- commonlib.Files.GetRemoteFileText()
+    local assets = PrepareApp.GetAssetList()
     
     local file_list = {}
-    for _,key in ipairs(_assetsList) do
+    for _,key in ipairs(assets) do
         local status = ParaIO.CheckAssetFile(key)
         if status~=1 and status~=-4 and status~=-1 then
             -- print(key,"status",status)
@@ -411,9 +423,14 @@ function PrepareApp.PreloadTextures(callback,maxTime)
 end
 
 function PrepareApp.SetBarProgress(percent)
+    local progressSize = System.options.isCommunity and 320 or 500
     local progress_fg = ParaUI.GetUIObject("progress_fg")
-    progress_fg.width = math.floor(500*(percent*0.01))
-    progress_fg.background = string.format("Mod/WorldShare/Texture/progress_fg_500x36_32bits.png#0 0 %s 36;",progress_fg.width)
+    progress_fg.width = math.floor(progressSize*(percent*0.01))
+    local background = string.format("Mod/WorldShare/Texture/progress_fg_500x36_32bits.png#0 0 %s 36;",progress_fg.width)
+    if System.options.isCommunity then
+        background = string.format("Mod/WorldShare/Texture/progress_320x12_32bits.png#0 0 %s 12;",progress_fg.width)
+    end
+    progress_fg.background = background
 end
 
 function PrepareApp.SetStateTip(str)
@@ -450,7 +467,22 @@ function PrepareApp.ShowExitAlert(str)
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
 
-_assetsList = {
+function PrepareApp.GetAssetList()
+    if(_assetsList) then
+        return _assetsList;
+    end
+
+    if not System.options.isEducatePlatform then
+        -- for standard assets
+        _assetsList = {
+            "Texture/3DMapSystem/common/ThemeLightBlue/container_bg.png",
+            "Texture/Aries/Common/AssetLoader_32bits.png",
+            "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png",
+        };
+        if System.options.isCommunity then
+            _assetsList[#_assetsList+1] = "Texture/Aries/Creator/keepwork/community_32bits.png";
+        end
+        --[[ _assetsList = {
     --texture
     "Texture/3DMapSystem/common/ThemeLightBlue/container_bg.png",
     "Texture/3DMapSystem/common/ThemeLightBlue/slider_background_16.png",
@@ -810,9 +842,298 @@ _assetsList = {
     "character/CC/05effect/Birthplace/Birthplace.x",
     "character/common/marker_point/marker_point3.x",
 }
+]]
+    else
+        -- for 431 school assets
+        _assetsList = {
+--texture
+"Texture/3DMapSystem/common/ThemeLightBlue/container_bg.png",
+"Texture/3DMapSystem/common/ThemeLightBlue/slider_background_16.png",
+"Texture/3DMapSystem/common/ThemeLightBlue/slider_button_16.png",
+"Texture/Aries/ChatSystem/arrow1_32bits.png",
+"Texture/Aries/ChatSystem/arrow2_32bits.png",
+"Texture/Aries/ChatSystem/arrow3_32bits.png",
+"Texture/Aries/ChatSystem/gundongtiaobg_32bits.png",
+"Texture/Aries/ChatSystem/jiahao_32bits.png",
+"Texture/Aries/Common/AssetLoader_32bits.png",
+"Texture/Aries/Common/ThemeKid/dropdown_bg.png",
+"Texture/Aries/Common/ThemeKid/editbox_32bits.png",
+"Texture/Aries/Common/bbs_toast_bg_846x45_32bits.png",
+"Texture/Aries/Common/underline_white_32bits.png",
+"Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png",
+"Texture/Aries/Creator/Theme/scroll_track_32bits.png",
+"Texture/Aries/Creator/keepwork/Window/button/btn_hui109X45_32bits.png",
+"Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png",
+"Texture/Aries/Creator/keepwork/Window/tooltip/tipbj_32bits.png",
+"Texture/Aries/Creator/keepwork/dock/dianliangshoucang_45x45_32bits.png",
+"Texture/Aries/Creator/keepwork/dock/dianzan_45x45_32bits.png",
+"Texture/Aries/Creator/keepwork/dock/meiyoudianzan_45x45_32bits.png",
+"Texture/Aries/Creator/keepwork/dock/meiyoushoucang_45x45_32bits.png",
+"Texture/Aries/Creator/keepwork/dock/shezhi_45x45_32bits.png",
+"Texture/Aries/Creator/keepwork/map/btn_E_32X32_32bits.png",
+"Texture/Aries/Creator/keepwork/map/btn_R_32X32_32bits.png",
+"Texture/Aries/Creator/keepwork/vip/shuzishuru_32X32_32bits.png",
+"Texture/Aries/Login/Login/teen/loading_gray_32bits.png",
+"Texture/Aries/Login/Login/teen/loading_green_32bits.png",
+"Texture/Aries/Login/Login/teen/progressbar_green_tile.png",
+"Texture/Aries/NPCs/RainbowFlower/Clock_bg_32bits.png",
+"Texture/Aries/NPCs/RainbowFlower/time_bg_32bits.png",
+"Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png",
+"Texture/blocks/1000_Tomato.png",
+"Texture/blocks/1001_Wheat.png",
+"Texture/blocks/Chest.png",
+"Texture/blocks/CmdTextureReplacer.png",
+"Texture/blocks/CustomGeoset/hair/1_Avatar_boy_hair_00.png",
+"Texture/blocks/CustomGeoset/hair/hair_16_tou.png",
+"Texture/blocks/CustomGeoset/main/Avatar_tsj.png",
+"Texture/blocks/ItemFrame.png",
+"Texture/blocks/Jukebox.png",
+"Texture/blocks/Piston.png",
+"Texture/blocks/Piston_Viscous.png",
+"Texture/blocks/Redstone_Button_off.png",
+"Texture/blocks/Redstone_Button_on.png",
+"Texture/blocks/Redstone_Repeater_off.png",
+"Texture/blocks/Redstone_Repeater_on1.png",
+"Texture/blocks/Redstone_Repeater_on2.png",
+"Texture/blocks/Redstone_Repeater_on3.png",
+"Texture/blocks/Redstone_Repeater_on4.png",
+"Texture/blocks/Redstone_Wire_mip1.png",
+"Texture/blocks/TeleportStone.png",
+"Texture/blocks/agentsign.png",
+"Texture/blocks/arrow.png",
+"Texture/blocks/bedrock.png",
+"Texture/blocks/bloodstain.png",
+"Texture/blocks/bookshelf_three.png",
+"Texture/blocks/box_three.png",
+"Texture/blocks/brick.png",
+"Texture/blocks/cake_top.png",
+"Texture/blocks/clay.png",
+"Texture/blocks/coal_ore.png",
+"Texture/blocks/cobblestone.png",
+"Texture/blocks/cobblestone_mossy.png",
+"Texture/blocks/codeblock_off.png",
+"Texture/blocks/codeblock_on.png",
+"Texture/blocks/colorblock.png",
+"Texture/blocks/command_block.png",
+"Texture/blocks/command_block_on.png",
+"Texture/blocks/deadbush.png",
+"Texture/blocks/destroy.png",
+"Texture/blocks/diamond_block_new.png",
+"Texture/blocks/diamond_ore.png",
+"Texture/blocks/dirt.png",
+"Texture/blocks/door_iron_lower.png",
+"Texture/blocks/door_iron_upper.png",
+"Texture/blocks/door_wood_lower.png",
+"Texture/blocks/door_wood_upper.png",
+"Texture/blocks/doortop_three.png",
+"Texture/blocks/drum.png",
+"Texture/blocks/emerald_block_new.png",
+"Texture/blocks/emerald_ore.png",
+"Texture/blocks/end_stone.png",
+"Texture/blocks/farmland_dry.png",
+"Texture/blocks/fern.png",
+"Texture/blocks/flower_dandelion.png",
+"Texture/blocks/flower_rose.png",
+"Texture/blocks/glass09.png",
+"Texture/blocks/glass_pane.png",
+"Texture/blocks/gold_block_new.png",
+"Texture/blocks/gold_ore.png",
+"Texture/blocks/grass_top.png",
+"Texture/blocks/gravel.png",
+"Texture/blocks/hay_block_three.png",
+"Texture/blocks/ice.png",
+"Texture/blocks/ice_single.png",
+"Texture/blocks/iron_bars.png",
+"Texture/blocks/iron_block_new.png",
+"Texture/blocks/iron_ore.png",
+"Texture/blocks/items/spawnpoint.png",
+"Texture/blocks/items/textframe.png",
+"Texture/blocks/items/waterdrop.png",
+"Texture/blocks/ladder.png",
+"Texture/blocks/lapis_block_new.png",
+"Texture/blocks/lapis_ore.png",
+"Texture/blocks/lava/lava_fps10_a010.png",
+"Texture/blocks/leaves_birch.png",
+"Texture/blocks/leaves_cactus_three.png",
+"Texture/blocks/leaves_jungle.png",
+"Texture/blocks/leaves_oak.png",
+"Texture/blocks/leaves_spruce.png",
+"Texture/blocks/log_birch_three.png",
+"Texture/blocks/log_jungle_three.png",
+"Texture/blocks/log_oak_three.png",
+"Texture/blocks/log_spruce_three.png",
+"Texture/blocks/melon_three.png",
+"Texture/blocks/metal_normal.png",
+"Texture/blocks/mirror.png",
+"Texture/blocks/movie_three.png",
+"Texture/blocks/mushroom_brown.png",
+"Texture/blocks/mushroom_red.png",
+"Texture/blocks/mycelium_three.png",
+"Texture/blocks/nether_brick.png",
+"Texture/blocks/netherrack.png",
+"Texture/blocks/noteblock.png",
+"Texture/blocks/nplcad3block_off.png",
+"Texture/blocks/nplcad3block_on.png",
+"Texture/blocks/obsidian.png",
+"Texture/blocks/particle_rain.png",
+"Texture/blocks/particle_rain_splash.png",
+"Texture/blocks/particle_snow.png",
+"Texture/blocks/pink_leaves.png",
+"Texture/blocks/piston_top_normal.png",
+"Texture/blocks/planks_birch.png",
+"Texture/blocks/planks_jungle.png",
+"Texture/blocks/planks_oak.png",
+"Texture/blocks/planks_spruce.png",
+"Texture/blocks/pumpkinLight_three.png",
+"Texture/blocks/pumpkin_three.png",
+"Texture/blocks/quartz_block_chiseled_top.png",
+"Texture/blocks/quartz_block_lines_top.png",
+"Texture/blocks/quartz_block_top.png",
+"Texture/blocks/quartz_ore.png",
+"Texture/blocks/rail_activator.png",
+"Texture/blocks/rail_activator_powered.png",
+"Texture/blocks/rail_detector.png",
+"Texture/blocks/rail_normal.png",
+"Texture/blocks/redstoneLight_lit.png",
+"Texture/blocks/redstone_block_new.png",
+"Texture/blocks/redstone_conductor_off.png",
+"Texture/blocks/redstone_conductor_on.png",
+"Texture/blocks/redstone_lamp_off.png",
+"Texture/blocks/redstone_lamp_on.png",
+"Texture/blocks/redstone_ore.png",
+"Texture/blocks/redstone_torch_off.png",
+"Texture/blocks/redstone_torch_on.png",
+"Texture/blocks/reeds.png",
+"Texture/blocks/sand.png",
+"Texture/blocks/sandstone_carved_three.png",
+"Texture/blocks/sandstone_smooth_three.png",
+"Texture/blocks/sandstone_three.png",
+"Texture/blocks/sandstone_top.png",
+"Texture/blocks/sapling_birch.png",
+"Texture/blocks/sapling_jungle.png",
+"Texture/blocks/sapling_oak.png",
+"Texture/blocks/sapling_spruce.png",
+"Texture/blocks/sensor_stone.png",
+"Texture/blocks/snow.png",
+"Texture/blocks/snow_dirt_three.png",
+"Texture/blocks/soul_sand.png",
+"Texture/blocks/sponge.png",
+"Texture/blocks/state_green.png",
+"Texture/blocks/state_grey.png",
+"Texture/blocks/state_hint.png",
+"Texture/blocks/state_red.png",
+"Texture/blocks/state_white.png",
+"Texture/blocks/stone.png",
+"Texture/blocks/stone_glow.png",
+"Texture/blocks/stone_slab_three.png",
+"Texture/blocks/stonebrick.png",
+"Texture/blocks/stonebrick_chiseled.png",
+"Texture/blocks/stonebrick_cracked.png",
+"Texture/blocks/stonebrick_mossy.png",
+"Texture/blocks/tnt_three.png",
+"Texture/blocks/top_grass_three.png",
+"Texture/blocks/torch.png",
+"Texture/blocks/transparent_colorblock.png",
+"Texture/blocks/trapdoor.png",
+"Texture/blocks/vine.png",
+"Texture/blocks/water/water_fps10_a009.png",
+"Texture/blocks/waterlily.png",
+"Texture/blocks/web.png",
+"Texture/blocks/wheat_stage_0.png",
+"Texture/blocks/wool_colored_black.png",
+"Texture/blocks/wool_colored_blue.png",
+"Texture/blocks/wool_colored_brown.png",
+"Texture/blocks/wool_colored_cyan.png",
+"Texture/blocks/wool_colored_gray.png",
+"Texture/blocks/wool_colored_green.png",
+"Texture/blocks/wool_colored_light_blue.png",
+"Texture/blocks/wool_colored_lime.png",
+"Texture/blocks/wool_colored_magenta.png",
+"Texture/blocks/wool_colored_orange.png",
+"Texture/blocks/wool_colored_pink.png",
+"Texture/blocks/wool_colored_purple.png",
+"Texture/blocks/wool_colored_red.png",
+"Texture/blocks/wool_colored_silver.png",
+"Texture/blocks/wool_colored_white.png",
+"Texture/blocks/wool_colored_yellow.png",
+"Texture/common/Sunset.dds",
+"Texture/common/cloud.dds",
+"Texture/dxutcontrols.dds",
+"Texture/ripple.dds",
+"Texture/ripple/WaterBumpMap.dds",
+"Texture/tileset/blocks/carpet_block_single.dds",
+"Texture/tileset/blocks/doortop_three.dds",
+"Texture/tileset/blocks/earth2_single.dds",
+"Texture/tileset/blocks/earth_purple_single.dds",
+"Texture/tileset/blocks/earth_single.dds",
+"Texture/tileset/blocks/ice2_single.dds",
+"Texture/tileset/blocks/ladder_three.dds",
+"Texture/tileset/blocks/leaf_single.dds",
+"Texture/tileset/blocks/leaves_blue_single.dds",
+"Texture/tileset/blocks/leaves_brown_single.dds",
+"Texture/tileset/blocks/leaves_green_single.dds",
+"Texture/tileset/blocks/leaves_greenlight_single.dds",
+"Texture/tileset/blocks/leaves_orange_single.dds",
+"Texture/tileset/blocks/leaves_purple_single.dds",
+"Texture/tileset/blocks/leaves_purpledark_single.dds",
+"Texture/tileset/blocks/leaves_red_single.dds",
+"Texture/tileset/blocks/leaves_reddrak_single.dds",
+"Texture/tileset/blocks/leaves_yellow_single.dds",
+"Texture/tileset/blocks/roof_blue_single.dds",
+"Texture/tileset/blocks/roof_brown_single.dds",
+"Texture/tileset/blocks/roof_green_single.dds",
+"Texture/tileset/blocks/roof_pink_single.dds",
+"Texture/tileset/blocks/roof_purple_single.dds",
+"Texture/tileset/blocks/roof_red_single.dds",
+"Texture/tileset/blocks/roof_white_single.dds",
+"Texture/tileset/blocks/roof_yellow_single.dds",
+"Texture/tileset/blocks/stone2_single.dds",
+"Texture/tileset/blocks/stone_round_single.dds",
+"Texture/tileset/blocks/stone_yellow_single.dds",
+"Texture/tileset/blocks/test_six.dds",
+"Texture/tileset/blocks/top_ice_three.dds",
+"Texture/tileset/blocks/treetrunk2_three.dds",
+"Texture/tileset/blocks/treetrunk_three.dds",
+"Texture/tileset/blocks/wall_block_red_single.dds",
+"Texture/tileset/blocks/wall_white2_single.dds",
+"Texture/tileset/blocks/water3_single.dds",
+"Texture/tileset/blocks/water4_single.dds",
+"Texture/tileset/blocks/window_three.dds",
+"Texture/tooltip2_32bits.PNG",
+"Texture/whitedot.png",
 
+--mesh
+"model/Skybox/skybox3/skybox3.x",
+"model/blockworld/BlockModel/block_model_four.x",
+"model/blockworld/BlockModel/block_model_one.x",
+"model/blockworld/IconModel/IconModel_32x32.x",
+"model/blockworld/TextFrame/TextFrame.x",
+"model/common/building_point/building_point.x",
+"model/common/marker_point/marker_point.x",
+
+--model
+"character/CC/02human/CustomGeoset/actor.x",
+"character/CC/02human/paperman/boy01.x",
+"character/CC/02human/paperman/boy06.x",
+"character/CC/05effect/Birthplace/Birthplace.x",
+"character/common/marker_point/marker_point3.x",
+}
+    end
+    return _assetsList;
+end
+
+local _loginAssetsList;
 --登录界面就要用到的
-_loginAssetsList = {
+function PrepareApp.GetLoginAssetsList()
+    if(_loginAssetsList) then
+		return _loginAssetsList;
+    end
+    _loginAssetsList = {
+        "texture/whitedot.png",
+        "texture/aries/creator/theme/gamecommonicon_32bits.png",
+    }
+    --[[
+    _loginAssetsList = {
     "texture/aries/common/themekid/dropdown_bg.png",
     "texture/3dmapsystem/common/themelightblue/container_bg.png",
     "texture/aries/common/themekid/editbox_32bits.png",
@@ -837,4 +1158,7 @@ _loginAssetsList = {
     "texture/aries/creator/paracraft/login/plug_16x16_32bits.png",
     "texture/aries/creator/paracraft/login/menu_bg_36x36_32bits.png",
     "texture/aries/creator/paracraft/login/server_16x16_32bits.png",
-}
+    };
+    ]]
+    return _loginAssetsList
+end

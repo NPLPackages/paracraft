@@ -452,8 +452,57 @@ function Assessment:GetWorkMark()
                 finishOptions[#finishOptions + 1] = {v.optionName}
             end
         end
-        return count,self.reviews,finishOptions
+        return count,self.reviews,finishOptions,self.knowledge
     end
+end
+
+--[[ {text=L"建造", name="static"   },
+    {text=L"电影", name="movie"   },
+    {text=L"代码", name="character"},
+    {text=L"背包", name="playerbag"   },
+    {text=L"机关", name="gear"	   },
+    {text=L"装饰", name="deco"     },
+	{text=L"工具", name="tool"	   },
+	{text=L"模板", name="template" },]]
+--搜索分类目录下的方块数量
+function Assessment:SearchBlockNumByCategory(category)
+    if not category or category == "" then
+        return 999999
+    end
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
+    local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
+    local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+    local ds_src = ItemClient.GetBlockDS(category);
+    if ds_src and #ds_src > 0 then
+        local num = 0
+        local block_map = {}
+        for index, item in ipairs(ds_src) do 
+            if(item.block_id) then
+                block_map[item.block_id] = true
+            end
+        end
+        local rendist =  math.floor(GameLogic.options:GetRenderDist() or 0)
+        local player = GameLogic.GetPlayer()
+        if player then
+            local px,py,pz =player:GetBlockPos()
+            local minx,maxx = math.max(px-rendist,0),px+rendist
+            local miny,maxy = math.max(py-rendist,0),py+rendist
+            local minz,maxz = math.max(pz-rendist,0),pz+rendist
+            for x=minx,maxx do
+                for y=miny,maxy do
+                    for z=minz,maxz do
+                        local blockId ,blockData = BlockEngine:GetBlockIdAndData(x, y, z)
+                        if blockId and blockId > 0 and block_map[blockId] then
+                            num = num + 1
+                        end
+                    end
+                end
+            end
+        end
+        return num
+    end
+    return  0
 end
 -----------------------------
 --------输出-----------------
@@ -509,6 +558,11 @@ end
 --获得全部Score
 function Assessment:GetScore()
     return self.score
+end
+
+--添加知识点
+function Assessment:AddKnowledges(strKnowledge)
+    self.knowledge = strKnowledge
 end
 
 --向后台发送review,score等数据，并回调。

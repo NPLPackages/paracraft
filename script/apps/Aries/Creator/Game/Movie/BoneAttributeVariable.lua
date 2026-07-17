@@ -113,6 +113,44 @@ function BoneAttributeVariable:AddKey(time, data)
 	
 end
 
+-- modify the C++ data directly as a constant value.
+-- use this function to control the animation externally. 
+-- @note: this function does not modify the time variable.
+function BoneAttributeVariable:SetData(data)
+	local name = self:GetAttributeName();
+	local animInstance = self.animInstance;
+	if(self.type == "rot") then
+		animInstance:AddDynamicField(name, ATTRIBUTE_FIELDTYPE.FieldType_AnimatedQuaternion);
+		self.lastData = self.lastData or mathlib.Quaternion:new();
+	else
+		animInstance:AddDynamicField(name, ATTRIBUTE_FIELDTYPE.FieldType_AnimatedVector3);
+		self.lastData = self.lastData or mathlib.vector3d:new();
+	end
+	animInstance:SetFieldKeyNums(name, 1);
+	animInstance:SetFieldKeyTime(name, 1, 0);
+	animInstance:SetFieldKeyValue(name, 1, data);
+	self.lastData:set(data);
+end
+
+-- get the C++ dynamic data directly as a constant value.
+-- @param bRefresh: true to refresh, otherwise use the last cached value (usually set via self:SetData).
+function BoneAttributeVariable:GetData(bRefresh)
+	if(not bRefresh) then
+		return self.lastData
+	end
+	local name = self:GetAttributeName();
+	local animInstance = self.animInstance;
+	if(animInstance:GetFieldKeyNums(name) > 0) then
+		if(self.type == "rot") then
+			self.lastData = self.lastData or mathlib.Quaternion:new()
+		else
+			self.lastData = self.lastData or mathlib.vector3d:new()
+		end
+		animInstance:GetFieldKeyValue(name, 1, self.lastData);
+		return self.lastData;
+	end
+end
+
 function BoneAttributeVariable:GetKeyNum()
 	return self.animInstance:GetFieldKeyNums(self:GetAttributeName());
 end
@@ -143,7 +181,7 @@ end
 
 -- Update or insert (Upsert) a key frame at given time.
 -- @param data: data is cloned before updating. 
-function BoneAttributeVariable:UpsertKeyFrame(key_time, data)
+function BoneAttributeVariable:UpsertKeyFrame(key_time, data) 
 	self:CreateGetTimeVar():UpsertKeyFrame(key_time, data);
 	self:LoadFromTimeVar();
 end

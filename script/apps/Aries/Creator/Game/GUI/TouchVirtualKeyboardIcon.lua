@@ -55,8 +55,8 @@ function TouchVirtualKeyboardIcon.IsSingletonVisible()
 end
 
 -- try show the singleton
-function TouchVirtualKeyboardIcon.ShowSingleton(bSHow)
-	if bSHow then
+function TouchVirtualKeyboardIcon.ShowSingleton(bShow)
+	if bShow then
 		local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileUIRegister.lua")
 		local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister");
@@ -69,17 +69,20 @@ function TouchVirtualKeyboardIcon.ShowSingleton(bSHow)
 	local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
 		if(Screen:GetWidth() > 0) then
 			timer:Change();
-			TouchVirtualKeyboardIcon.GetSingleton():Show(bSHow);
-
-			Screen:Connect("sizeChanged", function(width, height)
-				LOG.std(nil, "info", "TouchVirtualKeyboardIcon", "adjust position %d, %d", width, height);
-				local self = TouchVirtualKeyboardIcon.GetSingleton();
-				self:SetPosition();
-				self:GetKeyBoard():SetPosition(math.floor(self.left+self.width + self.width * 0.2));
-			end);
+			local self = TouchVirtualKeyboardIcon.GetSingleton()
+			self:Show(bShow);
+			if(bShow) then
+				Screen:Connect("sizeChanged", self, self.OnScreenSizeChange, "UniqueConnection");
+			end
 		end
 	end})
 	mytimer:Change(100,300);
+end
+
+function TouchVirtualKeyboardIcon.OnScreenSizeChange(self, width, height)
+	LOG.std(nil, "info", "TouchVirtualKeyboardIcon", "adjust position %d, %d", width, height);
+	self:SetPosition();
+	self:GetKeyBoard():SetPosition(math.floor(self.left+self.width + self.width * 0.2));
 end
 
 -- all input can be nil. 

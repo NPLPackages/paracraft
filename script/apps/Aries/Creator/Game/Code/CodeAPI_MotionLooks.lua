@@ -38,6 +38,10 @@ function env_imp:say(text, duration, bAbove3D)
 		if(actor) then
 			if(text~=nil) then
 				text = tostring(text);
+				if text:find("<") and not text:match("</%w+>") then
+					text = text:gsub("<","&lt;")
+					text = text:gsub(">","&gt;")
+				end
 			end
 			actor:Say(text, -1, bAbove3D)
 		else
@@ -56,6 +60,7 @@ end
 -- @param bIsAccurate: if true, we will move precisely dx,dy,dz offset(can be real numbers). 
 -- otherwise we will only walk to integer target block position (no movement if offset does not land in a new block).
 function env_imp:walk(dx,dy,dz, duration, bIsAccurate)
+	duration = duration and tonumber(duration)
 	if(not dz) then
 		dz = dy;
 		dy = nil;
@@ -197,7 +202,7 @@ function env_imp:setPos(x, y, z, objName)
 	else
 		actor = GameLogic.GetCodeGlobal():GetActorByName(objName);
 	end
-	if(actor) then
+	if(actor and x and y and z) then
 		x,y,z = BlockEngine:real_min(x, y, z);
 		actor:SetPosition(x, y, z);
 	end
@@ -206,7 +211,7 @@ end
 -- same as moveTo, except that we use real coordinate in block unit
 function env_imp:setBlockPos(bx, by, bz)
 	local actor = self.actor;
-	if(actor) then
+	if(actor and bx and by and bz) then
 		actor:SetBlockPos(bx, by, bz);
 	end
 end
@@ -231,12 +236,12 @@ function env_imp:getPos(objName)
 	end
 end
 
-function env_imp:getPlayerPos(valueType)
-	local x, y, z = EntityManager.GetPlayer():GetPosition()
-	x, y, z = BlockEngine:block(x, y, z);
-	if (valueType == "x") then return x end 
-	if (valueType == "y") then return y end 
-	if (valueType == "z") then return z end 
+-- @param axis: if nil, we will return x, y, z. it can also be "x", "y", "z"
+function env_imp:getPlayerPos(axis)
+	local x, y, z = EntityManager.GetPlayer():GetBlockPos()
+	if (axis == "x") then return x end 
+	if (axis == "y") then return y end 
+	if (axis == "z") then return z end 
 	return x, y, z;
 end
 
@@ -297,7 +302,7 @@ end
 -- @param duration: default to 1 tick
 function env_imp:moveForward(dist, duration)
 	local actor = env_imp.GetActor(self);
-	if(actor) then
+	if(actor and dist) then
 		if(useFourDirectionRotationStyle) then
 			local dir = Direction.GetDirectionFromFacing(actor:GetFacing());
 			local dx, dy, dz = Direction.GetOffsetBySide(dir);
@@ -309,8 +314,23 @@ function env_imp:moveForward(dist, duration)
 	end
 end
 
-function env_imp:turn(degree)
-	if(self.actor) then
+-- @param degree: in yaw
+-- @param pitch, roll: can be nil
+function env_imp:turn(degree, pitch, roll)
+	if(self.actor and degree) then
+		if(pitch or roll) then
+			local entity = self.actor:GetEntity();
+			if(entity) then
+				pitch, roll = roll, pitch; -- tricky: revert pitch and roll to be compatible with turnTo
+				if(pitch) then
+					entity:SetPitch(entity:GetPitch() + pitch * math.pi/180)
+				end
+				if(roll) then
+					entity:SetRoll(entity:GetRoll() + roll * math.pi/180)
+				end
+			end
+		end
+		degree = tonumber(degree)
 		self.actor:SetFacingDelta(degree*math.pi/180);
 	end
 	env_imp.wait(self, env_imp.GetDefaultTick(self));
@@ -391,23 +411,25 @@ end
 
 function env_imp:rotate(x, y, z)
 	local entity = env_imp.GetEntity(self);
-	if (not entity) then return end
-	entity:SetRoll(x * math.pi / 180 + entity:GetRoll());
-	entity:SetFacing(y * math.pi / 180 + entity:GetFacing());
-	entity:SetPitch(z * math.pi / 180 + entity:GetPitch());
+	if(entity and x and y and z) then
+		entity:SetRoll(z * math.pi / 180 + entity:GetRoll());
+		entity:SetFacing(y * math.pi / 180 + entity:GetFacing());
+		entity:SetPitch(x * math.pi / 180 + entity:GetPitch());
+	end
 end
 
 function env_imp:rotateTo(x, y, z)
 	local entity = env_imp.GetEntity(self);
-	if (not entity) then return end
-	entity:SetRoll(x * math.pi / 180);
-	entity:SetFacing(y * math.pi / 180);
-	entity:SetPitch(z * math.pi / 180);
+	if(entity and x and y and z) then
+		entity:SetRoll(z * math.pi / 180);
+		entity:SetFacing(y * math.pi / 180);
+		entity:SetPitch(x * math.pi / 180);
+	end
 end
 
 function env_imp:scale(scaleDeltaPercentage)
 	local entity = env_imp.GetEntity(self);
-	if(entity) then
+	if(entity and scaleDeltaPercentage) then
 		entity:SetScalingDelta(scaleDeltaPercentage/100);
 	end
 	env_imp.wait(self, env_imp.GetDefaultTick(self));
@@ -415,7 +437,7 @@ end
 
 function env_imp:scaleTo(scalePercentage)
 	local entity = env_imp.GetEntity(self);
-	if(entity) then
+	if(entity and scalePercentage) then
 		entity:SetScaling(scalePercentage/100);
 	end
 	env_imp.checkyield(self);
@@ -642,6 +664,7 @@ end
 -- @param timeTo: if nil, default to timeFrom. this will also stop previous timer
 -- @param isLooping: default to false.
 function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
+	boneName = boneName or "*"
 	if(not timeFrom and not timeTo) then
 		local timer = env_imp.getPlayTimer(self, boneName, true)
 		if(timer) then
@@ -918,7 +941,7 @@ local function GetMovieChannelByName_(name, codeblock)
 	name = GetMovieChannelName_(name, codeblock)
 	local channel = MovieManager:CreateGetMovieChannel(name);
 	if(not channel:GetStartBlockPosition() and name == codeblock:GetFilename()) then
-		local movieEntity = self.codeblock:GetMovieEntity();
+		local movieEntity = codeblock:GetMovieEntity();
 		if(movieEntity) then
 			local x, y, z = movieEntity:GetBlockPos();
 			channel:SetStartBlockPosition(x, y, z);
@@ -936,7 +959,7 @@ function env_imp:setMovie(name, x, y, z)
 	name = GetMovieChannelName_(name, self.codeblock)
 	local channel = MovieManager:CreateGetMovieChannel(name);
 	if(channel) then
-		if(not z or (z==0) ) then
+		if(not z or (z==0) or not x or not y) then
 			local movieEntity = self.codeblock:GetMovieEntity();
 			if(movieEntity) then
 				x, y, z = movieEntity:GetBlockPos();
@@ -1034,11 +1057,17 @@ local lastWinId = 0;
 -- @param alignment: if "headon", it means on top of the current actor. default to "_lt"
 -- it can also be "global_lt", which will attach to root gui object, 
 -- instead of scene viewport window, whose zorder is always -5. 
+-- it can also be {alignment = "headon3D", offset, facing}, where offset are {x=0, y=0, z=0} 
 -- @return the window object itself
 function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, envTable, wndParent)
 	if(mcmlCode) then
 		if(not mcmlCode:match("<pe:mcml")) then
 			mcmlCode = "<pe:mcml>"..mcmlCode.."</pe:mcml>"
+		end
+		local alignParams;
+		if(type(alignment) == "table") then
+			alignParams = alignment
+			alignment = alignParams.alignment;
 		end
 		local xmlRoot = ParaXML.LuaXML_ParseString(mcmlCode);
 		if(type(xmlRoot)=="table" and table.getn(xmlRoot)>0) then
@@ -1076,7 +1105,8 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 						}
 						if(alignment == "headon3D") then
 							params.is3D = true
-							params.facing = -1.57
+							params.facing = alignParams and alignParams.facing or -1.57
+							params.offset = alignParams and alignParams.offset;
 						end
 						my_window = entity:SetHeadOnDisplay(params)
 					end
@@ -1106,7 +1136,7 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 				my_window:Show({
 					-- xml here
 					url=xmlRoot, 
-					name = self.codeblock:GetFilename() or ("codeWindow"..lastWinId),
+					name = (self.codeblock:GetFilename() or "codeWindow")..lastWinId,
 					alignment = alignment or "_lt", 
 					left=left or 0, top=top or 0, width=width or 300, height=height or 100, 
 					zorder=zorder or zorder, 
@@ -1150,7 +1180,7 @@ function env_imp:playMatchedMovie(name, bWaitForFinish)
 		entity:SetDummy(true);
 		entity:EnableAnimation(false);
 		
-		local channel = GetMovieChannelByName_(name, codeblock);
+		local channel = GetMovieChannelByName_(name, self.codeblock);
 		local movieController = {time = 0, FrameMove = nil};
 		if(channel and actor:PlayMatchedMovie(channel.name, movieController)) then
 			local timer = env_imp.getPlayTimer(self)

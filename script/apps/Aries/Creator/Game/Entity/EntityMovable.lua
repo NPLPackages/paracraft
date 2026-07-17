@@ -88,6 +88,13 @@ function Entity:init()
 			self:SetPosition(x, y, z);
 		end
 		local ReplaceableTextures;
+
+		local skin,default_assets = CustomCharItems:GetSkinByAsset(self:GetMainAssetPath());
+		if (skin) then
+			self.mainAssetPath = default_assets or CustomCharItems.defaultModelFile;
+			self.skin = skin;
+		end
+			
 		if(not self.skin) then
 			if(item:GetAssetFile() == self:GetMainAssetPath()) then
 				local skin = item:GetSkinFile();
@@ -413,17 +420,21 @@ function Entity:RefreshClientModel(bForceRefresh, playerObj)
 	if(playerObj) then
 		-- refresh skin and base model, preserving all custom bone info
 		local assetPath = self:GetMainAssetPath()
-		if(playerObj:GetField("assetfile", "") ~= assetPath or bForceRefresh) then
-			local skin = CustomCharItems:GetSkinByAsset(assetPath);
-			if (skin) then
-				self.mainAssetPath = CustomCharItems.defaultModelFile;
+		local objAssetFile = playerObj:GetField("assetfile", "");
+		
+		if(objAssetFile ~= assetPath or bForceRefresh) then
+			local skin,default_assets = CustomCharItems:GetSkinByAsset(assetPath);
+			local petAssetFile = self.petObj and self.petObj:GetField("assetfile", "") or "";
+			local bNotMount = petAssetFile ~= "" and petAssetFile ~= assetPath
+			if (skin and bNotMount) then 
+				self.mainAssetPath = default_assets or CustomCharItems.defaultModelFile;
 				self.skin = skin;
 				assetPath = self.mainAssetPath;
 				self:GetDataWatcher():SetField(self.dataMainAsset, assetPath);
 			else
 				-- check if the player got a custom modelPath & this modelpath doesn't map to skinIdString
 				-- make sure the pet is unloaded
-				PlayerAssetFile.ShowPetOrNot(playerObj, "", self, false, "");
+				PlayerAssetFile.ShowMountOrNot(playerObj, "", self, false, "");
 			end;
 			playerObj:SetField("assetfile", assetPath);
 		end
@@ -451,15 +462,86 @@ function Entity:HasCustomGeosets()
 	return self.hasCustomGeosets
 end
 
+-- only call this function when the entity is a custom character.
+-- we will put on the item, and it will return item_id that has been replaced. 
+-- please note: when we put on a new shirt, the old shirt and the back are both returned. 
+-- @param itemId: custom character item id, such as 83127
+-- @return replacedItemId, replacedItemId2: this can be nil or the same as the itemId. or the replaced one or two items. 
+function Entity:PutOnCustomCharItem(itemId)
+	local item = CustomCharItems:GetItemById(itemId)
+	if(item and self:HasCustomGeosets()) then
+		local oldSkins = self:GetSkin();
+		local newSkins = CustomCharItems:AddItemToSkin(oldSkins, item);
+		if(newSkins and newSkins ~= oldSkins) then
+			local oldItems, newItems;
+			if(oldSkins) then
+				oldItems = commonlib.split(oldSkins, ";")
+			end
+			if(newSkins) then
+				newItems = commonlib.split(newSkins, ";")
+			end
+			local replacedItemId;
+			if(oldSkins) then
+				for _, id in pairs(oldItems) do
+					local bHasItem;
+					for _, id2 in pairs(newItems) do
+						if(id == id2) then
+							bHasItem = true
+							break;
+						end
+					end
+					if(not bHasItem and CustomCharItems:GetItemById(id)) then
+						replacedItemId = id
+						break
+					end
+				end
+			else
+				replacedItemId = tostring(itemId);
+			end
+			self:SetSkin(newSkins)
+			return replacedItemId
+		end
+	end
+	return itemId;
+end
+
+-- only call this function when the entity is a custom character.
+-- we will take off the given item, and it will return item_id that has been taken off. 
+-- @return itemId if succeed
+function Entity:TakeOffCustomCharItem(itemId)
+	local item = CustomCharItems:GetItemById(itemId)
+	if(item and self:HasCustomGeosets()) then
+		local oldSkins = self:GetSkin();
+		if(oldSkins) then
+			local oldItems = commonlib.split(oldSkins, ";")
+			if(oldItems) then
+				local index;
+				for i, id in ipairs(oldItems) do
+					if(id == itemId) then
+						index = i;
+						break;
+					end
+				end
+				if(index) then
+					commonlib.removeArrayItem(oldItems, index)
+					local newSkins = table.concat(oldItems, ";");
+					self:SetSkin(newSkins)
+					return itemId;
+				end
+			end
+		end
+	end
+end
+
 function Entity:RefreshSkin(player)
 	local player = player or self:GetInnerObject();
 	if(player) then
 		local skin = self:GetSkin();
 		if(self.isCustomModel) then
-			PlayerAssetFile:RefreshCustomModel(player, skin)
+			PlayerAssetFile:RefreshCustomModel(player, skin, self:GetMainAssetPath())
 			return 
 		end
-
+		
 		if(self.hasCustomGeosets) then
 			PlayerAssetFile:RefreshCustomGeosets(player, skin, self);
 			return;
@@ -768,18 +850,6 @@ function Entity:MoveForward(speed)
 	self.moveForward = speed;
 end
 
--- framemove this entity when it is riding (mounted) on another entity. 
--- we will update according to mounted entity's position. 
-function Entity:FrameMoveRidding(deltaTime)
-	
-	if(self:HasFocus()) then
-		-- just in case the user changed the position.
-		self:UpdatePosition();
-		self.moveForward = 0;
-	end
-	EntityManager.Entity.FrameMoveRidding(self, deltaTime);
-end
-
 function Entity:HasTarget()
 	return (self.targetX ~= nil);
 end
@@ -829,6 +899,8 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 		end
 		local bFlying = self:IsFlying();
 		local bHasMotionLast = self:HasMotion();
+		local motionX, motionZ = self.motionX, self.motionZ;
+		local hasXZDecay;
 		if(self:HasTarget()) then
 			local dx, dy, dz;
 			dx = self.targetX - self.x;
@@ -841,14 +913,14 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 					-- reached position
 					self:SetPosition(self.targetX, self.y, self.targetZ);
 					self:SetBlockTarget(nil, nil, nil);
-					self.motionX = 0;
+					motionX = 0;
 					self.motionY = 0;
-					self.motionZ = 0;
+					motionZ = 0;
 				else
 					local inverse_dist = 1 / (dist ^ 0.5) * moveLength;
-					self.motionX = dx * inverse_dist;
+					motionX = dx * inverse_dist;
 					-- self.motionY = dy * inverse_dist;
-					self.motionZ = dz * inverse_dist;
+					motionZ = dz * inverse_dist;
 				
 					local facing = self:GetFacing()*0.4 + Direction.GetFacingFromOffset(dx, 0, dz) * 0.6;
 					self:SetFacing(facing);
@@ -861,34 +933,34 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 					-- reached position
 					self:SetBlockTarget(nil, nil, nil);
 					self:SetPosition(self.targetX, self.y, self.targetZ);
-					self.motionX = 0;
+					motionX = 0;
 					self.motionY = 0;
-					self.motionZ = 0;
+					motionZ = 0;
 				else
 					local inverse_dist = 1 / (dist ^ 0.5) * moveLength;
-					self.motionX = dx * inverse_dist;
+					motionX = dx * inverse_dist;
 					self.motionY = dy * inverse_dist;
-					self.motionZ = dz * inverse_dist;
+					motionZ = dz * inverse_dist;
 					local facing = self:GetFacing()*0.4 + Direction.GetFacingFromOffset(dx, 0, dz) * 0.6;
 					self:SetFacing(facing);
 				end
 			end
 		else
 			if (self.onGround and bHasMotionLast) then
-				local dist_sq = self.motionX ^ 2 + self.motionZ ^ 2;
+				hasXZDecay = true;
+				local dist_sq = motionX ^ 2 + motionZ ^ 2;
 				local decayFactor = 1-self:GetSurfaceDecay();
-				self.motionX = self.motionX * decayFactor;
-				self.motionZ = self.motionZ * decayFactor;
+				motionX = motionX * decayFactor;
+				motionZ = motionZ * decayFactor;
 				if(dist_sq < 0.00001) then
 					-- make it stop when motion is very small
-					self.motionX = 0;
-					-- self.motionY = 0;
-					self.motionZ = 0;
+					motionX = 0;
+					motionZ = 0;
 				end
 			end
 		end
 
-		local dist_sq = self.motionX ^ 2 + self.motionZ ^ 2;
+		local dist_sq = motionX ^ 2 + motionZ ^ 2;
 		
 		if(bFlying) then
 			dist_sq = dist_sq + self.motionY ^ 2;
@@ -908,7 +980,22 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 			self.motionY = math.max(-1, self.motionY - self:GetGravity()*2*deltaTime*deltaTime);
 		end
 		
-		self:MoveEntityByDisplacement(self.motionX,self.motionY,self.motionZ);
+		self:MoveEntityByDisplacement(motionX, self.motionY, motionZ);
+
+		
+		if (hasXZDecay) then
+			-- tricky code: we will not modify motionX and motionZ if it is not on ground after applying displacement
+			if(self.onGround) then
+				if(self.motionX ~= 0) then
+					self.motionX = motionX;
+				end
+				if(self.motionZ ~= 0) then
+					self.motionZ = motionZ;
+				end
+			end
+		else
+			self.motionX, self.motionZ = motionX, motionZ;
+		end
 
 		if(dist_sq == 0 and self.onGround) then
 			-- restore to normal frame move interval. 
@@ -954,22 +1041,8 @@ function Entity:FrameMoveRidding(deltaTime)
 	Entity._super.FrameMoveRidding(self, deltaTime);
 end
 
-function Entity:ShouldEntityLoadPet()
-	if(PlayerAssetFile.IsPetSkinIdExist(self.skin) and (not self.petObj)) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
-		local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile");
-		local isAttachmentStringExist = attachments and string.len(attachments) > 0;
-
-		PlayerAssetFile.ShowPetOrNot(
-			self:GetInnerObject(), attachments, self, 
-			isAttachmentStringExist, self.skin)
-	end
-end
-
 -- called every frame
 function Entity:FrameMove(deltaTime)
-	-- self:ShouldEntityLoadPet()
-
 	if(GameLogic.isRemote and not self:HasFocus()) then
 		if (self.smoothFrames > 0) then
             local x = self.targetX - self.x

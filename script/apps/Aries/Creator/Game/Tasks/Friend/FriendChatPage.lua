@@ -8,6 +8,8 @@ Use Lib:
 local FriendChatPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendChatPage.lua");
 FriendChatPage.Show();
 --]]
+NPL.load("(gl)script/apps/Aries/Chat/BadWordFilter.lua");
+local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
 local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
@@ -89,25 +91,25 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg,bIsTopLevel)
 	local last_chat_msg = FriendManager:GetLastChatMsg() or {}
 
 	if FriendChatPage.IsOpen then
-		if ChatUserData and ChatUserData.id == chat_user_data.id then
+		if ChatUserData and ChatUserData.friendId == chat_user_data.friendId then
 			return
 		end
 
-		FriendChatPage.SaveChatContent(ChatUserData.id)
+		FriendChatPage.SaveChatContent(ChatUserData.friendId)
 
 		FriendChatPage.UpdataFriendList(nil, function ()
 			ChatUserData = chat_user_data
 
-			if last_chat_msg[ChatUserData.id] == nil then
+			if last_chat_msg[ChatUserData.friendId] == nil then
 				chat_user_data.last_msg_time_stamp = os.time()
-				TempFriendList[chat_user_data.id] = chat_user_data
+				TempFriendList[chat_user_data.friendId] = chat_user_data
 			end
 			
 			
 	
 			local list = FriendChatPage.GetRecentFromFriendsList()
 			for k, v in pairs(list) do
-				if v.id == ChatUserData.id then
+				if v.id == ChatUserData.friendId then
 					FriendChatPage.select_item_id = v.id
 				end
 				-- FriendList[v.id] = v
@@ -115,9 +117,8 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg,bIsTopLevel)
 			FriendChatPage.Current_Item_DS = list
 			FriendChatPage.OnRefresh()
 
-			local connection = FriendManager.connections[ChatUserData.id]
-			FriendManager:Connect(ChatUserData.id,function()
-				-- 如果connection存在 则说明已经有保存在内存的未读消息 这种情况要重新请求下最新的未读消息
+			local connection = FriendManager.connections[ChatUserData.friendId]
+			FriendManager:Connect(ChatUserData.friendId,function()
 				if connection then
 					connection:LoadUnReadMsgs(function (unread_msgs)
 						connection.unread_msgs = unread_msgs
@@ -137,20 +138,19 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg,bIsTopLevel)
 	FriendChatPage.IsOpen = true
 
 	ChatUserData = chat_user_data
-	if last_chat_msg[ChatUserData.id] == nil then
+	if last_chat_msg[ChatUserData.friendId] == nil then
 		chat_user_data.last_msg_time_stamp = os.time()
-		TempFriendList[chat_user_data.id] = chat_user_data
+		TempFriendList[chat_user_data.friendId] = chat_user_data
 	end
 	
-	local search_text = search_text or ""
-	keepwork.user.friends({
-		username=search_text,
+	keepwork.friend.friendsList({
         headers = {
             ["x-per-page"] = 200,
             ["x-page"] = 1,
         }
 	},function(err, msg, data)
 		-- commonlib.echo(data, true)
+		-- echo("xxxxxxxxxxxxxxxxxxxxx")
 		if err == 200 then
 			local function show_callback()
 				local params = {
@@ -165,9 +165,9 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg,bIsTopLevel)
 					isTopLevel = bIsTopLevel or false,
 					--app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 					directPosition = true,
-						align = "_ct",
-						x = -760/2,
-						y = -583/2,
+						align = "_ctl",
+						x = 350,
+						y = 5,
 						width = 760,
 						height = 583,
 				};
@@ -176,19 +176,22 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg,bIsTopLevel)
 					page = params._page
 				end
 				-- 
-				for k, v in pairs(data.rows) do
-					FriendList[v.id] = v
+				for k, v in pairs(data) do
+					if v.friend and type(v.friend) == "table" then
+						v.username = v.friend.username
+						v.nickname = v.friend.nickname
+						v.portrait = v.friend.portrait
+					end
+					FriendList[v.friendId] = v
 				end
 				
 				local list = FriendChatPage.GetRecentFromFriendsList()
 				for k, v in pairs(list) do
-					if v.id == ChatUserData.id then
+					if v.id == ChatUserData.friendId then
 						FriendChatPage.select_item_id = v.id
 					end
-					-- FriendList[v.id] = v
 				end
 				FriendChatPage.Current_Item_DS = list
-				-- FriendChatPage.OnRefresh()
 
 				FriendChatPage.CreateChatContentView()
 				FriendChatPage.FreshFriendGridView()
@@ -209,7 +212,7 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg,bIsTopLevel)
 
 
 
-				FriendManager:Connect(ChatUserData.id,function()
+				FriendManager:Connect(ChatUserData.friendId,function()
 					show_callback()
 				end)
 			end, true);
@@ -368,7 +371,7 @@ function FriendChatPage.DrawConversationNodeHandler2(_parent, treeNode)
 					<div style="margin-top:%s;margin-left:%s;width:%s;font-size:%s;color:#575757;text-align:%s;text-singleline:%s;">
 						%s
 					</div>	
-				]], margin_top, text_margin_left, text_width, content_font_size, align_type, is_more_line, v)
+				]], margin_top, text_margin_left, text_width, content_font_size, align_type, tostring(is_more_line), v)
 			end
 			mcmlStr = string.format([[
 				<div style="margin-left:0px;margin-top:0px;padding-left:30px;padding-top:2px;width:500px;">
@@ -408,7 +411,7 @@ function FriendChatPage.DrawConversationNodeHandler2(_parent, treeNode)
 					<div style="margin-top:%s;margin-left:12px;width:%s;font-size:%s;color:#575757;text-singleline:%s;">
 						%s
 					</div>	
-				]], margin_top, text_width, content_font_size, is_more_line, v)
+				]], margin_top, text_width, content_font_size, tostring(is_more_line), v)
 			end
 	
 			mcmlStr = string.format([[
@@ -582,52 +585,12 @@ function FriendChatPage.SendMsg(msg)
 		send_text = page:GetValue("sendText") or ""
 		page:SetValue("sendText", "")
 	end
-
-
 	if send_text == "" then
 		GameLogic.AddBBS("statusBar", L"请输入信息!", 5000, "0 255 0");
 		return
 	end
-	FriendManager:SendMessage(ChatUserData.id, { words = send_text, msg_type=msg_type})
-
-	-- local send_text = node:GetValue()
-
-
+	FriendManager:SendMessage(ChatUserData.friendId, { words = BadWordFilter.FilterString(send_text), msg_type=msg_type})
 end
-
--- body={
---     "app/msg",
---     {
---       action="msg",
---       meta={
---         client="meZBlwOs7mONOlZzAABN",
---         target="__chat_1083_1103__",
---         timestamp="2020-09-07 15:07" 
---       },
---       payload={
---         ChannelIndex=25,
---         content="哈哈哈哈试试",
---         id=1083,
---         msgKey="e48cf47d-d0b4-4e6d-9f4f-9415264c2fee",
---         nickname="qq342949687",
---         orgAdmin=0,
---         student=0,
---         tLevel=0,
---         toid=1103,
---         type=4,
---         username="qq342949687",
---         vip=0,
---         worldId=1192 
---       },
---       userInfo={
---         iat=1599462458,
---         machineCode="19eb2894-9e6b-45f3-87f4-30f31ad7eb1a-4C4C4544-0056-3110-804A-C8C04F373433",
---         platform="PC",
---         userId=1083,
---         username="qq342949687" 
---       } 
---     } 
---   },
 
 function FriendChatPage.OnMsg(payload, full_msg)
 	if nil == full_msg or nil == payload then
@@ -639,7 +602,7 @@ function FriendChatPage.OnMsg(payload, full_msg)
 		FriendChatPage.UpdataFriendList()
 	end
 	
-	if payload.id ~= UserData.id and payload.id ~= ChatUserData.id then
+	if payload.id ~= UserData.id and payload.id ~= ChatUserData.friendId then
 		local list = FriendChatPage.GetRecentFromFriendsList()
 		FriendChatPage.Current_Item_DS = list
 
@@ -661,11 +624,13 @@ function FriendChatPage.OnMsg(payload, full_msg)
 	chat_data.time = os.time()
 	
 	local ctl = CommonCtrl.GetControl("chat_TreeView");	
-	ctl.RootNode:AddChild(CommonCtrl.TreeNode:new(chat_data));
-	ctl:Update(true);
-
+	if ctl then
+		ctl.RootNode:AddChild(CommonCtrl.TreeNode:new(chat_data));
+		ctl:Update(true);
+	end
+	
 	-- 通知服务器已读
-	local connection = FriendManager.connections[ChatUserData.id]
+	local connection = FriendManager.connections[ChatUserData.friendId]
 	if connection then
 		keepwork.friends.updateLastMsgTagInRoom({
 			roomId = connection.roomId,
@@ -696,7 +661,7 @@ function FriendChatPage.ClearData()
 end
 
 function FriendChatPage.CloseView()
-	FriendChatPage.SaveChatContent(ChatUserData.id)
+	FriendChatPage.SaveChatContent(ChatUserData.friendId)
 	FriendChatPage.IsOpen = false
 	FriendChatPage.ClearData()
 	FriendManager:ClearAllConnections()
@@ -718,11 +683,11 @@ function FriendChatPage.ClickItem(id)
 		return
 	end
 
-	FriendChatPage.SaveChatContent(ChatUserData.id)
+	FriendChatPage.SaveChatContent(ChatUserData.friendId)
 
 	FriendChatPage.select_item_id = id
 	for k, v in pairs(FriendChatPage.Current_Item_DS) do
-		if v.id == id then
+		if v.friendId == id then
 			ChatUserData = v
 			break
 		end
@@ -732,8 +697,8 @@ function FriendChatPage.ClickItem(id)
 
 	FriendChatPage.OnRefresh()
 
-	local connection = FriendManager.connections[ChatUserData.id]
-	FriendManager:Connect(ChatUserData.id,function()
+	local connection = FriendManager.connections[ChatUserData.friendId]
+	FriendManager:Connect(ChatUserData.friendId,function()
 		-- 如果connection存在 则说明已经有保存在内存的未读消息 这种情况要重新请求下最新的未读消息
 		if connection then
 			connection:LoadUnReadMsgs(function (unread_msgs)
@@ -781,7 +746,7 @@ function FriendChatPage.CreateChatContentView()
 	-- 创建未读消息
 	-- local ctl = CommonCtrl.GetControl("chat_TreeView");	
 	------------------------------------------------之前的聊天记录------------------------------------------------
-	local filepath = string.format("chat_content/%s_%s.txt", UserData.id,ChatUserData.id)
+	local filepath = string.format("chat_content/%s_%s.txt", UserData.id,ChatUserData.friendId)
 	if( ParaIO.DoesFileExist(filepath)) then
 		local file = ParaIO.open(filepath, "r");
 		if(file:IsValid()) then
@@ -808,7 +773,7 @@ function FriendChatPage.CreateChatContentView()
 
 	------------------------------------------------服务器保存的未读消息------------------------------------------------
 	
-	local connection = FriendManager.connections[ChatUserData.id]
+	local connection = FriendManager.connections[ChatUserData.friendId]
 	if nil == connection then
 		return
 	end
@@ -846,14 +811,14 @@ function FriendChatPage.CreateChatContentView()
 
 	local clear_unread_callback = function ()
 			-- 清除未读消息数量
-			if FriendChatPage.UnreadMsg[ChatUserData.id] and FriendChatPage.UnreadMsg[ChatUserData.id].unReadCnt then
-				FriendChatPage.UnreadMsg[ChatUserData.id].unReadCnt = 0
+			if FriendChatPage.UnreadMsg[ChatUserData.friendId] and FriendChatPage.UnreadMsg[ChatUserData.friendId].unReadCnt then
+				FriendChatPage.UnreadMsg[ChatUserData.friendId].unReadCnt = 0
 				FriendChatPage.FreshFriendGridView()
 			end
 	
 			-- 清除好友列表未读消息数量
 			if FriendsPage.GetIsOpen() then
-				FriendsPage.ClearUnReadMsg(ChatUserData.id)
+				FriendsPage.ClearUnReadMsg(ChatUserData.friendId)
 			end
 	
 			connection.unread_msgs = {}
@@ -864,8 +829,8 @@ function FriendChatPage.CreateChatContentView()
 			clear_unread_callback()
 		end)	
 	else -- 预防单人的未读消息清除了但没清总的未读消息
-		if FriendChatPage.UnreadMsg[ChatUserData.id] then
-			local msgKey = FriendChatPage.UnreadMsg[ChatUserData.id].msgKey or ""
+		if FriendChatPage.UnreadMsg[ChatUserData.friendId] then
+			local msgKey = FriendChatPage.UnreadMsg[ChatUserData.friendId].msgKey or ""
 			keepwork.friends.updateLastMsgTagInRoom({
 				roomId = connection.roomId,
 				msgKey = msgKey,
@@ -964,7 +929,7 @@ function FriendChatPage.GetRecentFromFriendsList()
 	local list = {}
 	local id_list = {}
 	for key, v in pairs(FriendList) do
-		local id = tostring(v.id)
+		local id = tostring(v.friendId)
 		if last_chat_msg[id] then
 			v.last_msg_time_stamp = last_chat_msg[id].time_stamp
 			list[#list + 1] = v
@@ -973,8 +938,8 @@ function FriendChatPage.GetRecentFromFriendsList()
 	
 	
 	for key, v in pairs(TempFriendList) do
-		local id = tostring(v.id)
-		if last_chat_msg[id] == nil and FriendList[v.id] then -- 为空说明是一个全新的会话
+		local id = tostring(v.friendId)
+		if last_chat_msg[id] == nil and FriendList[v.friendId] then -- 为空说明是一个全新的会话
 			list[#list + 1] = v
 		end
 	end
@@ -986,9 +951,7 @@ function FriendChatPage.GetRecentFromFriendsList()
 end
 
 function FriendChatPage.UpdataFriendList(search_text, callback)
-	search_text = search_text or ""
-	keepwork.user.friends({
-		username=search_text,
+	keepwork.friend.friendsList({
         headers = {
             ["x-per-page"] = 200,
             ["x-page"] = 1,
@@ -997,8 +960,15 @@ function FriendChatPage.UpdataFriendList(search_text, callback)
 		-- commonlib.echo(data, true)
 		if err == 200 then
 			FriendList = {}
-			for k, v in pairs(data.rows) do
-				FriendList[v.id] = v
+			for k, v in pairs(data) do
+				if v.status == 1 then --当status不为1时，表示该好友已删除
+					if v.friend and type(v.friend) == "table" then
+						v.username = v.friend.username
+						v.nickname = v.friend.nickname
+						v.portrait = v.friend.portrait
+					end
+                    FriendList[v.friendId] = v
+                end
 			end
 
 			if callback then
@@ -1017,6 +987,7 @@ function FriendChatPage.FlushCurDataAndView(search_text)
 end
 
 function FriendChatPage_DowloadFile(name,mcmlNode)
+	print("FriendChatPage_DowloadFile",name,FriendChatPage.TemplateItem)
 	if FriendChatPage.TemplateItem then
 		return
 	end

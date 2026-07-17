@@ -13,10 +13,12 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Login/DownloadWorld.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
 local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
 local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
+local DownLoadPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdate/DownLoadPage.lua");
+local UpdateResultDialog = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdate/UpdateResultDialog.lua");
 local AutoUpdater = NPL.load("AutoUpdater");
 local Broadcast = NPL.load("Mod/GeneralGameServerMod/CommonLib/Broadcast.lua");
 local ClientUpdater430 = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater430"));
-
+ClientUpdater430.autoUpdater = nil
 function ClientUpdater430:ctor()
     self._isAutoInstall = true
 	if(not ClientUpdater430) then
@@ -29,7 +31,7 @@ function ClientUpdater430:ctor()
     }
 	local autoUpdater = AutoUpdater:new(params);
 	self.autoUpdater = autoUpdater;
-
+    print("ClientUpdater430:ctor")
     local timer;
 	autoUpdater:onInit(ParaIO.GetWritablePath(), ParaWorldLoginDocker.GetAppConfigByName("paracraftAppVersion"), function(state,param1, param2)
         if(state)then
@@ -41,8 +43,9 @@ function ClientUpdater430:ctor()
             elseif(state == State.VERSION_CHECKED)then
                 self:UpdateProgressText(L"版本验证完毕");
             elseif(state == State.VERSION_ERROR)then
-				_guihelper.MessageBox(L"无法获取版本信息");
-
+                self:UpdateProgressText(L"无法获取版本信息，可使用本地模式。");
+				-- _guihelper.MessageBox(L"无法获取版本信息，可使用本地模式。");
+                DownLoadPage.OnClose()
             elseif(state == State.PREDOWNLOAD_MANIFEST)then
                 self:UpdateProgressText(L"资源列表预下载");
             elseif(state == State.DOWNLOADING_MANIFEST)then
@@ -51,6 +54,12 @@ function ClientUpdater430:ctor()
 				self:UpdateProgressText(L"已经获取资源列表");
             elseif(state == State.MANIFEST_ERROR)then
 				_guihelper.MessageBox(L"无法获取资源列表");
+                commonlib.TimerManager.SetTimeout(function()
+                    _guihelper.CloseMessageBox(true)
+                    DownLoadPage.OnClose()
+                    UpdateResultDialog.ShowPage("failed")
+                end,1000*2)
+                
 				-- if(self.callback) then
 				-- 	self.callback(false)
 				-- end
@@ -69,8 +78,10 @@ function ClientUpdater430:ctor()
                         local downloadSpeed = (downloadedSize - lastDownloadedSize) / ((nowTime - lastTime) / 1000)
                         lastDownloadedSize = downloadedSize
                         lastTime = nowTime
-                        local tips = string.format("%.1f/%.1fMB(%.1fKB/S)", downloadedSize / 1024 / 1024, totalSize / 1024 / 1024, downloadSpeed / 1024)
-						self:UpdateProgressText(tips);
+                        -- local tips = string.format("%.1f/%.1fMB(%.1fKB/S)", downloadedSize / 1024 / 1024, totalSize / 1024 / 1024, downloadSpeed / 1024)
+                        local tips = string.format("%.1fKB/S", downloadSpeed / 1024)
+                        local percent = math.floor((downloadedSize/totalSize)* 100)
+						self:UpdateProgressText(tips,percent);
                     end
 					
                 end})
@@ -84,14 +95,39 @@ function ClientUpdater430:ctor()
 					timer:Change();
                     timer = nil
 				end
-                if self._isAutoInstall then
-                    autoUpdater:apply();
+                if true then
+                    DownLoadPage.OnClose()
+                    UpdateResultDialog.ShowPage("success",function()
+                        if self._isAutoInstall then
+                            GameLogic.AddBBS(nil,L"更新已完成，正在自动重启，请等待.....")
+                            commonlib.TimerManager.SetTimeout(function()
+                                autoUpdater:apply();
+                            end,500)
+                        else
+                            autoUpdater:prepare430apply()
+                            self:ShowSlientlyPage()
+                        end
+                    end)
                 else
-                    autoUpdater:prepare430apply()
-                    self:ShowSlientlyPage()
+                    if self._isAutoInstall then
+                        GameLogic.AddBBS(nil,L"更新已完成，正在自动重启，请等待.....")
+                        commonlib.TimerManager.SetTimeout(function()
+                            autoUpdater:apply();
+                        end,500)
+                    else
+                        autoUpdater:prepare430apply()
+                        self:ShowSlientlyPage()
+                    end
                 end
+                
             elseif(state == State.ASSETS_ERROR)then
-				_guihelper.MessageBox(L"无法获取资源");
+                if true then
+                    DownLoadPage.OnClose()
+                    UpdateResultDialog.ShowPage("failed")
+                else
+                    _guihelper.MessageBox(L"无法获取资源");
+                end
+               
 				if(timer) then
 					timer:Change();
                     timer = nil
@@ -103,7 +139,12 @@ function ClientUpdater430:ctor()
             elseif(state == State.UPDATED)then
                 
             elseif(state == State.FAIL_TO_UPDATED)then
-				
+                if true then
+                    DownLoadPage.OnClose()
+                    UpdateResultDialog.ShowPage("failed")
+                else
+                    _guihelper.MessageBox(L"更新失败");
+                end
             end    
         end
 	end)
@@ -256,13 +297,14 @@ function ClientUpdater430:parseManifest(data,hostServer)
     return _downloadUnits
 end
 
-function ClientUpdater430:UpdateProgressText(text)
+function ClientUpdater430:UpdateProgressText(text,percent)
     local ret = GameLogic.GetFilters():apply_filters('check_is_downloading_from_lan',{
     })
     if ret and ret._hasStartDownloaded then ---已经在局域网开始更新了,停止下载任务
         return
     end
-    DownloadWorld.UpdateProgressText(text);
+    DownLoadPage.UpdateProgress(text,percent)
+    -- DownloadWorld.UpdateProgressText(text);
 end
 
 -- public function:
@@ -273,7 +315,7 @@ function ClientUpdater430:Check(callbackFunc)
 		if(not callbackFunc) then
 			return
 		end
-
+        print("--------check result",bSucceed)
 		if(bSucceed) then
             local bNeedUpdate = self.autoUpdater:isNeedUpdate()
             local curVersion = self:getCurVersion()
@@ -294,8 +336,7 @@ end
 
 function ClientUpdater430:Download()
     self._isAutoInstall = true
-    
-    DownloadWorld.ShowPage(self.gamename,10001);
+    DownLoadPage.ShowPage(self.gamename,10001)
     self.autoUpdater:download()
 end
 
@@ -522,4 +563,48 @@ function ClientUpdater430.WriteConfigForLauncher()
     if System.options.launcherExeName==nil then 
         System.options.launcherExeName = "ParaCraft.exe"
     end
+end
+
+function ClientUpdater430:getMiniVersion()
+    return self.autoUpdater:getMiniVersion()
+end
+
+--params: versionStr 版本号 如："1.0.1"
+function ClientUpdater430:ChangeVersion(versionStr)
+    if not self.autoUpdater or not versionStr or versionStr == "" then
+        return 0
+    end
+    local latest_version = self.autoUpdater:getLatestVersion()
+    local mini_version = self.autoUpdater:getMiniVersion()
+    local update_version = self.autoUpdater:getUpdateVersion()
+    
+    local compare_result1 = self.autoUpdater:_compareVer(versionStr, latest_version)
+    local compare_result2 = self.autoUpdater:_compareVer(versionStr, mini_version)
+    if compare_result2 < 0 or compare_result1 > 0 then
+        return 
+    end
+    self.autoUpdater:SetLatestVersion(versionStr)
+    self.autoUpdater:SetNeedUpdate(true)
+    return true
+end
+
+--params: versionStr 版本号 如："1.0.1"
+--返回是否已经下载过该版本的资源，以及下载路径
+function ClientUpdater430.CheckHasDownloaded(versionStr)
+    local versionStr = versionStr or "1.0.1"
+    local storagePath = ParaIO.GetWritablePath().. "caches/";
+    local versionPath = storagePath.. versionStr;
+    local files = commonlib.Files.Find({}, storagePath, 0, 500, "*")
+    local isHaveDownloadPath = false
+    for _, file in ipairs(files) do
+        if file and file.fileattr == 16 then
+            local fileName = file.filename or ""
+            local isMatch = fileName:match("^(%d+%.%d+%.%d+)$")
+            if isMatch and fileName == versionStr then
+                isHaveDownloadPath = true
+                break
+            end
+        end
+    end
+    return isHaveDownloadPath,storagePath,versionPath,files
 end

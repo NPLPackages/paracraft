@@ -127,13 +127,14 @@ function MovieClipTimeLine.OnClosePage()
 	
 	self.inited = false;
 	local viewport = ViewportManager:GetSceneViewport();
+	local viewportUI = ViewportManager:GetGUIViewport();
 	if(viewport:GetMarginBottomHandler() == self) then
 		viewport:SetMarginBottomHandler(nil);
-		viewport:SetMarginBottom(0);
+		viewport:SetMarginBottom(viewportUI:GetMarginBottom());
 	end
 	if(viewport:GetMarginRightHandler() == self) then
 		viewport:SetMarginRightHandler(nil);
-		viewport:SetMarginRight(0);	
+		viewport:SetMarginRight(viewportUI:GetMarginRight());	
 	end
 end
 
@@ -344,6 +345,17 @@ function MovieClipTimeLine:ShowTimeline(state)
 			end)
 			_guihelper.SetFontColor(_this, "#ffffff");
 			_this:AttachToRoot();
+
+			self.bIsSelfPaint = true
+			if(self.bIsSelfPaint) then
+				_this:SetField("SelfPaint", true);
+				if(not _this:GetField("SelfPaintInParent", false)) then
+					-- if self paint parent API is not supported(Engine is not update to date), we will not use self paint. 
+					_this:SetField("SelfPaint", false);
+					self.bIsSelfPaint = false;
+				end
+			end
+
 			local params = {url="script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html"}
 			params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"MovieClipTimeLine");
 			page = page or System.mcml.PageCtrl:new(params);
@@ -355,11 +367,12 @@ function MovieClipTimeLine:ShowTimeline(state)
 		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 		local Screen = commonlib.gettable("System.Windows.Screen");
 		local viewport = ViewportManager:GetSceneViewport();
-		viewport:SetMarginBottom(math.floor(self.height * (Screen:GetUIScaling()[2])));
+		local viewportUI = ViewportManager:GetGUIViewport();
+		viewport:SetMarginBottom(viewportUI:GetMarginBottom() + math.floor(self.height * (Screen:GetUIScaling()[2])));
 		viewport:SetMarginBottomHandler(self);
 		if(GameLogic.options:IsMaintainMovieBlockAspectRatio() and not viewport:GetMarginRightHandler()) then
 			-- let us maintain aspect ratio
-			viewport:SetMarginRight(math.floor(self.height/Screen:GetHeight()*Screen:GetWidth() * (Screen:GetUIScaling()[1])));
+			viewport:SetMarginRight(viewportUI:GetMarginRight() + math.floor(self.height/Screen:GetHeight()*Screen:GetWidth() * (Screen:GetUIScaling()[1])));
 			viewport:SetMarginRightHandler(self);
 		end
 		if(not self.inited) then

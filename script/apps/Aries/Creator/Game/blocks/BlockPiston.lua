@@ -50,7 +50,7 @@ block.isExtended = isExtended;
 
 -- returns true if the piston can push the specified block
 local function canPushBlock(block_id, x,y,z, canMoveFreeBlock)
-    if (block_id == block_types.names.Obsidian) then
+    if (not block_id or block_id == block_types.names.Obsidian) then
         return false;
     else
         if (block_id ~= block_types.names.Piston and block_id ~= block_types.names.StickyPiston) then

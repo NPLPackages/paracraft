@@ -1,0 +1,319 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type='text/npl' refresh='false'>
+                <![CDATA[
+                    MqttDetailPage = NPL.load('(gl)script/apps/Aries/Creator/Game/Mqtt/MqttDetailPage.lua')
+                    MqttDetailPage.OnInit()
+
+                    local page = document:GetPageCtrl()
+                    function close()
+                        page:CloseWindow()
+                    end
+
+                    function onclickNewProject()
+                        MqttDetailPage.OnClickAddProject()
+                    end
+
+                    function onclickDetail(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickProjectDetail(index)
+                        end
+                    end
+
+                    function onclickDelete(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickProjectDelete(index)
+                        end
+                    end
+
+                    function onclickUpdate(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickProjectUpdate(index)
+                        end
+                    end
+
+                    function GetProjectName()
+                        return MqttDetailPage.mqttProjectData and MqttDetailPage.mqttProjectData.name or ""
+                    end
+
+                    function OnChangeTabview(name)
+                        MqttDetailPage.ChangeMenu(name)
+                    end
+
+                    function onclickNewTopic()
+                        MqttDetailPage.OnClickNewTopic()
+                    end
+
+                    function DS_TopicList(index)
+                        if index == nil then
+                            return #MqttDetailPage.mqttTopicList
+                        else
+                            return MqttDetailPage.mqttTopicList[index]
+                        end
+                    end
+
+                    function load_topic_more()
+                        MqttDetailPage.LoadTopicMore(Eval("index"))
+                    end
+
+                    function onclickTopicCopy(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickTopicCopy(index)
+                        end
+                    end
+
+                    function onclickTopicEdit(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickTopicEdit(index)
+                        end
+                    end
+
+                    function onclickTopicDetail(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickTopicDetail(index)
+                        end
+                    end
+
+                    function onclickTopicClear(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickTopicClear(index)
+                        end
+                    end
+
+                    function onclickTopicDelete(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickTopicDelete(index)
+                        end
+                    end
+
+                    function load_device_more()
+                        MqttDetailPage.LoadDeviceMore(Eval("index"))
+                    end
+
+                    function onclickNewDevice()
+                        MqttDetailPage.OnClickNewDevice()
+                    end
+
+                    function DS_DeviceList(index)
+                        if index == nil then
+                            return #MqttDetailPage.mqttDeviceList
+                        else
+                            return MqttDetailPage.mqttDeviceList[index]
+                        end
+                    end
+
+                    function onclickDevicePassWordCopy(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickDevicePassWordCopy(index)
+                        end
+                    end
+
+                    function onclickDeviceUserNameCopy(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickDeviceUserNameCopy(index)
+                        end
+                    end
+
+                    function onclickDeviceClientIdCopy(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickDeviceClientIdCopy(index)
+                        end
+                    end
+
+                    function onclickDeviceDelete(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttDetailPage.OnClickDeviceDelete(index)
+                        end
+                    end
+
+                    function IsLimitTopicDesc(msg)
+                        if msg == nil or msg == "" then
+                            return false
+                        end
+                        local fontName = "System;12;norm"
+                        local width = _guihelper.GetTextWidth(msg, fontName)
+                        --print("IsLimitTopicDesc========",width)
+                        return width and width > 180
+                    end
+
+                    function GetLimitTopicDesc(msg)
+                        return commonlib.GetLimitLabelByTextWidth(msg,180,"System;12;norm")
+                    end
+
+                    function IsLimitDeviceName(name)
+                        if name == nil or name == "" then
+                            return false
+                        end
+                        local fontName = "System;12;norm"
+                        local width = _guihelper.GetTextWidth(name, fontName)
+                        return width and width > 100
+                    end
+
+                    function GetLimitDeviceName(name)
+                        return commonlib.GetLimitLabelByTextWidth(name,100,"System;12;norm")
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    flat_button = {
+                        color = "#cccccc",
+                        ["margin-top"] = 0,
+                        background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8"
+                    },
+                }
+            </style>
+            <!-- mc_green_button_with_fillet -->
+            <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+                <pe:container alignment="_ct" width="1070" height="520" style="margin-left:-535px;margin-top:-260px;background: ;">
+                    <aries:window mode='thin' title='<%= L"项目详情："..GetProjectName() %>' width='1070' height='520' onclose='close()'>
+                        <div style="margin-left: 16px;">
+                            <div style="margin-left: 20px; margin-top: 20px;">
+                                <pe:repeat DataSource="<%=MqttDetailPage.menuConfig%>">
+                                    <pe:repeatitem style="float:left;width:50px;">
+                                        <pe:if condition='<%=MqttDetailPage.select_tab_index == Eval("index") %>' >
+                                            <input type="button" value='<%=Eval("title")%>' uiname = '<%=format("MqttDetailPage.tab_%d", Eval("index"))%>' name='<%=Eval("index")%>' class="mc_blue_button_with_fillet" onclick="OnChangeTabview" style="font-weight:bold;margin-right:6px;margin-top:0px;color:#ffffff;font-size:14px;min-width:85px;height:24px;" />
+                                        </pe:if>
+                                        <pe:if condition='<%=MqttDetailPage.select_tab_index ~= Eval("index") %>' >
+                                            <input type="button" value='<%=Eval("title")%>' uiname = '<%=format("MqttDetailPage.tab_%d", Eval("index"))%>' name='<%=Eval("index")%>' class="mc_light_grey_button_with_fillet" onclick="OnChangeTabview" style="font-weight:bold;margin-right:6px;margin-top:2px;color:#ffffff;font-size:14px;min-width:83px;height:22px;" />
+                                        </pe:if>
+                                    </pe:repeatitem>
+                                </pe:repeat>
+                            </div>
+                            <div style="width: 1030px; height: 400px;background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 34 34:8 8 8 8);">
+                                <pe:if condition="<%=MqttDetailPage.select_tab_index == 1%>">
+                                    <div >
+                                        <div style="position: relative; margin-left: 894px; margin-top: 10px;">
+                                            <input type='button' value='<%=L"新建主题"%>' onclick='onclickNewTopic' class='mc_light_grey_button_with_fillet' style='color: #FFFFFF; margin-left: 15px; width: 100px; height: 22px;' />
+                                        </div>
+                                        <div style=" margin-left: 10px;margin-top: 10px; width:930px; height:22px; text-align:center;font-size: 16px;color:#000000;" >
+                                            <div style="float: left; width: 340px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"主题名称"%></div>
+                                            <div style="float: left; width: 290px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"备注"%></div>
+                                            <div style="float: left; width: 260px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"操作"%></div>
+                                        </div>
+                                        <div style="margin-left: -10px; width: 930px; height: 356px;">
+                                            <pe:gridview RememberScrollPos="true"
+                                                        AllowPaging="false"
+                                                        VerticalScrollBarStep="50"
+                                                        DefaultNodeHeight="24"
+                                                        ItemsPerLine="1"
+                                                        DataSource="<%=DS_TopicList%>"
+                                                        name="mqtt_topic_list">
+                                                <Columns>
+                                                    <div style=" margin-left: 20px;margin-top: 0px; width:930px; min-height:24px; text-align:center;font-size: 12px;" >
+                                                        <div style="float: left; width: 340px;  background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                            <div style="float: left; width: 300px;"><%=Eval("name")%>
+                                                                <input type="button" name="<%=Eval('index')%>" onclick="onclickTopicCopy" value="<%=L'[复制]'%>" style="float: left; color: #0000ff; background: url();" />
+                                                            </div>
+                                                        </div>
+                                                        <div style="float: left; width: 290px;  background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                            <div style="float: left; width: 260;">
+                                                                <pe:if condition='<%=IsLimitTopicDesc(Eval("desc"))%>'>
+                                                                    <div style="float: left;width: 200px;">
+                                                                        <div style="position: relative; width: 200px; height: 22px;"><%=GetLimitTopicDesc(Eval("desc"))%></div>
+                                                                        <div tooltip='<%=Eval("desc")%>' style="position: relative; width: 200px; height: 22px;"></div>
+                                                                    </div>
+                                                                    <input type="button" name="<%=Eval('index')%>" onclick="onclickTopicEdit" value="<%=L'[编辑]'%>" style="float: left; color: #0000ff; background: url();" />
+                                                                </pe:if>
+                                                                <pe:if condition='<%=not IsLimitTopicDesc(Eval("desc"))%>'>
+                                                                    <%=Eval("desc")%>                                                                
+                                                                    <input type="button" name="<%=Eval('index')%>" onclick="onclickTopicEdit" value="<%=L'[编辑]'%>" style="float: left; color: #0000ff; background: url();" />
+                                                                </pe:if>
+                                                            </div>
+                                                        </div>
+                                                        <div style="float: left; width: 260px;  background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                            <input type="button" name="<%=Eval('index')%>" onclick="onclickTopicDetail" value="<%=L'[查看详情]'%>" style="float: left; margin-left: 30px; color: #0000ff; background: url();" />
+                                                            <input type="button" name="<%=Eval('index')%>" onclick="onclickTopicClear" value="<%=L'[清空数据]'%>" style="float: left; margin-left: 4px; color: #0000ff; background: url();" />
+                                                            <input type="button" name="<%=Eval('index')%>" onclick="onclickTopicDelete" value="<%=L'[删除]'%>" style="float: left; margin-left: 4px; color: #0000ff; background: url();" />
+                                                        </div>
+                                                    </div>
+                                                    <pe:custom oncreate='<%= load_topic_more() %>'></pe:custom>
+                                                </Columns>
+                                            </pe:gridview>
+                                        </div>
+                                    </div>
+                                </pe:if>
+                                <pe:if condition="<%=MqttDetailPage.select_tab_index == 2%>">
+                                    <div >
+                                        <div style="position: relative; margin-left: 894px; margin-top: 10px;">
+                                            <input type='button' value='<%=L"新建设备"%>' onclick='onclickNewDevice' class='mc_light_grey_button_with_fillet' style='color: #FFFFFF; margin-left: 15px; width: 100px; height: 22px;' />
+                                        </div>
+                                        <div style=" margin-left: 10px;margin-top: 10px; width:930px; height:22px; text-align:center;font-size: 14px;color:#000000;" >
+                                            <div style="float: left; width: 120px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"设备名称"%></div>
+                                            <div style="float: left; width: 240px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"client_id"%></div>
+                                            <div style="float: left; width: 240px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"用户名"%></div>
+                                            <div style="float: left; width: 160px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"密码"%></div>
+                                            <div style="float: left; width: 60px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"在线状态"%></div>
+                                            <div style="float: left; width: 60px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"操作"%></div>
+                                        </div>
+                                        <div style="margin-left: -10px; width: 930px; height: 356px;">
+                                            <pe:gridview RememberScrollPos="true"
+                                                        AllowPaging="false"
+                                                        VerticalScrollBarStep="50"
+                                                        DefaultNodeHeight="24"
+                                                        ItemsPerLine="1"
+                                                        DataSource="<%=DS_DeviceList%>"
+                                                        name="mqtt_device_list">
+                                                <Columns>
+                                                    <div style=" margin-left: 20px;margin-top: 0px; width:930px; min-height:24px; text-align:center;font-size: 12px;" >
+                                                        <div style="float: left; height: 23px; width: 120px;  background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                            <pe:if condition='<%=IsLimitDeviceName(Eval("desc"))%>'>
+                                                                <div style="position: relative; width: 120px; height: 24px;"><%=GetLimitDeviceName(Eval("desc"))%></div>
+                                                                <div tooltip='<%=Eval("desc")%>' style="position: relative; width: 120px; height: 24px;"></div>
+                                                            </pe:if>
+                                                            <pe:if condition='<%=not IsLimitDeviceName(Eval("desc"))%>'>
+                                                                <%=Eval("desc")%>
+                                                            </pe:if>
+                                                        </div>
+                                                        <div style="float: left; height: 23px; width: 240px;  background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                            <div style="float: left; width: 230; text-align:left; margin-left: 20px;"><%=Eval("clientid")%>
+                                                                <input type="button" name="<%=Eval('index')%>" onclick="onclickDeviceClientIdCopy" value="<%=L'[复制]'%>" style="float: left; color: #0000ff; background: url();" />
+                                                            </div>
+                                                        </div>
+                                                        <div style="float: left; height: 23px; width: 240px;  background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                            <div style="float: left; width: 230;text-align:left; margin-left: 20px;"><%=Eval("username")%>
+                                                                <input type="button" name="<%=Eval('index')%>" onclick="onclickDeviceUserNameCopy" value="<%=L'[复制]'%>" style="float: left; color: #0000ff; background: url();" />
+                                                            </div>
+                                                        </div>
+                                                        <div style="float: left; height: 23px; width: 160px;  background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                            <div style="float: left; width: 140;text-align:left; margin-left: 20px;"><%=Eval("password")%>
+                                                                <input type="button" name="<%=Eval('index')%>" onclick="onclickDevicePassWordCopy" value="<%=L'[复制]'%>" style="float: left; color: #0000ff; background: url();" />
+                                                            </div>
+                                                        </div>
+                                                        <div style="float: left; height: 23px; width: 60px;  background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                            <%=Eval("isOnline") == 1 and L"在线" or L"离线"%>
+                                                        </div>
+                                                        <div style="float: left; height: 23px; width: 60px;  background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                            <input type="button" name="<%=Eval('index')%>" onclick="onclickDeviceDelete" value="<%=L'[删除]'%>" style="float: left; margin-left: 4px; color: #0000ff; background: url();" />
+                                                        </div>
+                                                    </div>
+                                                    <pe:custom oncreate='<%= load_device_more() %>'></pe:custom>
+                                                </Columns>
+                                            </pe:gridview>
+                                        </div>
+                                    </div>
+                                </pe:if>
+                            </div>
+                            <div style="margin-left: 936px; margin-top: 10px;">
+                                <input type='button' value='<%=L"关闭"%>' onclick='close' class='mc_light_grey_button_with_fillet' style='color: #FFFFFF; margin-left: 15px; width: 80px; height: 26px;' />
+                            </div>
+                        </div>
+                    </aries:window>
+                </pe:container>
+            </pe:container>            
+        </pe:mcml>
+    </body>
+</html>

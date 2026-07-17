@@ -57,6 +57,7 @@ SystemSettingsPage.category_show = {
 }
 
 SystemSettingsPage.category_game = {
+		{left_text=L"触屏模式", name="toggleTouckModel",right_type="button",onclick=""},
 		{left_text=L"反转鼠标", name="checkBoxInverseMouse",right_type="button",onclick=""},
 		{left_text=L"鼠标灵敏度", name="",right_type="button",onclick=""},
 		{left_text=L"锁定摄像机", name="checkBoxLockCamera",right_type="button",onclick=""},
@@ -146,13 +147,17 @@ function SystemSettingsPage.OnInit()
 	page:SetValue("comboShader",  tostring(math.min(math.max(1, nRenderMethod), 4)) );
 
 	SystemSettingsPage.stereoMode_ds = {
-		{value="0",idx=1, text=L"关闭"},
-		{value="2",idx=2, text=L"左/右眼"},
-		{value="5",idx=3, text=L"红/蓝眼镜"},
-		{value="8",idx=4, text=L"360全景(单眼ods)"},
-		-- <option value="7">SingleEye old</option>
+		{value="0",text=L"关闭"},
+		{value="2",text=L"左/右眼"},
+		{value="5",text=L"红/蓝眼镜"},
+		{value="4",text=L"交替光栅"},
 	}
-	
+	if (System.os.GetPlatform() == "win32") then
+		SystemSettingsPage.stereoMode_ds[#SystemSettingsPage.stereoMode_ds+1] = {value="8", text=L"360全景(单眼ods)"}
+	end
+	if (System.os.GetPlatform() == "emscripten") then
+		SystemSettingsPage.stereoMode_ds[#SystemSettingsPage.stereoMode_ds+1] = {value="9", text="WebXR"}
+	end
 	local stereoMode = GameLogic.options:GetStereoMode() or 0
 	for i,item in ipairs(SystemSettingsPage.stereoMode_ds) do
 		if tonumber(item.value) == stereoMode then 
@@ -247,14 +252,13 @@ function SystemSettingsPage:OnResize()
 	SystemSettingsPage.needRefreshWithResize = nil
 	if page then
 		local ctl = page:FindControl("UI_Scaling")
-		if ctl.max~=SystemSettingsPage.GetMaxUIScale() then
+		if ctl and ctl.max ~= SystemSettingsPage.GetMaxUIScale() then
 			GameLogic.options:SetUIScaling(nil)
 			ctl.min = 0.6
 			ctl.max = SystemSettingsPage.GetMaxUIScale()
 			ctl.value = SystemSettingsPage.GetDefaultUiScale()
 			ctl:UpdateUI()
 		end
-
 	end
 end
 
@@ -409,6 +413,11 @@ function SystemSettingsPage.InitPageParams()
 	--local sound_volume_text = GetSoundVolumeText(sound_volume);
 	--page:SetNodeValue("btn_SoundVolume", sound_volume_text);
 	ds["sound_volume"] = sound_volume;
+
+	--触屏模式
+	local touchEnable = Game.PlayerController:LoadLocalData("Paracraft_System_Touch_Model",nil,true);
+	UpdateCheckBox("btn_TouchToggle", touchEnable);
+	ds["touch_model"] = touchEnable;
 
 
 	-- 真实光影
@@ -1045,8 +1054,13 @@ function SystemSettingsPage.InitSoundDevice()
 	if nodeDevice and nodeDevice:IsValid() then
 		nodeDevice.visible = false
 	end
+	local nodeDevice = ParaUI.GetUIObject("deviceRecord_container")
+	if nodeDevice and nodeDevice:IsValid() then
+		nodeDevice.visible = false
+	end
 	if page then
 		page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
+		page:SetValue("AudioRecordDevice", SystemSettingsPage.currentAudioRecordDevice);
 	end
 	
 	local cur_state = SystemSettingsPage.setting_ds["open_sound"];
@@ -1073,6 +1087,26 @@ function SystemSettingsPage.onDeviceClick(name)
 	end
 end
 
+function SystemSettingsPage.onClickRecordDevice(name)
+	local index = tonumber(name)
+	if index and index > 0 then
+		local devices = SystemSettingsPage.GetAudioRecordDevices()
+		local curdevice = devices[index].value
+		if (curdevice ~= SystemSettingsPage.currentAudioRecordDevice) then
+			AudioEngine.ResetAudioRecordDevice(curdevice)
+			SystemSettingsPage.currentAudioRecordDevice = curdevice
+			SystemSettingsPage.InitSoundDevice()
+		end
+	end
+end
+
+function SystemSettingsPage.onClickShowRecordDevice()
+	local nodeDevice = ParaUI.GetUIObject("deviceRecord_container")
+	if nodeDevice and nodeDevice:IsValid() then
+		nodeDevice.visible = not nodeDevice.visible
+	end
+end
+
 function SystemSettingsPage.OnClickResetAudioDevice()
 	AudioEngine.ResetAudioDevice();
 	SystemSettingsPage.currentAudioDevice = nil;
@@ -1080,16 +1114,17 @@ function SystemSettingsPage.OnClickResetAudioDevice()
 end
 
 function SystemSettingsPage.GetAudioDevices()
-	local deviceList = {};
-	local devices = ParaEngine.GetAttributeObject():GetField("AudioDeviceName", "");
-	if (devices and devices ~= "") then
-		local names = commonlib.split(devices, ";");
-		for i = 1, #names do
-			deviceList[#deviceList + 1] = {text = commonlib.Encoding.DefaultToUtf8(names[i]), value = names[i]};
-		end
-	end
+	local deviceList = AudioEngine.GetAudioDevices()
 	if (not SystemSettingsPage.currentAudioDevice and #deviceList > 0) then
 		SystemSettingsPage.currentAudioDevice = deviceList[1].value;
+	end
+	return deviceList;
+end
+
+function SystemSettingsPage.GetAudioRecordDevices()
+	local deviceList = AudioEngine.GetAudioRecordDevices()
+	if (not SystemSettingsPage.currentAudioRecordDevice and #deviceList > 0) then
+		SystemSettingsPage.currentAudioRecordDevice = deviceList[1].value;
 	end
 	return deviceList;
 end
@@ -1160,6 +1195,26 @@ function SystemSettingsPage.OnClickEnableMouseInverse()
 	SystemSettingsPage.setting_ds["mouse_inverse"] = next_state;
 	local key = "Paracraft_System_Mouse_Inverse";
 	GameLogic.GetPlayerController():SaveLocalData(key,next_state,true);
+end
+
+function SystemSettingsPage.OnToggleTouchModel(name)
+	local cur_state = SystemSettingsPage.setting_ds["touch_model"];
+	local next_state = not cur_state;
+	if next_state then
+		GameLogic.RunCommand("/show mobilepad")
+	else
+		GameLogic.RunCommand("/hide mobilepad")
+	end
+	UpdateCheckBox(name, next_state);
+	SystemSettingsPage.setting_ds["touch_model"] = next_state;
+	local key = "Paracraft_System_Touch_Model";
+	GameLogic.GetPlayerController():SaveLocalData(key,next_state,true);
+	local category_ds_index = SystemSettingsPage.category_ds_index
+	SystemSettingsPage.OnCancel()
+	SystemSettingsPage.category_ds_index = category_ds_index 
+	commonlib.TimerManager.SetTimeout(function()
+		SystemSettingsPage.ShowPage()
+	end,100)
 end
 
 function SystemSettingsPage.OnClickChangeRenderDist()
@@ -1260,6 +1315,11 @@ function SystemSettingsPage.OnClickEnableFullScreenMode()
 end
 
 function SystemSettingsPage.OnOK()
+	if (GameLogic.options.stereoMode == 9) then
+		page:CloseWindow();
+		return;
+	end
+
 	local bNeedUpdateScreen;
 	local att = ParaEngine.GetAttributeObject();
 	local ds = SystemSettingsPage.setting_ds;
@@ -1549,12 +1609,18 @@ function SystemSettingsPage.OnToggleViewBobbing()
 end
 
 function SystemSettingsPage.OnChangeStereoMode(name, value)
-	for k,v in pairs(SystemSettingsPage.stereoMode_ds) do 
-		if v.idx==value then
-			value = v.value
-			break
-		end
+	if (value == "0") then
+		GameLogic.RunCommand("/stereo off");
 	end
+
+	if (value == "9") then
+		GameLogic.RunCommand("/stereo -s webxr");
+		GameLogic.options.stereoMode = 9;
+		WorldCommon.GetWorldInfo().stereoMode = tostring(9);
+		WorldCommon.SaveWorldTag();
+		return;
+	end
+
 	if value=="8" then 
 		local att = ParaEngine.GetAttributeObject();
 		local oldsize = att:GetField("ScreenResolution", {1280,720});
@@ -1619,6 +1685,13 @@ function SystemSettingsPage.OnChangeStereoEyeDist(value)
 	end
 end
 
+function SystemSettingsPage.OnChangeStereoConvergenceOffset(value)
+	value = tonumber(value);
+	if(value) then
+		GameLogic.options:SetStereoConvergenceOffset(value);
+	end
+end
+
 function SystemSettingsPage.OnTimeSliderChanged(value)
 	if (value) then
 		local time=(value/1000-0.5)*2;
@@ -1671,6 +1744,10 @@ function SystemSettingsPage.OnClearMemory()
 end
 
 function SystemSettingsPage.OnOpenBackupFolder()
+	if (System.os.GetPlatform() == "emscripten") then
+		_guihelper.MessageBox(L"网页版不支持备份。");
+		return;
+	end
 	GameLogic.world_revision:OnOpenRevisionDir();
 end
 

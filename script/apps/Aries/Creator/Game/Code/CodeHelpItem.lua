@@ -166,16 +166,27 @@ function CodeHelpItem:AddExample(example, index)
 end
 
 function CodeHelpItem:getFieldValue(name)
-	if(self.all_fields[name]) then
-		local text = self.all_fields[name].text;
+	local field = self.all_fields[name]
+	if(field) then
+		local text = field.text;
 		if(type(text) == "function") then
 			return text();
 		else
+			if(field.type == "input_statement" and self.currentLanguage == "python") then
+				text = "    "..(text or "");
+			end
 			return text;
 		end
 	else
 		return name;
 	end
+end
+
+function CodeHelpItem:GetIndent()
+	if(self.currentLanguage == "python") then
+		-- TODO: get indent from code block
+	end
+	return "";
 end
 
 function CodeHelpItem:getFieldAsString(name)
@@ -209,6 +220,7 @@ function CodeHelpItem:GetNPLCode_python()
 		return self.python_code;
 	end
 	local python_code = ""
+	self.currentLanguage = "python"
     if(self.ToPython)then
 		python_code = (self:ToPython() or "");
     else
@@ -216,7 +228,7 @@ function CodeHelpItem:GetNPLCode_python()
 		    python_code = (self:ToNPL() or "");
 	    end
     end
-	
+	self.currentLanguage = nil
 	self.python_code = python_code;
 	return python_code;
 end

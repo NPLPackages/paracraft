@@ -10,6 +10,7 @@ local EntityAnimation = commonlib.gettable("MyCompany.Aries.Game.Effects.EntityA
 EntityAnimation.Init();
 EntityAnimation.PlayAnimation(entity, "lie")
 EntityAnimation.PlayAnimation(entity, {"lie", 0,"sit"})
+EntityAnimation.SetExternalAnimation(entity, animId, externalIDorFilename)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
@@ -43,6 +44,8 @@ local anim_map_haqi = {
 }
 local assetNameToAnimMap = {
 	["character/v3/Elf/Female/ElfFemale.xml"] = anim_map_haqi,
+	["character/v3/TeenElf/Female/TeenElfFemale.xml"] = anim_map_haqi,
+	["character/v3/TeenElf/Male/TeenElfMale.xml"] = anim_map_haqi,
 }
 
 -- id to name are also read from this xml file.
@@ -187,3 +190,75 @@ function EntityAnimation.CreateGetAnimId(filename, entity)
 	end
 end
 
+-- @param id: can be a number or array of numbers to check if all anim ids exist.
+function EntityAnimation.HasAnimation(id, entity)
+	if(entity) then
+		local assetfile = entity:GetMainAssetPath();
+		if(assetfile) then
+			assetfile = PlayerAssetFile and PlayerAssetFile:GetFilenameByName(assetfile) or assetfile;
+			local ParaXModelAttr = commonlib.gettable("System.Scene.Assets.ParaXModelAttr");
+			if(not ParaXModelAttr.new) then
+				NPL.load("(gl)script/ide/System/Scene/Assets/ParaXModelAttr.lua");
+			end
+			local attr = ParaXModelAttr:new():initFromAssetFile(assetfile);
+			local animations = attr and attr:GetAnimations();
+			if(animations) then
+				if(type(id) ~= "table") then
+					-- Fast path for single id
+					for _, anim in ipairs(animations) do
+						if(anim.animID == id) then
+							return true;
+						end
+					end
+					return false;
+				else
+					-- Multiple ids path
+					local idsToCheck = id;
+					local foundCount = 0;
+					
+					for _, anim in ipairs(animations) do
+						for _, checkId in ipairs(idsToCheck) do
+							if(anim.animID == checkId) then
+								foundCount = foundCount + 1;
+								break;
+							end
+						end
+					end
+					
+					-- Return true only if all requested IDs were found
+					return foundCount == #idsToCheck;
+				end
+			end
+		end
+	end
+	return false;
+end
+-- set external animation for the given entity. It will replace the original animation with the external animation.
+-- @param animId: this can be 0 idle, 4 walk, 5 run etc.
+-- @param externalIDorFilename: if this is a number, it is the external animation id, usually bigger than 1000. 
+-- If this is a string, it is the paraX filename that contains the external animation.
+-- if this is -1, it means to remove the external animation and use the original animation.
+-- @note: the entity and external animation must share the same bone structure to work properly.
+function EntityAnimation.SetExternalAnimation(entity, animId, externalIDorFilename)
+	local externalAnimId = EntityAnimation.CreateGetAnimId(externalIDorFilename);
+	if(externalAnimId and (externalAnimId > 1000 or externalAnimId == -1)) then
+		if(entity) then
+			local obj = entity:GetInnerObject()
+			if(obj and obj.ToCharacter) then
+				local char = obj:ToCharacter();
+				char:EnableAnimIDMap(true);
+				char:AddAnimIDMap(animId, externalAnimId);
+			end
+		end
+	end
+end
+
+function EntityAnimation.ClearExternalAnimation(entity)
+	if(entity) then
+		local obj = entity:GetInnerObject()
+		if(obj and obj.ToCharacter) then
+			local char = obj:ToCharacter();
+			char:ClearAllAnimIDMap();
+		end
+	end
+end

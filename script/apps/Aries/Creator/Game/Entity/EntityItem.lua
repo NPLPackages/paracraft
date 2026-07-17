@@ -242,7 +242,7 @@ function Entity:OnCollideWithPlayer(entity, bx,by,bz)
 		local count = item.count;
 
 		if (not self.delayBeforeCanPickup and entity.inventory:AddItemToInventory(item)) then
-			self:PlaySound();
+			self:PlaySound("click");
 			entity:OnItemPickup(self, count);
 
 			if (item.count <= 0) then

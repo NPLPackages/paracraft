@@ -53,7 +53,7 @@ end
 
 -- the title text to display (can be mcml)
 function Entity:GetCommandTitle()
-	return L"输入骨骼名称: 例如wheel, mount, tail_IK. <br/>如果名字包含_IK代表支持反向动力学";
+	return L"输入骨骼名称: 例如wheel, mount, tail_IK. <br/>如果名字包含_IK代表支持反向动力学".."<br/>"..L"约束{rotAxis='y', min=-1.57, max=1.57}";
 end
 
 function Entity:HasCommand()
@@ -113,7 +113,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 		-- GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
 		return true;
 	else
-		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
+		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock() and not self:IsLocked()) then
 			local ctrl_pressed = Keyboard:IsCtrlKeyPressed();
 			if(ctrl_pressed) then
 				self:OpenEditor("entity", entity);

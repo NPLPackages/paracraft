@@ -170,41 +170,6 @@ end
 function NplPPT.CompileCode(code, filename, codeblock)
 	NplPPT.code = code
 	return NplPPT.OpenPPTPage
-    -- local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
-    -- local entity = codeblock:GetEntity();
-    -- local compiler = CodeCompiler:new():SetFilename(filename)
-	-- if(codeblock and entity and entity:IsAllowFastMode()) then
-	-- 	compiler:SetAllowFastMode(true);
-	-- end
-    -- local codeLanguageType;
-    -- if(entity.GetCodeLanguageType)then
-    --     codeLanguageType = entity:GetCodeLanguageType();
-    -- end
-
-    -- if(codeLanguageType == "python")then
-    --     local pyruntime = NPL.load("Mod/PyRuntime/Transpiler.lua")
-	-- 	if(not NplPPT.isPythonRuntimeLoaded) then
-	-- 		NplPPT.isPythonRuntimeLoaded = true;
-	-- 		pyruntime:start()
-	-- 	end
-    --     local py_env, env_error_msg = NPL.load("Mod/PyRuntime/py2npl/polyfill.lua")
-	-- 	local code_env = codeblock:GetCodeEnv()
-	-- 	py_env['_set_codeblock_env'](code_env)
-    --     pyruntime:installMethods(code_env, py_env);
-        
-	-- 	-- synchronous
-    --     local error, luacode = pyruntime:transpile(code)
-
-	-- 	if error then
-	-- 		local error_msg = luacode
-	-- 		return nil, luacode
-	-- 	end
-
-	-- 	codeblock:SetModified(true)
-    --     return compiler:Compile(luacode);
-    -- else
-	--     return compiler:Compile(code);
-    -- end
 end
 
 function NplPPT.GetCustomCodeUIUrl()

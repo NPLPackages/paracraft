@@ -13,6 +13,8 @@ NPL.load("(gl)script/ide/Json.lua");
 NPL.load("(gl)script/apps/Aries/Chat/BadWordFilter.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems");
 local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
 local Encoding = commonlib.gettable("System.Encoding");
@@ -45,7 +47,7 @@ UserInfoPage.skin_category_ds = {
 	{tex1 = "zi_kuzi1_28X14_32bits", tex2 = "zi_kuzi2_28X14_32bits", name = "pants", ui_index = 4},
 	{tex1 = "zi_shouchi1_28X14_32bits", tex2 = "zi_shouchi2_28X14_32bits", name = "right_hand_equipment", ui_index = 6},
 	{tex1 = "zi_beibu1_28X14_32bits", tex2 = "zi_beibu2_28X14_32bits", name = "back", ui_index = 5},
-	{tex1 = "zi_zuoqi1_28X14_32bits", tex2 = "zi_zuoqi2_28X14_32bits", name = "pet", ui_index = 8},
+	-- {tex1 = "zi_zuoqi1_28X14_32bits", tex2 = "zi_zuoqi2_28X14_32bits", name = "pet", ui_index = 8},
 };
 
 UserInfoPage.MenuItem_DS = {
@@ -67,20 +69,24 @@ UserInfoPage.isOnlyShowHave = false
 UserInfoPage.IsFollow = false
 UserInfoPage.IsFriend = false
 UserInfoPage.isExpland_Follow = false
-_G.SKIN_ITEM_TYPE = {
+local SKIN_ITEM_TYPE = {
 	FREE = "0",
-	VIP = "1",
+	SVIP = "1",
 	ONLY_BEANS_CAN_PURCHASE = "2",
 	ACTIVITY_GOOD = "3",
+	VIP = "4",
 	-- 套装部件
 	SUIT_PART = "5"
 }
+UserInfoPage.SKIN_ITEM_TYPE = SKIN_ITEM_TYPE
 
-_G.FRIEND_TYPE = {
+local FRIEND_TYPE = {
 	NORMAL = 1,
 	FOLLOW = 2,
 	FRIEND = 3,
 }
+UserInfoPage.FRIEND_TYPE = FRIEND_TYPE;
+
 UserInfoPage.CurFriendType = FRIEND_TYPE.NORMAL
 UserInfoPage.buyClothesData = nil
 local page
@@ -90,7 +96,24 @@ function UserInfoPage.OnInit()
 end
 
 function UserInfoPage.ShowPage(username,category_name,userId)
+	if System.options.isCommunity then
+		local CommunityUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityUserInfo.lua")
+		CommunityUserInfo.ShowPage(username,category_name,userId)
+		return
+	end
+
 	local category_name = category_name or "works"
+	if System.options.isHideVip then
+		UserInfoPage.MenuItem_DS = {
+			{title="作<br/>品",ui_index = 1,text="作品", name="works"},
+			{title="荣<br/>誉",ui_index = 3,text="荣誉", name="honor"},
+			{title="背<br/>包",ui_index = 4,text="背包", name="bags",isAuth = true},
+			{title="账<br/>号<br/>安<br/>全",ui_index = 5,text="账号安全", name="security",isAuth = true}
+		}
+		if category_name == "skin" then
+			category_name = "honor"
+		end
+	end
 	UserInfoPage.InitData()
 	local username = (username and username ~= "") and username or SystemUserName
 	if not username or username == ""  then
@@ -101,7 +124,7 @@ function UserInfoPage.ShowPage(username,category_name,userId)
 		id = "kp" .. Encoding.base64(commonlib.Json.Encode({userId=userId}));
 	end
 	keepwork.user.getinfo({
-		cache_policy = "access plus 0",
+		cache_policy = "access plus 10 seconds",
         router_params = {
             id = id,
         }
@@ -114,6 +137,12 @@ function UserInfoPage.ShowPage(username,category_name,userId)
 			if UserInfoPage.IsAuthUser() then
 				UserInfoPage.ShowView(category_name)
 			else
+				if System.options.isPapaAdventure then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
+					local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+					PapaAPI:SendShowHomePage(username,id)
+					return
+				end
 				UserInfoPage.CheckIsFollow(function()
 					UserInfoPage.CheckIsFriend(function()
 						UserInfoPage.UpdateFriendType()
@@ -199,27 +228,6 @@ function UserInfoPage.GetPurchaseTime(skinId)
 		end
 	end
 	return 0
-end
-
-function UserInfoPage.UpdateClotheData(clothesData)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
-	local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
-	if clothesData then
-		-- echo(clothesData,true)
-		local temp = {}
-		for i,v in ipairs(clothesData) do
-			local startTime =  UserInfoPage.FormatTime(v.startAt)
-			local server_time = QuestAction.GetServerTime()
-			local curDateTime = UserInfoPage.FormatTime(tonumber(server_time))
-			local day,hours,minutes,seconds,time_str = commonlib.GetTimeStr_BetweenToDate(startTime, curDateTime);
-			if day < 10  then
-				temp[#temp + 1] = v
-			elseif day == 10 and math.abs(hours - 24) > 0 then 
-				temp[#temp + 1] = v
-			end
-		end
-		return temp
-	end
 end
 
 function UserInfoPage.GetDeadlineStr(EndTime)
@@ -625,7 +633,8 @@ function UserInfoPage.FinishEdit()
 			return;
 		end
 
-		if BadWordFilter.HasBadWorld(name) then
+		local filterName = BadWordFilter.FilterString2(name);
+		if name ~= filterName then
 			_guihelper.MessageBox(L"包含敏感词，请重新修改");
 			return 
 		end
@@ -1067,7 +1076,7 @@ end
 function UserInfoPage.OnClickGotoBind()
 	local token = commonlib.getfield("System.User.keepworktoken")
 	local urlbase = GameLogic.GetFilters():apply_filters("get_keepwork_url");
-	local method = '/u/p/thirdPartyAccountBinding'
+	local method = '/u/p/userData'
 	local url = string.format('%s/p?url=%s&token=%s',urlbase,Mod.WorldShare.Utils.EncodeURIComponent(method),token) 
 	GameLogic.RunCommand("/open "..url)
 end
@@ -1348,7 +1357,7 @@ function UserInfoPage.UpdateItemData() --下架了套装，需要处理散件数
 	--去掉异常数据
 	local temp = {}
 	for i,v in ipairs(UserInfoPage.Current_SkinItem_DS) do
-		if v.type == SKIN_ITEM_TYPE.ONLY_BEANS_CAN_PURCHASE and v.price and v.price ~= "" then
+		if v.type == SKIN_ITEM_TYPE.ONLY_BEANS_CAN_PURCHASE and v.price and v.price ~= "" and tonumber(v.price) > 0 then
 			temp[#temp + 1] = v
 		end
 		if v.type ~= SKIN_ITEM_TYPE.ONLY_BEANS_CAN_PURCHASE then
@@ -1455,17 +1464,11 @@ function UserInfoPage.Purchase(skinId)
 	end)
 end
 
---- @return table: 获取需要知识豆购买类型的skin
-local ONLY_BEANS_CAN_PURCHASE_GSID = 40009 --17
 function UserInfoPage.GetClothesOfServerData(bRefresh)
 	if not UserInfoPage.buyClothesData or bRefresh then
-		local bOwn, id, bagId, copies, item = KeepWorkItemManager.HasGSItem(ONLY_BEANS_CAN_PURCHASE_GSID);
-		if(item and item.serverData) then
-			local clothes = UserInfoPage.UpdateClotheData(item.serverData.clothes)
-			UserInfoPage.buyClothesData = clothes
-			--echo(UserInfoPage.buyClothesData,true)
-			return clothes
-		end
+		local SkinManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/SkinManager.lua")
+		local clothes = SkinManager.GetServerSkinData()
+		UserInfoPage.buyClothesData = clothes
 	end
 	return UserInfoPage.buyClothesData;
 end
@@ -1485,6 +1488,9 @@ function UserInfoPage.RemoveSkin(name)
 	if not index or index <= 0 or not UserInfoPage.IsAuthUser() then
 		return 
 	end
+	if System.options.isHideVip then
+        return
+    end
 	local iconItem = UserInfoPage.Current_Icon_DS[index];
 	local length = string.len(UserInfoPage.mainSkin)
 	if (iconItem and iconItem.id and iconItem.id ~= "") then
@@ -1581,6 +1587,9 @@ function UserInfoPage.GetSkinIdByName(name)
 end
 
 function UserInfoPage.OnClickExchangeSkin(data)
+	if System.options.isHideVip then
+        return
+    end
 	if data and data.type == SKIN_ITEM_TYPE.ONLY_BEANS_CAN_PURCHASE and not UserInfoPage.CheckSkinIsValid(data.id) then
 		local UserExchangeSkinPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserExchangeSkinPage.lua");
 		UserExchangeSkinPage.ShowPage(data);
@@ -1640,50 +1649,6 @@ function UserInfoPage.OnClickShowHased()
 	UserInfoPage.GetAllItemData()
 	UserInfoPage.UpdateItemData()
 	UserInfoPage.RefreshPage()
-end
-
-function UserInfoPage.CheckUserSkin()
-	local user_skin = GameLogic.GetPlayerController():GetSkinTexture()
-	-- 没皮肤的话不检查
-	if not user_skin or user_skin == "" then
-		return
-	end
-
-	-- 默认裸装的皮肤的话不检查
-	local default_skin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString);
-	if user_skin == default_skin then
-		return
-	end
-
-	local newSkin = UserInfoPage.RemoveAllUnvalidItems(user_skin)
-	if user_skin == newSkin then
-		return
-	end
-	local playerEntity = GameLogic.GetPlayerController():GetPlayer();
-	if playerEntity then
-		playerEntity:SetSkin(user_skin); 
-	end	
-	GameLogic.options:SetMainPlayerSkins(user_skin);
-	GameLogic.GetFilters():apply_filters("user_skin_change", user_skin);
-	local asset = MyCompany.Aries.Game.PlayerController:GetMainAssetPath()
-    local skin = MyCompany.Aries.Game.PlayerController:GetSkinTexture()
-	local Keepwork = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
-	local userinfo = Keepwork:GetUserInfo();
-    local AuthUserId = userinfo.id;
-
-    local extra = userinfo.extra or {};
-    extra.ParacraftPlayerEntityInfo = extra.ParacraftPlayerEntityInfo or {};
-    extra.ParacraftPlayerEntityInfo.asset = asset;
-    extra.ParacraftPlayerEntityInfo.skin = skin;
-    extra.ParacraftPlayerEntityInfo.assetSkinGoodsItemId = 0;
-    keepwork.user.setinfo({
-        router_params = {id = AuthUserId},
-        extra = extra,
-    }, function(status, msg, data) 
-        if (status < 200 or status >= 300) then return echo("更新玩家实体信息失败") end
-        local userinfo = KeepWorkItemManager.GetProfile();
-        userinfo.extra = extra;
-    end);
 end
 
 

@@ -108,6 +108,7 @@ function GetVoiceNarratorDS()
         {value=20016, text=L"云龍(粤语)"},
         {value=20017, text=L"晓臻"},
         {value=20018, text=L"晓雨"},
+        {value=20021, text=L"晓雨女(AI模型)"},
     };
 end
 
@@ -122,45 +123,41 @@ end
 ]]></script>
 <aries:window mode="thin" style="width:640px;" title='<%=EditMovieTextPage.GetTitle()%>' uiname_onclose="EditMovieTextPage.OnClose" onclose="EditMovieTextPage.OnClose">
 <div style="margin: 10px; margin-bottom: 17px; color: #ffffff;">
-    <div style="margin-top: 5px;">
-        <div style="float:left;">
-            <%=L"字号:"%>
-            <select uiname="EditMovieTextPage.fontsize" name="fontsize" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetFontSizeDS()%>'>
-            </select>
-        </div>
-        <div style="float:left;margin-left:20px;">
-            <%=L"字体颜色:"%>
-            <select uiname="EditMovieTextPage.fontcolor" name="fontcolor" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetFontColorDS()%>'>
-            </select>
-        </div>
-        <div style="float: left; margin-left: 20px;">
-            <%=L"文字动画:"%>
-            <select uiname="EditMovieTextPage.textanim" name="textanim" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetTextAnimDS()%>'>
-            </select>
-        </div>
-        <div style="float: left; margin-left: 20px;">
-            <%=L"文字背景:"%>
-            <select uiname="EditMovieTextPage.textbg" name="textbg" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetTextBGDS()%>'>
-            </select>
-        </div>
+    <div style="margin-top: 5px; float: left; min-width: 100px">
+        <%=L"字号:"%>
+        <select uiname="EditMovieTextPage.fontsize" name="fontsize" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetFontSizeDS()%>'>
+        </select>
     </div>
-    <div style="margin-top: 5px;">
-        <div style="float:left;">
-            <%=L"背景:"%>
-            <select uiname="EditMovieTextPage.bgcolor" name="bgcolor" AllowUserEdit="true" style="height:24px;"  DataSource='<%=GetBGColorDS()%>'>
-            </select>
-        </div>
-        <div style="float:left;margin-left:20px;">
-            <%=L"位置:"%>
-            <select uiname="EditMovieTextPage.textpos" name="textpos" AllowUserEdit="false" style="height:24px;"  DataSource='<%=GetTextPosDS()%>'>
-            </select>
-        </div>
-        <div style="float:left;margin-left:20px;">
-            <%=L"背景动画:"%>
-            <select uiname="EditMovieTextPage.bganim" name="bganim" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetBGAnimDS()%>'>
-            </select>
-        </div>  
+    <div style="margin-top: 5px; float: left; margin-left: 20px; min-width: 100px">
+        <%=L"字体颜色:"%>
+        <select uiname="EditMovieTextPage.fontcolor" name="fontcolor" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetFontColorDS()%>'>
+        </select>
     </div>
+    <div style="margin-top: 5px; float: left; margin-left: 20px; min-width: 100px ">
+        <%=L"文字动画:"%>
+        <select uiname="EditMovieTextPage.textanim" name="textanim" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetTextAnimDS()%>'>
+        </select>
+    </div>
+    <div style="margin-top: 5px; float: left; margin-left: 20px; min-width: 100px ">
+        <%=L"文字背景:"%>
+        <select uiname="EditMovieTextPage.textbg" name="textbg" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetTextBGDS()%>'>
+        </select>
+    </div>
+    <div style="margin-top: 5px; float: left; min-width: 100px">
+        <%=L"背景:"%>
+        <select uiname="EditMovieTextPage.bgcolor" name="bgcolor" AllowUserEdit="true" style="height:24px;"  DataSource='<%=GetBGColorDS()%>'>
+        </select>
+    </div>
+    <div style="margin-top: 5px; float: left; margin-left: 20px; min-width: 100px">
+        <%=L"位置:"%>
+        <select uiname="EditMovieTextPage.textpos" name="textpos" AllowUserEdit="false" style="height:24px;"  DataSource='<%=GetTextPosDS()%>'>
+        </select>
+    </div>
+    <div style="margin-top: 5px; float: left; margin-left: 20px; min-width: 100px">
+        <%=L"背景动画:"%>
+        <select uiname="EditMovieTextPage.bganim" name="bganim" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetBGAnimDS()%>'>
+        </select>
+    </div>  
     <div style="margin-top: 10px; ">
         <div style="float:left;" tooltip='<%=L"%name% 为角色名字"%>'><%=L"文字:"%></div>
         <div class="mc_paper_panel" style="float: left; margin-left:0px; padding:5px;margin-right:5px;">
@@ -169,11 +166,13 @@ end
     </div>
 
     <div style="margin-top: 10px;">
-        <pe:if condition="<%=not System.options.isHideVip%>">
+        <pe:if condition="<%=not System.options.isHideVip or System.options.isEducatePlatform %>">
             <div style="float:left;margin-left:30px;">
-                <div style="margin-top: 2px; float: left; margin-left:0px;width: 20px;height: 20px; background: url(Texture/Aries/Creator/keepwork/Quest/VIP_20X20_32bits.png#0 0 20 20);"></div>
+                <pe:if condition="<%= not System.options.isEducatePlatform%>">
+                    <div style="margin-top: 2px; float: left; margin-left:0px;width: 20px;height: 20px; background: url(Texture/Aries/Creator/keepwork/Quest/VIP_20X20_32bits.png#0 0 20 20);"></div>
+                </pe:if>
                 <%=L"播音员:"%>
-                <select uiname="EditMovieTextPage.voicenarrator" onclick="EditMovieTextPage.OnClickSelcetNarrator" name="voicenarrator" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetVoiceNarratorDS()%>'>
+                <select uiname="EditMovieTextPage.voicenarrator" onclick="EditMovieTextPage.OnClickSelcetNarrator" name="voicenarrator" AllowUserEdit="false" style="width:80px;height:24px;" DataSource='<%=GetVoiceNarratorDS()%>'>
                 </select>
             </div>
 
@@ -181,13 +180,13 @@ end
             <label name="SoundDesc" style="float:left;margin-left:12px;width: 80px;margin-top: 3px;"/>
         </pe:if>
         
-        <div style="float:left;margin-left:45px;">
+        <div style="float:left;margin-left:5px;">
             <%=L"唇同步:"%>
             <!-- <input type="text" uiname="EditMovieTextPage.voicebelongto" EmptyText='<%=L"角色名称"%>' name="voicebelongto" style="width: 126px; height:24px;"/> -->
             
             <select uiname="EditMovieTextPage.voicebelongto" name="voicebelongto" AllowUserEdit="true" style="height:24px;width:70px" DataSource="<%=GetActorNames()%>"></select>
         </div>        
-        <div style="float:left;margin-left:5px;margin-top: 2px;">
+        <div style="float: left; margin-left: 5px; margin-top: 2px; min-width: 100px">
             <input type="checkbox" tooltip='<%=L"文字配音在角色所在的三维坐标的位置播放"%>' uiname="EditMovieTextPage.use3dvoice" name="use3dvoice" style="margin-top:2px;" />
             <div for="use3dvoice" tooltip='<%=L"文字配音在角色所在的三维坐标的位置播放"%>' uiname="CodeBlockSettings.use3dvoicefor" style="float:left;margin-left:2px;" >
                 <%=L"3D音效"%> 

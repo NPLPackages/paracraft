@@ -47,13 +47,14 @@ end
 
 -- @param timeMs: milliseconds or nil. 
 -- @param bForceWait: if true, we will not skip even if there is trigger in the next macro. 
+-- @param mode: default to nil. if "text", it will be ignored if previous text has finished playing.
 -- @return nil or {OnFinish=function() end}
-function Macros.Idle(timeMs, bForceWait)
+function Macros.Idle(timeMs, bForceWait, mode)
 	if(timeMs and timeMs > 0 and not bForceWait) then
 		local nextMacro = Macros:PeekNextMacro(1)
 		if(nextMacro) then
 			if (Macros.IsSkipIdle()) then return end 
-
+			
 			local nextNextMacro = Macros:PeekNextMacro(2)
 			
 			if(nextMacro.name == "WindowKeyPressTrigger") then
@@ -76,7 +77,7 @@ function Macros.Idle(timeMs, bForceWait)
 			if(nextMacro:IsTrigger() or 
 				(nextMacro.name == "CameraMove") or (nextMacro.name == "PlayerMove") or (nextMacro.name == "SceneMouseMove") or
 				(nextNextMacro and (nextNextMacro:IsTrigger() or (nextNextMacro.name == "SceneMouseMove")) and nextMacro.name == "CameraLookat")) then
-				return Macros.Idle(DefaultTriggerInterval, true);
+				return Macros.Idle(DefaultTriggerInterval, true, mode);
 			end
 
 			if (nextMacro.name == "CameraLookat" or nextMacro.name == "Idle" or nextMacro.name == "text") then
@@ -92,18 +93,35 @@ function Macros.Idle(timeMs, bForceWait)
 						local file_path = SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
 						if (file_path) then
 							local t = SoundManager:GetSoundDuration(sound_name, file_path);
-							return Macros.Idle(t * 1000 + DefaultTriggerInterval, true);
+							return Macros.Idle(t * 1000 + DefaultTriggerInterval, true, mode);
 						end
 						return Macros.Idle((math.floor(commonlib.utf8.len(text) / 5) + 1.5) * 1000, true);
 					else
-						return Macros.Idle(DefaultTriggerInterval, true);
+						return Macros.Idle(DefaultTriggerInterval, true, mode);
 					end
 				elseif (previousMacro:IsTrigger() or previousMacro.name == "Idle") then
-					return Macros.Idle(DefaultTriggerInterval, true);
+					return Macros.Idle(DefaultTriggerInterval, true, mode);
 				end
 			end
 		end
 	end
+
+	if(mode == "text") then
+		local callback = {};
+		local lastPlayingText = Macros.isPlayingText;
+		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+			local elapsed = commonlib.TimerManager.GetCurrentTime() - (Macros.lastPlayTextTime or 0);
+			if((elapsed > (timeMs or 1)) or (lastPlayingText and not Macros.isPlayingText)) then
+				timer:Change();
+				if(callback.OnFinish) then
+					callback.OnFinish();
+				end
+			end
+		end})
+		mytimer:Change(50, 50);
+		return callback;
+	end
+
 	local callback = {};
 	local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
 		if(callback.OnFinish) then

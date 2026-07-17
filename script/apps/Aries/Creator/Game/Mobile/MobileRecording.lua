@@ -8,6 +8,8 @@
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileMainPage.lua")
 local MobileMainPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileMainPage");
 local MobileRecording = NPL.export()
+local ScreenRecorderHandler = commonlib.gettable("MyCompany.Aries.Game.Mobile.ScreenRecorderHandler");
+
 local record_url = "Texture/Aries/Creator/keepwork/Paralife/record/"
 local page = nil
 local record_time = 0
@@ -58,7 +60,7 @@ function MobileRecording.ShowMobileRecordingUI()
 		pageRoot:AddChild(tipBg)
 
 		local _stdBtn = ParaUI.CreateUIObject("button", "stdButton", "_lt", 220, 8, 64, 64);
-		_stdBtn.background = record_url.."zantinganniu_55x55_32bits.png;0 0 55 55"
+		_stdBtn.background = record_url.."zanting_128x128_32bits.png"
 		_stdBtn:SetScript("onclick", function()
 			MobileRecording.StopRecord()
 			MobileRecording.ClosePage()
@@ -87,7 +89,7 @@ function MobileRecording.ShowMobileRecordingUI()
 		_guihelper.SetFontColor(time_text,"#000000")
 		tipBg:AddChild(time_text);
 
-		MobileRecording.DrawProgressView(tipBg)
+		MobileRecording.CreateProgressView(tipBg)
 	end
 end
 
@@ -95,64 +97,137 @@ function MobileRecording.IsVisible()
 	return page and page:IsVisible()
 end
 
-function MobileRecording.DrawProgressView(parent)
+function MobileRecording.CreateProgressView(parent)
 	if not parent then
 		return 
 	end
-    local _ownerDrawBtn = ParaUI.CreateUIObject("container", "canvas", "_lt", 232, 20, 50, 50);
-	_ownerDrawBtn:SetField("OwnerDraw", true);
-    local radius = 33
-    local x,y = 20,20
-    local ra = 0
-    local width = 6
+	local x,y,width,height = parent:GetAbsPosition()
+	local zorder = parent.zorder
+    local _ownerDrawBtn = ParaUI.CreateUIObject("container", "recording_progress", "_rt", -310, 20, 300, 100);
+	_ownerDrawBtn.background = ""
+	_ownerDrawBtn.zorder = 1
 	_ownerDrawBtn:GetAttributeObject():SetField("ClickThrough", true);
-	_ownerDrawBtn:SetScript("ondraw", function()
-        ra = angle * 1000
-        ParaPainter.SetPen("#000000")
-        for i=1,ra do
-            local r = i / 1000 
-            local dx = x + radius * math.cos(math.rad(r))
-            local dy = y + radius * math.sin(math.rad(r))
-            local dx1 = x + (radius - width) * math.cos(math.rad(r))
-            local dy2 = y + (radius - width) * math.sin(math.rad(r))
-            ParaPainter.DrawLine(dx1, dy2, dx, dy)
-        end
-    end);
-	parent:AddChild(_ownerDrawBtn);
+	for i=1,4 do 
+		local circle_sp = ParaUI.CreateUIObject("container", "circle_sp"..i, "_lt", 220 , 8, 64, 64);
+		circle_sp.zorder=12-(i - 1)*2;
+		circle_sp.rotation = math.rad(i*90 - 90)
+		circle_sp.background = "Texture/Aries/Creator/keepwork/Paralife/record/record_prgress_32x32_32bits.png";
+		circle_sp:GetAttributeObject():SetField("ClickThrough", true);
+		_ownerDrawBtn:AddChild(circle_sp);
+	end
+	_ownerDrawBtn:AttachToRoot();
+	
+	MobileRecording.sp_progresses = {}
+	for i=1,4 do
+		local circle_sp_progress = ParaUI.CreateUIObject("container", "circle_sp_progress", "_lt", 220 , 8, 64, 64);
+		circle_sp_progress.rotation = math.rad(i*90 - 90)
+		circle_sp_progress.zorder = 11-(i - 1) * 2
+		if i == 4 then
+			circle_sp_progress.zorder = 13
+			circle_sp_progress.visible = false
+		end
+		_guihelper.SetUIColor(circle_sp_progress,"0 0 0")
+		circle_sp_progress.background = "Texture/Aries/Creator/keepwork/Paralife/record/record_prgress_32x32_32bits.png";
+		circle_sp_progress:GetAttributeObject():SetField("ClickThrough", true);
+		_ownerDrawBtn:AddChild(circle_sp_progress);
+		MobileRecording.sp_progresses[#MobileRecording.sp_progresses + 1] = circle_sp_progress
+	end
 end
 
-function MobileRecording.StartRecord()
+function MobileRecording.SetPercent(percent)
+	if percent > 100 then
+		percent = 100
+
+	end
+	local playIndex = math.ceil(percent/25)
+	for i = 1,4 do
+		if i == playIndex then
+			if playIndex == 4 then				
+				MobileRecording.sp_progresses[i].visible = true 
+			end
+			local angle = (i - 1)*90 + 90*((percent - (i - 1) * 25))/25
+			MobileRecording.sp_progresses[i].rotation = math.rad(angle)
+		elseif i > playIndex then
+			local angle = i*90 - 90
+			MobileRecording.sp_progresses[i].rotation = math.rad(angle)
+			if i == 4 then
+				MobileRecording.sp_progresses[i].visible = false
+			end
+		elseif i < playIndex then
+			local angle = i*90
+			MobileRecording.sp_progresses[i].rotation = math.rad(angle)
+			if i == 4 then
+				MobileRecording.sp_progresses[i].visible = false
+			end
+		end
+	end	
+end
+
+function MobileRecording.StartRecordImp()
 	if MobileRecording.IsRecording then
 		return 
 	end
 	record_time = 0
 	local index = 0
 	local count = 0
+	local percent = 0
 	MobileRecording.IsRecording = true
+
+	local startFunc = function()
+		local angle_delta =  (360 / math.floor(max_record_time / record_detal)) --math.floor
+		local percent_delta = (100 / math.floor(max_record_time / record_detal)) 
+		record_timer = commonlib.Timer:new({callbackFunc = function(timer)
+			record_time = record_time + record_detal
+			local h,m,s = commonlib.timehelp.SecondsToHMS(record_time/1000);
+			local strTime = string.format("%.2d:%.2d", m,math.floor(s));
+			local time_text = ParaUI.GetUIObject("text_time")
+			time_text.text= strTime
+			--小红点
+			local record_dot = ParaUI.GetUIObject("record_dot")
+			index = index + 1
+			-- will cause dropped frames
+			-- angle = angle + angle_delta
+			percent = percent + percent_delta
+			MobileRecording.SetPercent(percent)
+			if index > 5 then
+				count = count + 1
+				local color = count % 2 == 0 and "#ffffff" or "#888888"
+				_guihelper.SetUIColor(record_dot,color)
+				index = 0
+			end
+			if record_time > max_record_time then
+				MobileRecording.StopRecord()
+				MobileRecording.ClosePage()
+			end
+		end})
+		record_timer:Change(0, record_detal);
+	end
+
+	if (System.os.CompareParaEngineVersion('1.5.1.0')) then
+		ScreenRecorderHandler.SetStartedCallbackFunc(function()
+			startFunc();
+		end)
+	else
+		startFunc();
+	end
+
 	GameLogic.RunCommand("/screenrecorder start")
-	local angle_delta =  (360 / math.floor(max_record_time / record_detal)) --math.floor
-	record_timer = commonlib.Timer:new({callbackFunc = function(timer)
-		record_time = record_time + record_detal
-		local h,m,s = commonlib.timehelp.SecondsToHMS(record_time/1000);
-		local strTime = string.format("%.2d:%.2d", m,math.floor(s));
-		local time_text = ParaUI.GetUIObject("text_time")
-		time_text.text= strTime
-		--小红点
-		local record_dot = ParaUI.GetUIObject("record_dot")
-		index = index + 1
-		angle = angle + angle_delta
-		if index > 5 then
-			count = count + 1
-			local color = count % 2 == 0 and "#ffffff" or "#888888"
-			_guihelper.SetUIColor(record_dot,color)
-			index = 0
+end
+
+function MobileRecording.StartRecord()
+	local MobilePermissionPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobilePermissionPage.lua")
+	MobilePermissionPage.ShowPage(function()
+		MobileRecording.StartRecordImp()
+	end,function()
+		if record_timer then
+			record_timer:Change()
+			record_timer = nil
 		end
-		if record_time > max_record_time then
-			MobileRecording.StopRecord()
-            MobileRecording.ClosePage()
-		end
-	end})
-	record_timer:Change(0, record_detal);
+		MobileMainPage.SetRecord(false)
+		MobileMainPage.HideCamera(false)
+		MobileRecording.IsRecording = false
+		MobileRecording.ClosePage()
+	end)
 end
 
 function MobileRecording.StopRecord()
@@ -162,10 +237,19 @@ function MobileRecording.StopRecord()
 	if record_timer then
 		record_timer:Change()
 		record_timer = nil
-		MobileMainPage.ShowShortScreen()
 		MobileRecording.IsRecording = false
-		-- GameLogic.AddBBS(nil,"录制已结束，显示录制结果界面")
-		GameLogic.RunCommand("/screenrecorder stop")
+		-- 录制已结束，显示录制结果界面
+		if (System.os.CompareParaEngineVersion('1.5.1.0')) then
+			GameLogic.RunCommand("/screenrecorder stop");
+			Mod.WorldShare.MsgBox:Show(L"正在转码，请稍候...", 120000);
+			ScreenRecorderHandler.SetRecordFinishedCallbackFunc(function(savedPath)
+				Mod.WorldShare.MsgBox:Close();
+				MobileMainPage.ShowShortScreen();
+			end);
+		else
+			GameLogic.RunCommand("/screenrecorder stop");
+			MobileMainPage.ShowShortScreen();
+		end
 	end
 end
 
@@ -188,5 +272,7 @@ function MobileRecording.ClosePage()
     if page then
         page:CloseWindow()
         page = nil
+
+		ParaUI.Destroy("recording_progress")
     end
 end

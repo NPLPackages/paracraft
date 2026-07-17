@@ -60,6 +60,7 @@ function pe_canvas3d:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		
 		local cameraObjectDist = self:GetNumber("CameraObjectDist");
 		local renderTargetSize = self:GetNumber("RenderTargetSize") or 256;
+		local defaultRotY = self:GetNumber('DefaultRotY') or 0;
 		local miniSceneName = self:GetAttributeWithCode("miniscenegraphname");
 
 		local _this = self.control;
@@ -73,6 +74,7 @@ function pe_canvas3d:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		_this:SetLookAtHeight(lookAtHeight or 1.5);
 		_this:SetDefaultCameraObjectDist(cameraObjectDist or 7);
 		_this:SetRenderTargetSize(renderTargetSize, renderTargetSize);
+		_this:SetDefaultRotY(defaultRotY);
 
 		local filename = self:GetAttributeWithCode("assetfile");
 		PlayerAssetFile:Init();
@@ -118,7 +120,7 @@ function pe_canvas3d:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		obj_params.CustomGeosets = CustomCharItems:RemovePetIdFromSkinIds(obj_params.CustomGeosets)
 
 		_this:ShowModel(obj_params);
-		obj_params.scaling = scaling;
+		obj_params.scaling = self:GetNumber("scaling") or scaling;
 		_this:ShowModel(obj_params);
 
 		--play movie related

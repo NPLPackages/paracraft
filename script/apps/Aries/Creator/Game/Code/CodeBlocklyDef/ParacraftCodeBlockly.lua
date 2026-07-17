@@ -151,26 +151,98 @@ function ParacraftCodeBlockly.CompileCode(code, filename, codeblock)
     end
 
     if(codeLanguageType == "python")then
-        local pyruntime = NPL.load("Mod/PyRuntime/Transpiler.lua")
-		if(not ParacraftCodeBlockly.isPythonRuntimeLoaded) then
-			ParacraftCodeBlockly.isPythonRuntimeLoaded = true;
-			pyruntime:start()
+		local hasPythonSupport = ParaEngine.GetAttributeObject():GetFieldIndex("PythonToLua") >= 0;
+		if (hasPythonSupport) then
+			code = code.."\n" -- python requires the last line to be a new line.
+			ParaEngine.GetAttributeObject():SetField("PythonToLua", code); 
+			local luacode = ParaEngine.GetAttributeObject():GetField("PythonToLua") or "";
+			LOG.std(nil, "debug", "python code:", code)
+			
+			luacode = [[local py_env, env_error_msg = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/polyfill.lua")
+local code_env = codeblock:GetCodeEnv()
+py_env['_set_codeblock_env'](code_env)
+for name, api in pairs(py_env) do
+	code_env[name] = api
+end
+]]..luacode
+			LOG.std(nil, "debug", "npl code:", luacode)
+			entity:SetIntermediateCode(luacode)
+			return compiler:Compile(luacode);
 		end
+		-- obsoleted code below: 
+		NPL.load("(gl)script/ide/System/os/os.lua");
+		local is_window = System.os.IsWin32();
+		local is_emscripten = System.os.IsEmscripten();
+		-- is_window = false;
+		local pyruntime = NPL.load("Mod/PyRuntime/Transpiler.lua")
+		if (is_window) then
+			if(not ParacraftCodeBlockly.isPythonRuntimeLoaded) then
+				ParacraftCodeBlockly.isPythonRuntimeLoaded = true;
+				pyruntime:start()
+			end
+		end
+
         local py_env, env_error_msg = NPL.load("Mod/PyRuntime/py2npl/polyfill.lua")
 		local code_env = codeblock:GetCodeEnv()
 		py_env['_set_codeblock_env'](code_env)
+
         pyruntime:installMethods(code_env, py_env);
         
-		-- synchronous
-        local error, luacode = pyruntime:transpile(code)
+		if (not is_window) then
+			local py2lua = function(code, callback) 
+				callback(false, code);
+			end
+			if (is_emscripten) then
+				local Emscripten = NPL.load("(gl)script/apps/Aries/Creator/Game/Emscripten/Emscripten.lua");
+				py2lua = function(code, callback)
+					Emscripten:ExecutePy2Lua(code, callback);
+				end
+			else
+				local NPLJS = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NPLJS.lua");
+				py2lua = function(code, callback)
+					-- NPLJS:Open("http://127.0.0.1:8088/npl/webparacraft/python/py2lua/index.local.html", function()
+					NPLJS:Open("https://webparacraft.keepwork.com/python/py2lua/index.html", function()
+						NPLJS:SendMsg("Py2Lua", code, nil, function(msgdata)
+							callback(not msgdata.error, msgdata.luacode);
+						end)
+					end, 0, 0, 0, 0)
+				end
+			end
+			local G_setfenv = _G.setfenv;
+			local G_print = _G.print;
+			return function()
+				local bExit = false;
+				py2lua(code, function(ok, luacode)
+					if (not ok) then 
+						return G_print("Emscripten:ExecutePy2Lua Error:", luacode);
+					end
+					entity:SetIntermediateCode(luacode)
+					local code_func, errmsg = compiler:Compile(luacode);
+					if (errmsg) then
+						return G_print("compiler:Compile Error:", errmsg);
+					end
+					G_setfenv(code_func, code_env);
+					run(function()
+						code_func();
+						bExit = true;
+					end)
+				end);
+				while (not bExit) do
+					wait(0.5);
+				end
+			end
+		end
 
+		-- synchronous
+		local error, luacode = pyruntime:transpile(code)
 		if error then
 			local error_msg = luacode
 			return nil, luacode
 		end
-
+		LOG.std(nil, "debug", "pyruntime", luacode)
+		entity:SetIntermediateCode(luacode)
 		codeblock:SetModified(true)
-        return compiler:Compile(luacode);
+		return compiler:Compile(luacode);
     else
 	    return compiler:Compile(code);
     end

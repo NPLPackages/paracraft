@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ProjectActivationList.lua" ><![CDATA[
+    local ProjectActivationList = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/ProjectActivationList.lua")
+    ProjectActivationList.OnInit()
+
+    function ClosePage()
+        ProjectActivationList.ClosePage()
+    end
+   
+    function GetDataSource(index)
+        if index == nil then
+            return #ProjectActivationList.activationList
+        else
+            return ProjectActivationList.activationList[index]
+        end
+    end
+
+    function GetWorldPreview(index)
+        local index = tonumber(index)
+        if index then
+            local empty_preview = 'Texture/Aries/Creator/paracraft/konbaitu_266x134_x2_32bits.png# 0 0 532 268'
+            local data = ProjectActivationList.activationList[index]
+            if data and data.project and data.project.extra then
+                return data.project.extra.imageUrl or empty_preview
+            end
+            return empty_preview
+        end
+    end
+
+    function GetWorldText(index)
+        local index = tonumber(index)
+        if index then
+            local data = ProjectActivationList.activationList[index]
+            local worldName = data and data.worldName
+            if data and data.project and data.project.extra then
+                worldName = (data.project.extra.worldTagName and data.project.extra.worldTagName ~= "") and data.project.extra.worldTagName or worldName
+            end
+            worldName = MyCompany.Aries.Chat.BadWordFilter.FilterString(worldName)
+            worldName = worldName or ""
+            if _guihelper.GetTextWidth(worldName) > 120 then
+                worldName = _guihelper.TrimUtf8TextByWidth(worldName, 120, "System;12;norm").."..."
+            end
+            return worldName
+        end
+        return ""
+    end
+
+    function GetFullWorldText(index)
+        local index = tonumber(index)
+        if index then
+            local data = ProjectActivationList.activationList[index]
+            local worldName = data and data.worldName
+            if data and data.project and data.project.extra then
+                worldName = (data.project.extra.worldTagName and data.project.extra.worldTagName ~= "") and data.project.extra.worldTagName or worldName
+            end
+            worldName = MyCompany.Aries.Chat.BadWordFilter.FilterString(worldName)
+            return worldName
+        end
+        return ""
+    end
+    function get_world_date(index)
+        local index = tonumber(index)
+        if index then
+            local data = ProjectActivationList.activationList[index]
+            local timestamp = commonlib.timehelp.GetTimeStampByDateTime(data.updatedAt)
+            local datetime = Mod.WorldShare.Utils:RecentDatetimeFormat(timestamp)
+            return datetime
+        end
+    end
+
+    function get_world_size(index)
+        local index = tonumber(index)
+        if index then
+            local data = ProjectActivationList.activationList[index]
+            if not data.fileSize then
+                data.fileSize = 0
+            end
+
+            return Mod.WorldShare.Utils.FormatFileSize(data.fileSize)
+        end
+    end
+
+    function get_project_collect(index)
+        local index = tonumber(index)
+        if index then
+            local data = ProjectActivationList.activationList[index]
+            if not data or not data.project then
+                return 0
+            end
+            local project = data.project
+            return tonumber(project.favorite) or 0
+        end
+        return 0
+    end
+
+    function get_project_views(index)
+        local index = tonumber(index)
+        if index then
+            local data = ProjectActivationList.activationList[index]
+            if not data or not data.project then
+                return 0
+            end
+            local project = data.project
+            return tonumber(project.visit) or 0
+        end
+        return 0
+    end
+
+    function get_project_thumbs(index)
+        local index = tonumber(index)
+        if index then
+            local data = ProjectActivationList.activationList[index]
+            if not data or not data.project then
+                return 0
+            end
+            local project = data.project
+            return tonumber(project.star) or 0
+        end
+        return 0
+    end
+
+    function activate(index)
+        local index = tonumber(index)
+        if index then
+            ProjectActivationList.ActivateProject(index)
+        end
+    end
+]]></script>
+<style type='text/mcss' src='Mod/WorldShare/cellar/Theme/Mcss/Theme1.mcss'>
+    {
+        share_world_name = {
+            ['text-singleline'] = 'true',
+            width = 210,
+            height = 24,
+            float = 'left',
+            ['font-size'] = 14,
+            ['base-font-size'] = 14,
+            ['margin-top'] = 3,
+            ['text-align'] = 'left',
+            color = '#323948',
+        },
+    }
+</style>
+<pe:container alignment="_fi" zorder='-2' onclick = "onclickBackground" width="100%" height="100%" style="background-color:#B4BBC2DF; ">
+</pe:container>
+<pe:container alignment="_ct"  style="margin-left: -570px; margin-top: -300px; width:1140px;height:600px;background: url();">   
+    <div style="width: 1140px; height: 600px; margin-left:4px; margin-top:6px; background: url(Texture/Aries/Creator/paracraft/Educate/beijingdi_50x50_32bits.png#0 0 50 50 :24 24 24 24);">
+        <div style="position: relative; width:  320px; height: 112px; background: url(Texture/Aries/Creator/paracraft/Educate/biaotidiban_320x112_32bits.png#0 0 320 112);">
+            <div style="margin-top: 20px; margin-left: 20px;">
+                <input type="button" onclick="ClosePage()" style="position: relative; margin-left: 4px;  width: 34px; height: 26px; background: url(Texture/Aries/Creator/paracraft/Educate/Project/fanhui_34x26_32bits.png#0 0 34 26);" />
+                <div style="margin-left: 61px; color: #000000; font-size: 20px; base-font-size: 20px; font-weight: bold;">
+                    <%=L"激活更多存档"%>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 80px; margin-left: 10px; width: 1140px; height: 480px; ">
+            <pe:gridview DataSource='<%=GetDataSource%>' name='gw_world_ds' VerticalScrollBarOffsetX="26"  RememberScrollPos='true' AllowPaging='false' VerticalScrollBarStep='100' DefaultNodeHeight='200' CellPadding='10' ItemsPerLine='4'>
+                <Columns>
+                    <div style='width: 262px; height: 222px; background: url(Texture/Aries/Creator/paracraft/Educate/Project/zuopingdi_261x222_32bits.png#0 0 261 222);'>
+                        <div align='center'style='width: 220px; height: 110px;margin-top: 18px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#72 20 16 16:2 2 2 2)'>
+                            <pe:container style='position: relative;width: 220px; height: 110px;background:url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9);' zorder='1' name='<%=Eval("index")%>' onclick='click_preview()'></pe:container>
+                            <img src='<%=GetWorldPreview(Eval("index"))%>' style="width: 220px; height: 110px;" />
+                        </div>
+                        <div style='margin-left: 22px; height: 32px;'>
+                            <div tooltip='<%= GetFullWorldText(Eval("index")) %>' class='share_world_name'>
+                                <%= GetWorldText(Eval("index")) %>
+                                <pe:if condition='<%= Eval("projectId") and tonumber(Eval("projectId") ) > 0 %>'>
+                                    <div style='float: left;margin-left: 2px;'tooltip='<%= L"项目ID：" .. Eval("projectId") %>'>
+                                        <span style='color: #b2b2b2;'>#<%= Eval('projectId') or '' %></span>
+                                    </div>
+                                </pe:if>
+                            </div>
+                        </div>
+
+                        <div style='margin-left: 22px;'>
+                            <div >
+                                <!-- 更新时间 -->
+                                <div style='float: left;height: 20px; width: 50px; font-size: 12px;base-font-size: 12px;color: #b2b2b2;'>
+                                    <%= get_world_date(Eval("index")) %>
+                                </div>
+                                <!-- 容量 -->
+                                <div style='float: left; height: 20px;width: 50px; font-size: 12px;base-font-size: 12px;color: #b2b2b2;'>
+                                    <%= get_world_size(Eval("index")) %>
+                                </div>
+                            </div>
+                            <div style='font-size: 12px;base-font-size: 12px;color: #b2b2b2;margin-top: 6px;'>
+                                <div style='float:left;'tooltip='<%= L"观看：" .. get_project_views(Eval("index")) %>'>
+                                    <img src='Texture/Aries/Creator/paracraft/Educate/Project/liulan_15x10_32bits.png#0 0 15 10' style='width: 15px;height: 10px;margin-top: 4px;' />
+                                    <div style='float:left;margin-left: 2px;'><%= get_project_views(Eval("index")) %></div>
+                                </div>
+                                <div style='float: left;margin-left: 8px;'tooltip='<%= L"点赞：" .. get_project_thumbs(Eval("index")) %>'>
+                                    <img src='Texture/Aries/Creator/paracraft/Educate/Project/dianzan_10x10_32bits.png#0 0 10 10'style='margin-top:3px; width: 10px; height: 10px;' />
+                                    <div style='float:left;margin-left: 2px;'><%= get_project_thumbs(Eval("index")) %></div>
+                                </div>
+                                <div style='float:left;margin-left: 8px;'tooltip='<%= L"收藏：" .. get_project_collect(Eval("index")) %>'>
+                                    <img src='Texture/Aries/Creator/paracraft/Educate/Project/soucang_10x10_32bits.png#0 0 10 10' style='width: 10px;height: 10px;margin-top: 3px;' />
+                                    <div style='float: left;margin-left: 2px;'><%= get_project_collect(Eval("index")) %></div>
+                                </div>
+                            </div>
+                            
+                            <input type='button' name='<%=Eval("index")%>' onclick='activate' tooltip='<%=L"激活"%>'   style='position: relative; margin-top: -26px; margin-left:186px; width: 23px;height: 20px;background: url(Texture/Aries/Creator/paracraft/Educate/Project/jinru_23x20_32bits.png#0 0 23 20);'/>
+                        </div>
+                    </div>
+                </Columns>
+                <EmptyDataTemplate>
+                    <div style='margin: 10px;font-weight: bold;'>
+                        <div align='center' style='width: 258px; height: 244px; margin-top: 80px; background: url(Texture/Aries/Creator/paracraft/Educate/Project/kongbai_258x244_32bits.png#0 0 258 244)'>
+                            <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: 170px; color: #3D7EFF;" ><%=L"你还没有需要激活的3D世界"%></div>
+                        </div>
+                    </div>
+                </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

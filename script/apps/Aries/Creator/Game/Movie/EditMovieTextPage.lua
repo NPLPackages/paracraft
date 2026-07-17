@@ -149,16 +149,29 @@ function EditMovieTextPage.OnClickSelcetNarrator(name, value)
 	end
 
 	if value >= 0 then
-		local has_permission = UserPermission.CheckUserPermission("movie_playText")
-		if not has_permission and not GameLogic.Macros:IsPlaying() then
-			page:SetValue("voicenarrator", default_narrator);
-			GameLogic.IsVip("PlyText", true, function(result)
-				if result then
-					page:SetValue("voicenarrator", value);
-				end
-			end)
-			
-			return
+		if not System.options.isEducatePlatform then
+			local has_permission = UserPermission.CheckUserPermission("movie_playText")
+			if not has_permission and not GameLogic.Macros:IsPlaying() then
+				page:SetValue("voicenarrator", default_narrator);
+				GameLogic.IsVip("PlyText", true, function(result)
+					if result then
+						page:SetValue("voicenarrator", value);
+					end
+				end)
+			end
+		else
+			if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+				page:SetValue("voicenarrator", default_narrator);
+				GameLogic.GetFilters():apply_filters('check_signed_in', '请先登录', function(result)
+					if result == true then
+						commonlib.TimerManager.SetTimeout(function()
+							page:SetValue("voicenarrator", value);
+						end, 500)
+					end
+				end)
+			else
+				page:SetValue("voicenarrator", value);
+			end
 		end
 	end
 end
@@ -226,7 +239,7 @@ function EditMovieTextPage.UpdateSoundDesc(channel_name)
 
 	channel_name = channel_name or "playtext" .. voicenarrator
 
-	local md5_value = SoundManager:GetPlayTextMd5(text, voiceNarrator)
+	local md5_value = SoundManager:GetPlayTextMd5(text, voicenarrator)
 	local filename = md5_value .. ".mp3"
 	local file_path = string.format("%s/%s/%s", SoundManager:GetPlayTextDiskFolder(), voicenarrator, filename)
 	local duration = SoundManager:GetSoundDuration(channel_name, file_path)

@@ -80,20 +80,20 @@ function BlockInEntityHand.RefreshRightHand(entity, itemStack, player)
 			item = itemStack:GetItem();
 		end
 		if(itemStack) then
-			if(item) then
-				model_filename = item:GetItemModel();	
+			if(item and item:IsShowModelInHand()) then
+				model_filename = item:GetItemModel(itemStack);	
 				if(not model_filename or model_filename == "icon") then
 					model_filename = iconModel;
 					bUseIcon = true;
 				end
-				inhand_offsets = item:GetItemModelInHandOffset();
+				inhand_offsets = item:GetItemModelInHandOffset(itemStack);
 			end
 			
 			if(model_filename and model_filename~="") then
-				scaling = (modelScalings[model_filename] or modelScalings["default"])*item:GetItemModelScaling();
+				scaling = (modelScalings[model_filename] or modelScalings["default"])*item:GetItemModelScaling(itemStack);
 				meshModel = ParaAsset.LoadStaticMesh("", model_filename);
 				if(bUseIcon) then
-					texReplaceable = item:GetIconObject();
+					texReplaceable = item:GetIconObject(itemStack, true);
 					-- obj:SetField("FaceCullingDisabled", true);
 				else
 					local block = item:GetBlock();
@@ -116,6 +116,21 @@ function BlockInEntityHand.RefreshRightHand(entity, itemStack, player)
 			end
 			inhand_offsets = inhand_offsets or modelOffsets[model_filename or ""] or modelOffsets["default"];
 			player:ToCharacter():GetAttachmentAttObj(nRightHandId):SetField("position", inhand_offsets);
+			
+			--[[ Apply color mask for blocks with color data (like colorblock)
+			if(item and item.HasColorData and item:HasColorData()) then
+				local color = item.GetPenColor and item:GetPenColor(itemStack);
+				if(color) then
+					-- Convert color to r,g,b,a format (0-255)
+					NPL.load("(gl)script/ide/System/Core/Color.lua");
+					local Color = commonlib.gettable("System.Core.Color");
+					local r, g, b = Color.DWORD_TO_RGB(color);
+					-- Set color mask on the attachment (multiply blend mode)
+					local colorStr = string.format("%d %d %d 255", r, g, b);
+					player:ToCharacter():GetAttachmentAttObj(nRightHandId):SetField("colorDiffuse", colorStr);
+				end
+			end
+			]]
 		else
 			player:ToCharacter():RemoveAttachment(nRightHandId);
 		end
@@ -133,12 +148,13 @@ function BlockInEntityHand.TransformEntityToBlockItem(entity, itemStackOrItemId)
 
 	if(type(itemStack) == "number") then
 		item = ItemClient.GetItem(itemStack);
+		itemStack = nil;
 	else
 		item = itemStack:GetItem();
 	end
 
 	if(item) then
-		model_filename = item:GetItemModel();	
+		model_filename = item:GetItemModel(itemStack);	
 		if(not model_filename or model_filename == "icon") then
 			model_filename = iconChar32;
 			bUseIcon = true;
@@ -163,6 +179,14 @@ function BlockInEntityHand.TransformEntityToBlockItem(entity, itemStackOrItemId)
 		entity:SetSkin(texReplaceable)
 		entity:SetBootHeight(bootHeight or 0)
 	end
+end
+
+function BlockInEntityHand.TransformEntityTo3DTexture(entity, filename)
+	local model_filename = iconChar32;
+	entity:SetModelFile(model_filename)
+	entity:SetSkin(filename)
+	local bootHeight = modelBootHeights[model_filename];
+	entity:SetBootHeight(bootHeight or 0)
 end
 
 --@param itemId: custom character item id

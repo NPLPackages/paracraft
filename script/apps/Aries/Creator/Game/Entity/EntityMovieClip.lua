@@ -106,6 +106,10 @@ function Entity:GetCameraItemStack()
 	return self.inventory:FindItem(block_types.names.TimeSeriesCamera);
 end
 
+-- whether it can be searched via Ctrl+F FindBlockTask
+function Entity:IsSearchable()
+	return true;
+end
 
 -- return table map {filename=true} of referenced external files, usually bmax files in the world directory. such as {"abc.bmax", "a.fbx", }
 -- if no external files are referenced, we will return nil.
@@ -210,11 +214,271 @@ local function offset_time_variable(var, offset)
 	end
 end
 
--- @param offset_bx, offset_by, offset_bz: in block coordinate
+local function get_actor_movie_timeseries(entity) -- 暂时只支持单actor
+	if not entity then
+		return 
+	end
+	for i=1, entity.inventory:GetSlotCount() do
+		local itemStack = entity.inventory:GetItem(i);
+		if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+			if(itemStack.id == block_types.names.TimeSeriesNPC) then
+				local timeSeries = itemStack.serverdata.timeseries;
+				if(timeSeries and timeSeries.assetfile and timeSeries.assetfile.data) then
+					local data = timeSeries.assetfile.data;
+					for i = 1, #(data) do
+						if(data[i] == "customchar" or data[i] == "character/CC/02human/CustomGeoset/actor.x") then
+							return timeSeries
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+local function get_movie_actor_offset(entity)
+	local actor_timeseries = get_actor_movie_timeseries(entity)
+	if not actor_timeseries then
+		return
+	end
+	local x ,y ,z = entity:GetPosition();
+	local movie_offset_x = actor_timeseries.x.data[1] - x;
+	local movie_offset_y = actor_timeseries.y.data[1] - y;
+	local movie_offset_z = actor_timeseries.z.data[1] - z;
+	return movie_offset_x, movie_offset_y, movie_offset_z
+end
+
+local function rotatePointAroundPivotY(pivot, point, angleRadians)
+    -- 计算旋转向量
+    local vector = {
+        point[1] - pivot[1],
+        point[2] - pivot[2],
+        point[3] - pivot[3]
+    }
+
+    -- 计算旋转矩阵的元素
+    local cosTheta = math.cos(angleRadians)
+    local sinTheta = math.sin(angleRadians)
+
+    -- 应用旋转矩阵
+    local newX = cosTheta * vector[1] - sinTheta * vector[3]
+    local newY = vector[2]  -- Y 轴不变
+    local newZ = sinTheta * vector[1] + cosTheta * vector[3]
+
+    -- 计算新的旋转点位置
+    local newPoint = {
+        pivot[1] + newX,
+        pivot[2] + newY,
+        pivot[3] + newZ
+    }
+
+    return newPoint
+end
+
+-- return x,y,z after rotation
+local function rotatePointAroundPivotY3(pivotX, pivotY, pivotZ, pointX, pointY, pointZ, angleRadians)
+	-- 计算旋转向量
+	local vectorX = pointX - pivotX
+	local vectorY = pointY - pivotY
+	local vectorZ = pointZ - pivotZ
+
+	-- 计算旋转矩阵的元素
+	local cosTheta = math.cos(angleRadians)
+	local sinTheta = math.sin(angleRadians)
+
+	-- 应用旋转矩阵
+	local newX = cosTheta * vectorX - sinTheta * vectorZ
+	local newY = vectorY  -- Y 轴不变
+	local newZ = sinTheta * vectorX + cosTheta * vectorZ
+
+	-- 计算新的旋转点位置
+	local resultX = pivotX + newX
+	local resultY = pivotY + newY
+	local resultZ = pivotZ + newZ
+
+	return resultX, resultY, resultZ
+    
+end
+
+-- scale all actors by scale_factor, this will scale all positions and scaling.
+-- if originX, originY, originZ is nil, it will use the position of first ActorNPC as origin or movie block position if NPC does not exist.
+function Entity:ScaleActors(scale_factor, originX, originY, originZ)
+	if(scale_factor == 1) then
+		return
+	end
+	if(not originX or not originY or not originZ) then
+		-- Try to get origin from first ActorNPC
+		for i=1, self.inventory:GetSlotCount() do
+			local itemStack = self.inventory:GetItem(i);
+			if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+				if(itemStack.id == block_types.names.TimeSeriesNPC) then
+					local timeSeries = itemStack.serverdata.timeseries;
+					if(timeSeries and timeSeries.x and timeSeries.x.data and timeSeries.y and timeSeries.y.data and timeSeries.z and timeSeries.z.data) then
+						originX = timeSeries.x.data[1];
+						originY = timeSeries.y.data[1];
+						originZ = timeSeries.z.data[1];
+						break;
+					end
+				end
+			end
+		end
+		-- Fall back to movie block position if no NPC found
+		if(not originX or not originY or not originZ) then
+			local x ,y ,z = self:GetPosition();
+			originX, originY, originZ = x, y, z
+		end
+	end
+	for i=1, self.inventory:GetSlotCount() do
+		local itemStack = self.inventory:GetItem(i);
+		if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+			if(itemStack.id == block_types.names.TimeSeriesNPC or itemStack.id == block_types.names.TimeSeriesOverlay) then
+				local timeSeries = itemStack.serverdata.timeseries;
+				if(timeSeries) then
+					-- Scale positions relative to origin
+					if(timeSeries.x and timeSeries.x.data) then
+						local xData = timeSeries.x.data;
+						for j = 1, #xData do
+							xData[j] = originX + (xData[j] - originX) * scale_factor;
+						end
+					end
+					if(timeSeries.y and timeSeries.y.data) then
+						local yData = timeSeries.y.data;
+						for j = 1, #yData do
+							yData[j] = originY + (yData[j] - originY) * scale_factor;
+						end
+					end
+					if(timeSeries.z and timeSeries.z.data) then
+						local zData = timeSeries.z.data;
+						for j = 1, #zData do
+							zData[j] = originZ + (zData[j] - originZ) * scale_factor;
+						end
+					end
+					-- Scale the scaling values
+					if(timeSeries.scaling and timeSeries.scaling.data and (#timeSeries.scaling.data) > 0) then
+						local scalingData = timeSeries.scaling.data;
+						for j = 1, #scalingData do
+							scalingData[j] = scalingData[j] * scale_factor;
+						end
+					elseif(timeSeries.scaling) then
+						-- Create scaling timeseries if it doesn't exist
+						timeSeries.scaling.times = {0};
+						timeSeries.scaling.data = {scale_factor};
+						timeSeries.scaling.ranges = {{1, 1}};
+					end
+					-- Scale parent attachment positions
+					if(timeSeries.parent and timeSeries.parent.data) then
+						local parentData = timeSeries.parent.data;
+						for j = 1, #parentData do
+							local parentEntry = parentData[j];
+							if(parentEntry and parentEntry.pos) then
+								-- Scale the position offset relative to parent
+								parentEntry.pos[1] = parentEntry.pos[1] * scale_factor;
+								parentEntry.pos[2] = parentEntry.pos[2] * scale_factor;
+								parentEntry.pos[3] = parentEntry.pos[3] * scale_factor;
+							end
+						end
+					end
+				end
+			elseif(itemStack.id == block_types.names.TimeSeriesCamera) then
+				local timeSeries = itemStack.serverdata.timeseries;
+				if(timeSeries) then
+					-- Scale camera lookat positions relative to origin
+					if(timeSeries.lookat_x and timeSeries.lookat_x.data) then
+						local xData = timeSeries.lookat_x.data;
+						for j = 1, #xData do
+							xData[j] = originX + (xData[j] - originX) * scale_factor;
+						end
+					end
+					if(timeSeries.lookat_y and timeSeries.lookat_y.data) then
+						local yData = timeSeries.lookat_y.data;
+						local cameraCharHeight = 0.5 * 0.875; -- camera is looking at char height * 0.875, see EntityCamera for camera height
+						for j = 1, #yData do
+							-- tricky: the camera y coordinate is offset by 0.5 for char height.
+							yData[j] = originY + (yData[j] - originY + cameraCharHeight) * scale_factor - cameraCharHeight;
+						end
+					end
+					if(timeSeries.lookat_z and timeSeries.lookat_z.data) then
+						local zData = timeSeries.lookat_z.data;
+						for j = 1, #zData do
+							zData[j] = originZ + (zData[j] - originZ) * scale_factor;
+						end
+					end
+					-- Scale eye distance
+					if(timeSeries.eye_dist and timeSeries.eye_dist.data) then
+						local distData = timeSeries.eye_dist.data;
+						for j = 1, #distData do
+							distData[j] = distData[j] * scale_factor;
+						end
+					end
+				end
+			end
+		end
+	end
+
+end
+
+function Entity:OffsetActorFacing(facing_offset, originX, originY, originZ)
+	if(facing_offset == 0) then
+		return
+	end
+	if(not originX or not originY or not originZ) then
+		local x ,y ,z = self:GetPosition();
+		originX, originY, originZ = x, y, z
+	end
+	local pivot = {originX, originY, originZ}
+	for i=1, self.inventory:GetSlotCount() do
+		local itemStack = self.inventory:GetItem(i);
+		if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+			if(itemStack.id == block_types.names.TimeSeriesNPC or itemStack.id == block_types.names.TimeSeriesOverlay) then
+				local timeSeries = itemStack.serverdata.timeseries;
+				local xData = timeSeries.x.data;
+				local yData = timeSeries.y.data;
+				local zData = timeSeries.z.data;
+				for i = 1, #xData do
+					xData[i], yData[i], zData[i] = rotatePointAroundPivotY3(originX, originY, originZ, xData[i], yData[i], zData[i], -facing_offset)
+				end
+				
+				if timeSeries.facing and timeSeries.facing.data and (#timeSeries.facing.data > 0) then	
+					local facingData = timeSeries.facing.data;
+					for i = 1, #facingData do
+						facingData[i] = mathlib.ToStandardAngle(facingData[i] + facing_offset)
+					end
+					timeSeries.facing.data = facingData
+				elseif(timeSeries.facing) then
+					-- create facing timeseries if it doesn't exist
+					timeSeries.facing.times = {0};
+					timeSeries.facing.data = {facing_offset};
+					timeSeries.facing.ranges = {{1, 1}};
+				end
+			elseif(itemStack.id == block_types.names.TimeSeriesCamera) then
+				local timeSeries = itemStack.serverdata.timeseries;
+				local xData = timeSeries.lookat_x.data;
+				local yData = timeSeries.lookat_y.data;
+				local zData = timeSeries.lookat_z.data;
+				for i = 1, #xData do
+					xData[i], yData[i], zData[i] = rotatePointAroundPivotY3(originX, originY, originZ, xData[i], yData[i], zData[i], -facing_offset)
+				end
+				if(timeSeries.eye_rot_y and timeSeries.eye_rot_y.data) then
+					local facingData = timeSeries.eye_rot_y.data;
+					for i = 1, #facingData do
+						facingData[i] = mathlib.ToStandardAngle(facingData[i] + facing_offset)
+					end
+					timeSeries.eye_rot_y.data = facingData
+				end
+			end
+		end
+	end
+end
+
+-- @param offset_bx, offset_by, offset_bz: in block coordinate, can be floating block number
 function Entity:OffsetActorPositions(offset_bx, offset_by, offset_bz)
 	local blockSize = BlockEngine.blocksize;
 	local offset_x, offset_y, offset_z = offset_bx*blockSize, offset_by*blockSize, offset_bz*blockSize
-
+	offset_bx, offset_by, offset_bz = math.floor(offset_bx), math.floor(offset_by), math.floor(offset_bz)
+	local movie_offset_x, movie_offset_y, movie_offset_z = get_movie_actor_offset(self);
+	offset_x = offset_x - (movie_offset_x or 0);
+	offset_y = offset_y - (movie_offset_y or 0);
+	offset_z = offset_z - (movie_offset_z or 0);
 	for i=1, self.inventory:GetSlotCount() do
 		local itemStack = self.inventory:GetItem(i);
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
@@ -267,6 +531,22 @@ function Entity:OffsetActorPositions(offset_bx, offset_by, offset_bz)
 					end
 				end
 			end
+		end
+	end
+end
+
+function Entity:OffsetActorSkin(skin)
+	local actor_timeseries = get_actor_movie_timeseries(self)
+	if not actor_timeseries then
+		return
+	end
+	local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+	local mainSkin = skin or ""
+	mainSkin = CustomCharItems:ChangeSkinStringToItems(mainSkin)
+	local skinData = actor_timeseries.skin.data
+	if skinData and type(skinData) == "table" then
+		for i = 1, #skinData do
+			actor_timeseries.skin.data[i] = CustomCharItems:MergeSkinString(actor_timeseries.skin.data[i],mainSkin);
 		end
 	end
 end
@@ -376,7 +656,7 @@ end
 -- @return: return true if it is an action block and processed . 
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	if(GameLogic.isRemote) then
-		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
+		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock() and not self:IsLocked()) then
 			self:OpenEditor("entity", entity);	
 		end
 	else
@@ -412,19 +692,7 @@ function Entity:OpenEditor(editor_name, entity)
 		GameLogic.SetModified();
 	end
 
-	local function open_editor_wrap()
-		if (System.User.isAnonymousWorld) then
-			GameLogic.CheckSignedIn(L"请先登录！", function()
-				if (System.User.isAnonymousWorld) then return end
-				open_editor();
-			end);
-		else
-			open_editor();
-		end
-	end
-	
-	UserPermission.CheckCanEditBlock("click_movie_block", open_editor_wrap)
-	
+	UserPermission.CheckCanEditBlock("click_movie_block", open_editor)
 	return true;
 end
 
@@ -837,15 +1105,6 @@ function Entity:OpenAtLine(line, pos)
 	self.selectedActorIndex = nil
 end
 
-local function offset_time_variable(var, offset)
-	if(var and var.data) then
-		local data = var.data;
-		for i = 1, #(data) do
-			data[i] = data[i] + offset;
-		end
-	end
-end
-
 -- @param animMap: {fromId, toId} id to id map
 -- @param filename: if nil, we will match all filename
 -- @return bFound, count: count is the number key replaced
@@ -858,7 +1117,6 @@ function Entity:RemapAnim(animMap, filename)
 				local timeSeries = itemStack.serverdata.timeseries;
 				if(timeSeries and timeSeries.assetfile and timeSeries.assetfile.data) then
 					local dataAssetFile = timeSeries.assetfile.data;
-					local fromTime, toTime = 0;
 					local bAssetMatched;
 					for i = 1, #(dataAssetFile) do
 						if(not filename or dataAssetFile[i] == filename) then
@@ -1472,8 +1730,7 @@ function Entity:CompareActorBones(entity)
 			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1			
-			end
-			if itemStack.id == 10062 then
+			elseif itemStack.id == 10062 and timeseries1 and timeseries2 then
 				if (timeseries1.bones and not timeseries2.bones) or (not timeseries1.bones and timeseries2.bones) then
 					diff_num = diff_num + 1
 					result[i] = 1
@@ -2070,7 +2327,9 @@ end
 
 -- static function: create a movie entity in memory from a block template file. 
 -- @param filename: block template file that should only contain one movie block. 
--- @param bx, by, bz: movie block position
+-- @param bx, by, bz: movie block position, can be nil.
+-- @param isMainPlayer: whether this movie is the main player's movie. 
+-- @param attachEntity: the entity that this movie should attach to. 
 -- @return movieEntity
 function Entity:CreateFromTemplateFile(filename, bx, by, bz)
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
@@ -2113,8 +2372,7 @@ function Entity:CreateFromTemplateFile(filename, bx, by, bz)
 			if(node and node[1]) then
 				local blocks = NPL.LoadTableFromString(node[1]);
 				if(blocks and #blocks > 0) then
-					if(root_node.attr and root_node.attr.relative_motion == "true") then
-						-- calculate relative motion
+					if(root_node.attr) then
 						local movieBlockId = block_types.names.MovieClip; -- id is 228
 						for i, block in ipairs(blocks) do
 							local block_id = block[4];
@@ -2123,13 +2381,17 @@ function Entity:CreateFromTemplateFile(filename, bx, by, bz)
 								if(entityData) then
 									local ox, oy, oz = entityData.attr.bx, entityData.attr.by, entityData.attr.bz;
 									if(ox and oy and oz) then
-										local offset_x, offset_y, offset_z = bx + block[1]- ox, by + block[2]- oy, bz + block[3] - oz;
 										local movieEntity = Entity:new();
 										movieEntity:LoadFromXMLNode(entityData);
-										movieEntity:OffsetActorPositions(offset_x, offset_y, offset_z);
-										movieEntity.bx = movieEntity.bx + offset_x;
-										movieEntity.by = movieEntity.by + offset_y;
-										movieEntity.bz = movieEntity.bz + offset_z;
+
+										-- calculate relative motion
+										if(root_node.attr.relative_motion == "true") then
+											local offset_x, offset_y, offset_z = bx + block[1]- ox, by + block[2]- oy, bz + block[3] - oz;
+											movieEntity:OffsetActorPositions(offset_x, offset_y, offset_z);
+											movieEntity.bx = movieEntity.bx + offset_x;
+											movieEntity.by = movieEntity.by + offset_y;
+											movieEntity.bz = movieEntity.bz + offset_z;
+										end
 										return movieEntity;
 									end
 								end

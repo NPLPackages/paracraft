@@ -9,7 +9,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileEnvFramePage.lua")
 local MobileEnvFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileEnvFramePage");
 -------------------------------------------------------
 ]]
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua");
+local EnvFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnvFramePage");
 local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -103,12 +104,10 @@ function MobileEnvFramePage.OnTimeSliderChanged(value)
 		local time=(value/1000-0.5)*2;
 		time = tostring(time);
 		CommandManager:RunCommand("time", time);
-		
-		cmdStr = "/time "..time
-
-		if not GameLogic.options:IsTimesAutoGo() then
-			GameLogic.options:SetFrozenDayTime(time,true)
+		if EnvFramePage.changecb then
+			EnvFramePage.changecb("time", time)
 		end
+		cmdStr = "/time "..time
 	end	
 	MobileEnvFramePage.cmd_time = cmdStr
 end
@@ -182,7 +181,10 @@ function MobileEnvFramePage.ChangeWeather(name,mcmlNode)
     elseif(string.match(name,"snow")) then
 		weather = "snow"
     end
-
+	MobileEnvFramePage.cmd_weather = string.format("/worldenv -weather=%s",weather)
+	if EnvFramePage.changecb then
+        EnvFramePage.changecb("cmd",MobileEnvFramePage.cmd_weather)
+    end
 	GameLogic.options:SetWeather(weather,true)
 end
 

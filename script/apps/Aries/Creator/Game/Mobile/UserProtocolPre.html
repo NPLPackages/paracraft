@@ -62,15 +62,40 @@
         end
 
         function GetTitle()
-            return L"信息"
+            return (System.options.appName and System.options.appName~= "") and System.options.appName or L"信息"
         end
 
         function onBtn_agree()
             UserProtocolPre.onBtn_agree()
         end
+
+        function isHuawei()
+            return System.os.GetAndroidFlavor() == 'huawei'
+        end
+
+        function GetTitleText()
+            local text = ""
+            if isHuawei() then
+                if System.options.isEducatePlatform then
+                    text = L"欢迎使用帕拉卡智慧教育平台软件，在使用之前，"
+                else
+                    text = L"欢迎使用帕拉卡3D虚拟社区学习软件，在使用之前，"
+                end
+            else
+                if System.options.isEducatePlatform then
+                    text = L"欢迎使用帕拉卡智慧教育平台软件，在使用之前，"
+                else
+                    text = L"欢迎使用帕拉卡3D动画编程，在使用之前，"
+                end
+            end
+            if System.options.partner == "huawei" then
+                text = L"欢迎使用当前软件软件，在使用之前，"
+            end
+            return text
+        end
     ]]>
 </script>
-<mb:window width = "520" height = "570" title_bg_height = "64" title = '<%=GetTitle()%>' onclose="ClosePage">
+<mb:window width = "520" height = "590" title_bg_height = "64" title = '<%=GetTitle()%>' onclose="ClosePage">
     <div style="min-width: 500px;height:540px;position: relative; margin-top: 60px;">
         <pe:gridview name="user_protocol_page_gridview" uiname="user_protocol_page_gridview.gridview" RememberScrollPos="true" CellPadding="0" AllowPaging="false" ItemsPerLine="1 " DefaultNodeHeight="540" DataSource='<%=GridDs%>' >
             <Columns>
@@ -81,7 +106,7 @@
                         </div>
                         <div style="line-height: 32;margin-top: 10;" >
                             <div class="text_size_content">
-                                <%= L'欢迎使用帕拉卡3D动画编程，在使用之前，' %>
+                                <%=GetTitleText()%>
                             </div>
                             <div class="text_size_content" style="float:left;">
                                 <%= L'请仔细阅读' %>

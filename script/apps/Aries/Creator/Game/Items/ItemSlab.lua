@@ -11,13 +11,13 @@ local ItemSlab = commonlib.gettable("MyCompany.Aries.Game.Items.ItemSlab");
 ]]
 NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/ide/math/bit.lua");
-local Player = commonlib.gettable("MyCompany.Aries.Player");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local band = mathlib.bit.band;
+local bor = mathlib.bit.bor;
 
 local ItemSlab = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.ItemColorBlock"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemSlab"));
 
@@ -49,10 +49,18 @@ local function GetBoxBlockBySlabID(slab_id)
 	return block_id_map[slab_id];
 end
 
-
 -- @param template: icon
 -- @param radius: the half radius of the object. 
 function ItemSlab:ctor()
+end
+
+function ItemSlab:OnSelect(itemStack)
+	ItemSlab._super.OnSelect(self, itemStack);
+	GameLogic.SetStatus(L"Alt+右键改变形状");
+end
+function ItemSlab:OnDeSelect()
+	ItemSlab._super.OnDeSelect(self);
+	GameLogic.SetStatus(nil);
 end
 
 -- Right clicking in 3d world with the block in hand will trigger this function. 
@@ -102,9 +110,10 @@ function ItemSlab:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_reg
 		if(isReplacing) then
 			local block_template = block_types.get(block_id);
 			if(block_template) then
+				self:PaintBlock(x_, y_, z_, self:GetPenColor(itemStack))
 				block_template:play_create_sound();
 
-				block_template:OnBlockPlacedBy(x,y,z, entityPlayer);
+				block_template:OnBlockPlacedBy(x_, y_, z_, entityPlayer);
 				if(itemStack) then
 					itemStack.count = itemStack.count - 1;
 				end
@@ -121,6 +130,7 @@ function ItemSlab:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_reg
 				end
 
 				if(BlockEngine:SetBlock(x, y, z, block_id, data, 3)) then
+					self:PaintBlock(x,y,z, self:GetPenColor(itemStack))
 					block_template:play_create_sound();
 
 					block_template:OnBlockPlacedBy(x,y,z, entityPlayer);
@@ -130,6 +140,53 @@ function ItemSlab:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_reg
 				end
 				return true;
 			end
+		end
+	end
+end
+
+function ItemSlab:mouseReleaseEvent(event)
+	if(event:isAccepted()) then
+		return
+	end
+	if(event:button() == "right" and GameLogic.GameMode:IsEditor()) then
+		if(event.alt_pressed and not event.shift_pressed and not event.ctrl_pressed) then
+			-- alt + right click to change its shape
+			event:accept();
+			local result = Game.SelectionManager:MousePickBlock(true, false, false);
+			if(result.blockX) then
+				local x,y,z = result.blockX,result.blockY,result.blockZ;
+				local block_template = BlockEngine:GetBlock(x,y,z);
+				if(block_template and block_template.shape == "slab") then
+					self:SwitchSlabShape(x,y,z)
+					event:accept();
+				end
+			end
+		end
+	end
+end
+
+local shapeSwitchTable;
+function ItemSlab:GetShapeSwitchTable()
+	if(not shapeSwitchTable) then
+		shapeSwitchTable = {
+			[0] = 1, [1] = 2, [2] = 3, [3] = 4, [4] = 5, [5] = 0,
+		}
+	end
+	return shapeSwitchTable;
+end
+
+function ItemSlab:SwitchSlabShape(x,y,z)
+	local block_template = BlockEngine:GetBlock(x,y,z);
+	if(block_template and block_template.shape == "slab") then
+		local data = BlockEngine:GetBlockData(x, y, z);
+		local shapes = self:GetShapeSwitchTable()
+		
+		local data2 = shapes[band(data, 0xff)]
+		if(data2) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
+			local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX = x,blockY = y, blockZ = z, 
+				to_id = self.id, to_data=bor(data2, band(data, 0xffffff00)), max_radius = 0, preserveRotation=false})
+			task:Run();
 		end
 	end
 end

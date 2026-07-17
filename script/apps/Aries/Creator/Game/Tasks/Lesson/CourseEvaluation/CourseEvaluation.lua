@@ -20,7 +20,7 @@ function CourseEvaluation.OnInit()
 end
 
 function CourseEvaluation.ShowView(callback,isFinished)
-    if  System.options.channelId_431 or System.options.isPapaAdventure then
+    if  System.options.isEducatePlatform or System.options.isPapaAdventure then
         if callback then
             callback()
         end

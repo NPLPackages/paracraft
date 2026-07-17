@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="true">
+<![CDATA[
+PlantSelection = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.PlantSelection")
+PlantConfig = commonlib.gettable("paracraft.offical.maisi.Plant.Config")
+
+PlantSelection.plantShop = {}
+PlantSelection.currentPage = 1
+PlantSelection.pageSize = 1
+
+local function InitShop()
+    PlantSelection.plantShop = {}
+    -- Only add seeds, filter out watering cans and other items
+    -- PlantConfig.list contains the seeds
+    local list = PlantConfig.list
+    if list and #list > 0 then
+       PlantSelection.plantShop = list
+    end
+    PlantSelection.currentPage = 1
+    PlantSelection.pageSize = math.ceil(#PlantSelection.plantShop / 8)
+end
+
+InitShop()
+
+function GetPlantShopCurrentPage(index)
+    if(index == nil) then
+        return #PlantSelection.plantShop;
+    else
+        return PlantSelection.plantShop[index];
+    end
+end
+
+function OnSelectPlant(name, mcmlNode)
+    local plantName = mcmlNode:GetAttribute("name")
+    if PlantSelection.OnSelect then
+        PlantSelection.OnSelect(plantName)
+    end
+    Page:CloseWindow()
+end
+
+function OnChangePage(name, mcmlNode)
+    local style = mcmlNode:GetAttribute("param")
+    if style == "pre" then
+        if PlantSelection.currentPage > 1 then
+            PlantSelection.currentPage = PlantSelection.currentPage - 1
+            Page:Refresh(0)
+        end
+    elseif style == "next" then
+        if PlantSelection.currentPage < PlantSelection.pageSize then
+            PlantSelection.currentPage = PlantSelection.currentPage + 1
+            Page:Refresh(0)
+        end
+    end
+end
+
+function OnClosePage()
+    Page:CloseWindow()
+end
+
+]]>
+</script>
+<div style="width:600px;height:420px;background-color:#000000e0;color:#ffffff;">
+    <div style="height:40px;margin-top:10px;">
+        <div style="position:relative;margin-left:20px;font-size:20px;font-weight:bold;">
+            选择作物
+        </div>
+        <div align="right" style="margin-right:15px;margin-top:5px;width:32px;height:32px;">
+             <input type="button" onclick="OnClosePage" style="width:32px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#363 59 26 26:8 8 8 8);"/>
+        </div>
+    </div>
+    <div style="margin-left:20px;margin-top:5px;width:560px;height:350px;">
+        <pe:gridview name="PlantGrid" DataSource="<%=GetPlantShopCurrentPage%>" CellPadding="5" ItemsPerLine="4" AllowPaging="true" pagesize="8">
+            <Columns>
+                <div style="width:120px;height:150px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8);">
+                    <div onclick="OnSelectPlant" name="<%=Eval('displayname')%>" style="margin-left:10px;margin-top:10px;width:100px;height:100px;background-color:#ffffff20;">
+                         <img src="<%=Eval('imageUrl')%>" style="margin-left:0px;margin-top:0px;width:100px;height:100px;"/>
+                    </div>
+                    <div style="text-align:center;margin-top:8px;font-size:16px;color:#ffffff;font-weight:bold;">
+                        <%=Eval('displayname')%>
+                    </div>
+                </div>
+            </Columns>
+            <EmptyDataTemplate>
+                <div style="margin:10px;font-size:16px;color:#ffffff;">没有可种植的作物数据</div>
+            </EmptyDataTemplate>
+            <PagerSettings Position="Bottom" height="24" style="margin-left:200px;margin-top:0px;width:168px;height:24px;" PreviousPageText="previous page" NextPageText="next page"/>
+            <PagerTemplate>
+                <form>
+                    <input type="button" name="pre" zorder=2 style="width:24px;height:24px;background:url(Texture/3DMapSystem/RobotShop/btn_Page_Left.png);"/>
+                    <div style="float:right;margin-top:0px;width:64px;">
+                        <label name="page" style="color:#FFFFFF;text-align:center;width:64px;height:18px;margin:4px"/>
+                    </div>
+                    <input type="button" name="next" zorder=2 style="width:24px;height:24px;background:url(Texture/3DMapSystem/RobotShop/btn_Page_Right.png);"/>
+                </form>
+            </PagerTemplate>
+        </pe:gridview>
+    </div>
+    <!-- Removed manual pagination controls since we are using gridview's built-in pager -->
+</div>
+</pe:mcml>
+</body>
+</html>

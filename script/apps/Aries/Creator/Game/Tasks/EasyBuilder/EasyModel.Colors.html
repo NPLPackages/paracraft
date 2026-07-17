@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyModel.lua" refresh="true">
+<![CDATA[
+EasyModel = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyModel");
+function dummy()
+end
+]]>
+</script>
+<pe:container zorder="-1" onclick="dummy()" style="background-color:#000000a0;width:488px;">
+	<!--color blocks-->
+	<pe:gridview style="height:102px;" name="gvwEasyColorTable" DefaultNodeHeight="48" pagesize="20" ItemsPerLine="10"
+				DataSource='<%=EasyModel.GetColorListDS%>'>
+		<Columns>
+			<pe:if condition='<%=Eval("color") == EasyModel.GetColor()%>'>
+				<div zorder="-1" style="position: relative;margin-left:1px;margin-top:1px;width:53px;height:53px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12)"></div>
+			</pe:if>
+			<div name='<%=Eval("index")%>' style='<%=string.format("color:#ffffff;margin-left:5px;margin-top:5px;width:43px;height:43px;background-color:%s", Eval("color"))%>' onclick="EasyModel.OnClickColor"></div>
+		</Columns>
+	</pe:gridview>
+</pe:container>
+</pe:mcml>
+</html>

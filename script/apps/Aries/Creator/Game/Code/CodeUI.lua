@@ -17,16 +17,19 @@ CodeUI:Clear()
 CodeUI:ShowOverlayPickingBuffer()
 -------------------------------------------------------
 ]]
+NPL.PostLoad(function()
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUIItem.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeGlobals.lua");
 NPL.load("(gl)script/ide/System/Windows/Window.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModBase.lua");
 NPL.load("(gl)script/ide/System/Scene/Overlays/OverlayPicking.lua");
+end)
+
 local OverlayPicking = commonlib.gettable("System.Scene.Overlays.OverlayPicking");
 local Window = commonlib.gettable("System.Windows.Window")
 local CodeGlobals = commonlib.gettable("MyCompany.Aries.Game.Code.CodeGlobals");
 local CodeUIItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeUIItem");
 
+NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModBase.lua");
 local CodeUI = commonlib.inherit(commonlib.gettable("Mod.ModBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeUI"));
 
 CodeUI:Property({"pickingPointSize", 8});

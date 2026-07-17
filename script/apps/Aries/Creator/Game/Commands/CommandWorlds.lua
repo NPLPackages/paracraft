@@ -39,7 +39,7 @@ Commands["save"] = {
 		end
 		local function callback()
 			if (GameLogic.GetFilters():apply_filters('is_signed_in'))  then
-				if System.options.channelId_431 or System.options.channelId_tutorial then
+				if System.options.isEducatePlatform or System.options.channelId_tutorial then
 					GameLogic.QuickSave();
 				else
 					GameLogic.GetFilters():apply_filters(
@@ -178,7 +178,7 @@ Commands["loadworld"] = {
 	desc=[[load a world by worldname or url or filepath relative to parent directory
 @param -i: interactive mode, which will ask the user whether to use existing world or not. 
 @param -e: always use existing world if it exist without checking if it is up to date.  
-@param -s: slient load.
+@param -s: silent load.
 @param -d: download the world without loading it. Upon finish, it will /sendevent download_offline_world_finish project_id
 @param -forcedownload: always download(again) online world without checking if it is different to local. 
 @param -auto|-force: it will check local world revision with remote world, and download ONLY-if remote world is newer. 
@@ -234,7 +234,34 @@ e.g.
 					-- prevent recursive calls.
 					mytimer:Change(1,nil);
 				else
-					_guihelper.MessageBox(L"无效的世界文件");
+					--_guihelper.MessageBox(L"无效的世界文件");
+					GameLogic.AddBBS(nil,"进入世界失败，请重试~~~")
+					GameLogic.SendErrorLog("CommandWorlds","load world failed","load world failed============"..(cmd_text or ""))
+
+					
+					--一般本地目录已经损坏了
+					local worldPath  = ""
+					if not filename:find("worlds/DesignHouse") then
+						local username = Mod.WorldShare.Store:Get("user/username");
+						if username and username ~= "" then
+							worldPath = "worlds/DesignHouse/_user/" .. username .. "/" .. filename
+						else
+							worldPath = "worlds/DesignHouse/".. filename
+						end
+					else
+						worldPath = filename
+					end
+					if worldPath ~= "" then --有可能fork失败了，或者加载世界失败了
+						local output = commonlib.Files.Find({}, worldPath, 0, 500, 'worldconfig.txt')
+
+						if not output or #output == 0 then
+							local delete_result = ParaIO.DeleteFile(worldPath)
+							if delete_result ~= 1 then
+								print("删除失败···",worldPath)
+							end
+							GameLogic.GetFilters():apply_filters("user_behavior", 1, "world.fork_or_enter.failed",{world_path=worldPath,result=delete_result,useNoId=true})
+						end
+					end
 				end
 			end
 
@@ -278,10 +305,10 @@ e.g.
 						end
 					end)
 			else
-				-- local worldpath = filename:gsub("%.zip$", "");
 				local worldpath = commonlib.Encoding.Utf8ToDefault(filename);
-				
-				if(System.world:DoesWorldExist(worldpath, true)) then
+				local fileExt = filename:match("%.(%w%w%w)$");
+
+				if(System.world:DoesWorldExist(worldpath, true) or fileExt == "zip" or fileExt == "pkg" or fileExt == "p3d") then
 					world = RemoteWorld.LoadFromLocalFile(worldpath);
 				else
 					if(GameLogic.current_worlddir) then
@@ -508,6 +535,8 @@ Commands["setworldinfo"] = {
 --this will make world accessible to only vip users
 /setworldinfo -isVipWorld true    
 /setworldinfo -selectWater true    
+/setworldinfo -assetUrl "https://some_cdn_url.zip"
+/setworldinfo -editableWorldname ABC
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local option_name = "";
@@ -517,6 +546,17 @@ Commands["setworldinfo"] = {
 				local isVipWorld;
 				isVipWorld, cmd_text = CmdParser.ParseBool(cmd_text);
 				GameLogic.options:SetVipWorld(isVipWorld);
+			elseif(option_name == "assetUrl") then
+				local value;
+				value, cmd_text = CmdParser.ParseFilename(cmd_text);
+				GameLogic.options:SetWorldOption(option_name, value);
+			elseif(option_name == "editableWorldname") then
+				local value;
+				value, cmd_text = CmdParser.ParseString(cmd_text);
+				if(value == "") then
+					value = nil;
+				end
+				GameLogic.CreateGetEditableWorld():SetDefaultWorldName(value)
 			else
 				local value;
 				value, cmd_text = CmdParser.ParseBool(cmd_text);
@@ -526,6 +566,19 @@ Commands["setworldinfo"] = {
 	end,
 };
 
+Commands["getworldinfo"] = {
+	name="getworldinfo", 
+	quick_ref="/getworldinfo [name|assetUrl]", 
+	desc=[[get a given world tag
+/getworldinfo assetUrl
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local name = CmdParser.ParseWord(cmd_text)
+		if(name) then
+			return GameLogic.options:GetWorldOption(name);
+		end
+	end,
+};
 Commands["resetworld"] = {
 	name="resetworld", 
 	quick_ref="/resetworld [-overwrite|replace] [template|projectId]", 
@@ -912,3 +965,101 @@ Commands['checkworldassessment'] = {
 		AssessmentQueue.Init(param1,param2)
 	end,
 }
+
+Commands['newworld'] = {
+	name="newworld", 
+    quick_ref='/newworld worldname [-force] [-worldGenerator name]',
+    desc=[[create a new world by world name or from an existing world
+@param worldname: this can also be absolute file path like "c:/temp/worldname"
+@param -worldGenerator: world type, default to superflat
+e.g.
+/newworld test
+/newworld "test" -force -worldGenerator paraworldMini
+]],
+    mode_deny = "",
+    handler = function(cmd_name, cmd_text, cmd_params)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+		local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+		local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+        
+		local option = ''
+		local forceCreate;
+        local name = ''
+        local worldGenerator = 'superflat'
+        
+        option, cmd_text = CmdParser.ParseOption(cmd_text)
+        if not option or option == 'name' then
+            name, cmd_text = CmdParser.ParseFilename(cmd_text)
+        else
+            return
+        end
+        if(not name or name == "") then
+            return
+        end
+		while(true) do
+			option, cmd_text = CmdParser.ParseOption(cmd_text)
+			if(option == "force") then
+				forceCreate = true
+			elseif(option == 'worldGenerator') then
+				worldGenerator, cmd_text = CmdParser.ParseString(cmd_text)
+			else
+				break;
+			end
+		end
+        local worldPath
+		local creationfolder;
+		if(commonlib.Files.IsAbsolutePath(name)) then
+			worldPath = name;
+			creationfolder, name = worldPath:match("^(.*)/([^/\\]+)$");
+			worldPath = worldPath .. "/";
+			-- get folder name
+			name = name:match("([^/\\]+)$")
+		else
+			creationfolder = CreateNewWorld.GetWorldFolder();
+			worldPath = creationfolder .. '/' .. commonlib.Encoding.Utf8ToDefault(name) .. '/'
+		end
+            
+        local tagPath = worldPath .. 'tag.xml'
+
+        if ParaIO.DoesFileExist(tagPath) then
+        	if(forceCreate) then
+				ParaIO.DeleteFile(worldPath)
+			else
+				return
+			end
+        end
+
+        local params = {
+            worldname = commonlib.Encoding.Utf8ToDefault(name),
+            title = name,
+            creationfolder = creationfolder,
+            world_generator = worldGenerator,
+            seed = name,
+            inherit_scene = true,
+            inherit_char = true,
+        }
+    
+		local worldPath, errorMsg = CreateNewWorld.CreateWorld(params)
+	end,
+}
+
+
+Commands["freezeworld"] = {
+	name="freezeworld", 
+	quick_ref="/freezeworld  [-memorymode] [true|false]", 
+	desc=[[In freezeworld true, only new blocks can be added, and locked blocks which create befoe the freezing command is called
+@param true: freeze the world,only can add blocks,can not delete the block befoe the freezing command is called.
+@param false: unfreeze the world,you can edit all blocks in this world.
+@param -memorymode: in memory mode, the frozen blocks are not saved to disk, and will be lost after exiting the world.
+/freezeworld true
+/freezeworld -memorymode true
+/freezeworld false
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local bEnable
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		bEnable, cmd_text = CmdParser.ParseBool(cmd_text)
+		GameLogic.EditableWorld:FreezeWorld(bEnable, options.memorymode)
+	end,
+};

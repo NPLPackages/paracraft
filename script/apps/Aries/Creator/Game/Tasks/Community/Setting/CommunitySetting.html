@@ -1,0 +1,201 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Community/Notification/CommunitySetting.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="CommunitySetting.lua"><![CDATA[
+CommunitySetting = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/Setting/CommunitySetting.lua")
+CommunitySetting.OnInit()
+
+
+function ClosePage()
+    Page:CloseWindow();
+    CommunitySetting.CloseView()
+end
+
+function GetMenuData()
+    return CommunitySetting.GetMenuData()
+end
+
+function GetCategoryDSIndex()
+    return CommunitySetting.GetCategoryDSIndex()
+end
+
+function OnChangeTabview(index)
+    CommunitySetting.OnChangeTabview(index)
+end
+
+function GetLimitValue(text)
+    return commonlib.GetLimitLabel(text, 25)
+end
+
+function onDeviceClick(name,value)
+    CommunitySetting.onDeviceClick(name,value)
+end
+
+function IsShowVolume()
+    return ParaAudio.GetVolume()>0
+end
+
+function GetDeviceDivStr()
+    local str1=[[
+    <div style="margin-top:23px; width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+        <div style="float:left;margin-left:12px; margin-top:12px; width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"音乐" %></div>
+        <div style="float:left;margin-top:10px;margin-left:260px;">
+            <input name="btn_EnableSound" type="button" onclick="CommunitySetting.OnClickEnableSound" style="width:48px;height:24px;font-size:12px; background: url(Texture/Aries/Creator/keepwork/setting/qiehuan1_108X29_32bits.png#0 0 108 29);"/>
+        </div>
+    </div>]]
+    if IsShowVolume() then
+        str1= str1..[[
+        <div style="margin-top:12px; width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+            <div style="float:left;margin-left:12px; margin-top:12px; width:90px;height:20px;text-align:left;font-size:14px; color: #ffffff;" ><%=L"音量" %></div>
+            <div style="float:left;margin-top:10px;margin-left:154px;">
+                <pe:sliderbar name="system_sound_volume" min="0.0" max="3.0" min_step="0.03" value='<%=CommunitySetting.setting_ds["sound_volume"]%>' button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style=" height:22px;width:150px" onchange="CommunitySetting.OnChangeSoundVolume" />
+            </div>
+        </div>]]
+    end
+    return str1
+end
+
+function OnChangeResolution()
+    CommunitySetting.OnChangeResolution()
+end
+
+]]></script>
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+    <pe:container alignment="_ct" width="600" height="500" style="margin-left:-345px;margin-top:-250px;background-color: #2e2e2e; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+        <div style="color:#ffffff;width:600px;height:500px" >
+            <div style="position: relative; width:160px; height: 500px; background-color: #262626;">
+            
+                <div style="position: relative; width: 148px; height: 500px;">
+                    <pe:repeat DataSource="<%=GetMenuData()%>" >
+                        <pe:repeatitem style="float:left;min-width:148px; ">
+                            <pe:if condition='<%=GetCategoryDSIndex() == Eval("index") %>' >
+                                <input type="button" value='<%=Eval("value")%>' name='<%=Eval("index")%>'  icon="<%=Eval('icon1')%>" icon_width="20" icon_height="20" icon_off_x="-54" icon_off_y="2" onclick="OnChangeTabview" style="font-weight:bold;margin-top: 6px; text-offset-x:-14; margin-left: 6px;color:#ffffff;font-size:14px;min-width:148px;height:46px; background-color: #1C1C1C; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)" />
+                            </pe:if>
+                            <pe:if condition='<%=GetCategoryDSIndex() ~= Eval("index") %>' >
+                                <input type="button" value='<%=Eval("value")%>' name='<%=Eval("index")%>'  icon="<%=Eval('icon')%>"  icon_width="20" icon_height="20" icon_off_x="-54" icon_off_y="2" onclick="OnChangeTabview" style="font-weight:bold;margin-top: 6px; text-offset-x:-14; margin-left: 6px;color:#A8A7B0;font-size:14px;min-width:148px;height:46px;background:url()" />
+                            </pe:if>
+                        </pe:repeatitem>
+                    </pe:repeat>
+                </div>
+           </div>
+           <div style="position: relative; margin-left: 170px; width: 440px; height: 500px;">
+                <div style="position: relative; width: 440px; height: 1px; margin-left: -10px; margin-top: 54px; background-color: #FFFFFF22"></div>
+                <div style="width: 440px height: 54px; margin-left: -10px;">
+                    <div style="position: relative; font-size: 18px; base-font-size: 18px; font-weight: bold; margin-top: 14px; margin-left: 14px;"><%=L"系统设置"%></div>
+                    <input type="button" onclick="ClosePage" style="margin-top: 18px; margin-left: 410px; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#246 238 16 16);"/>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <pe:if condition='<%=GetCategoryDSIndex() == 1 %>' >
+                        <div style="margin-top:23px; width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                            <div style="float:left;margin-left:12px; margin-top: 12px; width:110px;height:20px; color: #D9D9D9; text-align:left;font-size:14px;" ><%=L"全屏显示" %></div>
+                            <div style="float:left;margin-top:12px;margin-left:238px;">
+                                <input type="button" name='btn_FullScreenMode' value=''
+                                            onclick='CommunitySetting.OnClickEnableFullScreenMode'
+                                            style="width:48px;height:24px;font-size:14px;"
+                                            class="mc_light_grey_button_with_fillet"/>
+                            </div>
+                        </div>
+                        <pe:if condition='<%= not CommunitySetting.IsFullScreenMode() %>' >
+                            <div style="margin-top:16px; width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                                <div style="float:left;margin-left:12px; margin-top: 12px; width:90px;height:20px;text-align:left;font-size:14px; color: #D9D9D9;" ><%=L"分辨率" %></div>
+                                <div style="float:left;margin-left:146px; margin-top: 8px; font-size:11px;">
+                                    <select name = "ScreenResolution" AllowUserEdit="false" onselect="OnChangeResolution" fontcolor="#D9D9D9" dropBgColor="#262626" dropBorderColor="#262626" dropShadow="true" dropShadowX="0" dropShadowY="0" dropShadowBlur="10" dropShadowSpread="0" dropShadowAngle="0" dropShadowColor="#000000" dropX="-20" dropY="8" dropWidth="12" dropHeight="12" dropBg="Texture/Aries/Creator/keepwork/community_32bits.png#434 106 8 8" contentBg="Texture/Aries/Creator/keepwork/community_32bits.png#778 67 32 32:14 14 14 14" style="width: 160px; height:28px ; ">
+                                        <option value="3840 x 2160">3840X2160 (4K)</option>
+                                        <option value="2560 x 1440">2560X1440 (2K)</option>
+                                        <option value="1920 x 1080">1920X1080 (1080p)</option>
+                                        <option value="1600 x 1200">1600X1200 (UXGA)</option>
+                                        <option value="1280 x 720" selected="true">1280X720 (720p)</option>
+                                        <option value="1024 x 768">1024X768 (XGA)</option>
+                                        <option value="8196 x 6148">8196X6148(8K 360)</option>
+                                        <option value="6144 x 4608">6144X4608(6K 360)</option>
+                                        <option value="4096 x 3072">4096X3072(4K 360)</option>
+                                        <option value="2048 x 1536">2048X1536(2K 360)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </pe:if>
+                    </pe:if>
+                    
+                    <pe:if condition='<%=GetCategoryDSIndex() == 2 %>' >
+                        <%=GetDeviceDivStr()%>
+                        <div style="margin-top:14px; width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                            <div style="float:left;margin-left:12px; margin-top: 12px; width:90px;height:20px;text-align:left;font-size:14px; color: #D9D9D9;"><%=L"设备" %></div>
+                            <div style="float:left;margin-top:8px;margin-left:120px;">
+                                <select name = "AudioDevice" AllowUserEdit="false" onselect="onDeviceClick" DataSource="<%=CommunitySetting.GetAudioDevices()%>" fontcolor="#D9D9D9" dropBgColor="#262626" dropBorderColor="#262626" dropShadow="true" dropShadowX="0" dropShadowY="0" dropShadowBlur="10" dropShadowSpread="0" dropShadowAngle="0" dropShadowColor="#000000" dropX="-20" dropY="8" dropWidth="12" dropHeight="12" dropBg="Texture/Aries/Creator/keepwork/community_32bits.png#434 106 8 8" contentBg="Texture/Aries/Creator/keepwork/community_32bits.png#778 67 32 32:14 14 14 14" style="width: 160px; height:28px ; ">
+                                    
+                                </select>
+                                
+                            </div>
+                            <div style="float:left;margin-top:12px;margin-left:6px;">
+                                <input name="btn_ResetDevice"
+                                       type="button"
+                                       onclick="CommunitySetting.OnClickResetAudioDevice"
+                                       style="width:16px;
+                                              height: 16px;
+                                              margin-top: 2px;
+                                              background: url(Texture/Aries/Creator/keepwork/community_32bits.png#459 154 16 16);"/>
+                            </div>
+                        </div>
+                    </pe:if>
+
+                    <pe:if condition='<%=GetCategoryDSIndex() == 3 %>' >
+                        <div style="margin-top: 23px; width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                            <div style="float:left;margin-left:12px; margin-top: 12px; width:90px;height:20px;text-align:left;font-size:14px; color: #D9D9D9;" ><%=L"触屏模式" %></div>
+                            <div style="float:left; margin-top:12px;margin-left:258px;">
+                                <input name='btn_TouchToggle' value='' type="button" onclick='CommunitySetting.OnToggleTouchModel' style="width:48px;height:24px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                            </div>
+                        </div>
+                        <div style="width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14); margin-top:12px;">
+                            <div style="float:left;margin-left:12px; margin-top: 12px; width:90px;height:20px;text-align:left;font-size:14px; color: #D9D9D9;" ><%=L"反转鼠标" %></div>
+                            <div style="float:left; margin-top:12px;margin-left:258px;">
+                                <input name='btn_MouseInverse' value='' type="button" onclick='CommunitySetting.OnClickEnableMouseInverse' style="width:48px;height:24px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                            </div>
+                        </div>
+                    </pe:if>
+
+                    <pe:if condition='<%=GetCategoryDSIndex() == 4 %>' >
+                        <div style="margin-top: 23px; width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                            <div style="float:left;margin-left:12px; margin-top: 12px; width:90px;height:20px;text-align:left;font-size:14px; color: #D9D9D9;" ><%=L"清空缓存" %></div>
+                            <div style="float:left; margin-top:12px;margin-left:250px;">
+                                <input value='<%=L"立即清空"%>' type="button" onclick='CommunitySetting.OnClearCache' style="color: #75A6FF; width:56px;height:24px;font-size:12px; background:url();"/>
+                            </div>
+                        </div>
+                        <div style="margin-top: 23px; width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                            <pe:if condition="<%=not Mod.WorldShare.Utils.IsEnglish()%>">
+                                <div style="float:left;margin-left:12px; margin-top: 12px; width:90px;height:20px;text-align:left;font-size:14px; color: #D9D9D9;" ><%=L"整理内存" %></div>
+                                <div style="float:left; margin-top:12px;margin-left:250px;">
+                                    <input value='<%=L"前往整理"%>' type="button" onclick='CommunitySetting.OnClearMemory' style="color: #75A6FF; width:56px;height:24px;font-size:12px; background:url();"/>
+                                </div>
+                            </pe:if>
+                            <pe:if condition="<%=Mod.WorldShare.Utils.IsEnglish()%>">
+                                <div style="float:left;margin-left:12px; margin-top: 12px; width:130px;height:20px;text-align:left;font-size:14px; color: #D9D9D9;" ><%=L"整理内存" %></div>
+                                <div style="float:left; margin-top:12px;margin-left:200px;">
+                                    <input value='<%=L"前往整理"%>' type="button" onclick='CommunitySetting.OnClearMemory' style="color: #75A6FF; width:56px;height:24px;font-size:12px; background:url();"/>
+                                </div>
+                            </pe:if>
+                        </div>
+                        <div style="margin-top: 23px; width: 420px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                            <div style="float:left;margin-left:12px; margin-top: 12px; width:90px;height:20px;text-align:left;font-size:14px; color: #D9D9D9;" ><%=L"世界备份目录" %></div>
+                            <div style="float:left; margin-top:12px;margin-left:250px;">
+                                <input value='<%=L"打开"%>' type="button" onclick='CommunitySetting.OnOpenBackupFolder' style="color: #75A6FF; width:56px; height:24px;font-size:12px; background:url();"/>
+                            </div>
+                        </div>
+                    </pe:if>
+                </div>
+           </div>
+        </div>    
+    </pe:container>
+</pe:container>
+
+
+</pe:mcml>
+</body>
+</html>
+

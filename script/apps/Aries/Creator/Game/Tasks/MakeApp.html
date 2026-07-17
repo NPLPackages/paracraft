@@ -24,6 +24,10 @@
 
                     -- ios
                     function ios()
+                        if System.options.isEducatePlatform then
+                            _guihelper.MessageBox(L"此功能在当前客户端中不可用");
+                            return
+                        end
                         if (get_platform() ~= "mac") then
                             _guihelper.MessageBox(L"请在mac平台下执行此操作");
 
@@ -79,12 +83,15 @@
 
                     -- android
                     function android()
+                        if System.options.isEducatePlatform then
+                            _guihelper.MessageBox(L"此功能在当前客户端中不可用");
+                            return
+                        end
                         if (get_platform() ~= "win32") then
                             _guihelper.MessageBox(L"请在windows平台下执行此操作");
 
                             return;
                         end
-
                         GameLogic.IsVip("MakeApk", true, function(result) 
                             if(result) then
                                 build_platform = "android";
@@ -377,8 +384,7 @@
                     end
                 ]]>
             </script>
-            <pe:container
-                name="step1"
+            <pe:container name="step1"
                 visible="true"
                 style="position: relative;
                        background:;">
@@ -403,6 +409,22 @@
                                     base-font-size: 18px;">
                             <div style="float: left;
                                         width: 190px;">
+                                <div style="width: 105px;
+                                            height:128px;
+                                            margin-bottom: 8px;"
+                                            align="center">
+                                    <input type="button"
+                                        onclick="windows()"
+                                        style="width: 105px;
+                                                height: 106px;
+                                                margin-top: 11px;
+                                                background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#137 23 105 106)" />
+                                </div>
+                                <div style="margin-bottom: 4px;">Windows</div>
+                                <div style="color: #515151"><%= L"EXE文件" %></div>
+                            </div>
+                            <div style="float: left;
+                                        width: 190px;">
                                 <div style="width: 112px;
                                             height:128px;
                                             margin-bottom: 8px;"
@@ -416,22 +438,7 @@
                                 <div style="margin-bottom: 4px;">Android</div>
                                 <div style="color: #515151"><%= L"APK文件" %></div>
                             </div>
-                            <div style="float: left;
-                                        width: 190px;">
-                                <div style="width: 105px;
-                                            height:128px;
-                                            margin-bottom: 8px;"
-                                            align="center">
-                                    <input type="button"
-                                           onclick="windows()"
-                                           style="width: 105px;
-                                                  height: 106px;
-                                                  margin-top: 11px;
-                                                  background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#137 23 105 106)" />
-                                </div>
-                                <div style="margin-bottom: 4px;">Windows</div>
-                                <div style="color: #515151"><%= L"EXE文件" %></div>
-                            </div>
+                            
                             <div style="float: left;
                                         width: 190px;">
                                 <div style="width: 128px;

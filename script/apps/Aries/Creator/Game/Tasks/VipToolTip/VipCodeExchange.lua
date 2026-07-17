@@ -78,7 +78,7 @@ function VipCodeExchange.ShowPage()
         style = CommonCtrl.WindowFrame.ContainerStyle,
         allowDrag = false,
         enable_esc_key = true,
-        zorder = 100001,
+        zorder = 12,
         cancelShowAnimation = true,
         directPosition = true,
         align = "_fi",
@@ -88,6 +88,10 @@ function VipCodeExchange.ShowPage()
             height = view_height,
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);
+
+    if Mod.WorldShare.Utils.IsEnglish() and System.options.isDevMode then
+        -- _guihelper.MessageBox("Please enter the activation code in the input box and click the exchange button to activate the code.")
+    end
 end
 
 function VipCodeExchange.ClosePage()

@@ -219,7 +219,7 @@ function WorldCreatePage.OnClickSelect(index)
                     CommandManager:RunCommand(string.format('/loadworld -force -s %s', world_data.id))
                 else
                     parentId = parentId == 0 and cur_world_id or parentId
-                    CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update]], name, parentId))
+                    CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update -mode admin]], name, parentId))
                 end
             end
         end)

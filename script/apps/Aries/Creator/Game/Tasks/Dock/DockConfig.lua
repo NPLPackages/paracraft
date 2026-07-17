@@ -7,12 +7,6 @@
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua")
 local DockConfig = NPL.export()
-local worldParams;
-local currentId;
-local isLiked = false;
-local likeCount = 0;
-local isFavorited= false;
-local favoriteCount = 0;
 
 local hide_vip_world_ids = {
     ONLINE = { 18626 },
@@ -63,26 +57,23 @@ _G.DOCK_CONFIG = {
     },
     E_DOCK_MINI = {
         {name = "setting", align = "_rt",enabled = true, onclick=onclick, sortIndex=999,  width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/shezhi_45x45_32bits.png#0 0 64 45",},
-        {name = "share", align = "_rt",enabled = true, onclick=onclick, sortIndex=996, width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/zhuanfa_45x45_32bits.png#0 0 64 45",},
-        {name = "like", align = "_rt", enabled = true, onclick=onclick, sortIndex=990, width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/meiyoudianzan_45x45_32bits.png#0 0 64 45",},
-        {name = "favorite", align = "_rt", enabled = true, onclick=onclick, sortIndex=994, width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/meiyoushoucang_45x45_32bits.png#0 0 64 45",},
+        {name = "dianzan", align = "_rt",enabled = true, onclick=onclick, sortIndex=997, width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/meiyoudianzan_45x45_32bits.png#0 0 64 45",},
+        {name = "friends_2", align = "_rt",enabled = true, onclick=onclick, sortIndex=995,  width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/friend_45x45_32bits.png#0 0 64 45",},
+        {name = "skin", align = "_rt",enabled = true, onclick=onclick, sortIndex=994,  width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/skin_45x45_32bits.png#0 0 64 45",},
         {name = "mini_map" ,width=210,enabled = true,height=248,type="special"},
         {name = "mini_userinfo", enabled = true,width=363,height=100,type="special"},
     },
     E_DOCK_LESSON = {
         {name="home_point", align="_rt", enabled = true, onclick=onclick,sortIndex=997,  width = 100,height = 90,bg="Texture/Aries/Creator/keepwork/dock/fanhuichushendian_98x93_32bits.png#0 0 100 90"},
-        {name="create_spage", align="_rt", enabled = true, onclick=onclick,sortIndex=998,  width = 100,height = 90,bg="Texture/Aries/Creator/keepwork/dock/fanhuichuangyi_98x93_32bits.png#0 0 100 90"},
         {name = "esc", align = "_rt", enabled = true, onclick=onclick, sortIndex=999,  width=100,height=90, bg="Texture/Aries/Creator/keepwork/dock/xitongESC_98x94_32bits.png#0 0 100 90"},
     },
     E_DOCK_NORMAL = {
         {name = "setting", align = "_rt",enabled = true, onclick=onclick, sortIndex=999,  width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/shezhi_45x45_32bits.png#0 0 64 45",},
-        {name = "share", align = "_rt", enabled = true, onclick=onclick, sortIndex=996, width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/zhuanfa_45x45_32bits.png#0 0 64 45",},
-        {name = "like", align = "_rt", enabled = true, onclick=onclick, sortIndex=990, width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/meiyoudianzan_45x45_32bits.png#0 0 64 45",},
-        {name = "favorite", align = "_rt",enabled = true, onclick=GetClickStr(), sortIndex=994, width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/meiyoushoucang_45x45_32bits.png#0 0 64 45",}
+        {name = "dianzan", align = "_rt",enabled = true, onclick=onclick, sortIndex=997, width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/meiyoudianzan_45x45_32bits.png#0 0 64 45",},
+        {name = "friends_2", align = "_rt",enabled = true, onclick=onclick, sortIndex=995,  width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/friend_45x45_32bits.png#0 0 64 45",},
+        {name = "skin", align = "_rt",enabled = true, onclick=onclick, sortIndex=994,  width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/skin_45x45_32bits.png#0 0 64 45",},
     },
     E_DOCK_TUTORIAR = { 
-        -- {name = "setting", align = "_rt",tooltip=L"系统设置", enabled = true, onclick=onclick, sortIndex=999,  width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/shezhi_45x45_32bits.png#0 0 64 45",},
-        -- {name = "share", align = "_rt", tooltip=L"分享世界", enabled = true, onclick=onclick, sortIndex=996, width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/zhuanfa_45x45_32bits.png#0 0 64 45",},
         {name = "lesson", align = "_lb", tooltip=L"查看课程", enabled = true, onclick=onclick, sortIndex=995, width=206,height=116, bg="Texture/Aries/Creator/keepwork/dock/ppt_206x116_32bits.png#0 0 206 116",},
         {name = "save", align = "_rt", tooltip=L"提交作业", enabled = true, onclick=onclick, sortIndex=994, width=138,height=55, bg="Texture/Aries/Creator/keepwork/dock/zuoye_138x55_32bits.png#0 0 138 55",},
     },
@@ -90,24 +81,53 @@ _G.DOCK_CONFIG = {
         {name = "setting", align = "_rt",tooltip=L"系统设置", enabled = true, onclick=onclick, sortIndex=999,  width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/shezhi_45x45_32bits.png#0 0 64 45",},
     },
 }
+local login_config = {
+    name = "login",
+    align = "_rt",
+    enabled = true,
+    onclick=onclick,
+    sortIndex=999,
+    width=64,
+    height=45,
+    bg="Texture/Aries/Creator/keepwork/dock/login_45x45_32bits.png#0 0 64 45"
+}
+
+local save_config = {
+    name = "normal_save",
+    align = "_rt",
+    enabled = true,
+    onclick=onclick,
+    sortIndex=997,
+    tooltip=L"保存世界",
+    width=64,
+    height=45,
+    bg="Texture/Aries/Creator/keepwork/dock/tijiaozuoye_45x45_32bits.png#0 0 64 45"
+}
 
 function DockConfig.FilterConfigByProjectId(config)
     local projectId = tonumber(GameLogic.options:GetProjectId())
-    if DockConfig.IsFilterWorld(projectId) then --过滤dock的世界
+    if DockConfig.IsFilterWorld(projectId) or not System.options.mc then --过滤dock的世界
         return {}
     end
     local temp = DockConfig.GetParaDockCfg(config,projectId) --并行世界
     if temp then
         return temp
     end
-    if not projectId or projectId <= 0 then --普通世界没有projectId
-        local temp = {}
-        for k,v in pairs(config) do
-            if v.name ~= "like" and v.name ~= "favorite" then
-                temp[#temp + 1] = v
-            end
+    config = commonlib.filter(config, function(item)
+        if System.options.isEducatePlatform then
+            return item and item.name ~= "friends_2" and item.name ~= "skin"
         end
-        return temp
+        return true
+    end)
+    local is_signed_in = GameLogic.GetFilters():apply_filters('is_signed_in')
+    if not projectId or projectId <= 0 then --普通世界没有projectId
+        config = commonlib.filter(config, function(item)
+             return item and item.name ~= "dianzan"
+        end)
+        if not is_signed_in then
+            config[#config + 1] = login_config
+        end
+        return config
     end
     return config
 end
@@ -224,7 +244,7 @@ function DockConfig.IsTutorialUser()
         -- ["3D_tiyanke"]=true,
         -- ["tsyyz_test"] = true
     }
-    if GameLogic.IsReadOnly() and not DockConfig.IsAuthUserWorld() then
+    if GameLogic.IsReadOnly() then --DockConfig.IsAuthUserWorld()
         return false
     end
     if (lastData and isReturn and courses[lastData.code]) or isHomeWorkWorld then
@@ -392,18 +412,26 @@ function DockConfig.OnClickParaWorldDock(id)
 end
 
 function DockConfig.OnClickNormal(id)
+    if id ~= "setting" then
+        DockConfig.HideEscPage()
+    end
+    if id ~= "dianzan" then
+        DockConfig.HideProjectDock()
+    end
     if id == "setting" then
-        print("ddddddddddddddddd",id)
         GameLogic.ToggleDesktop("esc");
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.setting");
+        return
     end
     if id == "like" then
         DockConfig.OnClickLike()
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.like");
+        return
     end
     if id == "share" then
         GameLogic.RunCommand("/menu share.video_or_panorama")
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.share");
+        return
     end
     if id == "favorite" then
         if isFavorited then
@@ -413,22 +441,60 @@ function DockConfig.OnClickNormal(id)
             DockConfig.OnClickFavorite()
             GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.favorite");
         end
+        return
     end
     if id == "lesson" then
         GameLogic.RunCommand("/menu help.creativespace");
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.lesson");
+        return
     end
     if id == "save" then
         local MobileSaveWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileSaveWorldPage.lua")
         MobileSaveWorldPage.ShowPage("commit_work")
-        -- GameLogic.QuickSave()
-        -- GameLogic.SysncHomeWorkWorld()
-
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.summit");
+        return
     end
-    if id ~= "setting" then
-        DockConfig.HideEscPage()
+
+    if id == "normal_save" then
+        if GameLogic.IsReadOnly() then
+            GameLogic.RunCommand("/saveas")
+        else
+            GameLogic.RunCommand("/save")
+        end
+        return
     end
+    
+    if id == "login" then
+        GameLogic.CheckSignedIn(L"登录", function(result)
+            if result then
+                GameLogic.DockManager:OnWorldUnloaded()
+                commonlib.TimerManager.SetTimeout(function()
+                    GameLogic.DockManager:OnWorldLoaded()
+                end,500)
+            end
+        end)
+        return
+    end
+    if id == "dianzan" then
+        DockConfig.ShowProjectDock()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.dianzan");
+        return
+    end
+    if id == "skin" then
+        GameLogic.RunCommand("/show window.role")
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.skin");
+    end
+end
+
+function DockConfig.HideProjectDock()
+    local DockProject = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockProject.lua");
+    DockProject.Hide();
+end
+
+function DockConfig.ShowProjectDock()
+    local DockProject = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockProject.lua");
+    DockProject.Show();
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.project");
 end
 
 function DockConfig.HideEscPage()
@@ -439,173 +505,9 @@ function DockConfig.HideEscPage()
     end
 end
 
-function DockConfig.OnClickLike()
-    if isLiked then
-        return 
-    end
-    local kpProjectId = GameLogic.options:GetProjectId()
-    if not kpProjectId or tonumber(kpProjectId) == 0 then
-        return
-    end
-	keepwork.world.star({router_params = {id = kpProjectId}}, function(err, msg, data)
-		if (err == 200) then
-			isLiked = true;
-			GameLogic.QuestAction.SetDailyTaskValue("40012_1", nil, 1)
-            DockConfig.UpdateNum()
-		end
-	end);
+function DockConfig.GetSaveConfig()
+    return save_config
 end
 
-function DockConfig.OnClickFavorite()
-    local kpProjectId = GameLogic.options:GetProjectId()
-    if not kpProjectId or tonumber(kpProjectId) == 0 then
-        return
-    end
-	keepwork.world.favorite({objectId = kpProjectId, objectType = 5}, function(err, msg, data)
-		if (err == 200) then
-			isFavorited = true;
-            DockConfig.UpdateNum()
-		end
-	end);
-end
-
-function DockConfig.OnClickUnFavorite()
-    local kpProjectId = GameLogic.options:GetProjectId()
-    if not kpProjectId or tonumber(kpProjectId) == 0 then
-        return
-    end
-	keepwork.world.unfavorite({objectId = kpProjectId, objectType = 5}, function(err, msg, data)
-		if (err == 200) then
-			isFavorited = false;
-            DockConfig.UpdateNum()
-		end
-	end);
-end
-
-function DockConfig.UpdateNum()
-    local kpProjectId = GameLogic.options:GetProjectId()
-    if not kpProjectId or tonumber(kpProjectId) == 0 then
-        return
-    end
-    keepwork.world.detail({router_params = {id = kpProjectId}}, function(err, msg, data)
-        if (data) then
-            likeCount = data.star or 0;
-            favoriteCount = data.favorite or 0;
-            DockConfig.SetLike(isLiked)
-            DockConfig.SetFavorite(isFavorited)
-            DockConfig.SetFavoriteNum(favoriteCount)
-            DockConfig.SetLikeNum(likeCount)
-        end
-    end);
-end
-
-function DockConfig.Refresh(userId)
-    local kpProjectId = GameLogic.options:GetProjectId()
-    if not kpProjectId or tonumber(kpProjectId) == 0 then
-        return
-    end
-	currentId = userId;
-	keepwork.world.detail({router_params = {id = kpProjectId}}, function(err, msg, data)
-		if (data) then
-			likeCount = data.star or 0;
-			favoriteCount = data.favorite or 0;
-            -- print("Refresh===========",likeCount,favoriteCount)
-		end
-		keepwork.world.is_stared({router_params = {id = kpProjectId}}, function(err, msg, data)
-			if (err == 200) then
-				isLiked = data == true;
-                DockConfig.SetLike(isLiked)
-                DockConfig.SetLikeNum(likeCount)
-			end
-			keepwork.world.is_favorited({objectId = kpProjectId, objectType = 5}, function(err, msg, data)
-				if (err == 200) then
-					isFavorited = data == true;
-                    DockConfig.SetFavorite(isFavorited)
-                    DockConfig.SetFavoriteNum(favoriteCount)
-				end
-			end);
-		end);
-	end);
-end
-
-function DockConfig.SetIconData()
-    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-	local id = GameLogic.options:GetProjectId()
-	id = tonumber(id);
-	if (not id) then return end
-	keepwork.world.detail({router_params = {id = id}}, function(err, msg, data)
-		if (data and data.userId) then
-			local name = WorldCommon.GetWorldTag("name");
-			local world = {projectName = name, projectId = id, userId = data.userId};
-            worldParams = world
-            DockConfig.Refresh(worldParams.userId)
-		end
-	end);
-end
-
-function DockConfig.SetLike(bLike) --点赞
-    local like_dock = GameLogic.DockManager:GetDockByName("like")
-    if like_dock then
-        local likeBg = "Texture/Aries/Creator/keepwork/dock/dianzan_45x45_32bits.png;0 0 64 45"
-        if likeCount <= 0 then
-            likeBg = "Texture/Aries/Creator/keepwork/dock/meiyoudianzan_45x45_32bits.png;0 0 64 45"
-        end
-        if bLike then
-            likeBg= "Texture/Aries/Creator/keepwork/dock/dianliangdianzan_45x45_32bits.png;0 0 64 45"
-        end
-        like_dock:SetBackground(likeBg)
-    end
-end
-
-function DockConfig.SetFavorite(bStar) --收藏
-    local favorite_dock = GameLogic.DockManager:GetDockByName("favorite")
-    if favorite_dock then
-        local favoriteBg = "Texture/Aries/Creator/keepwork/dock/shoucang_45x45_32bits.png;0 0 64 45"
-        if favoriteCount <= 0 then
-           favoriteBg = "Texture/Aries/Creator/keepwork/dock/meiyoushoucang_45x45_32bits.png;0 0 64 45" 
-        end
-        if bStar then
-            favoriteBg = "Texture/Aries/Creator/keepwork/dock/dianliangshoucang_45x45_32bits.png;0 0 64 45"
-        end
-        favorite_dock:SetBackground(favoriteBg)
-    end
-end
-
-function DockConfig.SetFavoriteNum(num)
-    local uiname = "faorite_num"
-    local text = num > 0 and string.format("%d", num) or ""
-    local favorite_dock = GameLogic.DockManager:GetDockByName("favorite")
-
-    if favorite_dock and favorite_dock:IsValid() then
-        local favorite_num_ui = ParaUI.GetUIObject(uiname)
-        if favorite_num_ui and favorite_num_ui:IsValid() then
-            ParaUI.DestroyUIObject(favorite_num_ui)
-        end
-        favorite_num_ui = ParaUI.CreateUIObject("text", uiname, "_lt", 0, 0, 45, 15) 
-        favorite_num_ui.text = text
-        favorite_num_ui.font = "System;10;norm"
-        _guihelper.SetFontColor(favorite_num_ui, "#ffffff");
-        _guihelper.SetUIFontFormat(favorite_num_ui, 5); 
-        favorite_dock:AddChild(favorite_num_ui,0,32,uiname)
-    end
-end
-
-function DockConfig.SetLikeNum(num)
-    local text = num > 0 and string.format("%d", num) or ""
-    local uiname = "like_num"
-    local like_dock = GameLogic.DockManager:GetDockByName("like")
-    if like_dock and like_dock:IsValid() then
-        local like_num_ui = ParaUI.GetUIObject(uiname)
-        if like_num_ui and like_num_ui:IsValid() then
-            ParaUI.DestroyUIObject(like_num_ui)
-        end
-        like_num_ui = ParaUI.CreateUIObject("text", uiname, "_lt", 0, 0, 45, 15) 
-        like_num_ui.text = text
-        like_num_ui.font = "System;10;norm"
-        _guihelper.SetUIFontFormat(like_num_ui, 5); --设置字体居中
-        _guihelper.SetFontColor(like_num_ui, "#ffffff");
-        like_dock:AddChild(like_num_ui,0,32,uiname)
-    end
-end
 
 

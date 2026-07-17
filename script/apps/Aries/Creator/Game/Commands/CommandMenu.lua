@@ -107,14 +107,20 @@ Commands["menu"] = {
 				-- NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
 				-- local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
 				-- InternetLoadWorld.ShowPage(true);
-				if System.options.channelId_431 then
+				if System.options.isEducatePlatform then
 					local EducateProjectList = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/EducateProjectList.lua")
         			EducateProjectList.ShowPage()
 					return
-				elseif System.options.isPapaAdventure then
+				end
+				if System.options.isPapaAdventure then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
 					local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
 					PapaAPI:OpenMyWorks()
+					return
+				end
+				if System.options.isCommunity then
+					local CommunityMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityMainPage.lua")
+        			CommunityMainPage.Show()
 					return
 				end
 				GameLogic.GetFilters():apply_filters("cellar.opus.show");
@@ -144,6 +150,26 @@ Commands["menu"] = {
 				end
 			elseif(name == "file.exit") then
 				MyCompany.Aries.Creator.Game.Desktop.OnLeaveWorld(nil, true);
+			elseif(name == "file.openp3dfile") then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/File/P3DFileManager.lua")
+        		local P3DFileManager = commonlib.gettable("MyCompany.Aries.Game.Educate.P3DFileManager");
+				P3DFileManager:OpenP3dFile()
+			elseif(name == "file.exportp3dfile") then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/File/P3DFileManager.lua")
+				local P3DFileManager = commonlib.gettable("MyCompany.Aries.Game.Educate.P3DFileManager");
+				P3DFileManager:ExportWorldToP3dFile()
+			elseif(name == "file.importp3dfile") then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/File/P3DFileManager.lua")
+				local P3DFileManager = commonlib.gettable("MyCompany.Aries.Game.Educate.P3DFileManager");
+				P3DFileManager:ImportP3dFile()
+			elseif(name == "file.webdisk") then
+				local WebImageFileDialog = NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/WebImageFileDialog.lua");
+    			WebImageFileDialog.Show(3, function(file)
+					if file and file ~= "" and Game.is_started and not GameLogic.IsReadOnly() then
+						GameLogic.AddBBS(nil,L"文件下载成功，文件路径是"..file)
+						return
+					end
+				end)
 			end
 		elseif(name:match("^edit")) then
 			if(name == "edit.undo") then
@@ -153,6 +179,18 @@ Commands["menu"] = {
 			elseif(name == "edit.redo") then
 				if(GameMode:IsAllowGlobalEditorKey()) then
 					UndoManager.Redo();
+				end
+			elseif(name == "edit.upstairs") then
+				if(GameMode:IsAllowGlobalEditorKey()) then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
+					local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({mode="vertical", isUpward = true, add_to_history=false});
+					task:Run();
+				end
+			elseif(name == "edit.downstairs") then
+				if(GameMode:IsAllowGlobalEditorKey()) then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
+					local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({mode="vertical", isUpward = false, add_to_history=false});
+					task:Run();
 				end
 			elseif(name:match("^edit%.bookmark")) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TeleportListPage.lua");
@@ -176,9 +214,22 @@ Commands["menu"] = {
 			end
 		elseif(name:match("^window")) then
 			if(name == "window.texturepack") then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
-				local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
-				TextureModPage.ShowPage(true);
+				if System.options.isEducatePlatform then
+					GameLogic.CheckSignedIn(L"此功能需要登陆后才能使用",
+						function(result)
+							if (result) then
+								commonlib.TimerManager.SetTimeout(function()
+									NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
+									local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
+									TextureModPage.ShowPage(true);
+								end, 250);
+							end
+						end)
+				else
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
+					local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
+					TextureModPage.ShowPage(true);
+				end
 			elseif(name == "window.template") then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/GoalTracker.lua");
 				local GoalTracker = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.GoalTracker");
@@ -195,7 +246,12 @@ Commands["menu"] = {
 				local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
 				task:Run();
 			elseif(name == "window.explore") then
-				GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
+				if System.options.isCommunity then
+					local CommunityMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityMainPage.lua")
+					CommunityMainPage.Show(nil, "explore")
+				else
+					GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
+				end
 			elseif (name == "window.role") then
 				GameLogic.CheckSignedIn(L"此功能需要登陆后才能使用",
 					function(result)
@@ -229,6 +285,13 @@ Commands["menu"] = {
 			elseif(name == "window.userbag") then
 				local UserBagPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserBagPage.lua");
 				UserBagPage.ShowPage();
+			elseif(name == "window.mqtt") then
+				-- if (System.os.GetPlatform() == "emscripten") then
+				-- 	_guihelper.MessageBox(L"web版本暂时不支持MQTT， 请用客户端版本。");
+				-- 	return;
+				-- end
+				local MqttMainPage = NPL.load('(gl)script/apps/Aries/Creator/Game/Mqtt/MqttMainPage.lua')
+				MqttMainPage.ShowPage()
 			end
 		elseif(name == "online.server") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
@@ -278,7 +341,8 @@ Commands["menu"] = {
 			elseif(name == "help.home") then
 				GameLogic.RunCommand("/home")
 			elseif(name == "help.dailycheck" or name == "help.creativespace") then
-				if System.options.isPapaAdventure or System.options.channelId_431 then
+				if System.options.isPapaAdventure or System.options.isEducatePlatform or System.options.isCommunity then
+					GameLogic.AddBBS(nil, L"当前版本暂不支持此功能")
 					return
 				end
 				GameLogic.CheckSignedIn(L"此功能需要登陆后才能使用",

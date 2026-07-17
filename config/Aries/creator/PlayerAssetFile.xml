@@ -9,9 +9,14 @@
   <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
   <category name="common">
     <asset filename="character/CC/02human/CustomGeoset/actor.x" name="customchar" displayname="可换装人物"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_papa.x" hidden="true" name="newpapa" displayname="新帕帕"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_xuepapa.x" hidden="true" name="xuepapa" displayname="学校帕帕"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_kaka.x" hidden="true" name="newkaka" displayname="新卡卡"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_pilot.x" hidden="true" name="pilot" displayname="领航员"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_PZ.x" hidden="true" name="pengzai" displayname="鹏仔"/>
     <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
     <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" school="false"/>
-    <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖"/>
+    <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖" school="false"/>
     <asset filename="character/CC/03animals/cow/cow.x" name="cow" displayname="奶牛"/>
     <asset filename="character/CC/03animals/pig/pig.x" name="pig" displayname="小猪"/>
     <asset filename="character/CC/03animals/sheep/sheep.x" name="sheep" displayname="绵羊"/>
@@ -30,7 +35,7 @@
     <asset filename="character/CC/05effect/rainflower.x" name="rainflower" displayname="飘落花瓣" physics="false"/>
     <asset filename="character/CC/05effect/fallingleaves.x" name="fallingleaves" displayname="飘落树叶" physics="false"/>
     <asset filename="character/CC/05effect/fire.x" name="fire" displayname="火" physics="false"/>
-    <asset filename="character/CC/05effect/glow.x" name="glow" displayname="能量体" physics="false"/>
+    <asset filename="character/CC/05effect/glow.x" name="glow" displayname="能量体" physics="false" school="false"/>
     <asset filename="character/CC/05effect/ray.x" name="ray" displayname="放射光" physics="false"/>
     <asset filename="character/CC/05effect/flyingparticle.x" name="flyingparticle" displayname="星光环绕" physics="false"/>
     <asset filename="character/CC/05effect/star.x" name="star" displayname="星光升起" physics="false"/>
@@ -39,18 +44,18 @@
     <asset filename="character/CC/05effect/fallingparticle2.x" name="fallingparticle2" displayname="光斑洒落" physics="false"/>
     <asset filename="character/CC/05effect/risingline.x" name="risingline" displayname="垂直光线" physics="false"/>
     <asset filename="character/CC/05effect/dazycircle.x" name="dazycircle" displayname="眩晕圈" physics="false"/>
-    <asset filename="character/CC/05effect/swhirling.x" name="swhirling" displayname="漩涡" physics="false"/>
-    <asset filename="character/CC/05effect/thunder.x" name="thunder" displayname="雷电" physics="false"/>
-    <asset filename="character/CC/05effect/magicball.x" name="magicball" displayname="魔法球" physics="false"/>
+    <asset filename="character/CC/05effect/swhirling.x" name="swhirling" displayname="漩涡" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/thunder.x" name="thunder" displayname="雷电" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/magicball.x" name="magicball" displayname="魔法球" physics="false" school="false"/>
     <asset filename="character/CC/05effect/waterbubble.x" name="waterbubble" displayname="水泡" physics="false"/>
-    <asset filename="character/CC/05effect/ghost.x" name="ghost" displayname="幽灵" physics="false"/>
-    <asset filename="character/CC/05effect/bladelight.x" name="bladelight" displayname="刀光" physics="false"/>
-    <asset filename="character/CC/05effect/fallingelectric.x" name="fallingelectric" displayname="下落光球" physics="false"/>
-    <asset filename="character/CC/05effect/fallingfire.x" name="fallingfire" displayname="下落火球" physics="false"/>
-    <asset filename="character/CC/05effect/icearrow.x" name="icearrow" displayname="下落冰剑" physics="false"/>
-    <asset filename="character/CC/05effect/arena.x" name="arena" displayname="金色法阵" physics="false"/>
-    <asset filename="character/CC/05effect/arenablue.x" name="arenablue" displayname="蓝色法阵" physics="false"/>
-    <asset filename="character/CC/05effect/firingcirclebigger.x" name="firingcirclebigger" displayname="爆炸圈" physics="false"/>
+    <asset filename="character/CC/05effect/ghost.x" name="ghost" displayname="幽灵" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/bladelight.x" name="bladelight" displayname="刀光" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/fallingelectric.x" name="fallingelectric" displayname="下落光球" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/fallingfire.x" name="fallingfire" displayname="下落火球" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/icearrow.x" name="icearrow" displayname="下落冰剑" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/arena.x" name="arena" displayname="金色法阵" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/arenablue.x" name="arenablue" displayname="蓝色法阵" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/firingcirclebigger.x" name="firingcirclebigger" displayname="爆炸圈" physics="false" school="false"/>
     <asset filename="character/CC/05effect/glowingcirclebigger.x" name="glowingcirclebigger" displayname="变换光圈" physics="false"/>
     <asset filename="character/CC/05effect/fireglowingcircle.x" name="fireglowingcircle" displayname="旋转光圈" physics="false"/>
     <asset filename="model/blockworld/BlockModel/block_model_one.x" name="cube" displayname="可换装立方体"/>
@@ -60,7 +65,6 @@
     <asset filename="character/CC/02human/paperman/boy04.x" name="boy04" displayname="boy04"/>
     <asset filename="character/CC/02human/paperman/boy05.x" name="boy05" displayname="boy05"/>
     <asset filename="character/CC/02human/paperman/boy06.x" name="boy06" displayname="boy06"/>
-    <asset filename="character/CC/02human/paperman/boy07.x" name="boy07" displayname="boy07"/>
     <asset filename="character/CC/02human/paperman/girl01.x" name="girl01" displayname="girl01"/>
     <asset filename="character/CC/02human/paperman/girl02.x" name="girl02" displayname="girl02"/>
     <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
@@ -68,83 +72,64 @@
     <asset filename="character/CC/02human/paperman/girl05.x" name="girl05" displayname="girl05"/>
     <asset filename="character/CC/02human/paperman/Female_teachers.x" name="Female_teachers" displayname="女老师"/>
     <asset filename="character/CC/02human/paperman/Male_teacher.x" name="Male_teacher" displayname="男老师"/>
-    <asset filename="character/CC/02human/paperman/xiaolong.x" name="xiaolong" displayname="小龙"/>
     <asset filename="character/CC/02human/paperman/zaizai.x" name="zaizai" displayname="崽崽"/>
     <asset filename="character/CC/02human/paperman/nuannuan.x" name="nuannuan" displayname="囡囡"/>
   </category>
   <category name="people">
     <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
     <asset filename="character/CC/02human/CustomGeoset/actor.x" name="customchar" displayname="可换装人物"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_papa.x" name="newpapa" hidden="true" displayname="新帕帕"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_pilot.x" name="pilot" hidden="true" displayname="领航员"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_PZ.x" name="pengzai" hidden="true" displayname="鹏仔"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_xuepapa.x" name="xuepapa" hidden="true" displayname="学校帕帕"/>
+    <asset filename="character/CC/02human/CustomGeoset/actor_kaka.x" name="newkaka" hidden="true" displayname="新卡卡"/>
     <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
-    <asset filename="character/CC/02human/paperman/xmr.x" name="pendaman" displayname="熊猫人"/>
-    <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" />
+    <asset filename="character/CC/02human/paperman/xmr.x" name="pendaman" hidden="true" displayname="熊猫人"/>
+    <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" school="false"/>
     <asset filename="character/CC/02human/keepwork/avatar/pp.x" name="papa" displayname="帕帕" />
     <asset filename="character/CC/02human/keepwork/avatar/lala.x" name="lala" displayname="拉拉" />
     <asset filename="character/CC/02human/keepwork/avatar/kk.x" name="kaka" displayname="卡卡" />
-    <asset filename="character/CC/02human/paperman/boy01.x" name="boy01" displayname="boy01"/>
-    <asset filename="character/CC/02human/paperman/boy02.x" name="boy02" displayname="boy02"/>
-    <asset filename="character/CC/02human/paperman/boy03.x" name="boy03" displayname="boy03"/>
-    <asset filename="character/CC/02human/paperman/boy04.x" name="boy04" displayname="boy04"/>
-    <asset filename="character/CC/02human/paperman/boy05.x" name="boy05" displayname="boy05"/>
-    <asset filename="character/CC/02human/paperman/boy06.x" name="boy06" displayname="boy06"/>
-    <asset filename="character/CC/02human/paperman/boy07.x" name="boy07" displayname="boy07"/>
-    <asset filename="character/CC/02human/paperman/girl01.x" name="girl01" displayname="girl01"/>
-    <asset filename="character/CC/02human/paperman/girl02.x" name="girl02" displayname="girl02"/>
-    <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="girl03"/>
-    <asset filename="character/CC/02human/paperman/girl04.x" name="girl04" displayname="girl04"/>
-    <asset filename="character/CC/02human/paperman/girl05.x" name="girl05" displayname="girl05"/>
+    <asset filename="character/v3/TeenElf/Female/TeenElfFemale.xml" name="haqiFemale" displayname="哈奇女" school="false"/>
+    <asset filename="character/v3/TeenElf/Male/TeenElfMale.xml" name="haqiMale" displayname="哈奇男" school="false"/>
+    <asset filename="character/CC/02human/paperman/boy01.x" name="boy01" displayname="中国风红衣男孩"/>
+    <asset filename="character/CC/02human/paperman/boy02.x" name="boy02" displayname="白衣领带男孩"/>
+    <asset filename="character/CC/02human/paperman/boy03.x" name="boy03" displayname="休闲科技男孩"/>
+    <asset filename="character/CC/02human/paperman/boy04.x" name="boy04" displayname="蓝色校服男孩"/>
+    <asset filename="character/CC/02human/paperman/boy05.x" name="boy05" displayname="领带推销员男孩"/>
+    <asset filename="character/CC/02human/paperman/boy06.x" name="boy06" displayname="中国风蓝衣男孩"/>
+    <asset filename="character/CC/02human/paperman/boy07.x" name="boy07" displayname="boy07" hidden="true"/>
+    <asset filename="character/CC/02human/paperman/girl01.x" name="girl01" displayname="中国风红衣女孩"/>
+    <asset filename="character/CC/02human/paperman/girl02.x" name="girl02" displayname="夏日粉衣女孩"/>
+    <asset filename="character/CC/02human/paperman/girl03.x" name="girl03" displayname="礼仪短裙女孩"/>
+    <asset filename="character/CC/02human/paperman/girl04.x" name="girl04" displayname="古风粉衣仙女"/>
+    <asset filename="character/CC/02human/paperman/girl05.x" name="girl05" displayname="红色校服女孩"/>
+    <asset filename="character/CC/artwar/movie/school23.x" displayname="双小辫短裙女孩儿" name="girl07"/>
+    
     <asset filename="character/CC/02human/paperman/Female_teachers.x" name="Female_teachers" displayname="女老师"/>
     <asset filename="character/CC/02human/paperman/Male_teacher.x" name="Male_teacher" displayname="男老师"/>
-    <asset filename="character/CC/02human/paperman/Female_student.x" name="Female_student" displayname="女学生"/>
-    <asset filename="character/CC/02human/paperman/Male_student.x" name="Male_student" displayname="男学生"/>
-    <asset filename="character/CC/02human/paperman/xiaolong.x" name="xiaolong" displayname="小龙"/>
+    <asset filename="character/CC/02human/paperman/Female_student.x" name="Female_student" displayname="女学生" hidden="true"/>
+    <asset filename="character/CC/02human/paperman/Male_student.x" name="Male_student" displayname="男学生" hidden="true"/>
+    <asset filename="character/CC/02human/paperman/xiaolong.x" name="xiaolong" displayname="小龙" hidden="true"/>
     <asset filename="character/CC/02human/paperman/zaizai.x" name="zaizai" displayname="崽崽"/>
     <asset filename="character/CC/02human/paperman/nuannuan.x" name="nuannuan" displayname="囡囡"/>
     <asset filename="character/CC/02human/paperman/principal.x" name="principal" displayname="校长"/>
 
-    <!-- new models for shanghai team
-  <asset filename="character/CC/02human/paperman/boy.x" name="boy" displayname="boy"/>
-  <asset filename="character/CC/02human/paperman/girl.x" name="girl" displayname="girl"/>
-
-  -->
-
-    <!-- artwar in shanghai角色
-  <asset filename="character/CC/artwar/game/sunbin.x" displayname="孙膑" name="sunbin"/>
-  <asset filename="character/CC/artwar/game/sunbin_junshi.x" displayname="孙膑军师" name="sunbin_adviser"/>
-  <asset filename="character/CC/artwar/game/pangjuan.x" displayname="庞涓" name="pangjuan"/>
-  <asset filename="character/CC/artwar/game/pangjuan_jiangjun.x" displayname="庞涓将军" name="pangjuan_general"/>
-  <asset filename="character/CC/artwar/game/shanzei.x" displayname="山贼" name="shanzei"/>
-  <asset filename="character/CC/artwar/game/lieren.x" displayname="猎人" name="lieren"/>
-  <asset filename="character/CC/artwar/game/guiguzi.x" displayname="鬼谷子" name="guiguzi"/>
-  <asset filename="character/CC/artwar/game/cunming.x" displayname="村民" name="cunming"/>
-  <asset filename="character/CC/artwar/game/cunzhang.x" displayname="村长" name="cunzhang"/>
-  <asset filename="character/CC/artwar/game/red_archer.x" displayname="弓兵_红方" name="hong_gongbing"/>
-  <asset filename="character/CC/artwar/game/red_soldier.x" displayname="小兵_红方" name="hong_xiaobing"/>
-  <asset filename="character/CC/artwar/game/blue_archer.x" displayname="弓兵_蓝方" name="lan_gongbing"/>
-  <asset filename="character/CC/artwar/game/blue_soldier.x" displayname="小兵_蓝方" name="lan_xiaobing"/>
-
-  <asset filename="character/CC/artwar/game/Blue_Army_gun.x" displayname="敌军士兵_持枪" name="Blue_Army_gun"/>
-  <asset filename="character/CC/artwar/game/Red_Army_gun.x" displayname="红军士兵_持枪" name="Red_Army_gun"/>
-  <asset filename="character/CC/artwar/game/Red_Army_knife.x" displayname="红军士兵_持刀" name="Red_Army_knife"/>
-  <asset filename="character/CC/artwar/game/tufei_game.x" displayname="土匪_持刀" name="tufei_game"/>  
-
-
-  -->
-    <asset filename="character/CC/artwar/game/youxia.x" displayname="游侠" name="youxia"/>
+    
+    <asset filename="character/CC/artwar/game/youxia.x" displayname="游侠" name="youxia" school="false"/>
     <!-- 9-27更新 -->
-    <asset filename="character/CC/artwar/game/assassin.x" displayname="刺客" name="assassin"/>
+    <asset filename="character/CC/artwar/game/assassin.x" displayname="刺客" name="assassin" school="false"/>
     <!-- 11-5更新 -->
     <asset filename="character/CC/artwar/movie/boy_ground_service.x" displayname="男地勤" name="boy_ground_service"/>
     <asset filename="character/CC/artwar/movie/girl_ground_service.x" displayname="女地勤" name="girl_ground_service"/>
-    <asset filename="character/CC/artwar/movie/boy_police.x" displayname="男民警" name="boy_police"/>
-    <asset filename="character/CC/artwar/movie/girl_police.x" displayname="女民警" name="girl_police"/>
-    <asset filename="character/CC/artwar/movie/boy_police_c.x" displayname="男网警" name="boy_police_c"/>
-    <asset filename="character/CC/artwar/movie/girl_police_c.x" displayname="女网警" name="girl_police_c"/>
-    <asset filename="character/CC/artwar/movie/boy_traffic_police.x" displayname="男交警" name="boy_traffic_police"/>
-    <asset filename="character/CC/artwar/movie/girl_traffic_police.x" displayname="女交警" name="girl_traffic_police"/>
-    <asset filename="character/CC/artwar/movie/boy_traffic_police_c.x" displayname="男辅警" name="boy_traffic_police_c"/>
-    <asset filename="character/CC/artwar/movie/girl_traffic_police_c.x" displayname="女辅警" name="girl_traffic_police_c"/>
-    <asset filename="character/CC/artwar/movie/thief.x" displayname="小偷" name="thief"/>
+    <asset filename="character/CC/artwar/movie/boy_police.x" displayname="男民警" name="boy_police" school="false"/>
+    <asset filename="character/CC/artwar/movie/girl_police.x" displayname="女民警" name="girl_police" school="false"/>
+    <asset filename="character/CC/artwar/movie/boy_police_c.x" displayname="男网警" name="boy_police_c" school="false"/>
+    <asset filename="character/CC/artwar/movie/girl_police_c.x" displayname="女网警" name="girl_police_c" school="false"/>
+    <asset filename="character/CC/artwar/movie/boy_traffic_police.x" displayname="男交警" name="boy_traffic_police" school="false"/>
+    <asset filename="character/CC/artwar/movie/girl_traffic_police.x" displayname="女交警" name="girl_traffic_police" school="false"/>
+    <asset filename="character/CC/artwar/movie/boy_traffic_police_c.x" displayname="男辅警" name="boy_traffic_police_c" school="false"/>
+    <asset filename="character/CC/artwar/movie/girl_traffic_police_c.x" displayname="女辅警" name="girl_traffic_police_c" school="false"/>
+    <asset filename="character/CC/artwar/movie/thief.x" displayname="小偷" name="thief" school="false"/>
     <asset filename="character/CC/artwar/movie/fireman.x" displayname="消防员" name="fireman"/>
     <asset filename="character/CC/artwar/movie/boy_worker_1.x" displayname="男工人" name="boy_worker_1"/>
     <asset filename="character/CC/artwar/movie/girl_worker_1.x" displayname="女工人" name="girl_worker_1"/>
@@ -154,6 +139,7 @@
     <asset filename="character/CC/artwar/movie/girl_waiter1.x" displayname="女服务员1" name="girl_waiter1"/>
     <asset filename="character/CC/artwar/movie/boy_waiter2.x" displayname="男服务员2" name="boy_waiter2"/>
     <asset filename="character/CC/artwar/movie/girl_waiter2.x" displayname="女服务员2" name="girl_waiter2"/>
+    <asset filename="character/CC/artwar/movie/school21.x" displayname="女服务员3" name="girl_waiter3"/>
     <!--   12-2更新 -->
     <asset filename="character/CC/artwar/movie/boy_staff_bank.x" displayname="男职员" name="boy_staff_bank"/>
     <asset filename="character/CC/artwar/movie/girl_staff_bank.x" displayname="女职员" name="girl_staff_bank"/>
@@ -172,141 +158,42 @@
     <asset filename="character/CC/artwar/movie/nurse.x" displayname="护士" name="nurse"/>
     <asset filename="character/CC/artwar/movie/doctor.x" displayname="医生" name="doctor"/>
     <!--   2-24更新 -->
-    <asset filename="character/CC/artwar/movie/Blue_Army_boss.x" displayname="敌军长官" name="Blue_Army_boss"/>
-    <asset filename="character/CC/artwar/movie/Red_Army_boss.x" displayname="红军长官" name="Red_Army_boss"/>
-    <asset filename="character/CC/artwar/movie/Blue_Army_xiaobing.x" displayname="敌军士兵" name="Blue_Army_xiaobing"/>
-    <asset filename="character/CC/artwar/movie/Red_Army_xiaobing.x" displayname="红军士兵" name="Red_Army_xiaobing"/>
-    <asset filename="character/CC/artwar/movie/Red_Army_nv1.x" displayname="红军女士兵1" name="Red_Army_nv1"/>
-    <asset filename="character/CC/artwar/movie/Red_Army_nv2.x" displayname="红军女士兵2" name="Red_Army_nv2"/>
-    <asset filename="character/CC/artwar/movie/tufei_movie.x" displayname="土匪" name="tufei_movie"/>
-    <asset filename="character/CC/artwar/movie/Red_Army_master.x" displayname="政委" name="Red_Army_master"/>
-    <!--   <asset filename="character/CC/artwar/movie/pufuqianjin_Blue_Army.x" displayname="匍匐敌军" name="pufuqianjin_Blue_Army"/> 
-  <asset filename="character/CC/artwar/movie/pufuqianjin_Red_Army.x" displayname="匍匐红军" name="pufuqianjin_Red_Army"/>  -->
-
-    <!--   <asset filename="character/CC/artwar/movie/boy_air_force.x" displayname="男空军" name="boy_air_force"/> 
-  <asset filename="character/CC/artwar/movie/girl_air_force.x" displayname="女空军" name="girl_air_force"/> 
-  <asset filename="character/CC/artwar/movie/boy_land_force.x" displayname="男陆军" name="boy_land_force"/> 
-  <asset filename="character/CC/artwar/movie/girl_land_force.x" displayname="女陆军" name="girl_land_force"/> 
-  <asset filename="character/CC/artwar/movie/boy_navy_force.x" displayname="男海军" name="boy_navy_force"/> 
-  <asset filename="character/CC/artwar/movie/girl_navy_force.x" displayname="女海军" name="girl_navy_force"/>  
-  <asset filename="character/CC/artwar/movie/the_elderly.x" displayname="老男人" name="the_elderly"/> 
-  <asset filename="character/CC/artwar/movie/taoist.x" displayname="道士" name="taoist"/> 
--->
-
-
-    <!-- artwar in shanghai电影 -->
-    <!-- <asset filename="character/CC/artwar/movie/sunbin_movie.x" displayname="孙膑_演员" name="sunbin_movie"/>
-  <asset filename="character/CC/artwar/movie/sunbinjunshi_movie.x" displayname="孙膑军师_演员" name="sunbin_adviser_movie"/>
-  <asset filename="character/CC/artwar/movie/pangjuan_movie.x" displayname="庞涓_演员" name="pangjuan_movie"/>
-  <asset filename="character/CC/artwar/movie/pangjuanjiangjun_movie.x" displayname="庞涓将军_演员" name="pangjuan_general_movie"/>
-  <asset filename="character/CC/artwar/movie/shanzei_movie.x" displayname="山贼_演员" name="shanzei_movie"/>
-  <asset filename="character/CC/artwar/movie/guiguzi_movie.x" displayname="鬼谷子_演员" name="guiguzi_movie"/>
-  <asset filename="character/CC/artwar/movie/cunmin_movie.x" displayname="村民_演员" name="cunmin_movie"/>
-  <asset filename="character/CC/artwar/movie/cunzhang_movie.x" displayname="村长_演员" name="cunzhang_movie"/> -->
-    <!-- 5·27更新
-  <asset filename="character/CC/artwar/movie/flag_qi.x" displayname="齐国旗" name="flag_qi"/>
-  <asset filename="character/CC/artwar/movie/flag_wei.x" displayname="魏国旗" name="flag_wei"/>
-  <asset filename="character/CC/artwar/movie/xiaobing_qima_lan.x" displayname="骑兵_蓝方" name="xiaobing_qima_lan"/>
-  <asset filename="character/CC/artwar/movie/xiaobing_zou_lan.x" displayname="步兵_蓝方" name="xiaobing_zou_lan"/>
-  <asset filename="character/CC/artwar/movie/gongnv.x" displayname="宫女" name="gongnv"/>
-  <asset filename="character/CC/artwar/movie/title.x" displayname="孙子兵法LOGO" name="title"/>
-  <asset filename="character/CC/artwar/movie/zhu_1.x" displayname="竹简碎片1" name="zhu_1"/>
-  <asset filename="character/CC/artwar/movie/zhu_2.x" displayname="竹简碎片2" name="zhu_2"/>
-  <asset filename="character/CC/artwar/movie/zhu_3.x" displayname="竹简碎片3" name="zhu_3"/>
-  <asset filename="character/CC/artwar/movie/zhu_4.x" displayname="竹简碎片4" name="zhu_4"/>
-  <asset filename="character/CC/artwar/movie/zhu_5.x" displayname="竹简碎片5" name="zhu_5"/>
-  <asset filename="character/CC/artwar/movie/zhu_6.x" displayname="竹简碎片6" name="zhu_6"/>
-  <asset filename="character/CC/artwar/movie/zhu_7.x" displayname="竹简碎片7" name="zhu_7"/>
-  <asset filename="character/CC/artwar/movie/zhu_8.x" displayname="竹简碎片8" name="zhu_8"/>
-  <asset filename="character/CC/artwar/movie/zhu_9.x" displayname="竹简碎片9" name="zhu_9"/>
-  <asset filename="character/CC/artwar/movie/zhu_10.x" displayname="竹简碎片10" name="zhu_10"/>
-  <asset filename="character/CC/artwar/movie/zhu_11.x" displayname="竹简碎片11" name="zhu_11"/>
-  <asset filename="character/CC/artwar/movie/zhu_12.x" displayname="竹简碎片12" name="zhu_12"/>
-  <asset filename="character/CC/artwar/movie/zhu_13.x" displayname="竹简碎片13" name="zhu_13"/>
-  <asset filename="character/CC/artwar/movie/zhu_14.x" displayname="竹简碎片14" name="zhu_14"/>
-  <asset filename="character/CC/artwar/movie/zhu_15.x" displayname="竹简碎片15" name="zhu_15"/>
-  <asset filename="character/CC/artwar/movie/zhu_16.x" displayname="竹简碎片16" name="zhu_16"/>
-  <asset filename="character/CC/artwar/movie/zhu_17.x" displayname="竹简碎片17" name="zhu_17"/>
-  <asset filename="character/CC/artwar/movie/zhu_all.x" displayname="竹简碎片all" name="zhu_all"/>
-  <asset filename="character/CC/artwar/movie/复制.x" displayname="复制" name="复制"/> -->
-    <!-- 6·9更新
-  <asset filename="character/CC/artwar/movie/tyndall.x" displayname="丁达尔" name="tyndall"/>
-  <asset filename="character/CC/artwar/movie/xiaobing_kongshou_lan.x" displayname="步兵空手_蓝方" name="xiaobing_kongshou_lan"/>
-  <asset filename="character/CC/artwar/movie/xiaobing_jian_lan.x" displayname="步兵持剑_蓝方" name="xiaobing_jian_lan"/> -->
+    <asset filename="character/CC/artwar/movie/Blue_Army_boss.x" displayname="敌军长官" name="Blue_Army_boss" school="false"/>
+    <asset filename="character/CC/artwar/movie/Red_Army_boss.x" displayname="红军长官" name="Red_Army_boss" school="false"/>
+    <asset filename="character/CC/artwar/movie/Blue_Army_xiaobing.x" displayname="敌军士兵" name="Blue_Army_xiaobing" school="false"/>
+    <asset filename="character/CC/artwar/movie/Red_Army_xiaobing.x" displayname="红军士兵" name="Red_Army_xiaobing" school="false"/>
+    <asset filename="character/CC/artwar/movie/Red_Army_nv1.x" displayname="红军女士兵1" name="Red_Army_nv1" school="false"/>
+    <asset filename="character/CC/artwar/movie/Red_Army_nv2.x" displayname="红军女士兵2" name="Red_Army_nv2" school="false"/>
+    <asset filename="character/CC/artwar/movie/tufei_movie.x" displayname="土匪" name="tufei_movie" school="false"/>
+    <asset filename="character/CC/artwar/movie/Red_Army_master.x" displayname="政委" name="Red_Army_master" school="false"/>
 
     <!-- 电影用 -->
-    <asset filename="character/CC/codewar/pangjuanjiangjunxingtai_movie.x" displayname="庞涓将军_多动作" name="pangjuanjiangjunxingtai_movie"/>
-    <asset filename="character/CC/codewar/pangjuanqiuxuexingtai_movie.x" displayname="庞涓学习_多动作" name="pangjuanqiuxuexingtai_movie"/>
-    <asset filename="character/CC/codewar/sunbinjunshixingtai_movie.x" displayname="孙膑军事_多动作" name="sunbinjunshixingtai_movie"/>
-    <asset filename="character/CC/codewar/sunbinqiuxuexingtai_movie.x" displayname="孙膑求学_多动作" name="sunbinqiuxuexingtai_movie"/>
-    <asset filename="character/CC/artwar/movie/lieren_movie.x" displayname="猎人_演员" name="lieren_movie"/>
+    <asset filename="character/CC/codewar/pangjuanjiangjunxingtai_movie.x" displayname="庞涓将军" name="pangjuanjiangjunxingtai_movie" school="false"/>
+    <asset filename="character/CC/codewar/pangjuanqiuxuexingtai_movie.x" displayname="庞涓学习" name="pangjuanqiuxuexingtai_movie" school="false"/>
+    <asset filename="character/CC/codewar/sunbinjunshixingtai_movie.x" displayname="孙膑军事" name="sunbinjunshixingtai_movie" school="false"/>
+    <asset filename="character/CC/codewar/sunbinqiuxuexingtai_movie.x" displayname="孙膑求学" name="sunbinqiuxuexingtai_movie" school="false"/>
+    <asset filename="character/CC/artwar/movie/lieren_movie.x" displayname="猎人" name="lieren_movie" school="false"/>
 
 
     <!-- 像素卡通 -->
-    <asset filename="character/CC/02human/blockman/cunming.x" displayname="村民" name="cunming"/>
-    <asset filename="character/CC/02human/blockman/cunzhang.x" displayname="村长" name="cunzhang"/>
-    <asset filename="character/CC/02human/blockman/hong_gongbing.x" displayname="弓兵_红" name="hong_gongbing"/>
-    <asset filename="character/CC/02human/blockman/hong_xiaobing.x" displayname="小兵_红" name="hong_xiaobing"/>
-    <asset filename="character/CC/02human/blockman/lan_gongbing.x" displayname="弓兵_蓝" name="lan_gongbing"/>
-    <asset filename="character/CC/02human/blockman/lan_xiaobing.x" displayname="小兵_蓝" name="lan_xiaobing"/>
-    <!-- <asset filename="character/CC/02human/blockman/pangjuan_jiangjun.x" displayname="庞涓-将军形态" name="pangjuan_jiangjun"/> -->
-    <asset filename="character/CC/02human/blockman/shanzei.x" displayname="山贼" name="shanzei"/>
-    <!-- <asset filename="character/CC/02human/blockman/sunbin.x" displayname="孙膑" name="sunbin"/>
-  <asset filename="character/CC/02human/blockman/pangjuan.x" displayname="庞涓" name="pangjuan"/> -->
-    <asset filename="character/CC/02human/blockman/guiguzi.x" displayname="鬼谷子" name="guiguzi"/>
+    <asset filename="character/CC/02human/blockman/cunming.x" displayname="村民" name="cunming" school="false"/>
+    <asset filename="character/CC/02human/blockman/cunzhang.x" displayname="村长" name="cunzhang" school="false"/>
+    <asset filename="character/CC/02human/blockman/hong_gongbing.x" displayname="弓兵_红" name="hong_gongbing" school="false"/>
+    <asset filename="character/CC/02human/blockman/hong_xiaobing.x" displayname="小兵_红" name="hong_xiaobing" school="false"/>
+    <asset filename="character/CC/02human/blockman/lan_gongbing.x" displayname="弓兵_蓝" name="lan_gongbing" school="false"/>
+    <asset filename="character/CC/02human/blockman/lan_xiaobing.x" displayname="小兵_蓝" name="lan_xiaobing" school="false"/>
+    <asset filename="character/CC/02human/blockman/shanzei.x" displayname="山贼" name="shanzei" school="false"/>
+    <asset filename="character/CC/02human/blockman/guiguzi.x" displayname="鬼谷子" name="guiguzi" school="false"/>
 
 
-    <asset filename="character/CC/02human/blockman/archer_black.x" displayname="小弓箭手黑色" name="archer_black"/>
-    <asset filename="character/CC/02human/blockman/archer_red.x" displayname="小弓箭手红色" name="archer_red"/>
-    <asset filename="character/CC/02human/blockman/soldier_black.x" displayname="小士兵黑色" name="soldier_black"/>
-    <asset filename="character/CC/02human/blockman/soldier_red.x" displayname="小士兵红色" name="soldier_red"/>
-    <asset filename="character/CC/02human/blockman/rider_black.x" displayname="小骑兵黑色" name="rider_black"/>
-    <asset filename="character/CC/02human/blockman/rider_red.x" displayname="小骑兵红色" name="rider_red"/>
+    <asset filename="character/CC/02human/blockman/archer_black.x" displayname="小弓箭手黑色" name="archer_black" school="false"/>
+    <asset filename="character/CC/02human/blockman/archer_red.x" displayname="小弓箭手红色" name="archer_red" school="false"/>
+    <asset filename="character/CC/02human/blockman/soldier_black.x" displayname="小士兵黑色" name="soldier_black" school="false"/>
+    <asset filename="character/CC/02human/blockman/soldier_red.x" displayname="小士兵红色" name="soldier_red" school="false"/>
+    <asset filename="character/CC/02human/blockman/rider_black.x" displayname="小骑兵黑色" name="rider_black" school="false"/>
+    <asset filename="character/CC/02human/blockman/rider_red.x" displayname="小骑兵红色" name="rider_red" school="false"/>
 
-    <!-- 创意空间社区专用学生模型 -->
-    <!-- <asset filename="character/CC/artwar/movie/school5.x" displayname="男老师" name="shcool5"/>
-  <asset filename="character/CC/artwar/movie/school21.x" displayname="女老师" name="shcool21"/> -->
     <asset filename="character/CC/artwar/movie/school42.x" displayname="博物馆长" name="shcool42"/>
-    <!-- <asset filename="character/CC/artwar/movie/school1.x" displayname="向明小学男生1" name="shcool1"/>
-  <asset filename="character/CC/artwar/movie/school2.x" displayname="向明小学男生2" name="shcool2"/>
-  <asset filename="character/CC/artwar/movie/school3.x" displayname="向明小学男生3" name="shcool3"/>
-  <asset filename="character/CC/artwar/movie/school4.x" displayname="向明小学男生4" name="shcool4"/>
-  <asset filename="character/CC/artwar/movie/school6.x" displayname="朝阳小学男生1" name="shcool6"/>
-  <asset filename="character/CC/artwar/movie/school7.x" displayname="朝阳小学男生2" name="shcool7"/>
-  <asset filename="character/CC/artwar/movie/school8.x" displayname="朝阳小学男生3" name="shcool8"/>
-  <asset filename="character/CC/artwar/movie/school9.x" displayname="朝阳小学男生4" name="shcool9"/>
-  <asset filename="character/CC/artwar/movie/school10.x" displayname="南山小学男生1" name="shcool10"/>
-  <asset filename="character/CC/artwar/movie/school11.x" displayname="南山小学男生2" name="shcool11"/>
-  <asset filename="character/CC/artwar/movie/school12.x" displayname="南山小学男生3" name="shcool12"/>
-  <asset filename="character/CC/artwar/movie/school13.x" displayname="南山小学男生4" name="shcool13"/>
-  <asset filename="character/CC/artwar/movie/school14.x" displayname="思南小学男生1" name="shcool14"/>
-  <asset filename="character/CC/artwar/movie/school15.x" displayname="思南小学男生2" name="shcool15"/>
-  <asset filename="character/CC/artwar/movie/school16.x" displayname="思南小学男生3" name="shcool16"/>
-  <asset filename="character/CC/artwar/movie/school40.x" displayname="思南小学男生4" name="shcool41"/>
-  <asset filename="character/CC/artwar/movie/school17.x" displayname="世外小学男生1" name="shcool17"/>
-  <asset filename="character/CC/artwar/movie/school18.x" displayname="世外小学男生2" name="shcool18"/>
-  <asset filename="character/CC/artwar/movie/school19.x" displayname="世外小学男生3" name="shcool19"/>
-  <asset filename="character/CC/artwar/movie/school20.x" displayname="世外小学男生4" name="shcool20"/>
-  <asset filename="character/CC/artwar/movie/school22.x" displayname="向明小学女生1" name="shcool22"/>
-  <asset filename="character/CC/artwar/movie/school23.x" displayname="向明小学女生2" name="shcool23"/>
-  <asset filename="character/CC/artwar/movie/school24.x" displayname="向明小学女生3" name="shcool24"/>
-  <asset filename="character/CC/artwar/movie/school25.x" displayname="向明小学女生4" name="shcool25"/>
-  <asset filename="character/CC/artwar/movie/school26.x" displayname="向明小学女生5" name="shcool26"/>
-  <asset filename="character/CC/artwar/movie/school27.x" displayname="南山小学女生1" name="shcool27"/>
-  <asset filename="character/CC/artwar/movie/school28.x" displayname="南山小学女生2" name="shcool28"/>
-  <asset filename="character/CC/artwar/movie/school29.x" displayname="南山小学女生3" name="shcool29"/>
-  <asset filename="character/CC/artwar/movie/school30.x" displayname="南山小学女生4" name="shcool30"/>
-  <asset filename="character/CC/artwar/movie/school31.x" displayname="南山小学女生5" name="shcool31"/>
-  <asset filename="character/CC/artwar/movie/school32.x" displayname="思南小学女生1" name="shcool32"/>
-  <asset filename="character/CC/artwar/movie/school33.x" displayname="思南小学女生2" name="shcool33"/>
-  <asset filename="character/CC/artwar/movie/school34.x" displayname="思南小学女生3" name="shcool34"/>
-  <asset filename="character/CC/artwar/movie/school35.x" displayname="思南小学女生4" name="shcool35"/>
-  <asset filename="character/CC/artwar/movie/school43.x" displayname="思南小学女生5" name="shcool43"/>
-  <asset filename="character/CC/artwar/movie/school36.x" displayname="世外小学女生1" name="shcool36"/>
-  <asset filename="character/CC/artwar/movie/school37.x" displayname="世外小学女生2" name="shcool37"/>
-  <asset filename="character/CC/artwar/movie/school38.x" displayname="世外小学女生3" name="shcool38"/>
-  <asset filename="character/CC/artwar/movie/school39.x" displayname="世外小学女生4" name="shcool39"/>
-  <asset filename="character/CC/artwar/movie/school40.x" displayname="世外小学女生5" name="shcool40"/> -->
 
 
     <asset filename="character/v3/GameNpc/ABML/ABML.x" displayname="大使" name="ABML" school="false"/>
@@ -383,50 +270,50 @@
     <asset filename="character/CC/03animals/dog/dog.x" name="dog" displayname="狗"/>
 
     <asset filename="character/v3/GameNpc/FCSQ1/FCSQ1.x" displayname="战争飞马" name="FCSQ1" school="false"/>
-    <asset filename="character/v3/Npc/dapangxie/dapangxie.x" displayname="大螃蟹" name="dapangxie"/>
-    <asset filename="character/v3/Npc/dapangxie/xiaopangxie.x" displayname="青色小螃蟹" name="xiaopangxie"/>
-    <asset filename="character/v3/Npc/dapangxie/xiaopangxie2.x" displayname="蓝色小螃蟹" name="xiaopangxie2"/>
+    <asset filename="character/v3/Npc/dapangxie/dapangxie.x" displayname="大螃蟹" name="dapangxie" school="false"/>
+    <asset filename="character/v3/Npc/dapangxie/xiaopangxie.x" displayname="青色小螃蟹" name="xiaopangxie" school="false"/>
+    <asset filename="character/v3/Npc/dapangxie/xiaopangxie2.x" displayname="蓝色小螃蟹" name="xiaopangxie2" school="false"/>
     <asset filename="character/v3/Npc/Hashiqi/Hashiqi.x" displayname="哈士奇" name="Hashiqi"/>
     <asset filename="character/v3/Npc/laoying/laoying.x" displayname="老鹰" name="laoying"/>
     <asset filename="character/v3/Npc/qie/qie.x" displayname="企鹅" name="qie"/>
     <asset filename="character/v3/Npc/shayu/shayu.x" displayname="鲨鱼" name="shayu"/>
     <asset filename="character/v3/Npc/wuzei/wuzei.x" displayname="乌贼" name="wuzei"/>
     <asset filename="character/v5/02animals/Deer/Deer.x" displayname="小鹿" name="Deer"/>
-    <asset filename="character/v5/02animals/Elk/Elk.x" displayname="圣诞驯鹿" name="Elk"/>
+    <asset filename="character/v5/02animals/Elk/Elk.x" displayname="圣诞驯鹿" name="Elk" school="false"/>
     <asset filename="character/v5/02animals/HaiTun/HaiTun.x" displayname="海豚" name="HaiTun" hidden="true"/>
-    <asset filename="character/v5/02animals/HalloweenBat/HalloweenBat.x" displayname="万圣节蝙蝠" name="HalloweenBat"/>
+    <asset filename="character/v5/02animals/HalloweenBat/HalloweenBat.x" displayname="万圣节蝙蝠" name="HalloweenBat" school="false"/>
     <asset filename="character/v5/02animals/JingYu/JingYu.x" displayname="鲸鱼" name="JingYu" hidden="true" school="false"/>
     <asset filename="character/v5/02animals/JuXiangLv1/JuXiangLv1.x" displayname="巨象Lv1" name="JuXiangLv1" school="false"/>
     <asset filename="character/v5/02animals/JuXiangLv2/JuXiangLv2.x" displayname="巨象Lv2" name="JuXiangLv2" school="false"/>
     <asset filename="character/v5/02animals/JuXiangLv3/JuXiangLv3.x" displayname="巨象Lv3" name="JuXiangLv3" school="false"/>
-    <asset filename="character/v5/02animals/Lizard/Lizard.x" displayname="蜥蜴" name="Lizard"/>
+    <asset filename="character/v5/02animals/Lizard/Lizard.x" displayname="蜥蜴" name="Lizard" school="false"/>
     <asset filename="character/v5/02animals/Octopus/Octopus.x" displayname="章鱼" name="Octopus"/>
     <asset filename="model/06props/v5/05other/SeaStar/SeaStar_anim.x" displayname="海星" name="SeaStar_anim"/>
     <asset filename="model/06props/v5/05other/SeaStar/SeaStar_anim01.x" displayname="海星" name="SeaStar_anim01"/>
     <asset filename="character/v5/02animals/Ostrich/Ostrich.x" displayname="鸵鸟" name="Ostrich"/>
     <asset filename="character/v5/02animals/Panda/Panda.x" displayname="熊猫" name="Panda"/>
-    <asset filename="character/v5/02animals/Sheep/Sheep.x" displayname="黑羊" name="Sheep" school="false"/>
-    <asset filename="character/v5/02animals/Squirrel/Squirrel.x" displayname="松鼠" name="Squirrel" school="false"/>
-    <asset filename="character/v5/02animals/Swallow/Swallow.x" displayname="燕子" name="Swallow" school="false"/>
+    <asset filename="character/v5/02animals/Sheep/Sheep.x" displayname="黑羊" name="Sheep" />
+    <asset filename="character/v5/02animals/Squirrel/Squirrel.x" displayname="松鼠" name="Squirrel" />
+    <asset filename="character/v5/02animals/Swallow/Swallow.x" displayname="燕子" name="Swallow" />
     <asset filename="character/v5/02animals/Swallow/Swallow_mouther.x" displayname="燕子妈妈" name="Swallow_mouther" school="false"/>
     <asset filename="character/v5/02animals/Swan/Swan.x" displayname="天鹅" name="Swan"/>
-    <asset filename="character/v5/02animals/Tortoise/Tortoise.x" displayname="乌龟" name="Tortoise" school="false"/>
-    <asset filename="character/v5/02animals/Tortoise/Tortoise02.x" displayname="乌龟02" name="Tortoise02" school="false"/>
-    <asset filename="character/v5/02animals/Tortoise/Tortoise03.x" displayname="乌龟03" name="Tortoise03" school="false"/>
+    <asset filename="character/v5/02animals/Tortoise/Tortoise.x" displayname="乌龟" name="Tortoise" />
+    <asset filename="character/v5/02animals/Tortoise/Tortoise02.x" displayname="乌龟02" name="Tortoise02" />
+    <asset filename="character/v5/02animals/Tortoise/Tortoise03.x" displayname="乌龟03" name="Tortoise03" />
     <asset filename="character/v5/02animals/UglyDuckling/UglyDuckling.x" displayname="丑小鸭" name="UglyDuckling"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Cock/Cock.x" displayname="生肖公鸡" name="ZodiacCock"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Cow/Cow.x" displayname="生肖牛" name="ZodiacCow"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Dog/Dog.x" displayname="生肖狗" name="ZodiacDog"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Dragon/Dragon.x" displayname="生肖龙" name="ZodiacDragon"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Horse/Horse.x" displayname="生肖马" name="ZodiacHorse"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Monkey/Monkey.x" displayname="生肖猴子" name="ZodiacMonkey"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Mouse/Mouse.x" displayname="生肖老鼠" name="ZodiacMouse"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Pig/Pig.x" displayname="生肖猪" name="ZodiacPig"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Rabbit/Rabbit.x" displayname="生肖兔子" name="ZodiacRabbit"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Sheep/Sheep.x" displayname="生肖羊" name="ZodiacSheep"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Snake/Snake.x" displayname="生肖蛇" name="ZodiacSnake"/>
-    <asset filename="character/v5/02animals/ZodiacAnimals/Tiger/Tiger.x" displayname="生肖老虎" name="ZodiacTiger"/>
-    <asset filename="character/v5/10mobs/HaqiTown/Alexander/Alexander.x" displayname="鸭梨山大" name="Alexander"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Cock/Cock.x" displayname="生肖公鸡" name="ZodiacCock" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Cow/Cow.x" displayname="生肖牛" name="ZodiacCow" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Dog/Dog.x" displayname="生肖狗" name="ZodiacDog" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Dragon/Dragon.x" displayname="生肖龙" name="ZodiacDragon" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Horse/Horse.x" displayname="生肖马" name="ZodiacHorse" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Monkey/Monkey.x" displayname="生肖猴子" name="ZodiacMonkey" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Mouse/Mouse.x" displayname="生肖老鼠" name="ZodiacMouse" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Pig/Pig.x" displayname="生肖猪" name="ZodiacPig" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Rabbit/Rabbit.x" displayname="生肖兔子" name="ZodiacRabbit" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Sheep/Sheep.x" displayname="生肖羊" name="ZodiacSheep" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Snake/Snake.x" displayname="生肖蛇" name="ZodiacSnake" school="false"/>
+    <asset filename="character/v5/02animals/ZodiacAnimals/Tiger/Tiger.x" displayname="生肖老虎" name="ZodiacTiger" school="false"/>
+    <asset filename="character/v5/10mobs/HaqiTown/Alexander/Alexander.x" displayname="鸭梨山大" name="Alexander" school="false"/>
     <asset filename="character/v5/10mobs/HaqiTown/BalanceBubble/BalanceBubble.x" displayname="咕噜" name="BalanceBubble" school="false"/>
     <asset filename="character/v5/10mobs/HaqiTown/bingxiong/bingxiong.x" displayname="白熊" name="bingxiong" school="false"/>
     <asset filename="character/v5/10mobs/HaqiTown/Bonfire_Boss/Bonfire_Boss.x" displayname="火魔" name="Bonfire_Boss" school="false"/>
@@ -496,11 +383,11 @@
     <asset filename="character/v5/10mobs/HaqiTown/WaterBubble/WaterBubble.x" displayname="水咕噜" name="WaterBubble" school="false"/>
     <asset filename="character/v5/10mobs/HaqiTown/WindEagle/WindEagle.x" displayname="风鹰" name="WindEagle" school="false"/>
     <!-- 孙子兵法动物 -->
-    <asset filename="character/CC/codewar/lang.x" displayname="狼" name="lang"/>
-    <asset filename="character/CC/codewar/laohu.x" displayname="老虎" name="laohu"/>
-    <asset filename="character/CC/codewar/xiadengma.x" displayname="下等马" name="xiadengma"/>
-    <asset filename="character/CC/codewar/zhongdengma.x" displayname="中等马" name="zhongdengma"/>
-    <asset filename="character/CC/codewar/shangdengma.x" displayname="上等马" name="shangdengma"/>
+    <asset filename="character/CC/codewar/lang.x" displayname="狼" name="lang" school="false"/>
+    <asset filename="character/CC/codewar/laohu.x" displayname="老虎" name="laohu" school="false"/>
+    <asset filename="character/CC/codewar/xiadengma.x" displayname="下等马" name="xiadengma" school="false"/>
+    <asset filename="character/CC/codewar/zhongdengma.x" displayname="中等马" name="zhongdengma" school="false"/>
+    <asset filename="character/CC/codewar/shangdengma.x" displayname="上等马" name="shangdengma" school="false"/>
   </category>
   <category name="fantasy">
     <!-- 2021.09.28 补充垃圾桶及垃圾相关素材 -->
@@ -588,7 +475,7 @@
     <asset filename="character/v6/02animals/Mechanics_Helicopter/Mechanics_Helicopter.x" displayname="直升机" name="Mechanics_Helicopter" school="false"/>
   </category>
   <category name="vehicles">
-    <asset filename="character/v5/02animals/XueDiChe/XueDiChe.x" displayname="雪地车" name="XueDiChe" school="false"/>
+    <asset filename="character/v5/02animals/XueDiChe/XueDiChe.x" displayname="雪地车" name="XueDiChe" />
     <asset filename="character/v5/08functional/BlueBoat/BlueBoat.x" displayname="蓝船" name="BlueBoat" school="false"/>
     <asset filename="character/v5/02animals/NanGuaChe/NanGuaChe.x" displayname="南瓜车" name="NanGuaChe" school="false"/>
     <asset filename="character/v5/02animals/ShuangRenFeiTing/ShuangRenFeiTing.x" displayname="双人飞艇" name="ShuangRenFeiTing" school="false"/>
@@ -638,35 +525,7 @@
 
 
 
-    <!-- 垃圾分类 -->
-    <!-- <asset filename="character/CC/keepwork/laji/cy_caiyezi.x" displayname="菜叶子" name="caiyezi"/>
-  <asset filename="character/CC/keepwork/laji/cy_canzhiluoye.x" displayname="残枝落叶" name="canzhiluoye"/>
-  <asset filename="character/CC/keepwork/laji/cy_dagu.x" displayname="大骨" name="dagu"/>
-  <asset filename="character/CC/keepwork/laji/cy_guohe.x" displayname="果核" name="guohe"/>
-  <asset filename="character/CC/keepwork/laji/cy_xiangjiaopi.x" displayname="香蕉皮" name="xiangjiaopi"/>
-  <asset filename="character/CC/keepwork/laji/khs_bolipin.x" displayname="玻璃瓶" name="bolipin"/>
-  <asset filename="character/CC/keepwork/laji/khs_hezi.x" displayname="盒子" name="hezi"/>
-  <asset filename="character/CC/keepwork/laji/khs_jylg.x" displayname="卷状易拉罐" name="jylg"/>
-  <asset filename="character/CC/keepwork/laji/khs_luomu.x" displayname="螺母" name="luomu"/>
-  <asset filename="character/CC/keepwork/laji/khs_luosi.x" displayname="螺丝" name="luosi"/>
-  <asset filename="character/CC/keepwork/laji/khs_ylg.x" displayname="易拉罐" name="ylg"/>
-  <asset filename="character/CC/keepwork/laji/khs_yugu.x" displayname="鱼骨" name="yugu"/>
-  <asset filename="character/CC/keepwork/laji/khs_zhixiang.x" displayname="纸箱" name="zhixiang"/>
-  <asset filename="character/CC/keepwork/laji/qt_fanhe.x" displayname="饭盒" name="fanhe"/>
-  <asset filename="character/CC/keepwork/laji/qt_taoci.x" displayname="陶瓷" name="taoci"/>
-  <asset filename="character/CC/keepwork/laji/qt_yantou.x" displayname="烟头" name="yantou"/>
-  <asset filename="character/CC/keepwork/laji/qt_zhijin.x" displayname="纸巾" name="zhijin"/>
-  <asset filename="character/CC/keepwork/laji/yh_dianchi.x" displayname="电池" name="dianchi"/>
-  <asset filename="character/CC/keepwork/laji/yh_huazhuangpin.x" displayname="化妆品" name="huazhuangpin"/>
-  <asset filename="character/CC/keepwork/laji/yh_yaopin.x" displayname="药品" name="yaopin"/>
-  <asset filename="character/CC/keepwork/laji/yh_youqitong.x" displayname="油漆桶" name="youqitong"/>
-  -->
-
-    <!-- 2021.10.25 更新鸟巢相关素材 -->
-    <!-- <asset filename="character/CC/artwar/game/niaochao-wai.x" displayname="鸟巢" name="niaochao"/>-->
-    <!-- 2021.11.11 补充冬奥会相关素材 -->
-    <!-- <asset filename="character/CC/artwar/game/huoju.x" displayname="火炬" name="huoju"/>-->
-    <!-- <asset filename="character/CC/artwar/game/changxindeng.x" displayname="长信宫灯" name="changxindeng"/>-->
+   
     <!-- 5·27更新 -->
     <asset filename="character/CC/artwar/game/chai.x" displayname="柴火" name="chai"/>
     <asset filename="character/CC/artwar/game/desk.x" displayname="复古木桌" name="desk"/>
@@ -688,38 +547,10 @@
     <asset filename="character/CC/artwar/game/mumen_poor.x" displayname="破木门" name="mumen_poor"/>
     <!-- <asset filename="character/CC/artwar/game/复制.x" displayname="复制" name="复制"/>  -->
     <!-- 9·17更新 -->
-    <asset filename="character/CC/artwar/game/zhanqi_qin.x" displayname="秦国战旗" name="zhanqi_qin"/>
+    <asset filename="character/CC/artwar/game/zhanqi_qin.x" displayname="秦国战旗" name="zhanqi_qin" school="false"/>
     <!-- 8·5更新 -->
 
-
-    <!-- 孙子兵法素材 -->
-    <!-- <asset filename="character/CC/artwar/build/xiaofangzi1.x" displayname="小房子1" name="xiaofangzi1"/>
-  <asset filename="character/CC/artwar/build/xiaofangzi2.x" displayname="小房子2" name="xiaofangzi2"/>
-  <asset filename="character/CC/artwar/build/xiaofangzi3.x" displayname="小房子3" name="xiaofangzi3"/>
-  <asset filename="character/CC/artwar/build/xiaofangzi4.x" displayname="小房子4" name="xiaofangzi4"/>
-  <asset filename="character/CC/artwar/build/xiaofangzi5.x" displayname="小房子5" name="xiaofangzi5"/>
-  <asset filename="character/CC/artwar/build/xiaofangzi6.x" displayname="小房子6" name="xiaofangzi6"/>
-  <asset filename="character/CC/artwar/build/xiaofangzi7.x" displayname="小房子7" name="xiaofangzi7"/>
-  <asset filename="character/CC/artwar/build/xiaofangzi8.x" displayname="小房子8" name="xiaofangzi8"/>
-  <asset filename="character/CC/artwar/build/xiaopengzi1.x" displayname="小篷子1" name="xiaopengzi1"/>
-  <asset filename="character/CC/artwar/build/xiaoyuanzi1.x" displayname="小园子1" name="xiaoyuanzi1"/>
-  <asset filename="character/CC/artwar/build/xiaoyuanzi2.x" displayname="小园子2" name="xiaoyuanzi2"/>
-  <asset filename="character/CC/artwar/build/xiaoshu1.x" displayname="小树1" name="xiaoyuanzi1"/>
-  <asset filename="character/CC/artwar/build/xiaoshu2.x" displayname="小树2" name="xiaoyuanzi2"/> -->
-    <!-- ——5·27日新加 -->
-    <!-- <asset filename="character/CC/artwar/build/chengmen.x" displayname="城门" name="chengmen"/>
-  <asset filename="character/CC/artwar/build/chengqiang.x" displayname="城墙" name="chengqiang"/>
-  <asset filename="character/CC/artwar/build/dafangzi.x" displayname="大房子" name="dafangzi"/>
-  <asset filename="character/CC/artwar/build/fang1.x" displayname="房子1" name="fang1"/>
-  <asset filename="character/CC/artwar/build/fang2.x" displayname="房子2" name="fang2"/>
-  <asset filename="character/CC/artwar/build/fang3.x" displayname="房子3" name="fang3"/>
-  <asset filename="character/CC/artwar/build/guanai.x" displayname="关隘" name="guanai"/> -->
-    <!-- 6·22日新加 -->
-    <!-- <asset filename="character/CC/artwar/build/xiaofangzi.x" displayname="小房子" name="xiaofangzi"/> -->
-    <!-- 9·17更新 -->
-    <!-- <asset filename="character/CC/artwar/game/tree1.x" displayname="树1" name="tree1"/> -->
-
-    <asset filename="character/v3/Item/ObjectComponents/WEAPON/2133_SugarFree_PorkMeat_Max.anim.x" displayname="无糖猪肉" name="2133_SugarFree_PorkMeat_Max.anim"/>
+    <asset filename="character/v3/Item/ObjectComponents/WEAPON/2133_SugarFree_PorkMeat_Max.anim.x" displayname="无糖猪肉" name="2133_SugarFree_PorkMeat_Max.anim" school="false"/>
     <asset filename="character/v5/06quest/MysteryAcinusTree/MysteryAcinusTree.x" displayname="神秘浆果树" name="MysteryAcinusTree" school="false"/>
     <asset filename="character/v5/06quest/ZodiacAnimalFlower/ZodiacAnimalFlower.x" displayname="动物花" name="ZodiacAnimalFlower" school="false"/>
     <asset filename="character/v5/08functional/BreadTree/BreadTree.x" displayname="面包树" name="BreadTree" school="false"/>
@@ -729,11 +560,11 @@
     <asset filename="character/v5/02animals/Jinglingyuyi/Jinglingyuyi01.x" displayname="金色精灵羽翼" name="Jinglingyuyi01" school="false"/>
     <asset filename="character/v5/02animals/Jinglingyuyi/Jinglingyuyi02.x" displayname="蓝色精灵羽翼" name="Jinglingyuyi02" school="false"/>
     <asset filename="character/v5/02animals/Jinglingyuyi/Jinglingyuyi03.x" displayname="白色精灵羽翼" name="Jinglingyuyi03" school="false"/>
-    <asset filename="character/v5/06quest/MoFaXing/MoFaXingBlue.x" displayname="蓝色魔法星" name="MoFaXingBlue"/>
-    <asset filename="character/v5/06quest/MoFaXing/MoFaXingGreen.x" displayname="绿色魔法星" name="MoFaXingGreen"/>
-    <asset filename="character/v5/06quest/MoFaXing/MoFaXingPurle.x" displayname="紫色魔法星" name="MoFaXingPurle"/>
-    <asset filename="character/v5/06quest/MoFaXing/MoFaXingRed.x" displayname="红色魔法星" name="MoFaXingRed"/>
-    <asset filename="character/v5/06quest/MoFaXing/MoFaXingYellow.x" displayname="黄色魔法星" name="MoFaXingYellow"/>
+    <asset filename="character/v5/06quest/MoFaXing/MoFaXingBlue.x" displayname="蓝色魔法星" name="MoFaXingBlue" school="false"/>
+    <asset filename="character/v5/06quest/MoFaXing/MoFaXingGreen.x" displayname="绿色魔法星" name="MoFaXingGreen" school="false"/>
+    <asset filename="character/v5/06quest/MoFaXing/MoFaXingPurle.x" displayname="紫色魔法星" name="MoFaXingPurle" school="false"/>
+    <asset filename="character/v5/06quest/MoFaXing/MoFaXingRed.x" displayname="红色魔法星" name="MoFaXingRed" school="false"/>
+    <asset filename="character/v5/06quest/MoFaXing/MoFaXingYellow.x" displayname="黄色魔法星" name="MoFaXingYellow" school="false"/>
     <asset filename="character/v5/06quest/PolicePatrolFootStep/PolicePatrolFootStep.x" displayname="警犬巡逻脚印" name="PolicePatrolFootStep" school="false"/>
     <asset filename="character/v5/01human/FuYinJiTan/FuYinJiTan.x" displayname="符印祭坛" name="FuYinJiTan" school="false"/>
     <asset filename="character/v5/01human/LongTuTeng/LongTuTeng.x" displayname="龙图腾" name="LongTuTeng" school="false"/>
@@ -741,20 +572,20 @@
     <asset filename="character/v5/06quest/Fishnet/Fishnet.x" displayname="渔网" name="Fishnet" school="false"/>
     <asset filename="character/v5/06quest/GiftBox/GiftBox_Blue.x" displayname="蓝色礼盒" name="GiftBox_Blue" school="false"/>
     <asset filename="character/v5/06quest/GiftBox/GiftBox_Orange.x" displayname="橙色礼盒" name="GiftBox_Orange" school="false"/>
-    <asset filename="character/v5/06quest/GiftBox/GiftBox_Pink.x" displayname="粉色礼盒" name="GiftBox_Pink"/>
-    <asset filename="character/v5/06quest/HouseGift/HouseGift.x" displayname="礼物盒" name="HouseGift"/>
-    <asset filename="character/v5/06quest/JinBi/JinBiWhite.x" displayname="银币" name="JinBiWhite"/>
-    <asset filename="character/v5/06quest/JinBi/JinBiYellow.x" displayname="金币" name="JinBiYellow"/>
+    <asset filename="character/v5/06quest/GiftBox/GiftBox_Pink.x" displayname="粉色礼盒" name="GiftBox_Pink" school="false"/>
+    <asset filename="character/v5/06quest/HouseGift/HouseGift.x" displayname="礼物盒" name="HouseGift" school="false"/>
+    <asset filename="character/v5/06quest/JinBi/JinBiWhite.x" displayname="银币" name="JinBiWhite" school="false"/>
+    <asset filename="character/v5/06quest/JinBi/JinBiYellow.x" displayname="金币" name="JinBiYellow" school="false"/>
     <asset filename="character/v5/06quest/MusicBox/MusicBox_anim.x" displayname="播放中的音乐盒" name="MusicBox_anim" school="false"/>
     <asset filename="character/v5/06quest/MusicBox/MusicBox_stop.x" displayname="停止播放的音乐盒" name="MusicBox_stop" school="false"/>
-    <asset filename="character/v5/06quest/MysteryAcinusFruit/BlueAcinus/BlueAcinus.x" displayname="蓝色浆果" name="BlueAcinus"/>
-    <asset filename="character/v5/06quest/MysteryAcinusFruit/GreenAcinus/GreenAcinus.x" displayname="绿色浆果" name="GreenAcinus"/>
-    <asset filename="character/v5/06quest/MysteryAcinusFruit/RedAcinus/RedAcinus.x" displayname="红色浆果" name="RedAcinus"/>
-    <asset filename="character/v5/06quest/MysteryAcinusFruit/YellowAcinus/YellowAcinus.x" displayname="黄色浆果" name="YellowAcinus"/>
+    <asset filename="character/v5/06quest/MysteryAcinusFruit/BlueAcinus/BlueAcinus.x" displayname="蓝色浆果" name="BlueAcinus" school="false"/>
+    <asset filename="character/v5/06quest/MysteryAcinusFruit/GreenAcinus/GreenAcinus.x" displayname="绿色浆果" name="GreenAcinus" school="false"/>
+    <asset filename="character/v5/06quest/MysteryAcinusFruit/RedAcinus/RedAcinus.x" displayname="红色浆果" name="RedAcinus" school="false"/>
+    <asset filename="character/v5/06quest/MysteryAcinusFruit/YellowAcinus/YellowAcinus.x" displayname="黄色浆果" name="YellowAcinus" school="false"/>
     <asset filename="character/v5/08functional/IceStone/IceStone.x" displayname="冰石" name="IceStone" school="false"/>
     <asset filename="character/v5/08functional/JoyBean/JoyBean.x" displayname="欢乐豆" name="JoyBean" school="false"/>
     <asset filename="character/v5/08functional/JumpJumpBed/JumpJumpBed_anim.x" displayname="跳跳床" name="JumpJumpBed_anim" school="false"/>
-    <asset filename="model/01building/v5/01house/Lighthouse/Lighthouse_an.x" displayname="灯塔" name="Lighthouse_an"/>
+    <asset filename="model/01building/v5/01house/Lighthouse/Lighthouse_an.x" displayname="灯塔" name="Lighthouse_an" school="false"/>
     <asset filename="model/01building/v5/01house/MagicCamp/MagicTree/MagicTree_Star01.x" displayname="魔法星星" name="MagicTree_Star01" school="false"/>
     <asset filename="model/01building/v5/01house/MagicCamp/MetallicityTotem/MetallicityTotem_an.x" displayname="魔法护盾" name="MetallicityTotem_an" school="false"/>
     <asset filename="model/01building/v5/01house/MagicCamp/WaterAttributeTotem/WaterAttributeTotem_an01.x" displayname="爆发水雷" name="WaterAttributeTotem_an01" school="false"/>
@@ -766,44 +597,44 @@
     <asset filename="model/05plants/v5/01tree/SuccessTree/SuccessTree_an.x" displayname="胜利树" name="SuccessTree_an" school="false"/>
     <asset filename="model/06props/v5/02street/FieldBannerPVP/FieldBannerPVP_blueAnim.x" displayname="蓝色终点旗帜" name="FieldBannerPVP_blueAnim"/>
     <asset filename="model/06props/v5/02street/FieldBannerPVP/FieldBannerPVP_redAnim.x" displayname="红色终点旗帜" name="FieldBannerPVP_redAnim"/>
-    <asset filename="model/06props/v5/02street/KempBanner/KempBanner01_an.x" displayname="红队旗帜" name="KempBanner01_an" school="false"/>
-    <asset filename="model/06props/v5/02street/KempBanner/KempBanner02_an.x" displayname="黄队旗帜" name="KempBanner02_an" school="false"/>
-    <asset filename="model/06props/v5/02street/KempBanner/KempBanner03_an.x" displayname="蓝队旗帜" name="KempBanner03_an" school="false"/>
+    <asset filename="model/06props/v5/02street/KempBanner/KempBanner01_an.x" displayname="红队旗帜" name="KempBanner01_an"/>
+    <asset filename="model/06props/v5/02street/KempBanner/KempBanner02_an.x" displayname="黄队旗帜" name="KempBanner02_an"/>
+    <asset filename="model/06props/v5/02street/KempBanner/KempBanner03_an.x" displayname="蓝队旗帜" name="KempBanner03_an"/>
     <asset filename="model/06props/v5/03quest/BirdClock/BirdClock_an.x" displayname="布谷鸟钟" name="BirdClock_an" school="false"/>
     <asset filename="model/06props/v5/03quest/Cockhorse/Cockhorse_animation.x" displayname="玩具木马" name="Cockhorse_animation" school="false"/>
     <asset filename="model/06props/v5/03quest/FearfulBox/FearfulBox_an.x" displayname="吓一跳盒" name="FearfulBox_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/FighterFlag/FighterFlag_animation.x" displayname="黄色终点旗帜" name="FighterFlag_animation" school="false"/>
-    <asset filename="model/06props/v5/03quest/FindingGameMachine/FindingGameMachine_an.x" displayname="游戏机器" name="FindingGameMachine_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_01_an.x" displayname="绿色的蛋" name="FunnyEgg_01_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_02_an.x" displayname="橙红色的蛋" name="FunnyEgg_02_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_03_an.x" displayname="粉色的蛋" name="FunnyEgg_03_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_04_an.x" displayname="红白色的蛋" name="FunnyEgg_04_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_05_an.x" displayname="棕色的蛋" name="FunnyEgg_05_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/GramaryBox/GramaryBox_animation.x" displayname="魔方" name="GramaryBox_animation" school="false"/>
-    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver1_an.x" displayname="特大浮冰" name="IceRiver1_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver2_an.x" displayname="大浮冰" name="IceRiver2_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver3_an.x" displayname="浮冰" name="IceRiver3_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver4_an.x" displayname="小浮冰" name="IceRiver4_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver5_an.x" displayname="碎冰" name="IceRiver5_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/JackStraw/JackStraw_anim.x" displayname="稻草人" name="JackStraw_anim" school="false"/>
-    <asset filename="model/06props/v5/03quest/KursaalGate/KursaalGate_animation.x" displayname="会场旗帜" name="KursaalGate_animation" school="false"/>
-    <asset filename="model/06props/v5/03quest/MagicMirror/magicmirror_02_an.x" displayname="魔镜" name="magicmirror_02_an" school="false"/>
+    <asset filename="model/06props/v5/03quest/FighterFlag/FighterFlag_animation.x" displayname="黄色终点旗帜" name="FighterFlag_animation"/>
+    <asset filename="model/06props/v5/03quest/FindingGameMachine/FindingGameMachine_an.x" displayname="游戏机器" name="FindingGameMachine_an"/>
+    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_01_an.x" displayname="绿色的蛋" name="FunnyEgg_01_an" />
+    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_02_an.x" displayname="橙红色的蛋" name="FunnyEgg_02_an" />
+    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_03_an.x" displayname="粉色的蛋" name="FunnyEgg_03_an" />
+    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_04_an.x" displayname="红白色的蛋" name="FunnyEgg_04_an" />
+    <asset filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_05_an.x" displayname="棕色的蛋" name="FunnyEgg_05_an" />
+    <asset filename="model/06props/v5/03quest/GramaryBox/GramaryBox_animation.x" displayname="魔方" name="GramaryBox_animation" />
+    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver1_an.x" displayname="特大浮冰" name="IceRiver1_an" />
+    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver2_an.x" displayname="大浮冰" name="IceRiver2_an" />
+    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver3_an.x" displayname="浮冰" name="IceRiver3_an" />
+    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver4_an.x" displayname="小浮冰" name="IceRiver4_an" />
+    <asset filename="model/06props/v5/03quest/IceRiver/IceRiver5_an.x" displayname="碎冰" name="IceRiver5_an" />
+    <asset filename="model/06props/v5/03quest/JackStraw/JackStraw_anim.x" displayname="稻草人" name="JackStraw_anim" />
+    <asset filename="model/06props/v5/03quest/KursaalGate/KursaalGate_animation.x" displayname="会场旗帜" name="KursaalGate_animation" />
+    <asset filename="model/06props/v5/03quest/MagicMirror/magicmirror_02_an.x" displayname="魔镜" name="magicmirror_02_an" />
     <asset filename="model/06props/v5/03quest/MorningGlory/item_1H_Balloon_animation.x" displayname="气球" name="item_1H_Balloon_animation"/>
     <asset filename="model/06props/v5/03quest/MusicBox/MusicBox_anima.x" displayname="光碟" name="MusicBox_anima"/>
-    <asset filename="model/06props/v5/03quest/Pinwheel/Pinwheel_an.x" displayname="风车" name="Pinwheel_an" school="false"/>
-    <asset filename="model/06props/v5/03quest/Tumbler/Tumbler_animation.x" displayname="不倒翁" name="Tumbler_animation" school="false"/>
-    <asset filename="model/06props/v5/06combat/Common/WarBanner/WarBanner_Gray_an.x" displayname="灰色挂旗" name="WarBanner_Gray_an" school="false"/>
-    <asset filename="model/06props/v5/06combat/Common/WarBanner/WarBanner_Green_an.x" displayname="绿色挂旗" name="WarBanner_Green_an" school="false"/>
-    <asset filename="model/06props/v5/06combat/Common/WarBanner/WarBanner_Red_an.x" displayname="红色挂旗" name="WarBanner_Red_an" school="false"/>
+    <asset filename="model/06props/v5/03quest/Pinwheel/Pinwheel_an.x" displayname="风车" name="Pinwheel_an" />
+    <asset filename="model/06props/v5/03quest/Tumbler/Tumbler_animation.x" displayname="不倒翁" name="Tumbler_animation" />
+    <asset filename="model/06props/v5/06combat/Common/WarBanner/WarBanner_Gray_an.x" displayname="灰色挂旗" name="WarBanner_Gray_an" />
+    <asset filename="model/06props/v5/06combat/Common/WarBanner/WarBanner_Green_an.x" displayname="绿色挂旗" name="WarBanner_Green_an" />
+    <asset filename="model/06props/v5/06combat/Common/WarBanner/WarBanner_Red_an.x" displayname="红色挂旗" name="WarBanner_Red_an" />
     <asset filename="model/06props/v5/07GameRobot/Irrigator/Irrigator_anim.x" displayname="水车" name="Irrigator_anim"/>
     <asset filename="model/07effect/v5/CandyBeanBalloon/CandyBeanBalloon_blueAnim.x" displayname="蓝色糖果气球" name="CandyBeanBalloon_blueAnim"/>
     <asset filename="model/07effect/v5/CandyBeanBalloon/CandyBeanBalloon_greenAnim.x" displayname="绿色糖果气球" name="CandyBeanBalloon_greenAnim"/>
     <asset filename="model/07effect/v5/CandyBeanBalloon/CandyBeanBalloon_purpleAnim.x" displayname="粉色糖果气球" name="CandyBeanBalloon_purpleAnim"/>
     <asset filename="model/07effect/v5/CandyBeanBalloon/CandyBeanBalloon_redAnim.x" displayname="红色糖果气球" name="CandyBeanBalloon_redAnim"/>
-    <asset filename="model/07effect/v5/Jelly/Jelly1_anim.x" displayname="弹跳果冻" name="Jelly1_anim" school="false"/>
-    <asset filename="model/07effect/v5/Jelly/Jelly_anim.x" displayname="果冻" name="Jelly_anim" school="false"/>
-    <asset filename="model/07effect/v5/SnowBalloon/SnowBalloon_ball_anim.x" displayname="雪球" name="SnowBalloon_ball_anim" school="false"/>
-    <asset filename="model/07effect/v5/SnowBlast/SnowBlast_Ball_Anim.x" displayname="雪球（投掷）" name="SnowBlast_Ball_Anim" school="false"/>
+    <asset filename="model/07effect/v5/Jelly/Jelly1_anim.x" displayname="弹跳果冻" name="Jelly1_anim"/>
+    <asset filename="model/07effect/v5/Jelly/Jelly_anim.x" displayname="果冻" name="Jelly_anim"/>
+    <asset filename="model/07effect/v5/SnowBalloon/SnowBalloon_ball_anim.x" displayname="雪球" name="SnowBalloon_ball_anim"/>
+    <asset filename="model/07effect/v5/SnowBlast/SnowBlast_Ball_Anim.x" displayname="雪球（投掷）" name="SnowBlast_Ball_Anim"/>
     <asset filename="model/common/Arrowhead/Arrowhead_anim.x" displayname="方向标" name="Arrowhead_anim"/>
     <asset filename="model/common/star/star01_an.x" displayname="地球" name="star01_an"/>
     <asset filename="model/common/star/star02_an.x" displayname="月球" name="star02_an"/>
@@ -816,41 +647,41 @@
   </category>
   <category name="equipment">
     <!-- codewar武器 -->
-    <asset filename="character/CC/artwar/game/changjian.x" displayname="长剑" name="changjian"/>
+    <asset filename="character/CC/artwar/game/changjian.x" displayname="长剑" name="changjian" school="false"/>
     <asset filename="character/CC/artwar/game/fuchen.x" displayname="拂尘" name="fuchen"/>
     <asset filename="character/CC/artwar/game/guaizhang.x" displayname="拐杖" name="guaizhang"/>
     <asset filename="character/CC/artwar/game/huoba_ming.x" displayname="火把" name="huoba"/>
     <!-- <asset filename="character/CC/artwar/game/huoba_mie.x" displayname="火把灭" name="huoba"/>   -->
     <asset filename="character/CC/artwar/game/shanzi.x" displayname="扇子" name="shanzi"/>
     <!-- 2022.2.14更新 -->
-    <asset filename="character/CC/artwar/game/danpigu.x" displayname="单皮鼓" name="danpigu"/>
-    <asset filename="character/CC/artwar/game/gubang.x" displayname="鼓棒" name="gubang"/>
-    <asset filename="character/CC/artwar/game/jinghu.x" displayname="京胡" name="jinghu"/>
-    <asset filename="character/CC/artwar/game/luo.x" displayname="锣" name="luo"/>
-    <asset filename="character/CC/artwar/game/luobang.x" displayname="锣棒" name="luobang"/>
-    <asset filename="character/CC/artwar/game/maweigong.x" displayname="马尾弓" name="maweigong"/>
-    <asset filename="character/CC/artwar/game/sanxuan.x" displayname="三弦" name="sanxuan"/>
+    <asset filename="character/CC/artwar/game/danpigu.x" displayname="单皮鼓" name="danpigu" school="false"/>
+    <asset filename="character/CC/artwar/game/gubang.x" displayname="鼓棒" name="gubang" school="false"/>
+    <asset filename="character/CC/artwar/game/jinghu.x" displayname="京胡" name="jinghu" school="false"/>
+    <asset filename="character/CC/artwar/game/luo.x" displayname="锣" name="luo" school="false"/>
+    <asset filename="character/CC/artwar/game/luobang.x" displayname="锣棒" name="luobang" school="false"/>
+    <asset filename="character/CC/artwar/game/maweigong.x" displayname="马尾弓" name="maweigong" school="false"/>
+    <asset filename="character/CC/artwar/game/sanxuan.x" displayname="三弦" name="sanxuan" school="false"/>
     <!-- 5·27更新 -->
-    <asset filename="character/CC/artwar/game/axe.x" displayname="斧子" name="axe"/>
-    <asset filename="character/CC/artwar/game/lance.x" displayname="枪" name="lance"/>
-    <asset filename="character/CC/artwar/game/ge.x" displayname="戈" name="ge"/>
+    <asset filename="character/CC/artwar/game/axe.x" displayname="斧子" name="axe" school="false"/>
+    <asset filename="character/CC/artwar/game/lance.x" displayname="枪" name="lance" school="false"/>
+    <asset filename="character/CC/artwar/game/ge.x" displayname="戈" name="ge" school="false"/>
     <!-- 2021.12.30 新增旗子 -->
-    <asset filename="character/CC/artwar/game/qizhi.x" displayname="旗帜" name="qizhi"/>
+    <asset filename="character/CC/artwar/game/qizhi.x" displayname="旗帜" name="qizhi" school="false"/>
     <!-- 6·11更新 -->
     <!-- <asset filename="character/CC/artwar/game/jiguannu.x" displayname="机关弩" name="jiguannu"/>
-  <asset filename="character/CC/artwar/game/jiguannu_dipan.x" displayname="机关弩底盘" name="jiguannu_dipan"/> -->
+    <asset filename="character/CC/artwar/game/jiguannu_dipan.x" displayname="机关弩底盘" name="jiguannu_dipan"/> -->
     <!-- 8·5更新 -->
-    <asset filename="character/CC/artwar/game/firetrap_off.x" displayname="火焰陷阱" name="firetrap_off"/>
-    <asset filename="character/CC/artwar/game/firetrap_on.x" displayname="火焰陷阱（触发）" name="firetrap_on"/>
-    <asset filename="character/CC/artwar/game/bushoujia.x" displayname="捕兽夹" name="bushoujia"/>
-    <asset filename="character/CC/artwar/game/huoba_daoju.x" displayname="火把（道具）" name="huoba_daoju"/>
-    <!-- <asset filename="character/CC/artwar/game/tianshucanjuan.x" displayname="天书" name="tianshucanjuan"/> -->
-    <asset filename="character/CC/artwar/furnitures/umbrella_close.x" displayname="纸伞_闭" name="umbrella_close"/>
-    <asset filename="character/CC/artwar/furnitures/umbrella_open.x" displayname="纸伞_开" name="umbrella_open"/>
+    <asset filename="character/CC/artwar/game/firetrap_off.x" displayname="火焰陷阱" name="firetrap_off" school="false"/>
+    <asset filename="character/CC/artwar/game/firetrap_on.x" displayname="火焰陷阱（触发）" name="firetrap_on" school="false"/>
+    <asset filename="character/CC/artwar/game/bushoujia.x" displayname="捕兽夹" name="bushoujia" school="false"/>
+    <asset filename="character/CC/artwar/game/huoba_daoju.x" displayname="火把（道具）" name="huoba_daoju" school="false"/>
+    <!-- <asset filename="character/CC/artwar/game/tianshucanjuan.x" displayname="天书" name="tianshucanjuan" school="false"/> -->
+    <asset filename="character/CC/artwar/furnitures/umbrella_close.x" displayname="纸伞_闭" name="umbrella_close" school="false"/>
+    <asset filename="character/CC/artwar/furnitures/umbrella_open.x" displayname="纸伞_开" name="umbrella_open" school="false"/>
     <asset filename="character/CC/artwar/game/hammer.x" displayname="锤子" name="hammer"/>
 
-    <asset filename="character/CC/07items/arrows.x" displayname="很多箭" name="arrows"/>
-    <asset filename="character/CC/07items/arrow.x" displayname="箭" name="arrow"/>
+    <asset filename="character/CC/07items/arrows.x" displayname="很多箭" name="arrows" school="false"/>
+    <asset filename="character/CC/07items/arrow.x" displayname="箭" name="arrow" school="false"/>
     <asset filename="character/v3/Item/ObjectComponents/WEAPON/1290_VIPStaff1.anim.x" displayname="权杖1" name="1290_VIPStaff1.anim" school="false"/>
     <asset filename="character/v3/Item/ObjectComponents/WEAPON/1291_VIPStaff2.anim.x" displayname="权杖2" name="1291_VIPStaff2.anim" school="false"/>
     <asset filename="character/v3/Item/ObjectComponents/WEAPON/1292_VIPStaff3.anim.x" displayname="权杖3" name="1292_VIPStaff3.anim" school="false"/>
@@ -960,7 +791,7 @@
     <asset filename="character/CC/artwar/furnitures/hongxing_B.x" displayname="大红星" name="Hongxing_Da"/>
     <asset filename="character/CC/artwar/furnitures/hongxing_S.x" displayname="小红星" name="Hongxing_Xiao"/>
     <!--<asset filename="character/CC/artwar/furnitures/danghui_L.x" displayname="党徽（左）" name="Danghui_Zuo"/>
-  <asset filename="character/CC/artwar/furnitures/danghui_R.x" displayname="党徽（右）" name="Danghui_You"/>-->
+    <asset filename="character/CC/artwar/furnitures/danghui_R.x" displayname="党徽（右）" name="Danghui_You"/>-->
     <asset filename="character/CC/artwar/furnitures/xingxing_S.x" displayname="金色的星星" name="Jinsedexingxing"/>
     <asset filename="character/CC/artwar/furnitures/JiangBei_Jin.x" displayname="金奖杯" name="JiangBei_Jin"/>
     <asset filename="character/CC/artwar/furnitures/JiangBei_Tong.x" displayname="铜奖杯" name="JiangBei_Tong"/>
@@ -1084,7 +915,7 @@
     <asset filename="character/CC/artwar/furnitures/zhutai_on.x" displayname="烛台-明" name="zhutai_on"/>
     <asset filename="character/CC/artwar/furnitures/fountain3.x" displayname="喷水池" name="fountain3"/>
     <asset filename="character/CC/artwar/furnitures/closestool.x" displayname="马桶" name="closestool"/>
-    <asset filename="character/CC/artwar/furnitures/incense_burner.x" displayname="丹炉" name="incense_burner"/>
+    <asset filename="character/CC/artwar/furnitures/incense_burner.x" displayname="丹炉" name="incense_burner" school="false"/>
 
     <!-- 红色用品 -->
     <asset filename="character/CC/artwar/furnitures/bi.x" displayname="笔" name="bi"/>
@@ -1111,71 +942,7 @@
     <asset filename="character/CC/artwar/furnitures/yizi_fang.x" displayname="方椅子" name="yizi_fang"/>
     <asset filename="character/CC/artwar/furnitures/yizi_yuan.x" displayname="圆椅子" name="yizi_yuan"/>
     <asset filename="character/CC/artwar/furnitures/zhibi.x" displayname="纸笔" name="zhibi"/>
-    <!--  <asset filename="character/CC/artwar/furnitures/baozhi_off.x" displayname="报纸_安全" name="baozhi_off"/>
-  <asset filename="character/CC/artwar/furnitures/baozhi_on.x" displayname="报纸_危险" name="baozhi_on"/>
-  <asset filename="character/CC/artwar/furnitures/cd_on.x" displayname="插电板_危险1" name="cd_on"/>
-  <asset filename="character/CC/artwar/furnitures/cdb_sj_off.x" displayname="插电板_安全" name="cdb_sj_off"/>
-  <asset filename="character/CC/artwar/furnitures/cdb_sj_on.x" displayname="插电板_危险2" name="cdb_sj_on"/>
-  <asset filename="character/CC/artwar/furnitures/chadianban.x" displayname="插电板" name="chadianban"/>
-  <asset filename="character/CC/artwar/furnitures/chazuo.x" displayname="插座" name="chazuo"/>
-  <asset filename="character/CC/artwar/furnitures/chazuo_wanyong.x" displayname="万用插座_危险" name="chazuo_wanyong"/>
-  <asset filename="character/CC/artwar/furnitures/chongdianbao.x" displayname="充电宝" name="chongdianbao"/>
-  <asset filename="character/CC/artwar/furnitures/chongdianbao_off.x" displayname="充电宝_危险" name="chongdianbao_off"/>
-  <asset filename="character/CC/artwar/furnitures/chongdianbao_on.x" displayname="充电宝_安全" name="chongdianbao_on"/>
-  <asset filename="character/CC/artwar/furnitures/chuifengji.x" displayname="吹风机" name="chuifengji"/>
-  <asset filename="character/CC/artwar/furnitures/diannao_bai_off.x" displayname="白电脑_安全" name="diannao_bai_off"/>
-  <asset filename="character/CC/artwar/furnitures/diannao_bai_on.x" displayname="白电脑_危险" name="diannao_bai_on"/>
-  <asset filename="character/CC/artwar/furnitures/dianping.x" displayname="电瓶" name="dianping"/>
-  <asset filename="character/CC/artwar/furnitures/dianreqi_off.x" displayname="电热器_安全" name="dianreqi_off"/>
-  <asset filename="character/CC/artwar/furnitures/dianreqi_on.x" displayname="电热器_危险" name="dianreqi_on"/>
-  <asset filename="character/CC/artwar/furnitures/dianretan_off.x" displayname="电热毯_安全" name="dianretan_off"/>
-  <asset filename="character/CC/artwar/furnitures/dianretan_on.x" displayname="电热毯_危险" name="dianretan_on"/>
-  <asset filename="character/CC/artwar/furnitures/dianshiji_bai_off.x" displayname="白电视机_安全" name="dianshiji_bai_off"/>
-  <asset filename="character/CC/artwar/furnitures/dianshiji_bai_on.x" displayname="白电视机_危险" name="dianshiji_bai_on"/>
-  <asset filename="character/CC/artwar/furnitures/guo_chaocai.x" displayname="锅_炒菜中" name="guo_chaocai"/>
-  <asset filename="character/CC/artwar/furnitures/guo_off.x" displayname="锅_安全" name="guo_off"/>
-  <asset filename="character/CC/artwar/furnitures/guo_on.x" displayname="锅_危险" name="guo_on"/>
-  <asset filename="character/CC/artwar/furnitures/guo_yichu.x" displayname="锅_溢出" name="guo_yichu"/>
-  <asset filename="character/CC/artwar/furnitures/huncong_on.x" displayname="插电板_危险3" name="huncong_on"/>
-  <asset filename="character/CC/artwar/furnitures/huochai.x" displayname="火柴" name="huochai"/>
-  <asset filename="character/CC/artwar/furnitures/kaiguan_off.x" displayname="开关_安全" name="kaiguan_off"/>
-  <asset filename="character/CC/artwar/furnitures/kuzi.x" displayname="裤子" name="kuzi"/>
-  <asset filename="character/CC/artwar/furnitures/meiqizao.x" displayname="煤气灶" name="meiqizao"/>
-  <asset filename="character/CC/artwar/furnitures/redekuai_off" displayname="热得快_安全" name="redekuai_off"/>
-  <asset filename="character/CC/artwar/furnitures/redekuai_on.x" displayname="热得快_危险" name="redekuai_on"/>
-  <asset filename="character/CC/artwar/furnitures/reshuihu.x" displayname="热水壶" name="reshuihu"/>
-  <asset filename="character/CC/artwar/furnitures/shachongji.x" displayname="杀虫剂" name="shachongji"/>
-  <asset filename="character/CC/artwar/furnitures/shouji.x" displayname="手机" name="shouji"/>
-  <asset filename="character/CC/artwar/furnitures/shouji_fatang.x" displayname="手机_发热" name="shouji_fatang"/>
-  <asset filename="character/CC/artwar/furnitures/tonghuashu.x" displayname="童话书" name="tonghuashu"/>
-  <asset filename="character/CC/artwar/furnitures/taocipen.x" displayname="陶瓷盆" name="taocipen"/>
-  <asset filename="character/CC/artwar/furnitures/weibolu_off.x" displayname="微波炉_安全" name="weibolu_off"/>
-  <asset filename="character/CC/artwar/furnitures/weibolu_on.x" displayname="微波炉_危险" name="weibolu_on"/>
-  <asset filename="character/CC/artwar/furnitures/wenxiang_off.x" displayname="蚊香" name="wenxiang_off"/>
-  <asset filename="character/CC/artwar/furnitures/wenxiang_on.x" displayname="蚊香_点燃" name="wenxiang_on"/>
-  <asset filename="character/CC/artwar/furnitures/xian_1.x" displayname="电线1" name="xian_1"/>
-  <asset filename="character/CC/artwar/furnitures/xian_2.x" displayname="电线2" name="xian_2"/>
-  <asset filename="character/CC/artwar/furnitures/xian_3.x" displayname="电线3" name="xian_3"/>
-  <asset filename="character/CC/artwar/furnitures/xian_4.x" displayname="电线4" name="xian_4"/>
-  <asset filename="character/CC/artwar/furnitures/xian_5.x" displayname="电线5" name="xian_5"/>
-  <asset filename="character/CC/artwar/furnitures/xian_6.x" displayname="电线6" name="xian_6"/>
-  <asset filename="character/CC/artwar/furnitures/xian_7.x" displayname="电线7" name="xian_7"/>
-  <asset filename="character/CC/artwar/furnitures/xian_8.x" displayname="电线8" name="xian_8"/>
-  <asset filename="character/CC/artwar/furnitures/xian_9.x" displayname="电线9" name="xian_9"/>
-  <asset filename="character/CC/artwar/furnitures/xian_10.x" displayname="电线10" name="xian_10"/>
-  <asset filename="character/CC/artwar/furnitures/xian_huai.x" displayname="电线_坏" name="xian_huai"/>
-  <asset filename="character/CC/artwar/furnitures/xiangzi.x" displayname="箱子" name="xiangzi"/>
-  <asset filename="character/CC/artwar/furnitures/xiaotaiyang_off.x" displayname="小太阳_关" name="xiaotaiyang_off"/>
-  <asset filename="character/CC/artwar/furnitures/xiaotaiyang_on.x" displayname="小太阳_开" name="xiaotaiyang_on"/>
-  <asset filename="character/CC/artwar/furnitures/yan_off.x" displayname="烟_安全" name="yan_off"/>
-  <asset filename="character/CC/artwar/furnitures/yan_on.x" displayname="烟_危险" name="yan_on"/>
-  <asset filename="character/CC/artwar/furnitures/yanhua_dan.x" displayname="烟花_单支" name="yanhua_dan"/>
-  <asset filename="character/CC/artwar/furnitures/yanhua_duo.x" displayname="烟花_捆" name="yanhua_duo"/>
-  <asset filename="character/CC/artwar/furnitures/yanhuigang.x" displayname="烟灰缸" name="yanhuigang"/>
-  <asset filename="character/CC/artwar/furnitures/you.x" displayname="油" name="you"/>
-  <asset filename="character/CC/artwar/furnitures/yundou_off.x" displayname="熨斗_安全" name="yundou_off"/>
-  <asset filename="character/CC/artwar/furnitures/yundou_on.x" displayname="熨斗_危险" name="yundou_on"/>
-  <asset filename="character/CC/artwar/furnitures/zhanglang.x" displayname="蟑螂" name="zhanglang"/>   -->
+    
     <asset filename="character/CC/artwar/furnitures/cotton_swab.x" displayname="绵签" name="cotton_swab"/>
     <asset filename="character/CC/artwar/furnitures/blackboard_cyan.x" displayname="黑板（绿）" name="blackboard_cyan"/>
     <asset filename="character/CC/artwar/furnitures/blackboard_black.x" displayname="黑板（黑）" name="blackboard_black"/>
@@ -1184,19 +951,15 @@
     <asset filename="character/CC/artwar/furnitures/food2.x" displayname="食物2" name="food2"/>
     <asset filename="character/CC/artwar/furnitures/food3.x" displayname="食物3" name="food3"/>
     <asset filename="character/CC/artwar/furnitures/temperature_measuring_gun.x" displayname="测温枪" name="temperature_measuring_gun"/>
-    <asset filename="character/CC/artwar/furnitures/machine_gun.x" displayname="机枪" name="machine_gun"/>
-    <asset filename="character/CC/artwar/furnitures/Machete.x" displayname="大砍刀" name="Machete"/>
-    <asset filename="character/CC/artwar/furnitures/gun.x" displayname="冲锋枪" name="gun"/>
-    <asset filename="character/CC/artwar/furnitures/Sandbags_1.x" displayname="沙袋1" name="Sandbags_1"/>
-    <asset filename="character/CC/artwar/furnitures/Sandbags_2.x" displayname="沙袋2" name="Sandbags_2"/>
-    <asset filename="character/CC/artwar/furnitures/Sandbags_3.x" displayname="沙袋3" name="Sandbags_3"/>
-    <asset filename="character/CC/artwar/furnitures/ammunition_chest.x" displayname="弹药箱" name="ammunition_chest"/>
-    <!--
-  <asset filename="character/CC/artwar/furnitures/gongchan_logo1.x" displayname="红色标志1" name="gongchan_logo1"/>
-  <asset filename="character/CC/artwar/furnitures/gongchan_logo2.x" displayname="红色标志2" name="gongchan_logo2"/>
-  <asset filename="character/CC/artwar/furnitures/gongchan_logo3.x" displayname="红色标志3" name="gongchan_logo3"/>
-  <asset filename="character/CC/artwar/furnitures/gongchan_logo4.x" displayname="红色标志4" name="gongchan_logo4"/> -->
-    <asset filename="character/CC/artwar/furnitures/dilei.x" displayname="地雷" name="dilei"/>
+    <asset filename="character/CC/artwar/furnitures/machine_gun.x" displayname="机枪" name="machine_gun" school="false"/>
+    <asset filename="character/CC/artwar/furnitures/Machete.x" displayname="大砍刀" name="Machete" school="false"/>
+    <asset filename="character/CC/artwar/furnitures/gun.x" displayname="冲锋枪" name="gun" school="false"/>
+    <asset filename="character/CC/artwar/furnitures/Sandbags_1.x" displayname="沙袋1" name="Sandbags_1" school="false"/>
+    <asset filename="character/CC/artwar/furnitures/Sandbags_2.x" displayname="沙袋2" name="Sandbags_2" school="false"/>
+    <asset filename="character/CC/artwar/furnitures/Sandbags_3.x" displayname="沙袋3" name="Sandbags_3" school="false"/>
+    <asset filename="character/CC/artwar/furnitures/ammunition_chest.x" displayname="弹药箱" name="ammunition_chest" school="false"/>
+    
+    <asset filename="character/CC/artwar/furnitures/dilei.x" displayname="地雷" name="dilei" school="false"/>
     <asset filename="character/CC/artwar/furnitures/bilu.x" displayname="壁炉" name="bilu"/>
 
 
@@ -1204,58 +967,58 @@
 
   <category name="effects">
     <asset filename="character/CC/05effect/cloud.x" name="cloud" displayname="雾气" physics="false"/>
-    <asset filename="character/v5/06quest/MoFaXing/MoFaXing_Efx.x" displayname="魔法星" name="MoFaXing_Efx"/>
-    <asset filename="character/v5/06quest/JinBi/JinBi_Efx.x" displayname="金色闪光" name="JinBi_Efx"/>
+    <asset filename="character/v5/06quest/MoFaXing/MoFaXing_Efx.x" displayname="魔法星" name="MoFaXing_Efx" school="false"/>
+    <asset filename="character/v5/06quest/JinBi/JinBi_Efx.x" displayname="金色闪光" name="JinBi_Efx" school="false"/>
     <asset filename="character/CC/05effect/whitecloud.x" name="whitecloud" displayname="白云" physics="false"/>
     <asset filename="character/CC/05effect/blackcloudrotate.x" name="blackcloudrotate" displayname="乌云" physics="false"/>
     <asset filename="character/CC/05effect/blackcloud.x" name="blackcloud" displayname="旋转乌云" physics="false"/>
-    <asset filename="model/05plants/v5/01tree/SuccessTree/SuccessTree_efx.x" displayname="从地面往空中冒金色的泡泡" name="SuccessTree_efx"/>
-    <asset filename="character/CC/05effect/focusedblackdust.x" name="focusedblackdust" displayname="聚集黑雾" physics="false"/>
-    <asset filename="character/CC/05effect/rainflower.x" name="rainflower" displayname="飘落花瓣" physics="false"/>
-    <asset filename="character/CC/05effect/fallingleaves.x" name="fallingleaves" displayname="飘落树叶" physics="false"/>
+    <asset filename="model/05plants/v5/01tree/SuccessTree/SuccessTree_efx.x" displayname="从地面往空中冒金色的泡泡" name="SuccessTree_efx" school="false"/>
+    <asset filename="character/CC/05effect/focusedblackdust.x" name="focusedblackdust" displayname="聚集黑雾" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/rainflower.x" name="rainflower" displayname="飘落花瓣" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/fallingleaves.x" name="fallingleaves" displayname="飘落树叶" physics="false" school="false"/>
     <asset filename="character/CC/05effect/fire.x" name="fire" displayname="火" physics="false"/>
-    <asset filename="character/CC/05effect/glow.x" name="glow" displayname="能量体" physics="false"/>
+    <asset filename="character/CC/05effect/glow.x" name="glow" displayname="能量体" physics="false" school="false"/>
     <asset filename="character/CC/05effect/ray.x" name="ray" displayname="放射光" physics="false"/>
     <asset filename="character/CC/05effect/flyingparticle.x" name="flyingparticle" displayname="星光环绕" physics="false"/>
-    <asset filename="character/CC/05effect/star.x" name="star" displayname="星光升起" physics="false"/>
-    <asset filename="character/CC/05effect/risingparticle.x" name="risingparticle" displayname="光斑升起" physics="false"/>
-    <asset filename="character/CC/05effect/fallingparticle1.x" name="fallingparticle1" displayname="星光洒落" physics="false"/>
-    <asset filename="character/CC/05effect/fallingparticle2.x" name="fallingparticle2" displayname="光斑洒落" physics="false"/>
-    <asset filename="character/CC/05effect/risingline.x" name="risingline" displayname="垂直光线" physics="false"/>
-    <asset filename="character/CC/05effect/dazycircle.x" name="dazycircle" displayname="眩晕圈" physics="false"/>
-    <asset filename="character/CC/05effect/swhirling.x" name="swhirling" displayname="漩涡" physics="false"/>
+    <asset filename="character/CC/05effect/star.x" name="star" displayname="星光升起" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/risingparticle.x" name="risingparticle" displayname="光斑升起" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/fallingparticle1.x" name="fallingparticle1" displayname="星光洒落" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/fallingparticle2.x" name="fallingparticle2" displayname="光斑洒落" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/risingline.x" name="risingline" displayname="垂直光线" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/dazycircle.x" name="dazycircle" displayname="眩晕圈" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/swhirling.x" name="swhirling" displayname="漩涡" physics="false" school="false"/>
     <asset filename="character/CC/05effect/thunder.x" name="thunder" displayname="雷电" physics="false"/>
-    <asset filename="character/CC/05effect/magicball.x" name="magicball" displayname="魔法球" physics="false"/>
+    <asset filename="character/CC/05effect/magicball.x" name="magicball" displayname="魔法球" physics="false" school="false"/>
     <asset filename="character/CC/05effect/waterbubble.x" name="waterbubble" displayname="水泡" physics="false"/>
-    <asset filename="character/CC/05effect/ghost.x" name="ghost" displayname="幽灵" physics="false"/>
-    <asset filename="character/CC/05effect/bladelight.x" name="bladelight" displayname="刀光" physics="false"/>
-    <asset filename="character/CC/05effect/fallingelectric.x" name="fallingelectric" displayname="下落光球" physics="false"/>
-    <asset filename="character/CC/05effect/fallingfire.x" name="fallingfire" displayname="下落火球" physics="false"/>
-    <asset filename="character/CC/05effect/icearrow.x" name="icearrow" displayname="下落冰剑" physics="false"/>
-    <asset filename="character/CC/05effect/arena.x" name="arena" displayname="金色法阵" physics="false"/>
-    <asset filename="character/CC/05effect/arenablue.x" name="arenablue" displayname="蓝色法阵" physics="false"/>
-    <asset filename="character/CC/05effect/firingcirclebigger.x" name="firingcirclebigger" displayname="爆炸圈" physics="false"/>
-    <asset filename="character/CC/05effect/glowingcirclebigger.x" name="glowingcirclebigger" displayname="变换光圈" physics="false"/>
-    <asset filename="character/CC/05effect/fireglowingcircle.x" name="fireglowingcircle" displayname="旋转光圈" physics="false"/>
+    <asset filename="character/CC/05effect/ghost.x" name="ghost" displayname="幽灵" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/bladelight.x" name="bladelight" displayname="刀光" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/fallingelectric.x" name="fallingelectric" displayname="下落光球" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/fallingfire.x" name="fallingfire" displayname="下落火球" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/icearrow.x" name="icearrow" displayname="下落冰剑" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/arena.x" name="arena" displayname="金色法阵" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/arenablue.x" name="arenablue" displayname="蓝色法阵" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/firingcirclebigger.x" name="firingcirclebigger" displayname="爆炸圈" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/glowingcirclebigger.x" name="glowingcirclebigger" displayname="变换光圈" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/fireglowingcircle.x" name="fireglowingcircle" displayname="旋转光圈" physics="false" school="false"/>
     <!-- 2022.2.28 add new effect for paralife -->
-    <asset filename="character/CC/05effect/V5/fengtong/fengtong.x" name="fengtong" displayname="风筒风" physics="false"/>
-    <asset filename="character/CC/05effect/V5/KTwu/KT_WU.x" name="KT_WU" displayname="卡通烟雾" physics="false"/>
-    <asset filename="character/CC/05effect/V5/huazhuang/huazhuang.x" name="huazhuang" displayname="化妆粉" physics="false"/>
-    <asset filename="character/CC/05effect/V5/paopao/paopao.x" name="paopao" displayname="泡泡" physics="false"/>
-    <asset filename="character/CC/05effect/V5/shiwusuipian/suixie.x" name="suixie" displayname="食物碎屑" physics="false"/>
-    <asset filename="character/CC/05effect/V5/shuaya/shuaya.x" name="shuaya" displayname="刷牙" physics="false"/>
-    <asset filename="character/CC/05effect/V5/tiaoliao/tiaoliao.x" name="tiaoliao" displayname="撒胡椒粉" physics="false"/>
-    <asset filename="character/CC/05effect/V5/tiaoliao/tiaoliao1.x" name="tiaoliao1" displayname="撒盐" physics="false"/>
-    <asset filename="character/CC/05effect/V5/wu/WU.x" name="wu" displayname="煮饭雾气" physics="false"/>
-    <asset filename="character/CC/05effect/V5/wu/wuqi.x" name="wuqi" displayname="浴缸雾气" physics="false"/>
+    <asset filename="character/CC/05effect/V5/fengtong/fengtong.x" name="fengtong" displayname="风筒风" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/KTwu/KT_WU.x" name="KT_WU" displayname="卡通烟雾" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/huazhuang/huazhuang.x" name="huazhuang" displayname="化妆粉" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/paopao/paopao.x" name="paopao" displayname="泡泡" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/shiwusuipian/suixie.x" name="suixie" displayname="食物碎屑" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/shuaya/shuaya.x" name="shuaya" displayname="刷牙" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/tiaoliao/tiaoliao.x" name="tiaoliao" displayname="撒胡椒粉" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/tiaoliao/tiaoliao1.x" name="tiaoliao1" displayname="撒盐" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/wu/WU.x" name="wu" displayname="煮饭雾气" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/wu/wuqi.x" name="wuqi" displayname="浴缸雾气" physics="false" school="false"/>
     <asset filename="character/CC/05effect/V5/yanhua/yanhua.x" name="yanhua" displayname="烟花" physics="false"/>
-    <asset filename="character/CC/05effect/V5/huoyan/huoyan.x" name="huoyan" displayname="火焰" physics="false"/>
-    <asset filename="character/CC/05effect/V5/huoyan/huoyan2.x" name="huoyan2" displayname="喷火1" physics="false"/>
-    <asset filename="character/CC/05effect/V5/huoyan/huoyan3.x" name="huoyan3" displayname="喷火2" physics="false"/>
+    <asset filename="character/CC/05effect/V5/huoyan/huoyan.x" name="huoyan" displayname="火焰" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/huoyan/huoyan2.x" name="huoyan2" displayname="喷火1" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/huoyan/huoyan3.x" name="huoyan3" displayname="喷火2" physics="false" school="false"/>
     <!-- 2022.3.4 add new effects -->
-    <asset filename="character/CC/05effect/V5/fengtong/xiangshui.x" name="xiangshui" displayname="喷香水" physics="false"/>
-    <asset filename="character/CC/05effect/V5/wu/wuqi1.x" name="wuqi1" displayname="洗手盆雾气" physics="false"/>
-    <asset filename="character/CC/05effect/V5/weiyan/weiyan.x" name="weiyan" displayname="尾气" physics="false"/>
+    <asset filename="character/CC/05effect/V5/fengtong/xiangshui.x" name="xiangshui" displayname="喷香水" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/wu/wuqi1.x" name="wuqi1" displayname="洗手盆雾气" physics="false" school="false"/>
+    <asset filename="character/CC/05effect/V5/weiyan/weiyan.x" name="weiyan" displayname="尾气" physics="false" school="false"/>
     <!-- 2022.6.23 add new effects -->
     <asset filename="character/CC/05effect/V5/luoye01/luoye01.x" name="luoye01" displayname="落叶01" physics="false"/>
 
@@ -1273,10 +1036,10 @@
     <asset filename="character/particles/fire5/fire5.x" displayname="火" name="fire5"/>
     <asset filename="character/particles/fountain/fountain.x" displayname="喷泉" name="fountain"/>
     <asset filename="character/particles/fountain2/fountain2.x" displayname="喷泉2" name="fountain2"/>
-    <asset filename="character/particles/ring.x" displayname="铃声" name="ring"/>
-    <asset filename="character/particles/ring_head.x" displayname="铃声" name="ring_head"/>
-    <asset filename="character/particles/smoke/smoke.x" displayname="烟" name="smoke"/>
-    <asset filename="character/v5/06quest/Cartridge/Cartridge01_BaoZha.x" displayname="爆炸" name="Cartridge01_BaoZha"/>
+    <asset filename="character/particles/ring.x" displayname="铃声" name="ring" school="false"/>
+    <asset filename="character/particles/ring_head.x" displayname="铃声" name="ring_head" school="false"/>
+    <asset filename="character/particles/smoke/smoke.x" displayname="烟" name="smoke" school="false"/>
+    <asset filename="character/v5/06quest/Cartridge/Cartridge01_BaoZha.x" displayname="爆炸" name="Cartridge01_BaoZha" school="false"/>
     <asset filename="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragon_Efx.x" displayname="Efx飞龙之心" name="HeartOfFlyingDragon_Efx" school="false"/>
     <asset filename="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragonBlue.x" displayname="蓝色飞龙之心" name="HeartOfFlyingDragonBlue" school="false"/>
     <asset filename="character/v5/06quest/HeartOfFlyingDragon/HeartOfFlyingDragonGreen.x" displayname="绿色飞龙之心" name="HeartOfFlyingDragonGreen" school="false"/>
@@ -1331,15 +1094,15 @@
     <asset filename="character/v3/Item/ObjectComponents/GroundEffect/2365_LifeBackS4_VIP.anim.x" displayname="生命法阵" name="2365_LifeBackS4_VIP.anim" school="false"/>
     <asset filename="character/v3/Item/ObjectComponents/GroundEffect/2372_DeathBackS4_VIP.anim.x" displayname="黑色法阵" name="2372_DeathBackS4_VIP.anim" school="false"/>
     <asset filename="character/v3/Item/ObjectComponents/GroundEffect/Wisp.anim.x" displayname="小红束" name="Wisp.anim" school="false"/>
-    <asset filename="character/v5/09effect/AddBlue/AddBlue.x" displayname="加蓝" name="AddBlue"/>
+    <asset filename="character/v5/09effect/AddBlue/AddBlue.x" displayname="加蓝" name="AddBlue" school="false"/>
     <asset filename="character/v5/09effect/baoza/baoza.x" displayname="爆炸1" name="baoza" school="false"/>
     <asset filename="character/v5/09effect/baoza/baoza2.x" displayname="爆炸2" name="baoza2" school="false"/>
     <asset filename="character/v5/09effect/baoza/baoza3.x" displayname="爆炸3" name="baoza3" school="false"/>
     <asset filename="character/v5/09effect/baoza/baoza4.x" displayname="爆炸4" name="baoza4" school="false"/>
-    <asset filename="character/v5/09effect/Bee/Bee.x" displayname="蜜蜂" name="Bee"/>
-    <asset filename="character/v5/09effect/CatchingFishGameSplash/CatchingFishGameSplash.x" displayname="捕鱼游戏冒泡" name="CatchingFishGameSplash"/>
-    <asset filename="character/v5/09effect/ceshi/diaoyu/diaoyu.x" displayname="钓鱼" name="diaoyu"/>
-    <asset filename="character/v5/09effect/ceshi/dirt/3/Purify_Base.x" displayname="净化" name="Purify_Base"/>
+    <asset filename="character/v5/09effect/Bee/Bee.x" displayname="蜜蜂" name="Bee" school="false"/>
+    <asset filename="character/v5/09effect/CatchingFishGameSplash/CatchingFishGameSplash.x" displayname="捕鱼游戏冒泡" name="CatchingFishGameSplash" school="false"/>
+    <asset filename="character/v5/09effect/ceshi/diaoyu/diaoyu.x" displayname="钓鱼" name="diaoyu" school="false"/>
+    <asset filename="character/v5/09effect/ceshi/dirt/3/Purify_Base.x" displayname="净化" name="Purify_Base" school="false"/>
     <asset filename="character/v5/09effect/ceshi/dirt/dilie/dilie.x" displayname="地雷" name="dilie" school="false"/>
     <asset filename="character/v5/09effect/ceshi/dirt/jidianshu/jidianshu.x" displayname="集电术" name="jidianshu"/>
     <asset filename="character/v5/09effect/ceshi/dirt/luanshichuankong/luanshichuankong.x" displayname="乱石穿空" name="luanshichuankong" school="false"/>
@@ -1407,7 +1170,7 @@
     <!--2022.8.30 因去游戏化，下线的部分模型
     <asset filename="character/v5/09effect/renmingbi.x" displayname="人民币" name="renmingbi" school="false"/>
     -->
-    <asset filename="character/v5/09effect/TransmittalDoor/TransmittalDoor.x" displayname="传送门" name="TransmittalDoor" school="false"/>
+    <asset filename="character/v5/09effect/TransmittalDoor/TransmittalDoor.x" displayname="传送门" name="TransmittalDoor" />
     <asset filename="character/v5/09effect/Upgrade/Chassis_blue.x" displayname="紫色底盘" name="Chassis_blue" school="false"/>
     <asset filename="character/v5/09effect/Upgrade/Chassis_green.x" displayname="绿色底盘" name="Chassis_green" school="false"/>
     <asset filename="character/v5/09effect/Upgrade/Chassis_huoquan.x" displayname="火圈底盘" name="Chassis_huoquan" school="false"/>

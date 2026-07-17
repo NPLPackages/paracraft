@@ -38,6 +38,8 @@ local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 Files.worldSearchPath = nil;
 -- how many assets to unload during each step. 
 Files.garbageCollectStep = 20;
+-- this is a temporary map from local filepath to external url filename, that is cleared on world exit.
+Files.worldAssetManifest = nil;
 
 -- add default always-in-memory files here, keep this to minimum, these file will survive UnloadAllUnusedAssets when a new world is loaded. 
 local alwaysInMemoryFiles = {
@@ -71,7 +73,17 @@ local alwaysInMemoryFiles = {
 
 -- currently only one addtional world search path can be added. 
 function Files.AddWorldSearchPath(worldPath)
-	Files.worldSearchPath = worldPath;
+	if(worldPath) then
+		if(not worldPath:match("[/\\]$")) then
+			worldPath = worldPath.."/";
+		end
+	end
+	if(Files.worldSearchPath ~= worldPath) then
+		Files.worldSearchPath = worldPath;
+		if(worldPath) then
+			LOG.std(nil, "info", "Files", "additional world search path is set to %s", worldPath);
+		end
+	end
 end
 
 function Files.GetAdditionalWorldSearchPath()
@@ -115,10 +127,14 @@ function Files.GetWorldFilePath(any_filename, search_folder, bCache)
 			any_filename = any_filename:gsub("^/\\+", "");
 		end
 		search_folder = search_folder or Files.worldSearchPath
+
 		if(not ParaIO.DoesAssetFileExist(any_filename, true)) then
 			local filename = GameLogic.GetWorldDirectory()..any_filename;
 			if(ParaIO.DoesAssetFileExist(filename, true)) then
 				any_filename = filename;
+				-- check if it is a world asset file
+			elseif(Files.worldAssetManifest and Files.worldAssetManifest[any_filename]) then
+				any_filename = Files.worldAssetManifest[any_filename]
 			elseif(search_folder) then
 				local filename = search_folder..any_filename;
 				if(ParaIO.DoesAssetFileExist(filename, true)) then
@@ -152,7 +168,7 @@ function Files.GetWorldFilePath(any_filename, search_folder, bCache)
 						
 					end
 				else
-					-- LOG.std(nil, "debug", "Files", "can not file world file %s", filename)
+					-- LOG.std(nil, "debug", "Files", "can not find world file %s", filename)
 					any_filename = nil;
 				end
 			end
@@ -206,6 +222,7 @@ function Files:ClearFindFileCache()
 	self.cache = {};
 	self.loadedAssetFiles = {};
 	Files.ClearWorldSearchPaths()
+	Files.worldAssetManifest = nil;
 end
 
 -- this is usually used when user entered or left a complex closed room full of assets.
@@ -500,6 +517,20 @@ function Files.GetRelativePath(filename)
 	end
 end	
 
+function Files.GetRelativePathWithGuesses(filename)
+	local sdk_root = ParaIO.GetWritablePath()
+	local file_dir = filename:sub(1, #sdk_root);
+	if(sdk_root == file_dir) then
+		return filename:sub(#sdk_root+1) or "";
+	else
+		local worldsIndex = filename:find("/worlds/DesignHouse/")
+		if worldsIndex then
+			return filename:sub(worldsIndex + 1)
+		end
+		return filename
+	end
+end
+
 -- we will try to find a file in world directory or global directory at all cost and save the result to cache 
 -- so that the next time the same file is requried, we will return fast for both exist or non-exist ones. 
 -- see also Files.FindFile() it differs with it for non-exist files, this function will also cache non-exist files. 
@@ -545,7 +576,6 @@ function Files.GetFilePathTryMultipleEncodings(filename)
 	end
 end
 
-
 -- find a given file by its file path. This funcition return original url if file is a http texture. 
 -- see also: Files.GetCachedFilePath()
 -- it will search filename, [worldpath]/filename,  replace [worlds/DesignHouse/last] with current one. 
@@ -562,12 +592,22 @@ function Files.FindFile(filename, searchpaths)
 		if(filepath) then
 			Files:AddFileToCache(filename, filepath);
 		else
-			local old_worldpath, relative_path = filename:match("^(worlds/DesignHouse/[^/]+/)(.*)$");
-			if(relative_path and old_worldpath ~= GameLogic.GetWorldDirectory()) then
-				local new_filename = GameLogic.GetWorldDirectory()..relative_path;
-				filepath = Files.GetWorldFilePath(new_filename);
-				if(filepath) then
+			-- try global model/paracraft/blocktemplates/ path if filename starts with "blocktemplates/"
+			if(filename:match("^blocktemplates/")) then
+				local global_path = "model/paracraft/"..filename;
+				if(ParaIO.DoesAssetFileExist(global_path, true)) then
+					filepath = global_path;
 					Files:AddFileToCache(filename, filepath);
+				end
+			end
+			if(not filepath) then
+				local old_worldpath, relative_path = filename:match("^(worlds/DesignHouse/[^/]+/)(.*)$");
+				if(relative_path and old_worldpath ~= GameLogic.GetWorldDirectory()) then
+					local new_filename = GameLogic.GetWorldDirectory()..relative_path;
+					filepath = Files.GetWorldFilePath(new_filename);
+					if(filepath) then
+						Files:AddFileToCache(filename, filepath);
+					end
 				end
 			end
 		end
@@ -576,8 +616,9 @@ function Files.FindFile(filename, searchpaths)
 		return filepath;
 	else
 		if(filename:match("^https?://")) then
-			-- do nothing for http textures. 
+			-- do nothing for http textures or models. 
 			Files:AddFileToCache(filename, filename);
+			return filename;
 		else
 			-- cache non-exist
 			Files:AddFileToCache(filename, false);
@@ -628,7 +669,12 @@ function Files.ResolveFilePath(filename)
 		info.isInWorldDirectory = true;
 	end
 
-	
+	if(not info.isInWorldDirectory) then
+		if(Files.worldAssetManifest and Files.worldAssetManifest[filename]) then
+			info.relativeToWorldPath = filename
+			info.isInWorldDirectory = true;
+		end
+	end
 
 	info.filename = filename:match("([^/]+)$");
 	return info;
@@ -765,4 +811,38 @@ function Files:FindSystemFiles(output, folder, nMaxFileLevels, nMaxFilesNum, fil
 		end
 	end
 	return files;
+end
+
+-- load external asset files from a text file, where each line is a mapping from relative world path to 
+-- external url (usually on a public CDN network), separated by a comma. 
+-- following is an example: 
+--   img/filename.jpg,https://cdn.keepwork.com/username/img/filename.jpg?ver=1
+--   img/filename.bmax,https://cdn.keepwork.com/username/img/filename.bmax?ver=1
+-- These external asset files are automatically ignored during git repo sync, even they are under world directory. 
+-- but, when generating standalone *.p3d or *.zip world archive or saving the world in edit mode, we will automatically
+-- download and include all external files to current world directory for offline usage.
+-- @param filename: if nil, default to `assetmanifest.txt` in current world directory. 
+function Files:LoadWorldAssetManifestFile(filename)
+	filename = GameLogic.GetWorldDirectory()..(filename or "assetmanifest.txt");
+	local file = ParaIO.open(filename, "r");
+	if(file:IsValid()) then
+		local count = 0;
+		Files.worldAssetManifest = Files.worldAssetManifest or {}
+		local line = file:readline();
+		while(line) do
+			local localFilename, externalFilename = line:match("^([^,]+),([^,]+)$");
+			if(localFilename and externalFilename) then
+				Files.worldAssetManifest[localFilename] = externalFilename;
+				count = count + 1;
+			end
+			line = file:readline();
+		end
+		file:close();
+		LOG.std(nil, "info", "WorldAssetManifest", "loaded %d world external asset file from %s", count, filename);
+	end
+end
+
+function Files:AddWorldAssetItem(localFilename, externalFilename)
+	Files.worldAssetManifest = Files.worldAssetManifest or {}
+	Files.worldAssetManifest[localFilename] = externalFilename;
 end

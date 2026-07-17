@@ -43,6 +43,22 @@ function BoneVariable:init(attr, animInstance, parent)
 	return self;
 end
 
+-- get named property in self.name
+-- @param key: common values are "name", "min", "max", "rotAxis". but it can also be any name value pair in the self.name string.
+function BoneVariable:GetNameProperty(key)
+	if(not self.nameProperties) then
+		local display_name, properties = self.name:match("^(.*)%s*(%{[^%}]+%})");
+		if(properties) then
+			self.nameProperties = NPL.LoadTableFromString(properties) or {};
+			self.nameProperties.name = display_name;
+		else
+			self.nameProperties = {};
+			self.nameProperties.name = self.name;
+		end
+	end
+	return self.nameProperties[key];
+end
+
 -- get current bone pivot. 
 -- please note this could return NAN
 function BoneVariable:GetPivot(bRefresh)
@@ -51,6 +67,13 @@ function BoneVariable:GetPivot(bRefresh)
 		self.pivot = self.attr:GetField("AnimatedPivotPoint", self.pivot);
 	end
 	return self.pivot;
+end
+
+-- get the static pivot point if any
+function BoneVariable:GetStaticPivot()
+	self.static_pivot = self.static_pivot or vector3d:new({0,0,0})
+	self.static_pivot = self.attr:GetField("PivotPoint", self.static_pivot);
+	return self.static_pivot;
 end
 
 -- force local time of bone variable
@@ -124,4 +147,40 @@ function BoneVariable:GetVarByName(name)
 	elseif(self:GetScaleName() == name) then
 		return self.variables[3]
 	end
+end
+
+function BoneVariable:GetRotationVar()
+	return self.variables[1]
+end
+
+function BoneVariable:SetRotation(quat)
+	self.variables[1]:SetData(quat)
+end
+
+function BoneVariable:GetRotationData()
+	return self.variables[1]:GetData()
+end
+
+function BoneVariable:GetTranslationVar()
+	return self.variables[2]
+end
+
+function BoneVariable:SetTranslation(trans)
+	self.variables[2]:SetData(trans)
+end
+
+function BoneVariable:GetTranslationData()
+	return self.variables[2]:GetData()
+end
+
+function BoneVariable:GetScalingVar()
+	return self.variables[3]
+end
+
+function BoneVariable:SetScaling(scaling)
+	self.variables[3]:SetData(scaling)
+end
+
+function BoneVariable:GetScalingData()
+	return self.variables[3]:GetData()
 end

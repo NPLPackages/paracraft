@@ -40,9 +40,9 @@ end
 
 --@return obj_type, object: where object can be table or string
 -- return nil, if clipboard does not contain data
-function Clipboard.Load()
+function Clipboard.Load(text)
 	local obj_type, object;
-	local clip = ParaMisc.GetTextFromClipboard();
+	local clip = text or ParaMisc.GetTextFromClipboard();
 	if(clip and clip:match("^<paracraft_clipboard")) then
 		local xmlRoot = ParaXML.LuaXML_ParseString(clip)
 		if(xmlRoot and not xmlRoot.name) then

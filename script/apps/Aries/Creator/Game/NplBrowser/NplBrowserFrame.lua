@@ -326,7 +326,7 @@ function NplBrowserFrame:Goto(url)
     end
 end
 function NplBrowserFrame:GotoEmpty()
-    self:Goto("about:blank");
+    self:Goto(NplBrowserPlugin.about_blank_url);
     commonlib.TimerManager.SetTimeout(function()  
 		ParaUI.GetUIObject("root"):Focus();
 	end, 1000)

@@ -206,8 +206,8 @@ function EditLightTask:handleLeftClickScene(event, result)
 			-- alt + left click to get the block in hand without destroying it
 			if(result.block_id and result.block_id~=0 and result.blockX) then
 				GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ, result.side);
-			elseif(result.entity) then
-				GameLogic.GetPlayerController():PickItemByEntity(entity);
+			elseif(result.entity and not result.entity:IsLocked()) then
+				GameLogic.GetPlayerController():PickItemByEntity(result.entity);
 			end
 		elseif(event.ctrl_pressed) then
 			EditLightTask.CancelSelection()

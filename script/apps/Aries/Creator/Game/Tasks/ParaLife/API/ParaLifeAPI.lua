@@ -43,35 +43,56 @@ local function InitDataSources()
 		["API.MountPackToGift"] = {name="function", attr = {value = "API.MountPackToGift", text=L"打包放于其上物体成为礼包(需有插件点,位置%1)",param1="mountPivot", text1=L"插件点位置:top|mid|bottom", default1="top",}}, 
 
 		-- clickable
-		["API.LookAt"] = {isDirectCall=true, name="function", attr = {value = "API.LookAt", text=L"摄影机观看本模型", }}, 
-		["API.ToggleOpen"] = {name="function", attr = {value = "API.ToggleOpen", text=L"切换模型'xxxopen.bmax','xxx.bmax'", }}, 
+		["API.LookAt"] = {isDirectCall=true, name="function", attr = {value = "API.LookAt", text=L"摄影机观看本模型"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1="",}}, 
 		["API.ToggleAnim"] = {name="function", attr = {value = "API.ToggleAnim", text=L"切换动作编号 0, %1", param1="anim", text1=L"动画id", default1=70, }}, 
+		["API.ToggleOpen"] = {name="function", attr = {value = "API.ToggleOpen", text=L"切换模型'xxxopen.bmax','xxx.bmax'"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1="",}}, 
+		["API.Push"] = {name="function", attr = {value = "API.Push", text=L"推进 %1 米", param1="length", text1=L"长度(米)", default1=1, }},
+		["API.Pull"] = {name="function", attr = {value = "API.Pull", text=L"拉出 %1 米", param1="length", text1=L"长度(米)", default1=1, }},
 		["API.PushPull"] = {name="function", attr = {value = "API.PushPull", text=L"推进/拉出 %1 米", param1="length", text1=L"长度(米)", default1=1, }},
+		["API.Lift"] = {name="function", attr = {value = "API.Lift", text=L"抬起 %1 米", param1="length", text1=L"长度(米)", default1=1, }},
+		["API.Drop"] = {name="function", attr = {value = "API.Drop", text=L"落下 %1 米", param1="length", text1=L"长度(米)", default1=1, }},
 		["API.LiftDrop"] = {name="function", attr = {value = "API.LiftDrop", text=L"抬起/落下 %1 米", param1="length", text1=L"长度(米)", default1=1, }},
-		["API.Door"] = {name="function", attr = {value = "API.Door", text=L"开/关门: %2轴 %1 度", param1="angle", text1=L"角度:[-360,360]", default1=90, param2="axis", text2=L"旋转轴:x|y|z", default2="y", }}, 
-		
-		["API.ClickLight"] = {name="function", attr = {value = "API.ClickLight", text=L"开灯/关灯（使用隐形光源）", }}, 
+		["API.DoorOpen"] = {name="function", attr = {value = "API.DoorOpen", text=L"开门: %2轴 %1 度", param1="angle", text1=L"角度:[-360,360]", default1=90, param2="axis", text2=L"旋转轴:x|y|z", default2="y", }},
+		["API.DoorClose"] = {name="function", attr = {value = "API.DoorClose", text=L"关门: %2轴 %1 度", param1="angle", text1=L"角度:[-360,360]", default1=90, param2="axis", text2=L"旋转轴:x|y|z", default2="y", }},
+		["API.Door"] = {name="function", attr = {value = "API.Door", text=L"开/关门: %2轴 %1 度,开门播放电影(名字|坐标 = %3)", param1="angle", text1=L"角度:[-360,360]", default1=90, param2="axis", text2=L"旋转轴:x|y|z", default2="y", text3=L"电影文件名或坐标", param3="movie", default3="", }}, 
+		["API.ClickShowImg"] = {name="function", attr = {value = "API.ClickShowImg", text=L"打开图片：%1"..L"(动作名=%2)"..L"，图片大小%3*%4", param1="img_url", text1=L"图片'xxx.png','xxx.jpg'", default1="", param2="actionname", text2=L"动作名称", default2="", text3=L"宽", param3="width", default3=256, text4=L"高", default4=256, param4="height"}}, 
+		["API.ClickSuspended"] = {name="function", attr = {value = "API.ClickSuspended", text=L"点击悬浮其上物品"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1="", }}, 
+
+		["API.ClickLight"] = {name="function", attr = {value = "API.ClickLight", text=L"开灯/关灯（使用隐形光源）"..L"(动作名=%1)"..L"，使用特效：%2", param1="actionname", text1=L"动作名称", default1="", param2="useEffect", text2=L"特效模型'xxx.bmax','xxx.x'", default2=""}}, 
+		["API.LightOn"] = {name="function", attr = {value = "API.LightOn", text=L"开灯（使用隐形光源）"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1="", }}, 
+		["API.LightOff"] = {name="function", attr = {value = "API.LightOff", text=L"关灯（使用隐形光源）"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1="", }}, 
 		["API.ToggleMusic"] = {name="function", attr = {value = "API.ToggleMusic", text=L"切换播放音乐文件 %1", param1="sound", text1=L"音乐文件mp3|ogg", default1=""}}, 
-		["API.ClickGiftBox"] = {name="function", attr = {value = "API.ClickGiftBox", text=L"点击拆礼盒", }}, 
-		["API.Flip"] = {isDirectCall=true, name="function", attr = {value = "API.Flip", text=L"水平翻转", }}, 
+		["API.MusicOn"] = {name="function", attr = {value = "API.MusicOn", text=L"播放音乐文件 %1", param1="sound", text1=L"音乐文件mp3|ogg", default1=""}}, 
+		["API.MusicOff"] = {name="function", attr = {value = "API.MusicOff", text=L"停止播放音乐"}}, 
+		["API.ClickGiftBox"] = {name="function", attr = {value = "API.ClickGiftBox", text=L"点击拆礼盒"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1="",}}, 
+		["API.Flip"] = {isDirectCall=true, name="function", attr = {value = "API.Flip", text=L"水平翻转"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1="",}}, 
 		["API.Turn"] = {isDirectCall=true, name="function", attr = {value = "API.Turn", text=L"旋转 %1 度", param1="angle", text1=L"角度:[-180,180]", default1=90}}, 
+		["API.CookingPot"] = {name="function", attr = {value = "API.CookingPot", text=L"召唤烹饪锅"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1="",}},
 		
 		["API.RandomWalkToSameBlockType"] = {name="function", attr = {value = "API.RandomWalkToSameBlockType", text=L"随机移动到附近同类型方格中能够"}}, 
 		["API.FloatToWaterSurface"] = {name="function", attr = {value = "API.FloatToWaterSurface", text=L"漂浮到水面，水下高度%1米", param1="inWaterDepth", text1=L"吃水深度(米)", default1=0.4}}, 
-
+		["API.OpenCodeblock"] = {name="function", attr = {value = "API.OpenCodeblock", text=L"打开代码方块%1", param1="codeblockName", text1=L"代码方块的名字(空表示与角色同名)", default1=""}}, 
+		["API.OpenEditableWorld"] = {name="function", attr = {value = "API.OpenEditableWorld", text=L"打开存档点"..L"(动作名=%1)", param1="actionname", text1=L"动作名称"}},
+		["API.EnterEditableWorld"] = {name="function", attr = {value = "API.EnterEditableWorld", text=L"进入存档点"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1=""}},
+		["API.LeaveEditableWorld"] = {name="function", attr = {value = "API.LeaveEditableWorld", text=L"离开存档点"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1=""}},
+		["API.PlayNearbyMovieBlockAsAgent"] = {name="function", attr = {value = "API.PlayNearbyMovieBlockAsAgent", text=L"主角附身附近的电影方块 %1中的演员 %2,相对播放:%3", param1="movieBlockName", text1=L"电影方块名称", default1="", param2="actorIndex", text2=L"演员序号", default2=1, param3="playRelative", text3=L"相对播放true|false", default3="true"}},
+		["API.CharInteract"] = {name="function", attr = {value = "API.CharInteract", text=L"互动"..L"(动作名=%1)", param1="actionname", text1=L"动作名称", default1=""}},
+		
 		-- Hover & Drag End
 		["API.HoverToPieces"] = {name="function", attr = {value = "API.HoverToPieces", text=L"悬浮其上播放粉碎效果", }}, 
 		["API.dragEndMaxDist"] = {name="function", attr = {value = "API.dragEndMaxDist", text=L"拖动距离超过 %1米则复位", param1="maxDragDist", text1=L"最大的可拖动距离", default1=3, }}, 
+		["API.DragEndToResetModel"] = {name="function", attr = {value = "API.DragEndToResetModel", text=L"重置模型的旋转", }}, 
 
 		-- framemove heart beat ticks
 		["API.RandomWalk"] = {name="function", attr = {value = "API.RandomWalk", text=L"随机走动: 半径%1米,速度%2米/秒,间隔%3秒", param1="maxWalkRadius", text1=L"最大行走半径(米)", default1=3, param2="walkSpeed", text2=L"行走速度(米/秒)", default2=4, param3="walkInterval", text3=L"行走时间间隔(秒)", default3=5,}}, 
-		["API.Follow"] = {name="function", attr = {value = "API.Follow", text=L"跟随角色%1: 最小半径%2米, 最大半径%3米", param1="followTarget", text1=L"角色名称, @p表示主角", default1="@p", param2="minDist", text2=L"最小半径(米)", default2=1, param3="maxDist", text3=L"最大半径(米)", default3=3,}}, 
+		["API.Follow"] = {name="function", attr = {value = "API.Follow", text=L"跟随角色%1: 最小半径%2米, 最大半径%3米", param1="followTarget", text1=L"角色名称, @p表示主角", default1="@p", param2="minDist", text2=L"最小半径(米)", default2=1, param3="maxDist", text3=L"最大半径(米)", default3=3,}},
 	}
 	APIMap = _;
 
 	DataSources.onClickEvent = {
 		attr = {text=L"当用户点击本模型时:"},
 		_["API.ShowHeadon"],
+		_["API.CharInteract"],
 		_["API.LookAt"],
 		_["API.ToggleOpen"],
 		_["API.ToggleAnim"],
@@ -79,11 +100,17 @@ local function InitDataSources()
 		_["API.LiftDrop"],
 		_["API.Door"],
 		_["API.ClickLight"],
+		_["API.ClickShowImg"],
+		_["API.ClickSuspended"],
 		_["API.ToggleMusic"],
+		_["API.CookingPot"],
 		_["API.Flip"],
 		_["API.Turn"],
 		_["API.RandomWalkToSameBlockType"],
 		_["API.FloatToWaterSurface"],
+		_["API.OpenCodeblock"],
+		_["API.OpenEditableWorld"],
+		_["API.PlayNearbyMovieBlockAsAgent"],
 	};
 	DataSources.onBeginDragEvent = {
 		attr = {text=L"当用户开始拖动本模型时:"},
@@ -99,6 +126,7 @@ local function InitDataSources()
 		_["API.Flip"],
 		_["API.Turn"],
 		_["API.dragEndMaxDist"],
+		_["API.DragEndToResetModel"],
 		_["API.FloatToWaterSurface"],
 	}
 	DataSources.onMountEvent = {
@@ -121,8 +149,30 @@ local function InitDataSources()
 		_["API.Turn"],
 		_["API.RandomWalk"],
 		_["API.Follow"],
+	}	
+	DataSources.onTriggerEnterEvent = {
+		attr = {text=L"当有物体进入触发区域时:"},
+		_["API.ShowHeadon"],
+		_["API.ToggleOpen"],
+		_["API.LightOn"],
+		_["API.MusicOn"],
+		_["API.Push"],
+		_["API.Lift"],
+		_["API.DoorOpen"],
+		_["API.EnterEditableWorld"],
+		_["API.PlayNearbyMovieBlockAsAgent"],
 	}
-	
+	DataSources.onTriggerExitEvent = {
+		attr = {text=L"当有物体离开触发区域时:"},
+		_["API.HideHeadon"],
+		_["API.LightOff"],
+		_["API.MusicOff"],
+		_["API.Pull"],
+		_["API.Drop"],
+		_["API.DoorClose"],
+		_["API.LeaveEditableWorld"],
+		_["API.PlayNearbyMovieBlockAsAgent"],
+	}
 end
 
 -- @param name: such as "API.ShowTag", must begin with "API"

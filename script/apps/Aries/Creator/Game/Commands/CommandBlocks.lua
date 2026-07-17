@@ -176,6 +176,33 @@ e.g.
 	end,
 };
 
+Commands["makesolid"] = {
+	name="makesolid", 
+	quick_ref="/makesolid [block_id:block_data]", 
+	desc=[[make blocks in the selected aabb area solid (without hollow blocks)
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
+		local fill_block_id, fill_block_data = cmd_text:match("%s*(%d+):?(%d*)$");
+		if(fill_block_data == "") then
+			fill_block_data = nil;
+		else
+			fill_block_data = tonumber(fill_block_data);
+		end
+		if(fill_block_id) then
+			fill_block_id = tonumber(fill_block_id);
+		end
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+		local count = MyCompany.Aries.Game.Tasks.SelectBlocks.MakeSolid(fill_block_id, fill_block_data);
+		if(count) then
+			GameLogic.AddBBS("make_solid", format(L"共有%d个空心方块被填充", count), 3000, "0 255 0");
+		end
+	end,
+};
+
 Commands["replace"] = {
 	name="replace", 
 	quick_ref="/replace [-all] [from_id:from_data] [to_id:to_data] [radius]", 

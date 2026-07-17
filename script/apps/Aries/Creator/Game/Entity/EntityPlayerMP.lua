@@ -12,6 +12,8 @@ local EntityPlayerMP = commonlib.gettable("MyCompany.Aries.Game.EntityManager.En
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityPlayer.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local TableCodec = commonlib.gettable("commonlib.TableCodec");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -56,7 +58,11 @@ function Entity:init(username, world)
 	local x, y, z = world:GetSpawnPoint();
 	self:SetLocationAndAngles(x, y, z, 0, 0);
 	self:SetDisplayName(self.username);
-	-- self.skin = EntityManager.PlayerSkins:GetSkinByID(2);
+	local skin,default_assets = CustomCharItems:GetSkinByAsset(self:GetMainAssetPath());
+	if (skin) then
+		self.mainAssetPath = default_assets or CustomCharItems.defaultModelFile;
+		self.skin = skin;
+	end
 	self:CreateInnerObject();
 	self:RefreshClientModel();
 	return self;
@@ -284,9 +290,16 @@ function Entity:UpdateEntityActionState()
 	local curAnimId = self:GetAnimId();
 	if(self.lastAnimId ~= curAnimId and curAnimId) then
 		self.lastAnimId = curAnimId;
-		local obj = self:GetInnerObject();
-		if(obj) then
-			obj:SetField("AnimID", curAnimId);
+		if(curAnimId < 100000) then
+			local obj = self:GetInnerObject();
+			if(obj) then
+				obj:SetField("AnimID", curAnimId);
+			end
+			if(self:IsPlayingMovieFile()) then
+				self:PlayMovieFile(nil);
+			end
+		else
+			self:PlayCustomAnimation(tostring(curAnimId));
 		end
 	end
 	local curSkinId = self:GetSkinId();
@@ -294,18 +307,21 @@ function Entity:UpdateEntityActionState()
 		self.lastSkinId = curSkinId;
 		self:SetSkin(curSkinId, true);
 	end
-	local dataWatcher = self:GetDataWatcher();
-	local curBlockIdInHand = dataWatcher:GetField(self.dataBlockInHand);
-	if(curBlockIdInHand~=self:GetBlockInRightHand()) then
-		self:SetBlockInRightHand(curBlockIdInHand);
-	end
-	local curMainAsset = dataWatcher:GetField(self.dataMainAsset);
-	if(curMainAsset~=self:GetMainAssetPath()) then
-		self:SetMainAssetPath(curMainAsset);
-	end
-	local curScale = dataWatcher:GetField(self.dataFieldScale);
-	if(curScale and curScale ~= self:GetScaling()) then
-		self:SetScaling(curScale)
+	
+	if(not curAnimId or curAnimId < 100000) then
+		local dataWatcher = self:GetDataWatcher();
+		local curBlockIdInHand = dataWatcher:GetField(self.dataBlockInHand);
+		if(curBlockIdInHand~=self:GetBlockInRightHand()) then
+			self:SetBlockInRightHand(curBlockIdInHand);
+		end
+		local curMainAsset = dataWatcher:GetField(self.dataMainAsset);
+		if(curMainAsset~=self:GetMainAssetPath()) then
+			self:SetMainAssetPath(curMainAsset);
+		end
+		local curScale = dataWatcher:GetField(self.dataFieldScale);
+		if(curScale and curScale ~= self:GetScaling()) then
+			self:SetScaling(curScale)
+		end
 	end
 
 	GameLogic.GetFilters():apply_filters("entity_player_mp_entity_action_state_updated", self);

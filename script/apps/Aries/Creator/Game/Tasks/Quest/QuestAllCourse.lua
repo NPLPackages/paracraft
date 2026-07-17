@@ -604,10 +604,10 @@ function QuestAllCourse.RunCommand(index, is_pre)
                 -- client_data.course_world_id = data.projectId
 
                 local select_teacher_data = QuestAllCourse.TeacherListData[QuestAllCourse.SelectTeacherIndex]
-                client_data.course_teacher_id = select_teacher_data.id
+                client_data.course_teacher_id = select_teacher_data and select_teacher_data.id
     
                 local select_level_data = QuestAllCourse.LevelListData[QuestAllCourse.SelectLevelIndex]
-                client_data.course_level_id = select_level_data.id
+                client_data.course_level_id = select_level_data and select_level_data.id
 
                 client_data.course_id = data.id
                 client_data.home_work_id = work_data.id or -1

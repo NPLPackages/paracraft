@@ -12,7 +12,13 @@
                     if name ~= "codeMode" then
                         CodeBlockWindow.OnClickEditMode(name)
                     else
-                        _guihelper.MessageBox("代码模式需要手动输入代码，请使用电脑下载帕拉卡客户端，在电脑端使用鼠标键盘编辑输入代码体验更佳。", function()
+                        local tipStr = L"代码模式需要手动输入代码，请使用电脑下载帕拉卡客户端，在电脑端使用鼠标键盘编辑输入代码体验更佳。"
+                        if CodeBlockWindow.IsNPLBrowserVisible() then
+                            GameLogic.AddBBS(nil,tipStr)
+                            CodeBlockWindow.OnClickEditMode(name)
+                            return
+                        end
+                        _guihelper.MessageBox(tipStr, function()
                             CodeBlockWindow.OnClickEditMode(name)
                         end,_guihelper.MessageBoxButtons.OK);
                     end
@@ -28,6 +34,7 @@
                 btn.background = bIsBig and "Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/btn_min_40x40_32bits.png#0 0 40 40" or "Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/btn_max_40x40_32bits.png#0 0 40 40"
             end
 
+            -- not used any more
             function OnClickCompileAndRun()    
                 local MobileCodeLogPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/CodeBlockWindow/MobileCodeLogPage.lua");
                 MobileCodeLogPage.Show();
@@ -67,7 +74,7 @@
                               width: 40px;
                               height: 40px;
                               background: url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/bofang_40x40_32bits.png#0 0 40 40);"
-                       onclick="OnClickCompileAndRun" />
+                       onclick="CodeBlockWindow.OnClickCompileAndRun" />
                 <input type="button"
                        uiname="CodeBlockWindow.pause"
                        name="pause"
@@ -210,6 +217,7 @@
                    enable_ime="false"
                    EmptyText='<%= L"点击这里输入..." %>'
                    MoveViewWhenAttachWithIME="true"
+                   MoveViewOffset="95"
                    CaretColor="#000000"
                    style="textcolor: #000000;
                    font-family: Consolas"

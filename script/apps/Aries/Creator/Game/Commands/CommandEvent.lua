@@ -16,8 +16,9 @@ local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 Commands["sendevent"] = {
 	name="sendevent", 
 	quick_ref="/sendevent [@entityname] event_name [cmd_text]", 
-	desc=[[ send a custom event to given entity
-@param entityname: if not specified, it means a global event, which is handled by home point entity. 
+	desc=[[ send a custom event to given entity. 
+@param entityname: if not specified, it means a global event, which is fired immediately and 
+handled by codeblocks and home point entity. 
 it will try scene entity first, and then code block actor name.
 @param cmd_text: additional parameter saved to event.cmd_text. 
 Examples:
@@ -61,7 +62,7 @@ Examples:
 					event.dest = playerName;
 				end
 
-				return GameLogic:event(event);
+				return GameLogic:event(event, true);
 			end
 		end
 	end,

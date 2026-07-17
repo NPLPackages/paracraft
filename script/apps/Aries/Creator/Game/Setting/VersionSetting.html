@@ -1,0 +1,61 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type='text/npl' refresh='false'>
+                <![CDATA[
+                    VersionSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/VersionSetting.lua')
+                    VersionSetting.OnInit()
+                    function close()
+                        VersionSetting.ClosePage()
+                    end  
+                    
+                    function setversion()
+                        VersionSetting.SetEngineVersion()
+                    end
+
+                    function OnClickVersionConfirm()
+                        VersionSetting.OnConfirmClick()
+                    end
+
+                    function cancel()
+                        VersionSetting.ClosePage()
+                    end
+                ]]>
+            </script>
+            <style type='type/mcss'>
+            </style>
+            <aries:window mode='thin' title='<%= VersionSetting.GetPageTitle() %>' width='505' height='300' onclose='close()'>
+                <div style="width: 500px; height: 300px; color: #ffffff;">
+                    <div style="width: 500px; height: 100px; margin-top: 10px; ">
+                        <div style="margin-top: 10px; margin-left: 60px;">
+                            <div>
+                                <%=string.format(L"当前引擎Runtime真实版本号：%s",VersionSetting.GetRealParaEngineVersion())%>
+                            </div>
+                            <div>
+                                <%=string.format(L"当前引擎Runtime版本号：%s",System.os.GetParaEngineVersion())%>
+                            </div>
+                            <div>
+                                <%=string.format(L"当前引擎资源版本号：%s",VersionSetting.GetResourceVersion())%>
+                            </div>
+                            <div>
+                                <%=string.format(L"当前引擎Pkg版本号：%s",VersionSetting.GetLoginVersion())%>
+                            </div>
+                            <div>
+                                <%=string.format(L"当前应用appId：%s",System.options.appId)%>
+                            </div>
+                        </div>
+                        <div style="margin-top: 40px; margin-left: 60px;">
+                            <%=L"设置引擎Runtime版本号:"%>
+                            <input type='text' name="engine_version" EmptyText="请输入你要修改的引擎版本号" MoveViewWhenAttachWithIME='true' enable_ime="true"  style='color: #ffffff;width:200px; height: 20px; margin-left: 20px;' />
+                        </div>
+                        <div style="margin-top: 40px; margin-left: 40px;">
+                            <input type='button' value='设置版本' onclick='setversion' class='mc_light_grey_button_with_fillet' style='color: #ffffff;min-width:100px; margin-left: 20px;' />
+                            <input type='button' value='确定' onclick='OnClickVersionConfirm' class='mc_light_grey_button_with_fillet' style='color: #ffffff; min-width:100px;margin-left: 20px;' />
+                            <input type='button' value='取消' onclick='cancel' class='mc_light_grey_button_with_fillet' style='color: #ffffff; min-width:100px;margin-left: 20px;' />
+                        </div>
+                    </div>
+                </div>
+            </aries:window>
+        </pe:mcml>
+    </body>
+</html>

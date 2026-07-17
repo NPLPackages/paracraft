@@ -1,0 +1,137 @@
+<!--script/apps/Aries/Creator/Game/Code/CodeBlockSettings.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeBlockSettings.lua">
+<![CDATA[
+CodeBlockSettings = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockSettings");
+CodeBlockSettings.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+]]></script>
+
+<aries:window mode="thin" title='<%=L"代码方块设置"%>' uiname_onclose="CodeBlockSettings.ClosePage" onclose="ClosePage">
+<div width="100%" style="padding:5px;color:#cccccc;margin-right:10x;">
+    <div style="margin-top: 5px; margin-left: 10px;">
+        <div style="margin-left: -8px;margin-bottom:10px;"> <%=L"编辑器"%></div>
+        <div style="margin-bottom:10px;float:left">
+            <div style="min-width: 90px;float:left"><%=L"编程语言:"%></div>
+            <div style="float:left">
+                <select uiname="CodeBlockSettings.language" name="language" style="width: 160px;max-width:160px;height:25px;margin-top:-1px;" onselect="CodeBlockSettings.OnSelectLang" AllowUserEdit="false">
+                    <option value="" selected="selected">NPL</option>
+                    <option value="npl_junior" selected="selected">NPL Junior</option>
+                    <option value="npl_cad">CAD</option>
+                    <option value="mcml">MCML UI</option>
+                    <option value="commands">commands</option>
+                    <option value="clang">clang(C/C++)</option>
+                    <option value="micropython">micropython</option>
+                    <option value="arduino">arduino</option>
+                    <option value="cpp">cpp</option>
+                    <option value="npl_python">python(NPL)</option>
+                    <option value="npl_blockpen">pen</option>
+                    <option value="npl_teacher">Teacher</option>
+                    <option value="microbit">Microbit</option>
+                    <option value="npl_camera">Camera</option>
+                    <option value="game_inventor">game inventor</option>
+                </select>
+                <input type="button" style="margin-left:25px" class="button" uiname="CodeBlockSettings.btnChangeLang" name="btnChangeLang" value='<%=L"自定义语言..."%>' onclick="CodeBlockSettings.OnClickCustomLanguage"/>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="float:left;min-width: 90px;"><%=L"字号:"%></div>
+            <select uiname="CodeBlockSettings.FontSize" name="FontSize" style="height:25px;margin-top:-1px;" onselect="CodeBlockSettings.OnChangeFontSize" AllowUserEdit="false">
+                <option value="13" selected="selected">13px</option>
+                <option value="16">16px</option>
+                <option value="18">18px</option>
+                <option value="24">24px</option>
+                <option value="36">36px</option>
+                <option value="48">48px</option>
+            </select>
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="float:left;min-width: 90px;"><%=L"图块模式:"%></div>
+            <div style="float:left">
+                <select uiname="CodeBlockSettings.blocklyMode" name="blocklyMode" style="height:25px;margin-top:-1px;" onselect="CodeBlockSettings.OnSelectBlocklyMode" AllowUserEdit="false">
+                    <option value="npl" selected="selected">NPL版图块</option>
+                    <option value="web" >Web版图块</option>
+                </select>
+            </div>
+            <pe:if condition="<%=CodeBlockSettings.IsUseNplBlockly()%>">
+                <input type="button" style="float: left; min-width:80px; margin-left: 10px;" class="button" uiname="CodeBlockSettings.BlockToolboxBtn" name="BlockToolboxBtn" value='<%=L"定制工具栏图块"%>' onclick="CodeBlockSettings.ClickBlockToolboxBtn"/>
+                <div style="margin-left: 90px; margin-top: 10px;">
+                    <select uiname="CodeBlockSettings.blocklyType" name="blocklyType" style="height:25px;margin-top:-1px;" onselect="CodeBlockSettings.OnSelectBlocklyType" AllowUserEdit="false">
+                        <option value="default" selected="selected">默认+扩展图块</option>
+                        <option value="custom" >仅自定义图块</option>
+                    </select>
+                    <input type="button" tooltip='<%=L"编辑自定义图块（扩展图块）"%>' style="min-width:80px; margin-left: 10px;" class="button" uiname="CodeBlockSettings.CustomBlockBtn" name="CustomBlockBtn" value='<%=L"定制图块"%>' onclick="CodeBlockSettings.ClickCustomBlockBtn"/>
+                </div>
+            </pe:if>
+        </div>
+    </div>
+    <div style="margin-top: 5px; margin-left: 10px;">
+        <div style="margin-left: -8px;margin-bottom:10px;"> <%=L"运行"%></div>
+        <div style="margin-bottom:10px;">
+            <%=L"自动开关范围: "%>
+            <input type="text" auto_virtual_keyboard="true" tooltip="当主角进入该区域时自动启动代码方块, 离开时关闭" uiname="CodeBlockSettings.txtTriggerBox" EmptyText="~ ~ ~ (dx dy dz)" name="txtTriggerBox" style="height:23px" onchange="CodeBlockSettings.OnChangeBoxTriggerString"/>
+            <!-- <div style="color:#808080;font-size:12px"><%=L"当主角进入该区域时自动启动代码方块, 离开时关闭"%></div> -->
+        </div>
+        <div style="margin-bottom: 10px;">
+            <input type="checkbox" uiname="CodeBlockSettings.isDeferLoad" name="isDeferLoad" style="margin-top:2px" onclick="CodeBlockSettings.OnChangeDeferLoad" />
+            <div uiname="CodeBlockSettings.isDeferLoad" for="isDeferLoad" tooltip='<%=L"等周围或相连的非延时代码方块加载后再执行"%>' style="float:left;margin-left:5px;">
+                <%=L"延迟运行"%>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <input type="checkbox" uiname="CodeBlockSettings.allowClientExecution" name="allowClientExecution" style="margin-top:2px" onclick="CodeBlockSettings.OnChangeAllowClientExecution"/>
+            <div uiname="CodeBlockSettings.allowClientExecutionFor" tooltip='<%=L"通常在多人联网程序中, 客户端需要执行的代码方块会设置此项"%>' for="allowClientExecution" style="float:left;margin-left:5px;" >
+                <%=L"允许客户端执行代码"%>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="float:left;min-width:150px;">
+                <input type="checkbox" uiname="CodeBlockSettings.allowFastMode" name="allowFastMode" style="margin-top:2px" onclick="CodeBlockSettings.OnChangeAllowFastMode" />
+                <div uiname="CodeBlockSettings.allowFastModeFor" for="allowFastMode" style="float:left;margin-left:5px;">
+                    <%=L"开启高性能模式（高级）"%>
+                </div>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="float: left; min-width: 150px;">
+                <input type="checkbox" uiname="CodeBlockSettings.allowMultiThreaded" name="allowMultiThreaded" style="margin-top:2px" onclick="CodeBlockSettings.OnChangeAllowMultiThreaded" />
+                <div uiname="CodeBlockSettings.allowMultiThreadedFor" tooltip='<%=L"名字以(gl)开头的方块，支持用runTask函数在真实线程中调用"%>' for="allowMultiThreaded" style="float:left;margin-left:5px;">
+                    <%=L"支持多线程"%>
+                </div>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <input type="checkbox" uiname="CodeBlockSettings.isStepMode" name="isStepMode" style="margin-top:2px;" onclick="CodeBlockSettings.OnChangeStepMode"/>
+            <div uiname="CodeBlockSettings.isStepMode"  for="isStepMode" style="float:left;margin-left:5px;" >
+                <%=L"开启步进运行模式"%>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top: 5px; margin-left: 10px;">
+        <div style="margin-left: -8px;margin-bottom:10px;"> <%=L"权限"%></div>
+        <div style="margin-bottom:10px;">
+            <input type="checkbox" uiname="CodeBlockSettings.isOpenSource" name="isOpenSource" style="margin-top:2px" onclick="CodeBlockSettings.OnSetOpenSource"/>
+            <div for="isOpenSource" tooltip='<%=L"只读模式下别人是否能看到代码"%>' uiname="CodeBlockSettings.isOpenSourceFor" style="float:left;margin-left:5px;">
+                <%=L"开源"%>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <input type="checkbox" uiname="CodeBlockSettings.isCodeReadOnly" name="isCodeReadOnly" style="margin-top:2px" onclick="CodeBlockSettings.OnSetCodeReadOnly"/>
+            <div for="isCodeReadOnly" tooltip='<%=L"只读时将禁止用户修改、暂停、重启代码方块等"%>' uiname="CodeBlockSettings.isCodeReadOnlyFor" style="float:left;margin-left:5px;" >
+                <%=L"只读"%>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div style="margin-bottom:10px;">
+        <input type="button" align="right" style="min-width:80px" class="button" uiname="CodeBlockSettings.close" name="close" value='<%=L"关闭"%>' onclick="ClosePage"/>
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+

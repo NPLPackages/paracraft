@@ -77,6 +77,11 @@ function ShaderManager:RegisterAllEffects()
 	local ODSStereoEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.ODSStereoEffect");
 	local effect = ODSStereoEffect:new():Init(self);
 	self:RegisterEffect(effect);
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Shaders/SuperMultiviewStereoEffect.lua");
+	local SuperMultiviewStereoEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.SuperMultiviewStereoEffect");
+	local effect = SuperMultiviewStereoEffect:new():Init(self);
+	self:RegisterEffect(effect);
 end
 
 -- register new effects such as from external mod. 

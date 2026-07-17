@@ -17,10 +17,23 @@ NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 
 local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 local Screen = commonlib.gettable("System.Windows.Screen");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 
 local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
 local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");	
+
+local urls={
+	ONLINE="https://keepwork.com/public/resource/openVideo.html",
+	STAGE="http://dev.kp-para.cn/public/resource/openVideo.html",
+	RELEASE="http://rls.kp-para.cn/public/resource/openVideo.html"
+}
+
+local function GetVideoBaseUrl()
+	local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+	local http_env = HttpWrapper.GetDevVersion()
+	return urls[http_env]
+end
 
 function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, css, parentLayout)
 	if System.os.GetPlatform() == 'android' then
@@ -43,10 +56,15 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 	if (video_url ~= "") then
 		NplBrowserManager:SetVideoUrl(video_url)
 		if(NplBrowserPlugin.IsSupportFullWebView()) then
-			local src_url = NplBrowserManager:GetVideoUrlSrc("mp4")
+			local src_url = NplBrowserManager:GetVideoUrlSrc("mp4") or ""
+			if src_url == "" then
+				LOG.std(nil, "info", "pe_nplbrowser", "Invalid video url");
+				return
+			end
+			src_url = src_url:gsub("^%s+",""):gsub("%s+$","");
 			if(src_url) then
 				local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
-				local online_url = "https://keepwork.com/official/open/apps/video"
+				local online_url = GetVideoBaseUrl()
 				url = online_url.."?video_url="..src_url;
 				local videoParams = RedSummerCampPPtPage.GetVideoParams()
 				if GameLogic.GetFilters():apply_filters('is_signed_in') and videoParams then
@@ -90,7 +108,7 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 	width = mcmlNode:GetNumber("width");
 	height = mcmlNode:GetNumber("height");
 	local screen_x, screen_y, screen_width, screen_height = _parent:GetAbsPosition();
-
+	
     local x = screen_x + left;
 	local y = screen_y + top;
     local input = {
@@ -127,6 +145,13 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 		end
 	end
 	
+	local viewportUI = ViewportManager:GetGUIViewport();
+	if (viewportUI) then
+		input.x = input.x + viewportUI:GetLeft();
+		input.y = input.y + viewportUI:GetTop();
+	end
+	
+
 	if (NplBrowserPlugin.IsWindowCreated(id)) then
 		local config = NplBrowserPlugin.GetWindowState(id);
 		if (config and config.url ~= input.url) then
@@ -167,6 +192,10 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 					end
 				end
 
+				local viewportUI = ViewportManager:GetGUIViewport();
+				x = x + viewportUI:GetLeft();
+				y = y + viewportUI:GetTop();
+
 			    NplBrowserPlugin.ChangePosSize(
 					{
 						id = id,
@@ -191,8 +220,16 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 	_parent:SetScript("ondestroy", function()
 		-- tricky: only make it invisible if the browser is not binded to another parent control
 		local config = NplBrowserPlugin.GetWindowState(id);
-		if (config and config.parent_id == parent_id) then
-			NplBrowserPlugin.Show({id=id, visible = false});
+		if System.os.IsEmscripten() then
+			if (config and config.parent_id == parent_id) then
+				config.url = NplBrowserPlugin.about_blank_url;
+				NplBrowserPlugin.UpdateWindowState(config.id, config);
+				NplBrowserPlugin.Show({id=id, visible = false});
+			end
+		else
+			if (config and config.parent_id == parent_id) then
+				NplBrowserPlugin.Show({id=id, visible = false});
+			end
 		end
 	end);
 end

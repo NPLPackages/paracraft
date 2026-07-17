@@ -32,10 +32,11 @@ local cmds = {
 	func_description = 'registerClickEvent(function()\\n%send)',
     ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		local block_indent = self:GetIndent();
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerClickEvent_func(msg):\n    %s\nregisterClickEvent(registerClickEvent_func)\n', input);
+		return string.format('def registerClickEvent_func(msg):\n%s\n%sregisterClickEvent(registerClickEvent_func)\n', input, block_indent);
 	end,
 	ToNPL = function(self)
 		return string.format('registerClickEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
@@ -72,6 +73,7 @@ end)
 				{"num0","numpad0"},{"num1","numpad1"},{"num2","numpad2"},{"num3","numpad3"},{"num4","numpad4"},{"num5","numpad5"},{"num6","numpad6"},{"num7","numpad7"},{"num8","numpad8"},{"num9","numpad9"},
 				{L"鼠标滚轮","mouse_wheel"},{L"鼠标按钮","mouse_buttons"}
 			},
+			text = "space",
 		},
 	},
 	hide_in_toolbox = true,
@@ -81,7 +83,11 @@ end)
 	canRun = false,
 	func_description = '"%s"',
 	ToNPL = function(self)
-		return self:getFieldAsString('value');
+		return self:getFieldAsString('keyname');
+	end,
+	ToPython = function(self)
+		local value =  self:getFieldAsString('keyname');
+		return value == "" and "space" or value;
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -115,11 +121,14 @@ end)
 	funcName = "registerKeyPressedEvent",
 	func_description = 'registerKeyPressedEvent(%s, function(msg)\\n%send)',
     ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		local keyname = self:getFieldAsString('keyname');
+		local key_param_name = commonlib.Encoding.toValidParamName(keyname);
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerKeyPressedEvent_func(msg):\n    %s\nregisterKeyPressedEvent("%s", registerKeyPressedEvent_func)\n', input, self:getFieldAsString('keyname'));
+		return string.format('def registerKeyPressedEvent_func_%s(msg):\n%s\n%sregisterKeyPressedEvent("%s", registerKeyPressedEvent_func_%s)\n', key_param_name, input, block_indent, keyname, key_param_name);
 	end,
 	ToNPL = function(self)
 		return string.format('registerKeyPressedEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
@@ -185,11 +194,12 @@ end)
 	funcName = "registerBlockClickEvent",
 	func_description = 'registerBlockClickEvent(%s, function(msg)\\n%send)',
     ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerBlockClickEvent_func(msg):\n    %s\nregisterBlockClickEvent("%s", registerBlockClickEvent_func)\n', input, self:getFieldAsString('blockid'));
+		return string.format('def registerBlockClickEvent_func(msg):\n%s\n%sregisterBlockClickEvent("%s", registerBlockClickEvent_func)\n', input, block_indent, self:getFieldAsString('blockid'));
 	end,
 	ToNPL = function(self)
 		return string.format('registerBlockClickEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('blockid'), self:getFieldAsString('input'));
@@ -240,11 +250,12 @@ end)
 	funcName = "registerTickEvent",
 	func_description = 'registerTickEvent(%d, function(msg)\\n%send)',
     ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerTickEvent_func(msg):\n    %s\nregisterTickEvent(%d, registerTickEvent_func)\n', input, self:getFieldValue('ticks'));
+		return string.format('def registerTickEvent_func(msg):\n%s\n%sregisterTickEvent(%d, registerTickEvent_func)\n', input, block_indent, self:getFieldValue('ticks'));
 	end,
 	ToNPL = function(self)
 		return string.format('registerTickEvent(%d, function()\n    %s\nend)\n',  self:getFieldValue('ticks'), self:getFieldAsString('input'));
@@ -291,11 +302,12 @@ registerTickEvent(1, nil)
 	funcName = "registerAnimationEvent",
 	func_description = 'registerAnimationEvent(%d, function()\\n%send)',
     ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerAnimationEvent_func(msg):\n    %s\nregisterAnimationEvent(%d, registerAnimationEvent_func)\n', input, self:getFieldValue('time'));
+		return string.format('def registerAnimationEvent_func(msg):\n%s\n%sregisterAnimationEvent(%d, registerAnimationEvent_func)\n', input, block_indent, self:getFieldValue('time'));
 	end,
 	ToNPL = function(self)
 		return string.format('registerAnimationEvent(%d, function()\n    %s\nend)\n', self:getFieldValue('time'), self:getFieldAsString('input'));
@@ -372,11 +384,12 @@ say("click me!")
 	funcName = "registerBroadcastEvent",
 	func_description = 'registerBroadcastEvent(%s, function(%s)\\n%send)',
     ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerBroadcastEvent_func(msg):\n    %s\nregisterBroadcastEvent("%s", registerBroadcastEvent_func)\n', input, self:getFieldValue('msg'));
+		return string.format('def registerBroadcastEvent_func(msg):\n%s\n%sregisterBroadcastEvent(%s, registerBroadcastEvent_func)\n', input, block_indent, self:getFieldValue('msg'));
 	end,
 	ToNPL = function(self)
 		return string.format('registerBroadcastEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
@@ -572,11 +585,12 @@ broadcastTo("Alice", "Hello", {text="hello"})
 	funcName = "registerStopEvent",
 	func_description = 'registerStopEvent(function()\\n%send)',
 	ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerStopEvent_func(msg):\n    %s\nregisterStopEvent(registerStopEvent_func)\n', input);
+		return string.format('def registerStopEvent_func(msg):\n%s\n%sregisterStopEvent(registerStopEvent_func)\n', input, block_indent);
 	end,
 	ToNPL = function(self)
 		return string.format('registerStopEvent(function()\n    %s\nend)\n', self:getFieldAsString('input'));
@@ -621,11 +635,12 @@ end)
 	funcName = "registerAgentEvent",
 	func_description = 'registerAgentEvent(%s, function(%s)\\n%send)',
     ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerAgentEvent_func(msg):\n    %s\nregisterAgentEvent("%s", registerAgentEvent_func)\n', input, self:getFieldValue('msg'));
+		return string.format('def registerAgentEvent_func(msg):\n%s\n%sregisterAgentEvent("%s", registerAgentEvent_func)\n', input, block_indent, self:getFieldValue('msg'));
 	end,
 	ToNPL = function(self)
 		return string.format('registerAgentEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
@@ -698,6 +713,8 @@ end)
 				{ L"ps_服务器启动", "ps_server_started" },
 				{ L"ps_服务器关闭", "ps_server_shutdown" },
 				{ L"用户加入", "connect" },
+				{ L"ble:myBluetooth", "ble:myBluetooth" },
+				{ L"udp:8099", "udp:8099" },
 			},
 		},
 	},
@@ -747,11 +764,12 @@ end)
 	funcName = "registerNetworkEvent",
 	func_description = 'registerNetworkEvent(%s, function(%s)\\n%send)',
     ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerNetworkEvent_func(msg):\n    %s\nregisterNetworkEvent("%s", registerNetworkEvent_func)\n', input, self:getFieldAsString('msg'));
+		return string.format('def registerNetworkEvent_func(msg):\n%s\n%sregisterNetworkEvent("%s", registerNetworkEvent_func)\n', input, block_indent, self:getFieldAsString('msg'));
 	end,
 	ToNPL = function(self)
 		return string.format('registerNetworkEvent("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('msg'), self:getFieldAsString('input'));
@@ -983,6 +1001,7 @@ sendNetworkEvent("*8099", nil, "binary \0 string")
 				{ L"/tip", "/tip" },
 				{ L"改变时间[-1,1]", "/time"},
 				{ L"加载世界:项目id", "/loadworld"},
+				{ L"主角跳转到", "/goto"},
 				{ L"设置真实光影[1|2|3]", "/shader"},
 				{ L"设置光源颜色[0,2] [0,2] [0,2]", "/light"},
 				{ L"设置太阳颜色[0,2] [0,2] [0,2]", "/sun"},
@@ -1000,7 +1019,6 @@ sendNetworkEvent("*8099", nil, "binary \0 string")
 				{ L"设置最小人物出现距离", "/property -scene MinPopUpDistance 100"},
 				{ L"设置最大人物多边形数目", "/property -scene MaxCharTriangles 500000"},
 				{ L"禁用自动人物细节", "/lod off"},
-				{ L"关闭自动等待", "/autowait false"},
 				{ L"隐藏物品栏", "/hide quickselectbar"},
 				{ L"显示物品栏", "/show quickselectbar"},
 			},
@@ -1055,19 +1073,6 @@ cmd("/camerayaw 0")
 cmd("/camerapitch 0.5")
 cmd("/time", "0")
 ]]},
-{desc = L"关闭自动等待", canRun = true, code = [[
-set("count", 1)
-showVariable("count")
-cmd("/autowait false")
-for i=1, 10000 do
-    _G.count = count +1
-end
-say("it finished instantly with autowait false", 3)
-cmd("/autowait true")
-for i=1, 10000 do
-    _G.count = count +1
-end
-]]}
 },
 },
 

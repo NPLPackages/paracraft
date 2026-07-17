@@ -8,6 +8,7 @@ block_data: optional, preferred block data when created, such as those with colo
 server_data: optional, preferred server data when created. 
 icon: optional icon
 uid: unique id used in macro recording
+pin_index: optional, if set, the item will be pinned to the specified index in the quick select bar when taken
 -->
 <blocklist>
   <category name="static" text="方块">
@@ -146,6 +147,7 @@ uid: unique id used in macro recording
     <block name="Black_Carpet"/>
     <block name="Glass_Carpet"/>
     <block name="Stone_Slope"/>
+    <block name="SoilCarpet"/>
     <block name="Sand_Slope" block_data="0" tip="白色"/>
     <block name="Sand_Slope" block_data="3840" tip="红色"/>
     <block name="Oak_Wood_Slope"/>
@@ -154,32 +156,78 @@ uid: unique id used in macro recording
     <block name="StoneBrick_Slope"/>
     <block name="NetherBrick_Slope"/>
     <block name="Quartz_Slope"/>
+    
+    <block name="ColorBlock" />
+    <block name="ColorBlock_Stairs" />
+    <block name="ColorBlock_Slab" />
+    <block name="ColorBlock_Slope" />
+    
+    <block name="ColorFence" />
+    <block name="ColorWall" />
+    <block name="MetalBlock" />
+    <block name="MetalBlock_Stairs" />
+    <block name="MetalBlock_Slab" />
+    <block name="MetalBlock_Slope" />
+
+    <block name="TransparentColorBlock" />
+    <block name="TransparentColorBlock_Stairs" />
+    <block name="TransparentColorBlock_Slab" />
+    <block name="TransparentColorBlock_Slope" />
   </category>
 
   <category name="deco" text="装饰">
-    <block id="100"/>
+    <block id="222"/>
+    <block id="117"/>
+    <block id="153"/>
+    <block id="90"/>
+    <block id="220"/>
+    <block id="162"/>
     <block id="113"/>
-    <block id="114"/>
-    <block id="115"/>
     <block id="116"/>
+    <block name="CornerGrass" />
+    <block id="115"/>
+    <block id="165"/>
+    <block id="92"/>
+    <block id="114"/>
     <block id="132"/>
     <block id="141"/>
     <block id="161"/>
     <block id="164"/>
-    <block id="165"/>
     <block id="208"/>
     <block name="Apple"/>
-    <block id="221"/>
-    <block id="222"/>
-    <block id="117"/>
-    <block id="6"/>
-    <block id="220"/>
+    <block id="149"/>
+    <block id="152"/>
+    <block id="188"/>
+    <block id="185"/>
+    <block id="122"/>
+    <block id="112"/>
+    <block id="160"/>
+    <block id="119"/>
+    <block id="172"/>
+    <block id="183"/>
+    <block id="120"/>
+    <block id="173"/>
+    <block id="184"/>
+    <block id="121"/>
     <block id="87"/>
     <block id="82"/>
-    <block id="23"/>
+    <block id="118"/>
+    <block id="163"/>
+    <block id="100"/>
+    <block id="6"/>
     <block id="90"/>
     <block id="95"/>
-    <block id="102"/>
+    <block id="221"/>
+    <block id="213"/>
+    <block id="218"/>
+    <block id="224"/>
+    <block id="144"/>
+    <block id="80"/>
+    <block name="Chest"/>
+    <block id="186"/>
+    <block id="84"/>
+    <block name="Mirror" />
+    <block name="BlockLight" />
     <block id="101"/>
     <block id="214"/>
     <block id="209"/>
@@ -188,27 +236,7 @@ uid: unique id used in macro recording
     <block name="IronTrapdoor" />
     <block name="Iron_Door" />
     <block id="166"/>
-    <block id="162"/>
     <block id="103"/>
-    <block id="211"/>
-    <block id="213"/>
-    <block id="218"/>
-    <block id="224"/>
-    <block id="118"/>
-    <block id="144"/>
-    <block id="80"/>
-    <block id="186"/>
-    <block id="84"/>
-    <block id="111"/>
-    <block id="206"/>
-    <block id="188"/>
-    <block id="185"/>
-    <block id="112"/>
-    <block id="160"/>
-    <block id="172"/>
-    <block id="183"/>
-    <block id="187"/>
-    <block id="182"/>
     <block id="104"/>
     <block id="177" block_data="0" tip="白色"/>
     <block id="177" block_data="3840" tip="红色"/>
@@ -222,28 +250,36 @@ uid: unique id used in macro recording
     <block id="177" block_data="14336" tip="蓝色"/>
     <block id="177" block_data="1024" tip="粉色"/>
     <block id="177" block_data="6400" tip="紫色"/>
-    <block id="175"/>
-    <block id="178"/>
-    <block id="168"/>
-    <block id="180"/>
-    <block id="173"/>
-    <block id="184"/>
     <block id="167"/>
     <block id="179"/>
     <block id="169"/>
     <block id="181"/>
+    <block id="168"/>
+    <block id="180"/>
     <block id="176"/>
-    <block id="163"/>
-    <block id="119"/>
-    <block id="120"/>
-    <block id="121"/>
-    <block id="122"/>
+    <block id="111"/>
+    <block id="175"/>
+    <block id="178"/>
+    <block id="206"/>
+    <block id="187"/>
+    <block id="182"/>
+
+  <!--分割线-->
+    <block id="23"/>
+    <block id="102"/>
+    <block id="211"/>
+    <block id="186"/>
+    <block id="188"/>
+    <block id="185"/>
+    <block id="112"/>
+    <block id="160"/>
+    <block id="172"/>
+    <block id="183"/>
+    <block id="104"/>
     <!--<block id="61"/>-->
-    <block name="Mirror" />
-    <block name="BlockLight" />
   </category>
 
-  <category name="character" text="编程">
+  <category name="character" text="代码">
     <block name="CodeBlock"/>
     <block name="Wire" />
     <block name="Lever" />
@@ -255,17 +291,23 @@ uid: unique id used in macro recording
     <block name="pigeon"/>
     <block name="dog"/>
     <block name="chicken"/>
-    <block name="CodeBlock" tip="方块画笔代码方块" uid="BlockPen" icon="Texture/blocks/items/brush.png" server_data='{langConfigFile="npl_blockpen"}'/>
-    <block name="CodeBlock" tip="摄影机代码方块" uid="CodeCamera" icon="Texture/blocks/items/ts_camera.png" server_data='{langConfigFile="npl_camera"}'/>
+    <block name="CodeBlock" tip="Python代码方块" uid="CodePython" server_data='{langConfigFile="npl_python", codeLanguageType="python", color8data=768}'/>
+    <block name="CodeBlock" tip="MicroPython硬件编程" uid="MicroPython" icon="Texture/blocks/items/micropython.png" server_data='{langConfigFile="micropython", editmode="blockmode", color8data=768}'/>
+    <block name="CodeBlock" tip="Arduino硬件编程" uid="Arduino" icon_removed="Texture/blocks/items/arduino.png" server_data='{langConfigFile="arduino", editmode="blockmode", color8data=62208}'/>
+    <block name="CodeBlock" tip="C++编程" uid="Cpp" icon_removed="Texture/blocks/items/cpp.png" server_data='{langConfigFile="cpp", codeLanguageType="cpp", color8data=62208}'/>
+    <block name="CodeBlock" tip="方块画笔代码方块" uid="BlockPen" icon_removed="Texture/blocks/items/brush.png" server_data='{langConfigFile="npl_blockpen"}'/>
+    <block name="CodeBlock" tip="摄影机代码方块" uid="CodeCamera" icon_removed="Texture/blocks/items/ts_camera.png" server_data='{langConfigFile="npl_camera"}'/>
     <block name="CodeBlock" tip="代码方块初级版" uid="CodeJunior" icon="Texture/blocks/codeblockjunior_cover.png" server_data='{langConfigFile="npl_junior", editmode="blockmode"}'/>
     <block name="AgentSignBlock"/>
     <block name="AgentItem"/>
+    <block name="NPLCADCodeBlock" />
+    <block name="NplMicroRobotBlock" />
+    <block name="MicrobitBlock" />
 
   </category>
 
   <category name="gear" text="机关">
     <block name="Command_Block"/>
-    <block name="CodeBlock"/>
     <block name="Wire" />
     <block name="Lever" />
     <block name="Stone_Button" />
@@ -275,15 +317,16 @@ uid: unique id used in macro recording
     <block name="IronTrapdoor" />
     <block name="Iron_Door" />
     <block name="Conductor" />
+    <block name="ConductorOmini" />
     <block name="Repeater" />
     <block name="Lamp"/>
     <block name="Wooden_Pressure_Plate"/>
     <block name="Stone_Pressure_Plate"/>
+    <block name="CornerGrass" />
     <block name="StickyPiston"/>
     <block name="Piston"/>
     <block name="TNT" />
     <block name="PowerBlock"/>
-    <block name="CornerGrass" />
     <block name="BlockUpdateDetector" />
     <block name="Chest"/>
     <block name="MusicBox"/>
@@ -295,6 +338,7 @@ uid: unique id used in macro recording
     <block name="RailPowered"/>
     <block name="RailDetector"/>
     <block name="Sign_Post"/>
+    <block name="RailcarModel"/>
     <block id="Wall_Sign"/>
     <block id="Painting"/>
     <block name="Book"/>
@@ -306,88 +350,117 @@ uid: unique id used in macro recording
     <block name="Bone"/>
     <block name="Minimap"/>
     <block name="player_spawn_point"/>
+    <block name="UserPoint"/>
     <block name="Checkpoint"/>
     <block name="BlockArrow"/>
+    <block name="RightTriangle"/>
     <block name="BlockModel"/>
     <block name="PhysicsModel"/>
     <block name="MemoryBlock"/>
-    <block name="RailcarModel"/>
   </category>
 
   <category name="tool" text="工具">
-    <!--<block name="TimeSeriesNPC"/>
-    <block name="TimeSeriesCamera"/>-->
-    <block name="Book"/>
-    <block name="Code"/>
-    <block name="CommandLine"/>
     <block name="TerrainBrush" />
     <block name="PaintBrush" />
-    <block name="wood_hoe"/>
     <block name="gold_coin"/>
     <block name="heart_blue"/>
+    <block name="wood_hoe"/>
     <block name="gun_snipper"/>
     <block name="simple_mob"/>
+    
     <block name="CmdUrl"/>
     <block name="player_spawn_point"/>
     <block name="Minimap"/>
 	  <block name="Material" />
     <block name="ColorBlock" />
+    <block name="ColorBlock_Stairs" />
+
+    <block name="ColorBlock_Slab" />
+    <block name="ColorBlock_Slope" />
     <block name="MetalBlock" />
+    <block name="MetalBlock_Stairs" />
+    <block name="MetalBlock_Slab" />
+    <block name="MetalBlock_Slope" />
+
     <block name="TransparentColorBlock" />
-    <block name="Sandstone_Stairs" />
-    <block name="Smooth_Sandstone" />
-    <block name="Sand_Slope" />
-    <block name="Sandstone_Slab" />
+    <block name="TransparentColorBlock_Stairs" />
+    <block name="TransparentColorBlock_Slab" />
+    <block name="TransparentColorBlock_Slope" />
     <block name="ColorFence" />
     <block name="ColorWall" />
-    <block name="White_Carpet" />
+
+
     <block name="LiveModel" />
     <block name="BlockModel" />
     <block name="PhysicsModel" />
     <block name="BlockLight" />
-
     <block name="InvisibleBlock" tip="拿在手中时可见"/>
     <block name="InvisibleGlowStone" tip="拿在手中时可见"/>
+
     <block name="InvisibleClickSensor" tip="拿在手中时可见"/>
     <block name="BanBlock" block_data="2730" tip="拿在手中时可编辑"/>
     <block name="TransparentBanBlock" block_data="2730" tip="拿在手中时可编辑"/>
     <block name="InvisibleCameraBlocker" tip="拿在手中时可编辑"/>
+    <block name="CodePPT"/>
 
-    <block name="AgentSignBlock" uid="MacroPlatform" tip="宏示教舞台" icon="Texture/blocks/items/agentMacroPlatform.png" server_data='{agentPackageName="macroplatform", tooltip="宏示教", agentUrl="Mod/Agents/macroplatform.xml", isGlobal=true,updateMethod="always"}'/>
+    <block name="Book"/>
+    <block name="Code"/>
+    <block name="CommandLine"/>
+
+    <block name="EditableWorld" />
+    <block name="EasyBuilder" tip="扮演" pin_index = 3 icon="Texture/3DMapSystem/Creator/Objects/speed.png" server_data='{toolname="play"}'/>
+    <block name="EasyBuilder" tip="传送" pin_index = 1 icon="Texture/3DMapSystem/Creator/Objects/Anchor.png" server_data='{toolname="map"}'/>
+    <block name="EasyBuilder" tip="活动模型" pin_index = 4 icon="Texture/3DMapSystem/Creator/Objects/Collection.png" server_data='{toolname="livemodel"}'/>
+    <block name="EasyBuilder" tip="建造" pin_index = 5 icon="Texture/3DMapSystem/Creator/Objects/Object_Add.png" server_data='{toolname="model"}'/>
+    <block name="EasyBuilder" tip="换装" pin_index = 6 icon="Texture/3DMapSystem/Creator/Objects/Finalize.png" server_data='{toolname="char"}'/>
+    <block name="EasyBuilder" tip="动作表情" pin_index = 7 icon="Texture/3DMapSystem/common/action.png" server_data='{toolname="action"}'/>
+    <block name="EasyBuilder" tip="环境" pin_index = 8 icon="Texture/3DMapSystem/Creator/Objects/Environment.png" server_data='{toolname="env"}'/>
+    <block name="EasyBuilder" tip="用户背包" pin_index = 9 icon="Texture/3DMapSystem/AppIcons/Inventory_64.dds" server_data='{toolname="bag"}'/>
+    <block name="EasyBuilder" tip="抱抱龙AI助手" icon="Texture/Aries/Item/10001_DragonIcon.png" server_data='{toolname="EasyPetCopilot"}'/>
+    <block name="EasyCloneBag"/>
+
+    <!--
+    <block name="NPLCADCodeBlock" />
+    <block name="NplMicroRobotBlock" />
+    <block name="MicrobitBlock" />
     <block name="LinkBoy"/>
     <block name="nplcad3" test_sdk="true"/>
-    <block name="CodePPT"/>
+    <block name="Sandstone_Stairs" />
+    <block name="Smooth_Sandstone" />
+    <block name="Sand_Slope" />
+    <block name="Sandstone_Slab" />
+    <block name="White_Carpet" />
+    <block name="AgentSignBlock" uid="MacroPlatform" tip="宏示教舞台" icon="Texture/blocks/items/agentMacroPlatform.png" server_data='{agentPackageName="macroplatform", tooltip="宏示教", agentUrl="Mod/Agents/macroplatform.xml", isGlobal=true,updateMethod="always"}'/>
     <block name="AgentSignBlock" uid="MacroPlatformS1" tip="S系列宏示教舞台" icon="Texture/blocks/items/agentMacroPlatforms.png" server_data='{agentPackageName="macroplatforms", tooltip="430宏示教", agentUrl="Mod/Agents/com.code.430_1.xml", isGlobal=true,updateMethod="always"}'/>
-    
-    <block name="ColorBlock_Stairs" />
-    <block name="ColorBlock_Slab" />
-    <block name="ColorBlock_Slope" />
-    <block name="TransparentColorBlock_Stairs" />
-    <block name="TransparentColorBlock_Slab" />
-    <block name="TransparentColorBlock_Slope" />
-    <block name="MetalBlock_Stairs" />
-    <block name="MetalBlock_Slab" />
-    <block name="MetalBlock_Slope" />
-    
+    -->
   </category>
+
   <category name="others" text="其他">
   </category>
   <category name="movie" text="电影">
     <block name="MovieClip"/>
-    <block name="Repeater" />
-    <block name="Wire" />
-    <block name="Stone_Button" />
-    <block name="Sign_Post"/>
-    <block name="player_spawn_point"/>
-    <block name="ColorBlock" />
     <block name="Bone"/>
     <block name="AnimModelBlock" />
+    <block name="MemoryBlock"/>
+    
+    <block name="Wire" />
+    <block name="Lever" />
+    <block name="Stone_Button" />
+    <block name="Repeater" />
+    <block name="Wooden_Pressure_Plate"/>
+    <block name="Stone_Pressure_Plate"/>
+    <block name="CornerGrass" />
+    <block name="player_spawn_point"/>
+    
+    <block id="211"/>
     <block name="BlockModel"/>
     <block name="PhysicsModel"/>
+    <block name="LiveModel" />
     <block name="villager"/>
-    <block name="MemoryBlock"/>
     <block name="CodeActor"/>
-    <block name="CodeBlock"/>
-    <block name="Lever" />
+    <block name="bird"/>
+    <block name="pigeon"/>
+    <block name="dog"/>
+    <block name="chicken"/>
   </category>
 </blocklist>

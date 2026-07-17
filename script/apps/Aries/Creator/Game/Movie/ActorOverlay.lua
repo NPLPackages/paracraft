@@ -20,6 +20,10 @@ NPL.load("(gl)script/ide/System/Scene/Cameras/Cameras.lua");
 NPL.load("(gl)script/ide/math/Matrix4.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+NPL.load("(gl)script/ide/math/bit.lua");
+local rshift = mathlib.bit.rshift;
+local bor = mathlib.bit.bor;
+local band = mathlib.bit.band;
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local Matrix4 = commonlib.gettable("mathlib.Matrix4");
@@ -462,7 +466,7 @@ color("#ff0000"); font(14);<br/>
 		EnterTextDialog.ShowPage(title, function(result)
 			if(result and result~="") then
 				local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
-				if(result and vars[1] and vars[2]) then
+				if(result and vars and vars[1] and vars[2]) then
 					self:BeginUpdate();
 					self:AddKeyFrameByName("ui_x", nil, vars[1]);
 					self:AddKeyFrameByName("ui_y", nil, vars[2]);
@@ -619,6 +623,32 @@ function Actor:FrameMovePlaying(deltaTime)
 	self:SetRenderCode(self:ComputeRenderCode(curTime))
 end
 
+-- fix display bug under opengl
+local function hackLength(pLen)
+	if not pLen then
+		return;
+	end
+							
+	local ret = pLen;
+
+	-- if power of 2
+	if((ret > 0) and (band(ret, (ret-1)) == 0)) then
+		return ret;
+	end							
+							
+	ret = ret - 1;
+							
+	ret = bor(ret, rshift(ret, 1));
+	ret = bor(ret, rshift(ret, 2));
+	ret = bor(ret, rshift(ret, 4));
+	ret = bor(ret, rshift(ret, 8));
+	ret = bor(ret, rshift(ret, 16));
+							
+	ret = ret + 1;
+							
+	return ret;
+end
+
 -- example codes:
 -- image("1.png", 300,200)
 -- color("#ff0000")
@@ -648,6 +678,7 @@ function Actor:CheckInstallCodeEnv(painter, isPickingPass)
 		-- DT_EXTERNALLEADING		   0x00000200
 		env.text = function(text, x, y, width, height, alignment)
 			if(text and text~="" ) then
+				text = tostring(text)
 				x = x or 0;
 				y = y or 0;
 									
@@ -741,37 +772,6 @@ function Actor:CheckInstallCodeEnv(painter, isPickingPass)
 				if(filename) then
 					if(not width or not height) then
 						local texture = ParaAsset.LoadTexture("", filename, 1);
-						
-						-- fix display bug under opengl
-						local function hackLength(pLen)
-							if not pLen then
-								return;
-							end
-														
-							NPL.load("(gl)script/ide/math/bit.lua");
-							local rshift = mathlib.bit.rshift;
-							local bor = mathlib.bit.bor;
-							local band = mathlib.bit.band;
-							
-							local ret = pLen;
-
-							-- if power of 2
-							if((ret > 0) and (band(ret, (ret-1)) == 0)) then
-								return ret;
-							end							
-							
-							ret = ret - 1;
-							
-							ret = bor(ret, rshift(ret, 1));
-							ret = bor(ret, rshift(ret, 2));
-							ret = bor(ret, rshift(ret, 4));
-							ret = bor(ret, rshift(ret, 8));
-							ret = bor(ret, rshift(ret, 16));
-							
-							ret = ret + 1;
-							
-							return ret;
-						end
 						width = hackLength(width or texture:GetWidth());
 						height = hackLength(height or texture:GetHeight());
 					end
@@ -873,7 +873,7 @@ function Actor:SelectMe()
 	if(entity) then
 		local editmodel = entity:GetEditModel();
 		editmodel:Connect("EndEdit", self, "OnEndEdit");
-		Actor._super.SelectMe(self);	
+		return Actor._super.SelectMe(self);	
 	end
 end
 

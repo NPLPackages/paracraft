@@ -47,6 +47,13 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/PacketEntityEffect.
 NPL.load("(gl)script/ide/System/Core/Color.lua");
 NPL.load("(gl)script/ide/mathlib.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HeadonDisplay.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BonesVariable.lua");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+local BonesVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local HeadonDisplay = commonlib.gettable("MyCompany.Aries.Game.Common.HeadonDisplay");
 local Color = commonlib.gettable("System.Core.Color");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -59,6 +66,7 @@ local ObtainItemEffect = commonlib.gettable("MyCompany.Aries.Game.Effects.Obtain
 local Variables = commonlib.gettable("MyCompany.Aries.Game.Common.Variables");
 local EntityAnimation = commonlib.gettable("MyCompany.Aries.Game.Effects.EntityAnimation");
 local vector3d = commonlib.gettable("mathlib.vector3d");
+local Event = commonlib.gettable("System.Core.Event");
 local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local Quaternion = commonlib.gettable("mathlib.Quaternion");
 local TimedEvent = commonlib.gettable("MyCompany.Aries.Game.TimedEvent")
@@ -82,6 +90,11 @@ Entity:Property({"position", nil, "getPosition", "setPosition"});
 Entity:Property({"max_collision_count", 10})
 Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
 Entity:Property({"staticTag", nil, "GetStaticTag", "SetStaticTag", auto=true});
+Entity:Property({"isLocked", nil, "IsLocked", "SetLocked", auto=true});
+Entity:Property({"isTrigger", false, "IsTrigger", "SetTrigger", auto=true});
+Entity:Property({"onTriggerEnterEvent", nil, "GetOnTriggerEnterEvent", "SetOnTriggerEnterEvent", auto=true});
+Entity:Property({"onTriggerExitEvent", nil, "GetOnTriggerExitEvent", "SetOnTriggerExitEvent", auto=true});
+Entity:Property({"onclickEvent", nil, "GetOnClickEvent", "SetOnClickEvent", auto=true});
 Entity:Property({"LocalTransform", nil, "GetModelLocalTransform", "SetModelLocalTransform"})
 -- globally unique identifier
 Entity:Property({"guid", nil, "GetKey", "SetKey"});
@@ -91,6 +104,7 @@ Entity:Signal("focusOut");
 Entity:Signal("valueChanged");
 Entity:Signal("facingChanged");
 Entity:Signal("scalingChanged");
+Entity:Signal("assetfileChanged");
 -- Entity:Signal("forceAutoSyncChanged");  -- ggs force auto sync
 
 local math_abs = math.abs;
@@ -124,10 +138,6 @@ local next_id = 0;
 function Entity:ctor()
 	next_id = next_id + 1;
 	self.entityId = next_id;
-	
-	-- added for pet feature
-	self.headUI_Params = nil;
-	self.petObj = nil;
 end
 
 -- this function can only be called before entity is attached, such as in Init() function. 
@@ -140,6 +150,10 @@ function Entity:SetEntityId(id)
 			next_id = id;
 		end
 	end
+end
+
+function Entity:IsValid()
+	return EntityManager.GetEntityById(self.entityId) == self;
 end
 
 -- when entity is focused, this is the additional camera roll applied.
@@ -174,6 +188,12 @@ end
 function Entity:tickEvent(event)
 end
 
+-- whether this entity is locked.
+function Entity:IsLocked()
+end
+
+function Entity:SetLocked(bLocked)
+end
 
 -- all kinds of custom user or game event, that is handled mostly by rule bag items.
 -- Entity event is the only source of inputs to the containing rule bag items, which the user can customize using ItemCommand, ItemScript, etc. 
@@ -250,6 +270,15 @@ end
 -- get the inventory object if any
 function Entity:GetInventory()
 	return self.inventory;
+end
+
+function Entity:SetInventory(newInventory)
+	local oldInventory = self.inventory;
+	self.inventory = newInventory;
+	if(newInventory) then
+		newInventory:SetParentEntity(self);
+	end
+	return oldInventory;
 end
 
 -- get the inventory view object if any. It will create one if inventory exist but view not exist. 
@@ -382,6 +411,10 @@ function Entity:UpdateFromXMLNode(node)
 		self:LoadFromXMLNode(node);
 		self:init()
 		self:Attach();
+		if(self.obj) then
+			self.obj:UpdateTileContainer();
+		end
+		self:UpdateBlockContainer()
 	end
 end
 
@@ -408,7 +441,16 @@ function Entity:LoadFromXMLNode(node)
 			if(attr.name) then
 				self.name = attr.name;
 			end
+			if(attr.isTrigger) then
+				self.isTrigger = (attr.isTrigger == "true") or (attr.isTrigger == true);
 
+				if(attr.onTriggerEnterEvent) then
+					self.onTriggerEnterEvent = attr.onTriggerEnterEvent
+				end
+				if(attr.onTriggerExitEvent) then
+					self.onTriggerExitEvent = attr.onTriggerExitEvent
+				end
+			end
 			if(attr.facing) then
 				self.facing = tonumber(attr.facing) or self.facing;
 			else
@@ -530,7 +572,15 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(mat and not mat:isIdentity()) then
 		attr.modelLocalTransform = mat:toString();
 	end
-	
+	if(self.isTrigger) then
+		attr.isTrigger = true;
+		if(self.onTriggerEnterEvent and self.onTriggerEnterEvent~="") then
+			attr.onTriggerEnterEvent = self.onTriggerEnterEvent
+		end
+		if(self.onTriggerExitEvent and self.onTriggerExitEvent~="") then
+			attr.onTriggerExitEvent = self.onTriggerExitEvent
+		end
+	end
 	--if(self.data_container and not self.data_container:IsEmpty()) then
 		--local data_node = {name="data",};
 		--node[#node+1] = data_node;
@@ -712,6 +762,11 @@ function Entity:IsWalking()
 	end
 end
 
+-- @param id: animation id or array of animation ids. 
+function Entity:HasAnimation(id)
+	return EntityAnimation.HasAnimation(id, self);
+end
+
 -- build animation sequence table to be fed to entity. 
 -- @param filenames: can be filename, animation name, animation id or array of above things. currently only two animation is supported. 
 -- such as {4,0} 
@@ -747,6 +802,14 @@ function Entity:SetAnimation(filenames)
 	end
 end
 
+function Entity:SetHeadRotation(yaw, pitch)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("HeadTurningAngle", yaw);
+		obj:SetField("HeadUpdownAngle", pitch);
+	end
+end
+
 -- get last animation id. this may return nil, which usually mean 0.
 function Entity:GetLastAnimId()
 	return self.lastAnimId;
@@ -764,6 +827,30 @@ end
 
 function Entity:CanHighlight()
 	return true;
+end
+
+-- @param text: string text to display (supports basic HTML)
+-- @param buttons: nil or {"button1", "button2"}
+-- {{text = "OK", default = true}, "button2"} format is also supported
+-- {{text = "输入文字", type="text"}, "确定"} type of text is also supported
+-- @param callbackFunc: function(textResult, btnIndex, allTextResults) 
+-- textResult: string text input if any button is of type="text", otherwise it is button text
+-- btnIndex: number index of button clicked (1-based)
+-- allTextResults: table of all text input values by button index
+function Entity:ShowHeadOnDialog(text, buttons, callbackFunc)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HeadOnDialog.lua");
+	local HeadOnDialog = commonlib.gettable("MyCompany.Aries.Game.Common.HeadOnDialog");
+	if(text) then
+		HeadOnDialog.ShowPage(self, text, buttons, callbackFunc);
+	else
+		HeadOnDialog.ClosePage()
+	end
+end
+
+function Entity:SetHeadOnDialogVisible(bVisible)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HeadOnDialog.lua");
+	local HeadOnDialog = commonlib.gettable("MyCompany.Aries.Game.Common.HeadOnDialog");
+	HeadOnDialog.SetVisible(bVisible);
 end
 
 -- enable headon display
@@ -785,19 +872,18 @@ end
 -- display a mcml v2 url or xmlnode on top of the entity. 
 -- @param params: {url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:red">hello world</div></pe:mcml>'), 
 --    pageGlobalTable, is3D:bool, bReuseWindow:bool, bAbove3D:bool, }
+--  when calling from codeblock make sure that `pageGlobalTable = codeblock:GetCodeEnv()` to access the codeblock variables.
 -- if nil, it will remove head on display
 -- @param headonIndex: default to 0, it can also be 1 or 2. so that multiple headon display can be shown at the same time.  
 -- @return the headon display object if created
 function Entity:SetHeadOnDisplay(params, headonIndex)
+	self.headUI_Params = params;
 	if(not params) then
 		local lastEntity = self:GetHeadonEntity(headonIndex)
 		if(lastEntity) then
 			lastEntity:Destroy();
-			-- self:SetHeadonEntity(headonIndex, nil)
 		end
 	else
-		self.headUI_Params = commonlib.clone(params);		
-
 		if(params.bReuseWindow) then
 			local lastEntity = self:GetHeadonEntity(headonIndex)
 			if(lastEntity) then
@@ -996,6 +1082,74 @@ end
 
 -- player entity collided with this entity
 function Entity:OnCollideWithPlayer(from_entity, bx,by,bz)
+	if(self.isTrigger) then
+		self.lastTriggerEntities = self.lastTriggerEntities or {}
+		if(not self.lastTriggerEntities[from_entity]) then
+			self.lastTriggerEntities[from_entity] = commonlib.TimerManager.GetCurrentTime();
+			self:OnTriggerEnter(from_entity)
+		end
+		if(not self.exitTriggerTimer) then
+			self.exitTriggerTimer = commonlib.Timer:new({callbackFunc = function(timer)
+				local expireTime = 300;
+				local curTime = commonlib.TimerManager.GetCurrentTime();
+				local toRemoveList;
+				local count = 0;
+				for entity, time in pairs(self.lastTriggerEntities) do
+					if(curTime - time > expireTime) then
+						toRemoveList = toRemoveList or {};
+						toRemoveList[#toRemoveList+1] = entity;
+					else
+						count = count + 1;
+					end
+				end
+				if(toRemoveList) then
+					for _, entity in ipairs(toRemoveList) do
+						self.lastTriggerEntities[entity] = nil;
+						self:OnTriggerExit(entity)
+					end
+				end
+				if(count == 0) then
+					self.exitTriggerTimer:Change();
+				end
+			end})
+		end
+		self.exitTriggerTimer:Change(200, 200)
+	end
+end
+
+-- called when this entity.isTrigger is true and is first triggered by another entity(usually the player).
+function Entity:OnTriggerEnter(from_entity)
+	if(self.isTrigger and from_entity) then
+		local event = Event:new():init("ontriggerenter");
+		event.from_entity = from_entity;
+		self:event(event);
+		
+		local onTriggerEnterEvent = self.onTriggerEnterEvent or "__entity_ontriggerenter"
+		if(onTriggerEnterEvent) then
+			local x, y, z = self:GetBlockPos();
+			local result = self:BroadcastEvents(onTriggerEnterEvent, {x=x, y=y, z=z, name=self.name, targetName=from_entity:GetName()});
+			return true;
+		end
+	end
+end
+
+-- called when this entity.isTrigger is true and is just exited trig by another entity(usually the player).
+function Entity:OnTriggerExit(from_entity)
+	if(self.isTrigger and from_entity) then
+		local event = Event:new():init("ontriggerexit");
+		event.from_entity = from_entity;
+		self:event(event);
+		
+		local onTriggerExitEvent = self.onTriggerExitEvent or "__entity_ontriggerexit"
+		if(onTriggerExitEvent) then
+			local x, y, z = self:GetBlockPos();
+			local result = self:BroadcastEvents(onTriggerExitEvent, {x=x, y=y, z=z, name=self.name, targetName=from_entity:GetName()});
+			return true;
+		end
+	end
+end
+
+function Entity:BroadcastEvents(eventNames, msg, entity)
 end
 
 -- virtual function: when the entity is hit (attacked) by the missile
@@ -1260,6 +1414,7 @@ function Entity:Detach()
 	end
 	if(self.block_container) then
 		self.block_container:Remove(self);
+		self.block_container = nil;
 	end
 	if(self:IsRegional()) then
 		local region = EntityManager.GetRegionContainer(self.bx, self.bz);
@@ -1282,16 +1437,17 @@ function Entity:CloneMe()
 end
 
 local isUseHeadonSay = true;
-local sHeadonSayTemplate = nil;
-
+local defaultHeadonSayTemplate = nil;
 -- let the entity say something on top of its head for some seconds. 
 -- @param text: text to show
 -- @param duration: in seconds. default to 4. if -1, it means permanent. 
 -- @param bAbove3D: default to nil, if true, headon UI will be displayed above all 3D objects. if false or nil, it just renders the UI with z buffer test enabled. 
+-- @param show_params: optional table with display settings: {background, min_width, height, min_height, padding, max_width, text_color, fontSize, padding_bottom}
 -- return true if we actually said something, otherwise nil.
-function Entity:Say(text, duration, bAbove3D)
+function Entity:Say(text, duration, bAbove3D, show_params)
 	if(text and text~="") then
 		duration = duration or 4;
+		
 		if(self.lastSayText ~= text) then
 			self.lastSayText = text;
 		elseif(duration <0) then
@@ -1301,25 +1457,48 @@ function Entity:Say(text, duration, bAbove3D)
 			end
 		end
 		if(GameLogic.isServer and self:IsServerEntity()) then
-			local packet = Packets.PacketEntityFunction:new():Init(self, "say", {text=text, duration=duration, bAbove3D=bAbove3D});
+			local packet = Packets.PacketEntityFunction:new():Init(self, "say", {text=text, duration=duration, bAbove3D=bAbove3D, show_params=show_params});
 			self:GetWorldServer():GetEntityTracker():SendPacketToAllPlayersTrackingEntity(self, packet)
 		end
 
 		if(isUseHeadonSay) then
-			if(not sHeadonSayTemplate) then
+			local template;
+			if(show_params and show_params.template) then
+				template = show_params.template;
+			elseif(not show_params and defaultHeadonSayTemplate) then
+				template = defaultHeadonSayTemplate;
+			else
+				local params = show_params or {};
 				local bg = headon_speech.dialog_bg:gsub(";", "#")
-				local text_color = Color.ConvertRGBAStringToColor(headon_speech.text_color);
-				local fontSize = tonumber(headon_speech.default_font:match(";%s*(%d+)") or 14);
-				local maxWidth = headon_speech.max_width + headon_speech.padding * 2
-				sHeadonSayTemplate = format([[<pe:mcml>
-<div style="width:%dpx;height:100px;margin-left:%dpx;margin-top:-100px;">
-	<div align="center" valign="bottom" style="background:url(%s);min-width:40px;color:%s;font-size:%dpx;padding:%dpx;padding-bottom:%dpx;"><script>document.write(text)</script></div>
+				local background = params.background;
+				if background and background~="" then
+					bg = background:gsub(";", "#")
+				end
+				local padding = params.padding or headon_speech.padding
+				local max_width = params.max_width or headon_speech.max_width
+				local maxWidth = max_width + padding * 2
+				local height = params.height or 100;
+				local min_width = params.min_width or 40;
+				local min_height = params.min_height or 40;
+				local text_color = params.text_color or Color.ConvertRGBAStringToColor(headon_speech.text_color);
+				local fontSize = params.fontSize or tonumber(headon_speech.default_font:match(";%s*(%d+)") or 14);
+				local padding_bottom = params.padding_bottom or headon_speech.padding_bottom;
+				local xmlStr = format([[<pe:mcml>
+<div style="width:%dpx;height:%dpx;margin-left:%dpx;margin-top:-%dpx;">
+	<div align="center" valign="bottom" style="background:url(%s);min-width:%dpx; min-height:%dpx; color:%s;font-size:%dpx;padding:%dpx;padding-bottom:%dpx;"><script>document.write(text)</script></div>
 </div>
-</pe:mcml>]], maxWidth, -maxWidth/2, bg, text_color, fontSize, headon_speech.padding, headon_speech.padding_bottom);
-				sHeadonSayTemplate = ParaXML.LuaXML_ParseString(sHeadonSayTemplate);
+</pe:mcml>]], maxWidth, height,-maxWidth/2, height, bg,min_width ,min_height,text_color, fontSize, padding, padding_bottom);
+				template = ParaXML.LuaXML_ParseString(xmlStr);
+				
+				-- cache template
+				if(show_params) then
+					show_params.template = template;
+				else
+					defaultHeadonSayTemplate = template;
+				end
 			end
 			
-			self:SetHeadOnDisplay({url=commonlib.clone(sHeadonSayTemplate), 
+			self:SetHeadOnDisplay({url=commonlib.clone(template), 
 				pageGlobalTable = function(tab, name)
 					if(name == "document") then
 						return document;
@@ -1394,7 +1573,13 @@ function Entity:UnloadPet()
 		-- delete pet obj
 		ParaScene.Delete(self.petObj);
 		self.petObj = nil;
-
+		if self.petEntity then
+			local headParams = self.petEntity.headUI_Params
+			self.petEntity = nil
+			if headParams then
+				self.headUI_Params = headParams
+			end
+		end
 		-- reset player model
 		local modelPath = ParaAsset.LoadParaX("", self:GetMainAssetPath() or CustomCharItems.defaultModelFile);
 		local charater = self:GetInnerObject():ToCharacter();
@@ -1419,6 +1604,36 @@ end
 
 function Entity:IsForceAutoSync()
 	return self.forceAutoSync;
+end
+
+-- load asset and update entity geometry
+-- @param onLoadedCallbackFunc: function(bLoaded) end, 
+-- @param timeoutSeconds: if nil, it will default to 10 seconds. and checks every 0.2 seconds.
+function Entity:CheckLoadAsset(onLoadedCallbackFunc, timeoutSeconds)
+	local obj = self:GetInnerObject()
+	if(not obj) then
+		return
+	end
+    local asset = obj:GetPrimaryAsset()
+    if(not asset:IsLoaded()) then
+        asset:LoadAsset()
+		timeoutSeconds = timeoutSeconds or 10;
+		timeoutSeconds = timeoutSeconds - 0.2
+		if(timeoutSeconds > 0) then
+			commonlib.TimerManager.SetTimeout(function()
+				self:CheckLoadAsset(onLoadedCallbackFunc, timeoutSeconds)
+			end, 200)
+		else
+			if(onLoadedCallbackFunc) then
+				onLoadedCallbackFunc(false)
+			end
+		end
+	else
+		obj:CallField("UpdateGeometry");
+		if(onLoadedCallbackFunc) then
+			onLoadedCallbackFunc(true)
+		end
+	end
 end
 
 --virtual function:
@@ -1481,7 +1696,10 @@ function Entity:SetHighlight(bHighlight)
 	end
 end
 
-function Entity:PlaySound(sound_name)
+-- @param channel_name: channelname or filename, where filename can be relative to current world or a predefined name
+function Entity:PlaySound(channel_name, filename, from_time, volume, pitch)
+	filename = filename or channel_name;
+	SoundManager:PlaySound(channel_name, filename, from_time or 0, volume, pitch);	
 end
 
 function Entity:IsServerEntity()
@@ -1514,6 +1732,25 @@ function Entity:OpenEditor(editor_name, entity)
 		task:Run();
 	end
 	GameLogic.SetModified();
+end
+
+-- open code editor of the given name. 
+-- @param name: if empty, we will use this entity name
+-- @return true if a code block with the given name is found and opened. 
+function Entity:OpenCodeEditor(codeblockName)
+	if(not codeblockName or codeblockName == "") then
+        codeblockName = self:GetName()
+    end
+	if(codeblockName and codeblockName ~= "") then
+		local codeEntity = GameLogic.EntityManager.FindFirstEntity(function(entity) 
+			return entity.class_name == "EntityCode" and entity:GetDisplayName() == codeblockName
+		end);
+
+		if(codeEntity) then
+			codeEntity:OpenEditor();
+			return true;
+		end
+	end
 end
 
 function Entity:GetBlockContainer()
@@ -1827,6 +2064,11 @@ function Entity:CanBeCollidedWith(entity)
     return false;
 end
 
+-- return true if this and the other entity can has collision event. 
+function Entity:CanHasCollisionEventWith(entity)
+    return false;
+end
+
 -- return true if this entity can be ridden by a player. 
 function Entity:CanBeMounted()
 	return false;
@@ -1885,6 +2127,15 @@ end
 
 function Entity:IsPlayer()
 	return false;
+end
+
+-- usually the rendering shape aabb height. 
+function Entity:GetHeight()
+	local obj = self:GetInnerObject();
+	if(obj) then
+		return obj:GetField("height", 0);
+	end
+	return 0;
 end
 
 -- in real world coordinates
@@ -2251,13 +2502,18 @@ function Entity:GetTickRateInterval()
 	return self.tickRateInterval or 0.03;
 end
 
+-- temporarily enable/disable realtime framemove
+function Entity:EnableRealtimeFramemove(bEnabled)
+	self.bRealtimeFramemove = bEnabled;
+end
+
 -- return true if EntityMob.framemove_interval is not nil and ready to frame move. 
 -- @param deltaTime in seconds
 -- @param bForceFrameMove: if nil we will only check but does not do the framemove. If true, we will not check but do the framemove
 -- true to run the framemove and increase the local time. 
 -- @return nil or deltaTimeReal in seconds.
 function Entity:CheckFrameMove(deltaTime, curTime, bForceFrameMove)
-	if(not self:IsDummy() and self.framemove_interval and (bForceFrameMove or self:IsTick("FrameMove", deltaTime, self.framemove_interval))) then
+	if(self.bRealtimeFramemove or (not self:IsDummy() and self.framemove_interval and (bForceFrameMove or self:IsTick("FrameMove", deltaTime, self.framemove_interval)))) then
 		local deltaTimeReal;
 		if(self.last_frametime) then
 			deltaTimeReal = curTime - (self.last_frametime or curTime);
@@ -2481,6 +2737,7 @@ end
 function Entity:SetMainAssetPath(name)
 	if(self:GetMainAssetPath() ~= name) then
 		self.mainAssetPath = name;
+		self:assetfileChanged();
 		return true;
 	end
 end
@@ -2526,6 +2783,14 @@ function Entity:GetBoundRadius()
 		return obj:GetField("radius", 0);
 	end
 	return 0;
+end
+
+-- set bounding box radius for view clipping. 
+function Entity:SetBoundRadius(radius)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("radius", radius);
+	end
 end
 
 -- set speed decay. percentage of motion lost per tick. 
@@ -3273,10 +3538,14 @@ end
 
 -- change entity global color
 -- @param color: 0xff0000 or "#ff00ff"
-function Entity:SetColor(color)
-	color = Color.ToValue(color)
-	if(color and self.color ~= color) then
-		self.color = color;
+function Entity:SetColor(color, bForceUpdate)
+	color = Color.ToValue(color or 0xffffff);
+	if(color and ((self.color or 0xffffff) ~= color or bForceUpdate)) then
+		if(color == 0xffffff) then
+			self.color = nil;
+		else
+			self.color = color;
+		end
 		local obj = self:GetInnerObject()
 		if(obj) then
 			local r,g,b = Color.DWORD_TO_RGBA(color);
@@ -3525,6 +3794,22 @@ function Entity:SetModelLocalTransform(roll_or_matTransform, pitch, yaw, dx, dy,
 	end
 end
 
+function Entity:ResetModelLocalTransform()
+	local matLocal = self:GetModelLocalTransform()
+    local bIsDynamicPhysics;
+    if(self:IsDynamicPhysicsEnabled()) then
+        bIsDynamicPhysics = true;
+        self:EnableDynamicPhysics(false)
+    end
+    local matLocal = self:GetModelLocalTransform()
+    if(matLocal and not matLocal:isIdentity()) then
+        self:SetModelLocalTransform(nil);
+    end
+    if(bIsDynamicPhysics) then
+        self:EnableDynamicPhysics(true)
+    end
+end
+
 -- return nil or model's local transform. 
 function Entity:GetModelLocalTransform()
 	return self.modelLocalTransform
@@ -3667,6 +3952,8 @@ end
 function Entity:GetStaticTag(name)
 	if(name==nil) then
 		return self.staticTag;
+	elseif(not self.staticTag) then
+		return nil;
 	else
 		return self:GetTagField(name);
 	end
@@ -3707,10 +3994,19 @@ end
 function Entity:SetTag(name, value)
 	if(value==nil) then
 		self.tag = name;
+		self.tagMap = nil;
 	elseif(name) then
-		local t = commonlib.totable(self.tag)
-		t[name] = value;
-		self.tag = commonlib.serialize_compact(t);
+		if(not self.tagMap) then
+			self.tagMap = commonlib.totable(self.tag) or {};
+		end
+		if(self.tagMap[name] ~= value) then
+			self.tagMap[name] = value;
+			if(value==nil and not next(self.tagMap)) then
+				self.tag = "";
+			else
+				self.tag = commonlib.serialize_compact(self.tagMap);
+			end
+		end
 	end
 end
 
@@ -3718,8 +4014,17 @@ end
 function Entity:GetTag(name)
 	if(name==nil) then
 		return self.tag;
-	elseif(self.tag) then
-		return commonlib.totable(self.tag)[name];
+	else
+		if(not self.tag) then
+			return nil;
+		elseif(not self.tagMap) then
+			if(self.tag and self.tag~="") then
+				self.tagMap = commonlib.totable(self.tag);
+			else
+				self.tagMap = {};
+			end
+		end
+		return self.tagMap[name];
 	end
 end
 
@@ -3741,4 +4046,341 @@ end
 
 function Entity:GetMaterialId()
 	return self.materialId or -1;
+end
+
+function Entity:GetBonesVariable()
+	if(not self.bones_variable) then
+		self.bones_variable = BonesVariable:new():initFromEntity(self);
+		self:Connect("assetfileChanged", self.bones_variable, self.bones_variable.OnAssetFileChanged)
+	end
+	return self.bones_variable;
+end
+
+-- get bone's world position and rotation. 
+-- @param boneName: like "R_Hand". can be nil.
+-- @param localPos: if not nil, this is the local offset
+-- @param localRot: if not nil, this is the local rotation {roll, pitch yaw}
+-- @param bUseParentRotation: use the parent rotation.
+-- @return x,y,z, roll, pitch yaw, scale: in world space.  
+-- return nil, if such information is not available, such as during async loading.
+function Entity:ComputeBoneWorldPosAndRot(boneName, localPos, localRot, bUseParentRotation)
+	local link_x, link_y, link_z = self:GetPosition()
+	local bFoundTarget;
+	self.parentPivot = self.parentPivot or mathlib.vector3d:new();
+		
+	local parentBoneRotMat;
+	if(boneName) then
+		local bones = self:GetBonesVariable();
+		local boneVar = bones:GetChild(boneName);
+		if(boneVar) then
+			bones:UpdateAnimInstance();
+			local pivot = boneVar:GetPivot(true);
+			self.parentPivot:set(pivot);
+			if(bUseParentRotation) then
+				parentBoneRotMat = boneVar:GetPivotRotation(true);
+			end
+			bFoundTarget = true;
+		end
+	else
+		self.parentPivot:set(0,0,0);
+		bFoundTarget = true;
+	end 
+	if(bFoundTarget) then
+		local parentObj = self:GetInnerObject();
+		if(not parentObj) then
+			return 
+		end
+		local parentScale = parentObj:GetScale() or 1;
+		local dx,dy,dz = 0,0,0;
+		if(not bUseParentRotation and localPos) then
+			self.parentPivot:add((localPos[1] or 0), (localPos[2] or 0), (localPos[3] or 0));
+		end
+
+		self.parentTrans = self.parentTrans or mathlib.Matrix4:new();
+		self.parentTrans = parentObj:GetField("LocalTransform", self.parentTrans);
+		self.parentPivot:multiplyInPlace(self.parentTrans);
+		self.parentQuat = self.parentQuat or Quaternion:new();
+		if(parentScale~=1) then
+			self.parentTrans:RemoveScaling();
+		end
+		self.parentQuat:FromRotationMatrix(self.parentTrans);
+		if(bUseParentRotation and parentBoneRotMat) then
+			self.parentPivotRot = self.parentPivotRot or Quaternion:new();
+			self.parentPivotRot:FromRotationMatrix(parentBoneRotMat);
+			self.parentQuat:multiplyInplace(self.parentPivotRot);
+
+			if(localRot) then
+				self.localRotQuat = self.localRotQuat or Quaternion:new();
+				self.localRotQuat:FromEulerAngles((localRot[3] or 0), (localRot[1] or 0), (localRot[2] or 0));
+				self.parentQuat:multiplyInplace(self.localRotQuat);
+			end
+		
+			if(localPos) then
+				self.localPos = self.localPos or mathlib.vector3d:new();
+				self.localPos:set((localPos[1] or 0), (localPos[2] or 0), (localPos[3] or 0));
+				self.localPos:rotateByQuatInplace(self.parentQuat);
+				dx, dy, dz = self.localPos[1], self.localPos[2], self.localPos[3];
+			end
+		end
+			
+		local p_roll, p_pitch, p_yaw = self.parentQuat:ToEulerAnglesSequence("zxy");
+			
+		if(not bUseParentRotation and localRot) then
+			-- just for backward compatibility, bUseParentRotation should be enabled in most cases
+			p_roll = (localRot[1] or 0) + p_roll;
+			p_pitch = (localRot[2] or 0) + p_pitch;
+			p_yaw = (localRot[3] or 0) + p_yaw;
+		end
+		local x, y, z = link_x + self.parentPivot[1] + dx, link_y + self.parentPivot[2] + dy, link_z + self.parentPivot[3] + dz
+		-- This fixed a bug where x or y or z could be NAN(0/0), because GetPivotRotation and GetPivot could return NAN
+		if(x == x and y==y and z==z) then
+			return x, y, z, p_roll, p_pitch, p_yaw, parentScale;
+		end
+	end
+end
+
+-- see also SetOverlayPaintFunction
+function Entity:CreateGetOverlayRenderer()
+	if(not self.overlayRenderer) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityOverlay.lua");
+		local EntityOverlay = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityOverlay")
+		local x, y, z = self:GetPosition();
+		self.overlayRenderer = EntityOverlay:new({x=x, y=y, z=z}):init();
+		self.overlayRenderer:SetParent(self);
+		self:Connect("valueChanged", self, self.UpdateOverlayTransform);
+		self:UpdateOverlayTransform()
+		self.overlayRenderer:Attach();
+	end
+	return self.overlayRenderer;
+end
+
+function Entity:UpdateOverlayTransform()
+	if(self.overlayRenderer) then
+		local x, y, z = self:GetPosition();
+		local facing = self:GetFacing();
+		self.overlayRenderer:SetPosition(x, y, z);
+		self.overlayRenderer:SetFacing(facing);
+	end
+end
+
+--[[ -- following is an example of mixed 3d and 2d rendering
+NPL.load("(gl)script/ide/System/Scene/Overlays/ShapesDrawer.lua");
+local ShapesDrawer = commonlib.gettable("System.Scene.Overlays.ShapesDrawer");
+
+GetEntity():SetOverlayPaintFunction(function(entity, painter)
+    painter:SetPen({width = 0.01, color="#0000ff"})
+    ShapesDrawer.DrawCircle(painter, 1, 2, 0, 0.3, "z", false, 12)
+    ShapesDrawer.DrawCircle(painter, 1, 2, 0, 0.3, "x", false, 12)
+
+    -- draw text with 0.01 scaling
+    painter:PushMatrix();
+    painter:TranslateMatrix(1, 2, 0); -- 3d position
+    painter:LoadBillboardMatrix();
+    painter:DrawTextScaled(0, 0, "hello", 0.01);
+    painter:PopMatrix();
+
+    -- draw line with 0.01 width
+    ShapesDrawer.DrawLine(painter, 0,0,0, 1,2,0)
+end)
+]]
+-- call this function if one wants to draw user defined 3d or 2d objects. 
+-- @param onPaintCallback: function(entity, painter) end, where entity is this entity object.
+function Entity:SetOverlayPaintFunction(onPaintCallback)
+	if(onPaintCallback) then
+		local overlayEntity = self:CreateGetOverlayRenderer()
+		if(overlayEntity) then
+			overlayEntity.DoPaint = function(entity, painter)
+				return onPaintCallback(self, painter);
+			end
+		end
+	else
+		if(self.overlayRenderer) then
+			self:Disconnect("valueChanged", self, self.UpdateOverlayTransform);
+			self.overlayRenderer:Destroy();
+			self.overlayRenderer = nil;
+		end
+	end
+end
+
+-- virtual
+function Entity:SetCanDrag()
+end
+
+-- check collision with nearby entities and broadcast collision event
+function Entity:BroadcastCollision()
+	local entities = EntityManager.GetEntitiesByAABBOfType(Entity, self:GetCollisionAABB())
+	if (entities and #entities > 1) then
+		for i=1, #entities do
+			local entity2 = entities[i];
+			if(entity2 ~= self and self:CanHasCollisionEventWith(entity2) and self:GetCollisionAABB():Intersect(entity2:GetCollisionAABB())) then
+				if(entity2:CanHasCollisionEventWith(self)) then
+					entity2:collided(self);
+				end	
+				self:collided(entity2);
+			end
+		end
+	end
+end
+
+-- set external animation for the given entity. It will replace the original animation with the external animation.
+-- @param animId: this can be 0 idle, 4 walk, 5 run etc. if nil, it will clear all external animations
+-- @param externalIDorFilename: if this is a number, it is the external animation id, usually bigger than 1000. 
+-- If this is a string, it is the paraX filename that contains the external animation.
+-- if this is -1, it means to remove the external animation and use the original animation.
+-- @note: the entity and external animation must share the same bone structure to work properly.
+function Entity:SetExternalAnimation(animId, externalIDorFilename)
+	if(animId) then
+		EntityAnimation.SetExternalAnimation(self, animId, externalIDorFilename)
+	else
+		EntityAnimation.ClearExternalAnimation(self)
+	end
+end
+
+-- return the action name of the entity. if there are multiple action names, they are separated by "|".
+-- @return: nil or string
+function Entity:GetActionName(index)
+	return self:GetStaticTag("actionname")
+end
+
+-- if there is an action point, return its world position.
+-- if there are multiple action points, return the first one as x,y,z, and return all points in the 4th return value.
+-- return x, y, z, {{x,y,z}, ...} 
+function Entity:GetActionPoint(index)
+	return self:GetPosition()
+end
+
+function Entity:GetActionRadius(index)
+	return self.actionRadius or 5; 
+end
+
+function Entity:SetActionRadius(radius, index)
+	self.actionRadius = radius
+end
+
+function Entity:DoAction(actionIndex)
+	if(not actionIndex or actionIndex == 1) then
+		local x, y, z = self:GetPosition()
+		return self:OnClick(x, y, z, "left")
+	end
+end
+
+-- play custom animation by animation name or id
+function Entity:PlayCustomAnimation(animationNameOrId)
+	local animationData = PlayerAssetFile:GetAnimationItem(tostring(animationNameOrId))
+	if animationData and animationData.filename and animationData.filename ~= "" then
+		animationNameOrId = tonumber(animationNameOrId);
+
+		if(animationNameOrId ~= self.customAnimationId) then
+			self.customAnimationId = animationNameOrId;
+		end
+		self:PlayMovieFile(animationData.filename)
+	end
+end
+
+function Entity:IsPlayingMovieFile()
+	return self.lastParamsBeforeMoviePlay ~= nil;
+end
+
+-- @param filename: a block template file containing a movie block, 
+-- if filename is nil, we will stop playing movie file.
+function Entity:PlayMovieFile(filename)
+	if (filename and MovieManager:GetInited() == nil) then
+		return
+	end
+	local channel = self:GetMovieChannel(filename ~= nil)
+	if channel then
+		if(filename) then
+			local lastCustomAnimationId = self.customAnimationId
+			self:PlayMovieFile(nil) -- stop previous movie first
+			self.customAnimationId = lastCustomAnimationId
+			CommonCtrl.FileLoader.AsyncLoadAsset(filename, function(bSuccess, filepath)
+				channel:CreateFromTemplateFile(filepath);
+				self.lastParamsBeforeMoviePlay = {
+					skin = self:GetSkin(),
+					animId = self:GetCurrentAnimId(),
+					position = {self:GetPosition()},
+					facing = self:GetFacing(),
+					roll = self:GetRoll(),
+					pitch = self:GetPitch(),
+					scaling = self:GetScaling(),
+					opacity = self:GetOpacity(),
+				}
+				local x,y,z = self:GetPosition()
+				channel:Disconnect("finished");
+				channel:TransformActorsByFirstActor(x, y, z, self:GetFacing(), self.lastParamsBeforeMoviePlay.skin);
+				channel:BindActorAgentToEntity(1, self);
+				channel:Stop()
+				channel:Play(0, -1)
+				channel:Connect("finished", function()
+					-- play loop section if self.customAnimationId is set
+					if self.customAnimationId and channel then
+						local animationData = PlayerAssetFile:GetAnimationItem(tostring(self.customAnimationId))
+						if animationData then
+							local loop_start = tonumber(animationData.loop_start)
+							local loop_end = tonumber(animationData.loop_end)
+							if loop_start and loop_end then
+								channel:Play(loop_start, loop_end, true)
+							end
+						end
+					else
+						self:PlayMovieFile(nil)
+					end
+				end);
+			end)
+		else
+			channel:Stop()
+			channel:ResetAll()
+			self.customAnimationId = nil;
+			if self.lastParamsBeforeMoviePlay then
+				-- Set flag to prevent infinite recursion with SetAnimation
+				self._isStoppingMovieFile = true;
+				
+				if(self.lastParamsBeforeMoviePlay.skin) then
+					self:SetSkin(self.lastParamsBeforeMoviePlay.skin)
+				end
+				if(self.lastParamsBeforeMoviePlay.animId~=0) then
+					self:SetAnimation(self.lastParamsBeforeMoviePlay.animId)
+				end
+				self:SetPosition(unpack(self.lastParamsBeforeMoviePlay.position))
+				self:SetFacing(self.lastParamsBeforeMoviePlay.facing)
+				if(self.lastParamsBeforeMoviePlay.roll) then
+					self:SetRoll(self.lastParamsBeforeMoviePlay.roll)
+				end
+				if(self.lastParamsBeforeMoviePlay.pitch) then
+					self:SetPitch(self.lastParamsBeforeMoviePlay.pitch)
+				end
+				if(self.lastParamsBeforeMoviePlay.scaling) then
+					self:SetScaling(self.lastParamsBeforeMoviePlay.scaling)
+				end
+				if(self.lastParamsBeforeMoviePlay.opacity) then
+					self:SetOpacity(self.lastParamsBeforeMoviePlay.opacity)
+				end
+				self.lastParamsBeforeMoviePlay = nil;
+				
+				-- Clear flag after restoration is complete
+				self._isStoppingMovieFile = false;
+			end
+		end
+	end
+end
+
+-- for playing external movie file
+function Entity:GetMovieChannel(bCreateIfNotExist)
+	if (not self.movieChannel and bCreateIfNotExist) then
+		self.movieChannel = MovieManager:CreateGetMovieChannel(self.name or "default");
+	end
+	return self.movieChannel;
+end
+
+function Entity:SetAnimId(animId)
+	if (not self:GetInnerObject()) then return end
+	animId = tonumber(animId) or 0; 
+	if (animId < 1000) then
+		self:GetInnerObject():SetField("AnimID", animId);
+	end
+end
+
+function Entity:GetAnimId()
+    if (not self:GetInnerObject()) then return 0 end
+    return self:GetInnerObject():GetField("AnimID", 0);
 end

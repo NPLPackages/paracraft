@@ -35,7 +35,7 @@ function GetTimeDesc(time)
 end
 
 function SearchFriend()
-    local search_ctrl = Page:FindUIControl("block_search_text_ctl")
+    local search_ctrl = Page:FindUIControl("add_friend_search_text_ctl")
     AddFriendsPage.SearchFriend(search_ctrl.text)
 end
 
@@ -43,20 +43,19 @@ function GetIcon(data)
     return AddFriendsPage.GetIcon(data)
 end
 
-function GetFansBtText(data)
-
-    return AddFriendsPage.GetFansBtText(data)
+function GetFriendBtText(data)
+    return AddFriendsPage.GetFriendBtText(data)
 end
 
-function Follow(data)
-    AddFriendsPage.ToFollow(data.id)
+function ToBeFriend(data)
+    AddFriendsPage.ToBeFriend(data.id)
 end
 
 function ClickItem()
 end
 
 function CanClick(data)
-    return not AddFriendsPage.IsFollow(data.id)
+    return not AddFriendsPage.IsFriend(data.id)
 end
 
 function OnSearch()
@@ -65,7 +64,7 @@ function OnSearch()
 	end
 end
 
-function GetNmae(data)
+function GetName(data)
 	local name = data.nickname or data.username
 	name = name or ""
     return name
@@ -81,7 +80,7 @@ end
 
     <div style="margin-left:33px;margin-top:5px;width:560;">
         <div style="float: left;width:440;height:26px;background:url(Texture/Aries/Creator/keepwork/friends/sousuo_16X16_32bits.png#0 0 16 16:4 4 4 4);">
-            <input type="text" EmptyText='<%=L"搜索: 输入对方账号、昵称或手机"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-left:5px;textcolor:#dedede;wid;height:25px;background:;" onkeyup="OnSearch" />
+            <input type="text" EmptyText='<%=L"搜索: 输入对方用户编号"%>' name="add_friend_search_text_ctl" uiname="add_friend_search_text_obj" CaretColor="#FFFFFFFF" style="margin-left:5px;textcolor:#dedede;wid;height:25px;background:;" onkeyup="OnSearch" />
         </div>
 
         <input type="button" value='搜索' onclick="SearchFriend" tooltip="搜索" style="float: left;color: #000000;margin-left: -7; margin-top: 0;font-size: 14pt;width: 55;height: 27; background:url(Texture/Aries/Creator/keepwork/friends/btn_shousuo_36X28_32bits.png#0 0 32 32:8 8 8 8)" />
@@ -97,24 +96,14 @@ end
                                onclick="ClickItem" param1='<%=Eval("nid")%>'>
                                 <input type="button" Normal_BG="" onclick="ClickItem" param1='<%= XPath("this") %>' MouseOver_BG='' alwaysmouseover="true" style="position:relative;margin-top:0px;width:550px;height:45px;background:;" />
                                 <div style="position:relative;margin-left:10px;margin-top:0px;padding-left:5px;padding-top:2px;width:550px;height:30px;">
-                                    <!-- <a width="32" height="26" style="padding-left:0px;padding-top:2px;background:;"
-                                       onclick="ClickItem" param1='<%=Eval("nid")%>'>
-                                        <aries:onlinestatus width="550" height="26" nid='<%=Eval("nid")%>' />
-                                    </a> -->
                                     <div style="float: left;margin-left:0px;margin-top:0px;">
                                         <img zorder="0" src='<%=GetIcon(XPath("this"))%>'width="46" height="46" onclick="ClickHead" param1='<%= XPath("this") %>'/>
                                     </div>
                                     <div onclick="ClickHead" param1='<%= XPath("this") %>' style="float: left;margin-left:16px;margin-top:8px;width:120px;color:#000000">
-                                        <%=GetNmae(XPath("this")) %>
+                                        <%=GetName(XPath("this")) %>
                                     </div>
-                                    <div style="float: left;margin-left:267px;margin-top:10px;font-size:12pt;color:#000000;text-align: right;">
-                                        <!-- <pe:if condition='<%=CanClick(XPath("this"))%>'>
-                                            
-                                        </pe:if> -->
-                                        <input type="button" value='<%= GetFansBtText(XPath("this"))%>' onclick="Follow" name='<%= XPath("this") %>' tooltip='<%= GetFansBtText(XPath("this"))%>' style="color: #000000; width: 52;height: 27; font-size: 14;background: url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X32_32bits.png#0 0 32 32:8 8 8 8);"/>
-                                        <!-- <pe:if condition='<%=not CanClick(XPath("this"))%>'>
-                                            <input type="button" value='<%= GetFansBtText(XPath("this"))%>' enabled='false' onclick="Follow" name='<%= XPath("this") %>' tooltip='<%= GetFansBtText(XPath("this"))%>' style="color: #000000; width: 52;height: 27; font-size: 14;background: url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X32_32bits.png#0 0 32 32:8 8 8 8);"/>
-                                        </pe:if> -->
+                                    <div style="float: left;margin-left:247px;margin-top:10px;font-size:12pt;color:#000000;text-align: right;">
+                                        <input type="button" value='<%= GetFriendBtText(XPath("this"))%>' onclick="ToBeFriend" name='<%= XPath("this") %>' tooltip='<%= GetFriendBtText(XPath("this"))%>' style="color: #000000; width: 66;height: 27; font-size: 12; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/friends/btn_guanzhu_32X32_32bits.png#0 0 32 32:8 8 8 8);"/>
                                     </div>
                                 </div>
                             </a>

@@ -1,0 +1,24 @@
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EnterConfirm.lua"><![CDATA[
+    EnterConfirm = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/EnterConfirm.lua")
+    EnterConfirm.OnInit();
+]]></script>
+<div style="width:512px;height:128px;">
+    <div style="position:relative;">
+        <div style="width:100px;height:128px;float:left;background:url(Texture/Aries/Common/gradient_white_32bits.png#0 0 7 16);background-color:#1f3243;"></div>
+        <div style="width:312px;height:128px;float:left;background:url(Texture/Aries/Common/gradient_white_32bits.png#7 0 1 16);background-color:#1f3243;"></div>
+        <div style="width:100px;height:128px;float:left;background:url(Texture/Aries/Common/gradient_white_32bits.png#8 0 7 16);background-color:#1f3243;"></div>
+    </div>
+    <div style="margin:10px 50;">
+        <pe:label name="lblCountdown" text="3秒后自动进入"  style="color:#f0a748;font-size:18px;height:56px;text-align: center;width:400px;"/>
+    </div>
+    <div>
+        <input type="button" name="btnEnter" value="立即进入" 
+           style="float: left; margin-left:270px;color:#ffffff;font-size:14px;min-width:80px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" 
+           onclick="EnterConfirm.OnConfirmEnter" />
+        <input type="button" name="btnClose" value="取消" 
+           style="float: left; margin-left:20px;color:#ffffff;font-size:14px;min-width:80px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" 
+           onclick="EnterConfirm.OnClose" />
+    </div> 
+</div>
+</pe:mcml>

@@ -13,17 +13,20 @@ EditModelProperty.ShowPage(function(values)
 end, {name="1", itemId, canDrag=true})
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
 local EditModelProperty = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelProperty");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local Color = commonlib.gettable("System.Core.Color");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
 local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local page;
-
+EditModelProperty.mountpoint_expanded = false;
 local function StringToBooleanNil(value)
-	if(value == "true") then
+	if type(value) == "boolean" then
+		return value
+	elseif(value == "true") then
 		return true
 	elseif(value == "false") then
 		return false
@@ -75,21 +78,43 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 				modelEntity:SetFrameMoveInterval(values.framemove_interval);
 				if(modelEntity.SetDragDisplayOffsetY) then
 					modelEntity:SetDragDisplayOffsetY(values.dragDisplayOffsetY)
-				end
+				end				
 				modelEntity:SetIdleAnim(values.idleAnim or 0)
+				if(modelEntity.SetAnimFrame) then
+					modelEntity:SetAnimFrame(values.animFrame)
+				end
 				modelEntity:SetAutoTurningDuringDragging(values.autoTurning)
 				modelEntity:SetDisplayModel(values.isDisplayModel~=false)
 				modelEntity:EnableDropFall(values.enableDropFall~=false)
+				modelEntity:SetTrigger(values.isTrigger == true)
+				if(values.onTriggerEnterEvent == "") then
+					values.onTriggerEnterEvent = nil
+				end
+				modelEntity:SetOnTriggerEnterEvent(values.onTriggerEnterEvent)
+				if(values.onTriggerExitEvent == "") then
+					values.onTriggerExitEvent = nil
+				end
+				modelEntity:SetOnTriggerExitEvent(values.onTriggerExitEvent)
+
+				modelEntity:SetLocked(values.isLocked)
 				
 				local opacity = tonumber(values.opacity)
 				if(opacity and opacity>=0 and opacity<=1) then
 					modelEntity:SetOpacity(opacity);
 				end
+				
+				local color = values.color
+				if(color and color ~= "") then
+					modelEntity:SetColor(color);
+				else
+					modelEntity:SetColor(nil);
+				end
+				
 				local bootHeight = tonumber(values.bootHeight)
 				if(bootHeight and modelEntity.SetBootHeight ~= nil) then
 					modelEntity:SetBootHeight(bootHeight);
 				end
-				
+
 				if(values.onClickEvent == "") then
 					values.onClickEvent = nil
 				end
@@ -172,13 +197,18 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 			isStackable = modelEntity.isStackable,
 			isDisplayModel = modelEntity:IsDisplayModel(),
 			enableDropFall = modelEntity:IsDropFallEnabled(),
+			isLocked = modelEntity:IsLocked(),
 			opacity = modelEntity:GetOpacity(),
+			color = Color.FromValueToStr(modelEntity:GetColor()),
 			bootHeight = modelEntity.GetBootHeight ~= nil and modelEntity:GetBootHeight() or 0,
 			stackHeight = modelEntity.stackHeight,
 			framemove_interval = modelEntity.framemove_interval,
 			dragDisplayOffsetY = modelEntity.dragDisplayOffsetY,
 			autoTurning = modelEntity.bIsAutoTurning,
 			canDrag = modelEntity.canDrag,
+			isTrigger = modelEntity.isTrigger,
+			onTriggerEnterEvent = modelEntity:GetOnTriggerEnterEvent(),
+			onTriggerExitEvent = modelEntity:GetOnTriggerExitEvent(),
 			onClickEvent = modelEntity:GetOnClickEvent(),
 			onHoverEvent = modelEntity:GetOnHoverEvent(),
 			onMountEvent = modelEntity:GetOnMountEvent(),
@@ -188,10 +218,22 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 			tag = modelEntity:GetTag(),
 			staticTag = modelEntity:GetStaticTag(),
 			category = modelEntity:GetCategory(),
-			modelfile = modelEntity:GetModelFile(),
-			idleAnim = modelEntity:GetIdleAnim(),
-			mountpoints = mountpoints, 
+			modelfile = modelEntity:GetModelFile(),			idleAnim = modelEntity:GetIdleAnim(),
+			animFrame = modelEntity.GetAnimFrame and modelEntity:GetAnimFrame() or nil,
+			mountpoints = mountpoints,
 		})
+	end
+end
+
+local dropNames = {"framemove_interval","category","dragDisplayOffsetY","idleAnim","animFrame","stackHeight","isStackable","canDrag","autoTurning","hasRealPhysics"}
+function EditModelProperty.HideDropdownList()
+	if(page) then
+		for i, name in ipairs(dropNames) do
+			local ctrl = page:FindControl(name);
+			if ctrl and ctrl.Destroy then
+				ctrl:Destroy()
+			end
+		end
 	end
 end
 
@@ -199,6 +241,7 @@ end
 -- @param last_values: {name, ...}
 function EditModelProperty.ShowPage(OnClose, last_values)
 	EditModelProperty.result = last_values;
+	EditModelProperty.mountpoint_expanded = false;
 	if(last_values) then
 		EditModelProperty.mountpoints = last_values.mountpoints
 	end
@@ -230,6 +273,7 @@ function EditModelProperty.ShowPage(OnClose, last_values)
 	params._page.OnClose = function()
 		if(OnClose) then
 			OnClose(EditModelProperty.result);
+			EditModelProperty.HideDropdownList()
 		end
 	end
 end
@@ -248,33 +292,50 @@ function EditModelProperty.OnOK()
 		local framemove_interval = page:GetValue("framemove_interval")
 		framemove_interval = tonumber(framemove_interval);
 		
+		local category = page:GetValue("category")
 		local dragDisplayOffsetY = page:GetValue("dragDisplayOffsetY")
-		if(dragDisplayOffsetY~="nil") then
-			dragDisplayOffsetY = tonumber(dragDisplayOffsetY) or 0.3;
-			dragDisplayOffsetY = math.min(math.max(dragDisplayOffsetY, -1), 1);
+		if(category == "staticblock") then
+			dragDisplayOffsetY = 0;
 		else
-			dragDisplayOffsetY = nil;
+			if(dragDisplayOffsetY~="nil") then
+				dragDisplayOffsetY = tonumber(dragDisplayOffsetY) or 0.3;
+				dragDisplayOffsetY = math.min(math.max(dragDisplayOffsetY, -1), 1);
+			else
+				dragDisplayOffsetY = nil;
+			end
 		end
 		local idleAnim = tonumber(page:GetValue("idleAnim", 0)) or 0
+		local animFrame = page:GetValue("animFrame")
+		if(animFrame == "") then
+			animFrame = nil
+		elseif(animFrame) then
+			animFrame = tonumber(animFrame)
+		end
 		local hasRealPhysics = page:GetValue("hasRealPhysics")
 		local autoTurning = StringToBooleanNil(page:GetValue("autoTurning"))
 		local isStackable = StringToBooleanNil(page:GetValue("isStackable"))
 		local canDrag = StringToBooleanNil(page:GetValue("canDrag"))
+		local isTrigger = StringToBooleanNil(page:GetValue("isTrigger"))
 
 		EditModelProperty.result = {
 			name = name,
 			stackHeight = stackHeight,
-			framemove_interval = framemove_interval, 
-			dragDisplayOffsetY = dragDisplayOffsetY,
-			idleAnim = idleAnim, 
+			framemove_interval = framemove_interval,			dragDisplayOffsetY = dragDisplayOffsetY,
+			idleAnim = idleAnim,
+			animFrame = animFrame,
 			hasRealPhysics = hasRealPhysics,
 			isDisplayModel = page:GetValue("isDisplayModel"),
 			enableDropFall = page:GetValue("enableDropFall"),
+			isLocked = page:GetValue("isLocked"),
 			opacity = page:GetValue("opacity"),
+			color = page:GetValue("color"),
 			bootHeight = page:GetValue("bootHeight"),
 			autoTurning = autoTurning,
 			isStackable = isStackable,
 			canDrag = canDrag,
+			isTrigger = isTrigger,
+			onTriggerEnterEvent = page:GetValue("onTriggerEnterEvent"),
+			onTriggerExitEvent = page:GetValue("onTriggerExitEvent"),
 			onClickEvent = page:GetValue("onClickEvent"),
 			onHoverEvent = page:GetValue("onHoverEvent"),
 			onMountEvent = page:GetValue("onMountEvent"),
@@ -284,7 +345,7 @@ function EditModelProperty.OnOK()
 			modelfile = page:GetValue("modelfile"),
 			tag = page:GetValue("tag"),
 			staticTag = page:GetValue("staticTag"),
-			category = page:GetValue("category"),
+			category = category,
 			mountpoints = EditModelProperty.mountpoints,
 		};
 		page:CloseWindow();
@@ -299,15 +360,20 @@ function EditModelProperty.UpdateUIFromValue(values)
 		page:SetValue("isStackable", tostring(values.isStackable));
 		page:SetValue("isDisplayModel", values.isDisplayModel);
 		page:SetValue("enableDropFall", values.enableDropFall);
+		page:SetValue("isLocked", values.isLocked);
 		page:SetValue("opacity", math.floor(values.opacity*100)/100);
+		page:SetValue("color", tostring(values.color or ""));
 		page:SetValue("bootHeight", values.bootHeight);
 		page:SetValue("stackHeight", tostring(values.stackHeight));
 		page:SetValue("framemove_interval", tostring(values.framemove_interval or ""));
-		page:SetValue("dragDisplayOffsetY", tostring(values.dragDisplayOffsetY));
-		page:SetValue("idleAnim", tostring(values.idleAnim));
+		page:SetValue("dragDisplayOffsetY", tostring(values.dragDisplayOffsetY));		page:SetValue("idleAnim", tostring(values.idleAnim));
+		page:SetValue("animFrame", tostring(values.animFrame or ""));
 		page:SetValue("hasRealPhysics", tostring(values.hasRealPhysics));
 		page:SetValue("autoTurning", tostring(values.autoTurning));
 		page:SetValue("canDrag", tostring(values.canDrag));
+		page:SetValue("isTrigger", values.isTrigger);
+		page:SetValue("onTriggerEnterEvent", tostring(values.onTriggerEnterEvent or ""));
+		page:SetValue("onTriggerExitEvent", tostring(values.onTriggerExitEvent or ""));
 		page:SetValue("onClickEvent", tostring(values.onClickEvent or ""));
 		page:SetValue("onHoverEvent", tostring(values.onHoverEvent or ""));
 		page:SetValue("onMountEvent", tostring(values.onMountEvent or ""));
@@ -352,6 +418,17 @@ function EditModelProperty.OnTextChange(name, mcmlNode)
 		if(EditModelProperty.mountpoints) then
 			EditModelProperty.mountpoints[index].name = text;
 		end
+	end
+end
+
+function EditModelProperty.OnClickExpand()
+	if not page then
+		return
+	end
+	local morePoint = ParaUI.GetUIObject("EditModelProperty.mountpoints_container");
+	if morePoint and morePoint:IsValid() then
+		EditModelProperty.mountpoint_expanded = not EditModelProperty.mountpoint_expanded;
+		morePoint.visible = EditModelProperty.mountpoint_expanded;
 	end
 end
 
@@ -407,4 +484,46 @@ function EditModelProperty.OnClickEmptyRuleSlot(slotNumber)
 			entity:OnClickEmptySlot(slot);
 		end
 	end
+end
+
+function EditModelProperty.ShowStaticPhysicsPropertiesEditor()
+	-- print("========================EditModelProperty.ShowStaticPhysicsPropertiesEditor=======================")
+	local entity = EditModelProperty.GetEntity()
+	if (not entity) then return end
+	-- _G.IsDevEnv = true;
+	-- NPL.load("script/ide/System/UI/TableEditor/TableEditor.lua", true);
+	NPL.load("script/ide/System/UI/TableEditor/TableEditor.lua");
+	local TableEditor = commonlib.gettable("System.UI.TableEditor.TableEditor");
+	TableEditor:ShowLiveModelStaticPhysicsProperties(entity);
+end
+
+function EditModelProperty.OnChangeSkin()
+	local entity = EditModelProperty.GetEntity()
+	if(entity) then
+		EditModelProperty.OnClose()
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+		local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
+		PlayerSkins:OpenEditor(entity, function(bSucceed, newSkin, oldSkin)
+			if(bSucceed) then
+				if(not GameLogic.IsVip()) then
+					if(oldSkin) then
+						entity:SetSkin(oldSkin);
+						GameLogic.AddBBS(nil, L"只有VIP用户才可以更换皮肤。", 7000, "255 0 0");
+					end
+				end
+			end
+		end)
+	end
+end
+
+function EditModelProperty.OnChooseColor()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.lua");
+	local SelectColor = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectColor");
+	local task = SelectColor:new();
+	task:ShowDialogPage(function(colorDWORD)
+		if(colorDWORD) then
+			local colorStr = Color.FromValueToStr(colorDWORD);
+			page:SetValue("color", colorStr);
+		end
+	end);
 end

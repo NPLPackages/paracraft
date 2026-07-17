@@ -1,0 +1,23 @@
+<pe:mcml>
+<script type="text/npl" src="BagFullTip.lua"><![CDATA[
+local BagFullTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/BagFullTip.lua")
+BagFullTip.OnInit();
+
+
+-- 关闭界面
+function OnClose()
+    BagFullTip.Close()
+end
+
+function ShowTempBag()
+    BagFullTip.ShowTempBag()
+end
+
+]]>
+</script>
+
+<div style="width: 200px; height: 100px; background: url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 64);">
+    <div style="position: relative; font-size: 18px; color: #0000fa;  margin-top: 8px; margin-left:12px;"><%=L"你的背包满了💦"%></div>
+    <input type="button" value="<%=L'查看'%>" style="width: 54px; font-weight: bold; text-offset-y:-2; height: 24px; margin-left: 124px; margin-top: 36px; background:url(Texture/Aries/Creator/keepwork/ggs/user/btn_confirm_16X16_32bits.png#0 0 16 16:6 6 6 6)"  onclick="ShowTempBag()"/>
+</div>
+</pe:mcml>

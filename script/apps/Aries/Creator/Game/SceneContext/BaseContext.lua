@@ -170,8 +170,9 @@ end
 
 function BaseContext:handleHookedEvent(event)
 	local GI = GameLogic:GetCodeGlobal():GetGI();
-	if (not GI) then return end
-	GI:HandleMouseKeyBoardEvent(event);
+	if(GI and GI.HandleMouseKeyBoardEvent) then
+		GI:HandleMouseKeyBoardEvent(event);
+	end
 end
 
 -- return true if handled
@@ -192,7 +193,7 @@ function BaseContext:handleHookedMouseEvent(event)
 			-- return true;
 		end
 	elseif(event:GetType() == "mouseReleaseEvent") then
-		if(event:button() == "left" and event:GetDragDist() < 10) then
+		if(event:button() == "left" and event:casualClickCheck(self:GetMouseClickDist())) then
 			if(GameLogic.GetCodeGlobal():BroadcastBlockClickEvent("BroadcastBlockClickEvent", event)) then
 				-- we need to leak event to global scene, even we processed it
 				-- return true;
@@ -432,7 +433,7 @@ function BaseContext:OnLeftMouseHold(fDelta)
 				block:OnMouseDown(event, result.blockX,result.blockY,result.blockZ);
 			end
 			
-			if(block and block:CanDestroyBlockAt(result.blockX,result.blockY,result.blockZ)) then
+			if(block and (self:CanDestroyBlockAt(result.blockX,result.blockY,result.blockZ) or block:CanDestroyBlockAt(result.blockX,result.blockY,result.blockZ))) then
 				self:UpdateClickStrength(fDelta, result);
 
 				click_data.left_holding_time = click_data.left_holding_time + fDelta;
@@ -561,7 +562,7 @@ function BaseContext:EndMouseClickCheck(event)
 		local diff2 = last_lookat_params - lookat_params;
 		if(diff:length2() < 0.2) then
 			if(math.abs(diff2[1])<0.2 and math.abs(diff2[2])<0.05 and math.abs(diff2[3])<0.05) then
-				if(event and event:GetDragDist() > 10) then
+				if(event and not event:casualClickCheck(self:GetMouseClickDist())) then
 					return;
 				end
 				return true;
@@ -572,7 +573,7 @@ function BaseContext:EndMouseClickCheck(event)
 		local lookat_params = vector3d:new({att:GetField("CameraObjectDistance", 0), att:GetField("CameraLiftupAngle", 0), att:GetField("CameraRotY", 0)});
 		local diff2 = last_lookat_params - lookat_params;
 		if(math.abs(diff2[1])<0.2 and math.abs(diff2[2])<0.05 and math.abs(diff2[3])<0.05) then
-			if(event and event:GetDragDist() > 10) then
+			if(event and not event:casualClickCheck(self:GetMouseClickDist())) then
 				return;
 			end
 			return true;
@@ -611,6 +612,10 @@ function BaseContext:mousePressEvent(event)
 	if GameLogic.GetFilters():apply_filters("BaseContextMousePressEvent", false, event) then
 		return
 	end
+
+	if GameLogic.GameMode:GetMode() == "tutorial" and event.alt_pressed and event.mouse_button == "left" then
+		return
+	end
 	if(not event.isEmulated and not event.touchSession) then
 		-- if it is from touch session, we will ignore UI controls
 		local temp = ParaUI.GetUIObjectAtPoint(event.x, event.y);
@@ -625,8 +630,13 @@ function BaseContext:mousePressEvent(event)
 	-- on touch screen, mouse press is fired before the timer where CheckMousePick is called, so we need to do a real mouse pick here
 	self:CheckMousePick(event);
 	local result = SelectionManager:GetPickingResult();
-	local mouseEntity = result.entity 
+	local mouseEntity = result.entity;
 	if(mouseEntity) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/PlayContext.lua");
+		local PlayContext = commonlib.gettable("MyCompany.Aries.Game.SceneContext.PlayContext");
+		if(PlayContext.manip and PlayContext.manip.selector) then
+			PlayContext.manip.selector:OnFinished();
+		end
 		mouseEntity:event(event)
 		if(event:isAccepted()) then
 			if(mouseEntity:isCaptureMouse()) then
@@ -708,6 +718,7 @@ end
 
 -- virtual: 
 function BaseContext:mouseWheelEvent(event)
+	GameLogic.GetFilters():apply_filters("mouseWheelEvent", false, event)
 	if(self:handleHookedMouseEvent(event)) then
 		return;
 	end
@@ -777,6 +788,7 @@ function BaseContext:keyPressEvent(event)
 end
 
 function BaseContext:keyReleaseEvent(event)
+	GameLogic.GetFilters():apply_filters("KeyReleaseEvent", false, event)
 	self:handleHookedEvent(event);
 end
 
@@ -812,19 +824,27 @@ function BaseContext:HandleEscapeKey()
 	end
 end
 
+function BaseContext:CanDestroyBlockAt(bx, by, bz)
+end
+
+function BaseContext:CanReachBlockAt(bx, by, bz)
+end
 
 -- try to destroy the block at picking result
 -- if the terrain block is hit, click_data.strength must be larger than max_break_time
 -- @param is_allow_delete_terrain: true 
 function BaseContext:TryDestroyBlock(result, is_allow_delete_terrain)
 	-- try to destroy block
+	if self:IsLockEdit() then
+		return
+	end
 	if(result and result.blockX) then
 		local click_data = self:GetClickData();
 		-- removed the block
 		local block_template = BlockEngine:GetBlock(result.blockX,result.blockY,result.blockZ);
 		
-		if(block_template and block_template:CanDestroyBlockAt(result.blockX,result.blockY,result.blockZ)) then
-			if(EntityManager.GetFocus():CanReachBlockAt(result.blockX,result.blockY,result.blockZ)) then
+		if(block_template and (self:CanDestroyBlockAt(result.blockX,result.blockY,result.blockZ) or block_template:CanDestroyBlockAt(result.blockX,result.blockY,result.blockZ))) then
+			if( self:CanReachBlockAt(result.blockX,result.blockY,result.blockZ) or EntityManager.GetFocus():CanReachBlockAt(result.blockX,result.blockY,result.blockZ)) then
 				local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, is_allow_delete_terrain=is_allow_delete_terrain})
 				task:Run();
 				GameLogic.GetFilters():apply_filters("user_event_stat", "block", "destroy:"..tostring(block_template.id), 1, nil);
@@ -874,7 +894,7 @@ end
 
 -- @param event: optional event object
 function BaseContext:OnCreateBlock(result, event)
-	if result.blockX == nil or result.blockY == nil or result.blockZ == nil then
+	if result.blockX == nil or result.blockY == nil or result.blockZ == nil or self:IsLockEdit() then
 		return;
 	end	
 	local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
@@ -1017,6 +1037,14 @@ function BaseContext:handleRightClickScene(event, result)
 	return isProcessed
 end
 
+function BaseContext:IsLockEdit()
+	local draggFilter = GameLogic.GetFilters():apply_filters('CodeBlockWindow.IsDragable')
+    if draggFilter == false then 
+		return true
+	end
+	return false
+end
+
 -- virtual: undo/redo related key events, such as ctrl+Z/Y
 -- return true if processed
 function BaseContext:handleHistoryKeyEvent(event)
@@ -1052,7 +1080,7 @@ function BaseContext:handlePlayerKeyEvent(event)
 			event:accept();
 		elseif(dik_key == "DIK_F") then
 			-- fly mode
-			if(GameMode:CanFly()) then
+			if(GameMode:CanFly() or GameLogic.IsVip()) then
 				GameLogic.ToggleFly();
 			else
 				NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
@@ -1078,9 +1106,17 @@ function BaseContext:handlePlayerKeyEvent(event)
 			end
 		elseif(dik_key == "DIK_W" or dik_key == "DIK_UP") then
 			GameLogic.WalkForward();
-			
+
+		elseif(dik_key == "DIK_T") then
+			local ActionNameDetector = commonlib.gettable("MyCompany.Aries.Game.Common.ActionNameDetector");
+			if(ActionNameDetector.IsEnabled and ActionNameDetector:IsEnabled()) then
+				ActionNameDetector:UpdateDetection();
+				ActionNameDetector:TriggerCurrentAction();
+			end
 		elseif(dik_key == "DIK_E") then
-			GameLogic.ToggleDesktop("builder");
+			if not self:IsLockEdit() then
+				GameLogic.ToggleDesktop("builder");
+			end
 			event:accept();
 		elseif(dik_key == "DIK_Q") then
 			GameLogic.GetPlayerController():ThrowBlockInHand();
@@ -1105,13 +1141,19 @@ function BaseContext:handlePlayerKeyEvent(event)
 			GameLogic.TalkToNearestNPC();
 			event:accept();
 		elseif(dik_key == "DIK_R") then
+			if System.options.isStrictGameMode then
+				event:accept();
+				return
+			end
 			local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
 			local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 			if not MovieClipController.IsVisible() then
-				if KeepWorkMallPage.isOpen then
-					KeepWorkMallPage.Close()
-				else
-					KeepWorkMallPage.Show();
+				if not self:IsLockEdit() then
+					if KeepWorkMallPage.isOpen then
+						KeepWorkMallPage.Close()
+					else
+						KeepWorkMallPage.Show();
+					end
 				end
 				event:accept();
 			end
@@ -1148,6 +1190,7 @@ function BaseContext:HandleGlobalKey(event)
 				System.App.Commands.Call("Help.ToggleWireFrame");
 			end
 			event:accept();
+			GameLogic:texturePackChanged();
 		end
 		if(event:isAccepted()) then
 			return true;
@@ -1235,7 +1278,8 @@ function BaseContext:HandleGlobalKey(event)
 						
 					if(dik_key == "DIK_C") then
 						-- copy current mouse cursor block to clipboard
-						SelectBlocks.CopyToClipboard();
+						local isCopyReferences = event.shift_pressed
+						SelectBlocks.CopyToClipboard(nil, nil, isCopyReferences);
 					elseif(dik_key == "DIK_V") then
 						-- paste from clipboard
 						SelectBlocks.PasteFromClipboard();
@@ -1278,45 +1322,27 @@ function BaseContext:HandleGlobalKey(event)
 	elseif(dik_key == "DIK_RETURN") then
 		if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyByRETURN") then
 			if(GameLogic.GameMode:CanChat() and GameLogic.options:IsShowChatWnd()) then
-				if (System.User.isAnonymousWorld == false) then
-					-- System.App.Commands.Call(System.App.Commands.GetDefaultCommand("EnterChat"));
-					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-					MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
-					event:accept();
-				else
-					GameLogic.CheckSignedIn(L"请先登录！", function()
-						if (System.User.isAnonymousWorld) then
-							LOG.std(nil, "info", "BaseContext:HandleGlobalKey", "User cannot use command line.");
-							return;
-						end
-						NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-						MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
-						event:accept();
-					end);
-				end
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+				MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+				event:accept();
 			end
 		end
 	elseif(dik_key == "DIK_SLASH") then
 		if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyBySLASH") then
 			if (GameLogic.GameMode:CanChat() and GameLogic.options:IsShowChatWnd()) then
-				if (not System.User.isAnonymousWorld) then
+				local function HandleSlashKey_()
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
 					MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
-					MyCompany.Aries.ChatSystem.ChatEdit.SetText("/");
-					event:accept();
-				else
-					GameLogic.CheckSignedIn(L"请先登录！", function()
-						if (System.User.isAnonymousWorld) then
-							LOG.std(nil, "info", "BaseContext:HandleGlobalKey", "User cannot use command line.");
-							return;
-						end
-	
-						NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-						MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+
+					if(event.shift_pressed) then
+						MyCompany.Aries.ChatSystem.ChatEdit.SetText("/ask ");
+					else
 						MyCompany.Aries.ChatSystem.ChatEdit.SetText("/");
-						event:accept();
-					end);
+					end
+					
+					event:accept();
 				end
+				HandleSlashKey_()
 			end
 		end
 	elseif(dik_key == "DIK_GRAVE") then
@@ -1680,4 +1706,9 @@ end
 
 function BaseContext:GetLinePathJumpHeightWhileHidden()
 	return self.jumpHeightWhileHidden or 32
+end
+
+-- if the mouse down and mouse up differs by larger than this distance, we will not consider it as a click.
+function BaseContext:GetMouseClickDist()
+	return 10;
 end

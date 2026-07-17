@@ -8,9 +8,18 @@ use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BonesVariable.lua");
 local BonesVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable");
-BonesVariables:init(actor)
--- BonesVariables:initFromEntity(entity)  -- alternatively we can use entity
-BonesVariables:SetSelectedBone(name)
+local bones = BonesVariable:new():init(actor)
+-- alternatively we can use live entity's GetBonesVariable
+local bones = entity:GetBonesVariable()
+local boneVar = bones:GetChild(boneName);
+if(boneVar) then
+	boneVar:SetRotation(mathlib.Quaternion:FromEulerAngles(1.57, 0, 0));
+	boneVar:SetTranslation({0,0,0});
+	boneVar:SetScaling({1,1,1});
+end
+for name, boneVar in bones:pairs() do
+	-- for each child
+end
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BoneVariable.lua");
@@ -21,6 +30,7 @@ local ATTRIBUTE_FIELDTYPE = commonlib.gettable("System.Core.ATTRIBUTE_FIELDTYPE"
 
 local BonesVariable = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Common.MultiAnimBlock"), commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable"));
 BonesVariable.name = "bones";
+BonesVariable.tableType = "BonesVariable";
 BonesVariable.actorBoneRange = "on"; -- temp value
 
 function BonesVariable:ctor()
@@ -248,6 +258,11 @@ function BonesVariable:GetChild(name)
 	end
 end
 
+-- iterator of each child name, bone pairs
+function BonesVariable:pairs()
+	return pairs(self:GetVariables());
+end
+
 -- create get bone variables for advanced editing
 -- This function is only called, when wants to edit variables. 
 function BonesVariable:GetVariables()
@@ -264,6 +279,11 @@ function BonesVariable:GetVariables()
 				if(not var) then
 					var = BoneVariable:new():init(bone_attr, animInstance, self);
 					self.variable_names[name] = var;
+					-- tricky: also add short names (first non-space letters) to the variable_names table.
+					local shortName = name:match("^%S+");
+					if(shortName and not self.variable_names[shortName]) then
+						self.variable_names[shortName] = var;
+					end
 					self.variables:add(var);
 				end
 			end

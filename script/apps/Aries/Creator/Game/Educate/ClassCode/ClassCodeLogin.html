@@ -1,0 +1,140 @@
+<!-- "script/apps/Aries/Creator/Game/Educate/Project/ClassCodeLogin.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ClassCodeLogin.lua"><![CDATA[
+    local OfflineAccountManager = NPL.load('(gl)Mod/WorldShare/cellar/OfflineAccount/OfflineAccountManager.lua')
+    local ClassCodeLogin = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/ClassCode/ClassCodeLogin.lua")
+    ClassCodeLogin.OnInit()
+    function ClosePage()
+        Page:CloseWindow(0)
+    end
+
+    function onclickBackground()
+        
+    end
+
+    function OnClickNext()
+        ClassCodeLogin.OnClickNext()
+    end
+
+    function OnClickBack()
+        ClassCodeLogin.OnClickBack()
+    end
+
+    function OnClickLocalMode()
+        ClassCodeLogin.OnClose()
+        OfflineAccountManager.SetOfflineAppCommandLine()
+        local EducateOfflinePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Offline/EducateOfflinePage.lua")
+        EducateOfflinePage.ShowPage()
+    end
+
+    function on_click_educate_net()
+        local url = "https://edu.palaka.cn/"
+        local platform = System.os.GetPlatform()
+        if platform == "win32" or platform == "emscripten" then
+            GameLogic.RunCommand("/open " .. url);
+            return
+        end
+        GameLogic.RunCommand("/open -e "..url)
+    end
+
+    function IsShowLocalMode()
+        local platform = System.os.GetPlatform()
+        return platform ~= "emscripten"
+    end
+
+    function OnClassCodeFocusIn()
+        ClassCodeLogin.OnTextFocusIn()
+    end
+
+    function OnClassCodeFocusOut()
+        ClassCodeLogin.OnTextFocusOut()
+    end
+
+    function OnClassCodeTextChange()
+        ClassCodeLogin.OnTextChanged()
+    end
+]]></script>
+    
+<pe:container alignment="_fi" zorder='-2' onclick = "onclickBackground" width="100%" height="100%" style="background-color:#ff00ff00; ">
+    <pe:container alignment='_rt' zorder='-1' style='width:120px;height:60px;position: relative; margin-top: 80px;margin-right: 100px;background-color:#fff60000;'>
+        <pe:if condition="<%=not System.options.isShenzhenAi5%>">
+            <div  style='width: 120px;margin-left: 0px;'>
+                <input type='button' onclick='on_click_educate_net' style='margin-left: 40px;width: 40px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login/wangzhan_40x40_32bits.png#0 0 40 40)'/>
+                <div style = " width: 120px;text-align: center;font-size: 8px;color: #0E1627;">
+                    <%=L"智慧教育平台"%>
+                </div>
+            </div>
+        </pe:if>
+    </pe:container>
+    <pe:container alignment="_ct" uiname="ClassCodeLogin.background" width="360" height="500" zorder='-1' style="margin-left: -180px;margin-top: -200px; background: url();">
+        <div style="position: relative; margin-left: 38px; margin-top: 164px;">
+            <input type='text'
+                    uiname='ClassCode_input' 
+                    style='textcolor: #FAF7FF;
+                            background: ;
+                            height: 34px;
+                            width: 300px;
+                            margin-top: 0px;
+                            margin-left: 0px;
+                            font-size: 16px;'
+                    CaretColor="#FFFFFFFF"
+                    onchange='OnClassCodeTextChange'
+                    onfocusin='OnClassCodeFocusIn'
+                    onfocusout ="OnClassCodeFocusOut"
+                    SkipAutoBadWordFilter='true'
+                    RemoveSpaces='true'
+                    MoveViewWhenAttachWithIME='true' />
+        </div>
+        <div zorder='-1' style="position: relative;width:360px;height: 400px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/dengludi_50x50_32bits.png#0 0 60 60:28 28 28 28);"></div>
+        <div style="position: relative; color: #38374D; font-size: 24px; base-font-size: 24px; font-weight: bold; margin-top: 64px;  text-align: center;">
+            <%=L"班级码登录"%>
+        </div>
+        <div style="position: relative; color: #7B7A8A; font-size: 12px; base-font-size: 12px; margin-top: 98px; text-align: center;">
+            <%=L"请输入老师提供的 6 位数班级码来进入课堂"%>
+        </div>
+
+        <input type="button" uiname="ClassCodeLogin.btn_next" onclick="OnClickNext" value="<%=L'下一步'%>" style="color: #FFFFFF; position: relative; width: 267px; height: 40px; margin-left: 47px; margin-top: 266px;  background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu2_200x30_32bits.png# 0 0 200 30:98 14 98 14);"/>
+        <input type="button" value="<%=L'返回上一步'%>" onclick="OnClickBack" style="color: #404BF5; position: relative; width: 267px; height: 40px; margin-left: 47px; margin-top: 319px;  background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu_40x30_32bits.png#0 0 40 30:18 14 18 14);"/>
+    </pe:container>
+    <pe:container alignment='_rb' style="background: url();">
+        <div style="width: 400px; height: 105px;">
+            <pe:if condition='<%= System.options.channelId == "431" and (System.os.GetPlatform() == "ios" or System.os.GetPlatform() == "android") %>'>
+                <div style="position: relative;
+                            margin-top: 70px;
+                            margin-left: 167px;
+                            color: #808080">粤ICP备2020141502号-4A</div>
+            </pe:if>
+            <pe:if condition="<%=IsShowLocalMode()%>">
+                <input type="button" 
+                    icon="Texture/Aries/Creator/paracraft/Educate/Login/icon_switch_21x26_32bits.png;0 0 21 26"
+                    icon_off_y="0"
+                    icon_off_x="-44"
+                    icon_width="21"
+                    icon_height="26"
+                    onclick="OnClickLocalMode" 
+                    value='<%= L"本地模式" %>' 
+                    style="spacing: 20px;
+                        margin-left: 170px;
+                        height: 60px;
+                        min-width: 160px;
+                        text-offset-x:12;
+                        font-size: 20px;
+                        font-weight: bold;
+                        color: #ffffff;
+                        background:url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/daquedin_46x46_32bits.png#0 0 46 46:16 16 16 16)" />
+            </pe:if>
+        </div>
+</pe:container>
+</pe:container>
+
+</pe:mcml>
+</body>
+</html>
+

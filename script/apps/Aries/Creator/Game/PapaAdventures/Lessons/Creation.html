@@ -3,6 +3,7 @@
         <pe:mcml>
             <script type="text/npl">
                 <![CDATA[
+
                     NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/Lessons/Creation.lua");
                     local Creation = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Lessons.Creation");
 
@@ -17,6 +18,10 @@
                             yes = "继续学习",
                             no = "退出"
                         });
+                    end
+
+                    function IsShowInGame()
+                        return Creation.IsShowInGame == true
                     end
 
                     function progress()
@@ -149,15 +154,36 @@
                         end
                     end
 
+                    function get_lesson_submit_type()
+                        return Creation.lessonSubmitType
+                    end
+
                     function hasSection()
                         return Creation.curSection ~= nil
                     end
 
                     function isHomeWork()
+                        local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+                        if IsMobileUIEnabled then
+                            return false
+                        end
                         NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
                         local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
                         local isHomeWorkWorld = WorldCommon.GetWorldTag('isHomeWorkWorld')
                         return isHomeWorkWorld == true or isHomeWorkWorld == "true"
+                    end
+
+                    function onClickInGame()
+                        Creation:OnClickInGame()
+                    end
+
+                    function OnClickChangeGameMode()
+                        Creation.OnClickChangeGameMode()
+                    end
+
+                    function IsShowMobile()
+                        local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+                        return IsMobileUIEnabled
                     end
                 ]]>
             </script>
@@ -229,12 +255,16 @@
                         width = 166,
                         height = 52,
                         background = "Texture/Aries/Creator/Game/PapaAdventures/button_submit_336x104_32bits.png",
-                        position = "absolute",
                     },
                     ["top-menu-next"] = {
                         width = 166,
                         height = 52,
                         background = "Texture/Aries/Creator/Game/PapaAdventures/lesson_next_step_336x104_32bits.png",
+                    },
+                    ["top-menu-finish"] = {
+                        width = 166,
+                        height = 52,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/finish_168X52_32bits.png;0 0 168 52",
                     },
                     ["top-menu-reset"] = {
                         width = 126,
@@ -295,40 +325,22 @@
                           zorder="-1"
                           visible="false">
             </pe:container>
-            <!-- <pe:container alignment="_lt"
-                          ClickThrough="true"
-                          class="top-menu-left"
-                          style="position: relative;
-                                 background: url();
-                                 width: 354px;
-                                 height: 500px;">
-                <div class="top-menu-close" onclick="close()"></div>
-                <div class="top-menu-progress" onclick="progress()"></div>
-                <div class="top-menu-target" onclick="target()"></div>
-                <pe:container alignment="_lt"
-                              name="progress-container"
-                              class="progress-container"
-                              visible="false">
-                    <%= task_items() %>
-                </pe:container>
-                <pe:container alignment="_lt"
-                              name="target-container"
-                              class="target-container"
-                              visible="false">
-                </pe:container>
-            </pe:container> -->
             <pe:container alignment="_rt"
                           ClickThrough="false"
                           class="top-menu-right"
+                          uiname="operate_right_top"
                           style="position: relative;
                                  background: url();
                                  width: 331px;
                                  height: 73px;">
                 <pe:if condition="<%= hasSection()%>">
-                    <pe:if condition="<%= has_next_step() %>">
+                    <pe:if condition="<%= get_lesson_submit_type() == 1 %>">
                         <div class="top-menu-next" align="right" onclick="next()"></div>
                     </pe:if>
-                    <pe:if condition="<%= not has_next_step() %>">
+                    <pe:if condition="<%= get_lesson_submit_type() == 2 %>">
+                        <div class="top-menu-finish" align="right" onclick="next()"></div>
+                    </pe:if>
+                    <pe:if condition="<%= get_lesson_submit_type() == 3 %>">
                         <div class="top-menu-submit" align="right" onclick="submit()"></div>
                     </pe:if>
                 </pe:if>
@@ -336,7 +348,13 @@
                     <div class="top-menu-submit" align="right" onclick="submit()"></div>
                 </pe:if>
                 
-                <!-- <div class="top-menu-reset" align="right" onclick="reset()"></div> -->
+                <pe:if condition="<%=IsShowMobile() and hasSection()%>">
+                    <input type="button" 
+                        onclick="OnClickChangeGameMode" 
+                        uiname="btn_creation_change_mode" 
+                        style="float: left; margin-top: -54px; margin-left: 68px; width: 57px; height:57px;
+                        background: url(Texture/Aries/Creator/keepwork/Mobile/icon/youximoshi_57x57_32bits.png#0 0 57 57);" />
+                </pe:if>
             </pe:container>
             <pe:if condition="<%= is_minimize() %>">
                 <pe:container alignment="_rb"
@@ -357,6 +375,10 @@
                     </div>
                 </pe:container>
             </pe:if>
+
+            <pe:container uiname="operate_in_game" visible="<%=IsShowInGame()%>" alignment="_lb" ClickThrough="false" style="width: 256px; height: 71px; background: url();">
+                <input type="button" onclick="onClickInGame" style="margin-left: 22px; width: 130px; height: 46px; background: url(Texture/Aries/Creator/Game/PapaAdventures/btn_browser_130x46_32bits.png# 0 0 130 46);" />
+            </pe:container>
             <script type="text/npl">
                 <![CDATA[
                     local page = document.GetPageCtrl();

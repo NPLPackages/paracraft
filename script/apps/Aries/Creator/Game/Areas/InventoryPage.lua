@@ -76,13 +76,16 @@ function InventoryPage.SetPlayerDisplayName()
 	end
 end
 
-function InventoryPage.ShowPage()
+function InventoryPage.ShowPage(bShow)
 	if(InventoryPage.last_player ~= EntityManager.GetPlayer()) then
 		InventoryPage.last_player = EntityManager.GetPlayer();
 		if(page) then
 			-- destroy the previous window if player has changed
 			page:CloseWindow(true);
 		end
+	end
+	if(bShow == false and (not page or not page:IsVisible())) then
+		return;
 	end
 	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
@@ -106,6 +109,7 @@ function InventoryPage.ShowPage()
 		bToggleShowHide=true, 
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		zorder = -3,
+		bShow = (bShow ~= false),
 		allowDrag = true,
 		click_through = true,
 		directPosition = true,

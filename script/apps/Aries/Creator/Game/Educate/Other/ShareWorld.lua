@@ -47,7 +47,7 @@ function ShareWorld.ShowPage()
             return
         end
         if GameLogic.IsReadOnly() or currentEnterWorld.is_zip then
-            ShareWorld:ShowWorldCode(currentEnterWorld.kpProjectId)
+            --ShareWorld:ShowWorldCode(currentEnterWorld.kpProjectId)
             return
         end
         KeepworkServiceProject:GetProjectIdByWorldName(
@@ -171,7 +171,7 @@ TileSize = 533.333313
         worldConfigFile:close()
     end
 
-    self:SysncWorld()
+    self:SyncWorld()
 end
 
 function ShareWorld:ShowWorldCode(projectId)
@@ -247,10 +247,30 @@ function ShareWorld:GetWorldName()
 end
 
 
-function ShareWorld:SysncWorld(callback)
+function ShareWorld:SyncWorld(callback,syncType)
+    if GameLogic.IsReadOnly() then
+        self.callback = nil
+        GameLogic.AddBBS(nil, L'当前世界为只读世界，无法保存上传')
+        return
+    end
     self.callback = callback
     self:CheckCanUpload(function()
-        Mod.WorldShare.Store:Set('world/currentWorld', Mod.WorldShare.Store:Get('world/currentEnterWorld'))
+        local revision = GameLogic.options:GetRevision()
+        local current_revision = Mod.WorldShare.Store:Get('world/currentRevision')
+        if current_revision and revision and current_revision ~= revision then
+            Mod.WorldShare.Store:Set('world/currentRevision', revision)
+        end
+        local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+        if not currentEnterWorld then
+            GameLogic.AddBBS(nil, L'当前世界数据异常，无法上传')
+            return 
+        end
+        if not Compare:IsMineWorld(currentEnterWorld) and not Compare:IsSharedToMe(currentEnterWorld) then
+            self.callback = nil
+            GameLogic.AddBBS(nil, L'当前世界不是你创建的或没有共享给你，暂时无法上传')
+            return
+        end
+        Mod.WorldShare.Store:Set('world/currentWorld', currentEnterWorld)
         SyncWorld:CheckTagName(function()
             SyncWorld:SyncToDataSource(
                 function(result, msg)
@@ -263,15 +283,18 @@ function ShareWorld:SysncWorld(callback)
             ) 
             self:ClosePage()
         end)
-    end)
+    end,syncType)
 end
 
-function ShareWorld:SysncWorldNoUI(callback)
+function ShareWorld:SyncWorldNoUI(callback)
     self:CheckCanUpload(function()
         local version = GameLogic.options:GetRevision()
-        local world_data = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
+        local world_data = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+        if not world_data then
+            world_data = Mod.WorldShare.Store:Get('world/currentWorld')
+        end
         local curProjectId = world_data and world_data.kpProjectId
-        GameLogic.GetFilters():apply_filters('store_set', "world/currentRevision",version or 1);
+        Mod.WorldShare.Store:Set('world/currentRevision', version or 1)
         GameLogic.AddBBS(nil,"正在保存世界")
         if curProjectId and tonumber(curProjectId) and tonumber(curProjectId) > 0 then
             GameLogic.GetFilters():apply_filters(
@@ -308,7 +331,7 @@ function ShareWorld:SysncWorldNoUI(callback)
 end
 
 
-function ShareWorld:CheckCanUpload(callback)
+function ShareWorld:CheckCanUpload(callback,synctype)
     local _,world_size = self:GetWorldSize()
     local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get','world/currentEnterWorld') or {}
     local kpProjectId = currentEnterWorld.kpProjectId or 0
@@ -327,14 +350,36 @@ function ShareWorld:CheckCanUpload(callback)
             echo(data)
         end
         if err == 200 and data == true then
-            if  world_size < maxSize  then
-                --GameLogic.AddBBS(nil,"空间大小检测通过，开始上传")
-            end
             if callback then
                 callback()
             end
+        elseif err == 401 then
+            GameLogic.GetFilters():apply_filters('logout')
+            GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true)
+            GameLogic.CheckSignedIn(L"请先登录", function(result)
+                if result then
+                    self:CheckCanUpload(callback,synctype)
+                else
+                    self:ExitWorld(synctype,true)
+                end
+            end)
         else
-            GameLogic.AddBBS(nil,"上传失败，远程空间大小不足，请联系客服")
+            GameLogic.QuickSave()
+            self:ExitWorld(synctype)
         end
     end)
+end
+
+function ShareWorld:ExitWorld(synctype,bIgnoreLogin)
+    local text = bIgnoreLogin and L"登录失败，您将无法保存对该世界的修改" or L"在线存储空间不足，您将无法保存对该世界的修改" 
+    if synctype and synctype == "exit_world" then
+        _guihelper.MessageBox(text, function(res)
+            if res and res == _guihelper.DialogResult.OK then
+                local WorldExitDialog = NPL.load('Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
+                WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
+            end
+        end,_guihelper.MessageBoxButtons.OKCancel_CustomLabel,nil, nil, nil, nil, {ok=L"直接退出"})
+        return
+    end
+    _guihelper.MessageBox(text)
 end

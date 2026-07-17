@@ -1,0 +1,46 @@
+<html>
+<body> 
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityVipPage")
+    local CommunityVipPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Tasks.Community.CommunityVipPage")
+    CommunityVipPage:InitUI()
+
+    function OnClose()
+        CommunityVipPage:CloseWindow()
+    end
+
+    function OnOpenVipCode()
+        local VipCodeExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchange.lua")
+        VipCodeExchange.ShowView();
+    end
+]]>
+</script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#1a1a1a;">
+    <pe:container zorder="2" alignment="_mt" width="0" height="90" style="position: relative; background-color:#1a1a1a;">
+        <input type="button" onclick="OnClose" style="position: relative; width: 44px; height: 44px; margin-left: 26px; margin-top: 26px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#300 47 45 45);" />
+        <!-- <pe:container zorder="1" alignment="_rt" ClickThrough="true" style="position: relative; width: 200px; height: 70px; margin-top: 20px; background: url();">
+            <pe:if condition="<%=Mod.WorldShare.Utils.IsEnglish()%>">
+                <div onclick="OnOpenVipCode" style="width: 200px; height: 30px; margin-top: 6px;  color: #FFFFFF; ">
+                    <div style="float: left;"><%=L"激活码兑换"%></div>
+                    <div style="float: left; width: 12px; height: 12px; margin-left: 3px; margin-top: 5px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#6 214 16 16);"></div>
+                </div>
+            </pe:if>
+            <pe:if condition="<%=not Mod.WorldShare.Utils.IsEnglish()%>">
+                <input type="button" onclick="OnOpenVipCode" value="<%=L'激活码兑换'%>" icon="Texture/Aries/Creator/keepwork/community_32bits.png#6 214 16 16" icon_width="12" icon_height="12" icon_off_x="54" icon_off_y="0" style="text-offset-x: 8; width: 120px; height: 30px; margin-left: 60px; color: #FFFFFF; background: url();"/>
+            </pe:if>
+        </pe:container> -->
+        
+    </pe:container>
+    <pe:container alignment="_ct"  style="position: relative; width: 1240px; height: 610px; margin-left:-620px;margin-top:-305px; background-color: #262626; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+        <div style='font-weight: bold;'>
+            <div align='center'style='width: 160px;height: 128px; margin-top: 232px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#2 2 160 128)'>
+            </div>
+            <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: -10px; color: #D3D3D3;" ><%=L"本版本不支持该功能"%></div>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type='text/npl' refresh='false'>
+                <![CDATA[
+                    MqttTopicDataDetail = NPL.load('(gl)script/apps/Aries/Creator/Game/Mqtt/Dialog/MqttTopicDataDetail.lua')
+                    MqttTopicDataDetail.OnInit()
+
+                    local page = document:GetPageCtrl()
+                    function close()
+                        MqttTopicDataDetail.topicData = nil
+                        page:CloseWindow()
+                    end
+
+                    function onclickTopicClear()
+                        MqttTopicDataDetail.OnClickTopicClear()
+                    end
+
+                    function GetTopicData()
+                        return MqttTopicDataDetail.topicData and MqttTopicDataDetail.topicData.msg
+                    end
+
+                    function onclickTopicCopy()
+                        ParaMisc.CopyTextToClipboard(GetTopicData())
+                        GameLogic.AddBBS(nil,L"拷贝成功")
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    
+                }
+            </style>
+            <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+                <pe:container alignment="_ct" width="420" height="250" style="margin-left:-210px;margin-top:-125px;background: ;">
+                    <aries:window mode='thin' title='<%= L"主题数据详情" %>' width='420' height='250' onclose='close()'>
+                        <!-- <div onclick="onclickTopicCopy()" style="position: relative; margin-left: 0px; margin-top: 6px; width: 400px; height: 200px; background: url();"></div> -->
+
+                        <div style="position: relative; margin-left: 0px; margin-top: 6px; width: 400px; height: 200px; background: url();">
+                            <pe:treeview name='topic_data'
+                                        style='height:200px;  background:;'
+                                        VerticalScrollBarOffsetX='4'
+                                        VerticalScrollBarStep=“24”>
+                                <div style="color: #ffffff; ">
+                                    <%= GetTopicData() %>
+                                </div>
+                            </pe:treeview>
+                        </div>
+                    </aries:window>
+                </pe:container>
+            </pe:container>     
+        </pe:mcml>
+    </body>
+</html>

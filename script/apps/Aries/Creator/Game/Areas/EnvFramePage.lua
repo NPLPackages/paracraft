@@ -115,7 +115,7 @@ end
 function EnvFramePage.OnChangeCategory(index, bRefreshPage)
     EnvFramePage.category_index = index or EnvFramePage.category_index;
 	
-	local category = EnvFramePage.category_ds[EnvFramePage.category_index];
+	local category = EnvFramePage.category_ds and EnvFramePage.category_ds[EnvFramePage.category_index];
 	if(category) then
 		-- EnvFramePage.Current_Item_DS = ItemClient.GetBlockDS(category.name);
 	end
@@ -144,10 +144,6 @@ function EnvFramePage.OnTimeSliderChanged(value)
 			EnvFramePage.changecb("time", time)
 		end
 		cmdStr = "/time "..time
-
-		if not GameLogic.options:IsTimesAutoGo() then
-			GameLogic.options:SetFrozenDayTime(time,true)
-		end
 	end	
 	EnvFramePage.cmd_time = cmdStr
 end
@@ -264,10 +260,6 @@ end
 
 function EnvFramePage.OnToggleAutoTimesGo(bChecked)
 	GameLogic.options:SetTimesAutoGo(bChecked,true)
-	if not bChecked then
-		local time = GameLogic.RunCommand("/time now")
-		GameLogic.options:SetFrozenDayTime(time,true)
-	end
 end
 
 function EnvFramePage.OnCopyCmd(name)

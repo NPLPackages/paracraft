@@ -176,6 +176,12 @@ function Game.Start(filename_or_world, is_standalone, force_nid, gs_nid, ws_id, 
 	LOG.std(nil,"debug","GameStart",commandName);
 	LOG.std(nil,"debug","Game.loadworld_params",Game.loadworld_params);
 
+	-- TODO tricky: fixed a bug for older runtime not releasing mini-scene properly
+	local RedSummerCampMainPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.RedSummerCampMainPage")
+	if RedSummerCampMainPage and RedSummerCampMainPage.Close then
+		RedSummerCampMainPage.Close()
+	end
+
 	System.App.Commands.Call(commandName, Game.loadworld_params);
 end
 
@@ -185,7 +191,7 @@ function Game.GetLoadWorldParams()
 end
 
 -- after logged in. 
-function Game.OnLogin(worldObj)
+function Game.OnLogin(worldObj, callbackFunc)
 	NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 	local world_tag = WorldCommon.LoadWorldTag();
@@ -194,52 +200,57 @@ function Game.OnLogin(worldObj)
 	Game.worldpath = ParaWorld.GetWorldDirectory();
 
 	-- init game logics under the current world directory
-	GameLogic.Init(worldObj);
+	GameLogic.Init(worldObj, function()
 	
-	if(not System.options.mc) then		
-		-- clear cursor selection to be compatible with public world.
-		MyCompany.Aries.HandleMouse.ClearCursorSelection();
-	end
+		if(not System.options.mc) then		
+			-- clear cursor selection to be compatible with public world.
+			MyCompany.Aries.HandleMouse.ClearCursorSelection();
+		end
 
-	NPL.load("(gl)script/apps/Aries/Creator/ToolTipsPage.lua");
-	MyCompany.Aries.Creator.ToolTipsPage.isExpanded = false;
-	-- MyCompany.Aries.Creator.ToolTipsPage.ShowPage("getting_started_mc");
+		NPL.load("(gl)script/apps/Aries/Creator/ToolTipsPage.lua");
+		MyCompany.Aries.Creator.ToolTipsPage.isExpanded = false;
+		-- MyCompany.Aries.Creator.ToolTipsPage.ShowPage("getting_started_mc");
 	
-	-- init desktop and UI
-	Desktop.OnActivateDesktop(GameLogic.GetMode());
+		-- init desktop and UI
+		Desktop.OnActivateDesktop(GameLogic.GetMode());
 
 
-	-- mark as started. 
-	Game.is_started = true;
+		-- mark as started. 
+		Game.is_started = true;
 	
-	if(not System.options.mc) then
-		-- play bg music
-		MyCompany.Aries.Scene.PlayRegionBGMusic("ambForest");
+		if(not System.options.mc) then
+			-- play bg music
+			MyCompany.Aries.Scene.PlayRegionBGMusic("ambForest");
 
-		NPL.load("(gl)script/apps/Aries/Scene/AutoCameraController.lua");
-		MyCompany.Aries.AutoCameraController:ApplyStyle({
-			min_dist=1.5, min_liftup_angle=0, max_liftup_angle=1.57,
-			adjust_dist_step_percentage = 0.2,
-			adjust_angle_step_percentage = 0.2,
-			CameraRollbackSpeed = 3,
-			disable_delay_adjustment = true,
-		});
-	end
+			NPL.load("(gl)script/apps/Aries/Scene/AutoCameraController.lua");
+			MyCompany.Aries.AutoCameraController:ApplyStyle({
+				min_dist=1.5, min_liftup_angle=0, max_liftup_angle=1.57,
+				adjust_dist_step_percentage = 0.2,
+				adjust_angle_step_percentage = 0.2,
+				CameraRollbackSpeed = 3,
+				disable_delay_adjustment = true,
+			});
+		end
 			
-	GameLogic.ToggleCamera(false);
+		GameLogic.ToggleCamera(false);
 	
-	if(not System.options.mc) then		
-		-- hide pet
-		MyCompany.Aries.Player.SendCurrentPetToHome();
-		-- disable mount pet
-		MyCompany.Aries.Pet.EnterIndoorMode(Map3DSystem.User.nid);
-	end		
+		if(not System.options.mc) then		
+			-- hide pet
+			MyCompany.Aries.Player.SendCurrentPetToHome();
+			-- disable mount pet
+			MyCompany.Aries.Pet.EnterIndoorMode(Map3DSystem.User.nid);
+		end		
 
-	Game.mytimer = Game.mytimer or commonlib.Timer:new({callbackFunc = Game.FrameMove})
-	Game.mytimer:Change(30,30);
+		Game.mytimer = Game.mytimer or commonlib.Timer:new({callbackFunc = Game.FrameMove})
+		Game.mytimer:Change(30,30);
 
-    GameLogic.After_OnActivateDesktop();
-	LOG.std(nil, "info", "Game", "Game.OnLogin finished");
+		GameLogic.After_OnActivateDesktop();
+		LOG.std(nil, "info", "Game", "Game.OnLogin finished");
+
+		if(callbackFunc) then
+			callbackFunc(true);
+		end
+	end);
 end
 
 -- exit the current game

@@ -9,6 +9,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.lua")
 local SelectColor = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectColor");
 local task = SelectColor:new();
 task:Run();
+task:ShowDialogPage(function(colorDWORD)   end);
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Core/Color.lua");
@@ -20,6 +21,7 @@ local SelectColor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.T
 SelectColor:Signal("colorPicked", function(color) end)
 
 local cur_instance;
+local page
 function SelectColor:ctor()
 end
 
@@ -72,6 +74,7 @@ function SelectColor.OnClickColor(index)
 	local item = SelectColor.GetColorList()[index];
 	if(item and self) then
 		local color = Color.ColorStr_TO_DWORD(item.color);
+		self.lastSelectedColor = color;
 		self:colorPicked(color);
 	end
 end
@@ -79,6 +82,10 @@ end
 function SelectColor:OnExit()
 	SelectColor._super.OnExit(self);
 	self:Destroy();
+	if(page) then
+		page:CloseWindow();
+		page = nil;
+	end
 	cur_instance = nil;
 end
 
@@ -100,11 +107,61 @@ function SelectColor:ShowPage()
 			alignment="_ctb", left=38, top= -110, width = 450, height = 96, parent = parent,
 		});
 		window:SetUIScaling(1.5,1.5)
-		return
+	else
+		window:Show({
+			name="SelectColor", 
+			url="script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.html",
+			alignment="_ctb", left=0, top= -55, width = 300, height = 64, parent = parent,
+		});
 	end
-	window:Show({
-		name="SelectColor", 
-		url="script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.html",
-		alignment="_ctb", left=0, top= -55, width = 300, height = 64, parent = parent,
-	});
+	window:EnableSelfPaint(true);
+end
+
+function SelectColor:ShowDialogPage(callback)
+	self.finished = false;
+	cur_instance = self;
+	
+	local width, height = 512, 256;
+    local params = {
+        url = "script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.dialog.html",
+        name = "EasyModel.Colors.ShowPage", 
+        isShowTitleBar = false,
+		isTopLevel = true,
+        DestroyOnClose = true,
+        bToggleShowHide=false, 
+        style = CommonCtrl.WindowFrame.ContainerStyle,
+        enable_esc_key = true,
+        allowDrag = false,
+        click_through = false, 
+        bShow = true,
+        SelfPaint = true,
+        directPosition = true,
+            align = "_ct",
+            x = width * -0.5,
+            y = height * -0.5,
+            width = width,
+            height = height,
+    };
+    System.App.Commands.Call("File.MCMLWindowFrame", params);
+	if(params._page) then
+		page = params._page;
+		params._page.OnClose = function()
+			page = nil;
+			if(callback) then
+				callback(self.lastSelectedColor);
+			end
+		end
+	end
+end
+
+
+function SelectColor.OnClickColorAndClose(index)
+	SelectColor.OnClickColor(index);
+	SelectColor.OnClose();
+end
+
+function SelectColor.OnClose()
+	if(cur_instance) then
+		cur_instance:OnExit();
+	end
 end

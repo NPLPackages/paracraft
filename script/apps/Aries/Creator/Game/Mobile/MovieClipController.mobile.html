@@ -88,13 +88,13 @@ end
                                 <div style="width: 44px;height: 44px; background:url(Texture/Aries/Creator/keepwork/Mobile/MovieClip/gezi_43x43_32bits.png#0 0 44 44)">
                                     <div style="width: 44px;height: 44px;position: relative; background:url(Texture/Aries/Creator/keepwork/Mobile/MovieClip/xuanzhongezi2_40x40_32bits.png#0 0 46 46)">
                                     </div>
-                                    <pe:mc_slot ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' 
+                                    <pe:mc_slot DisableClickDrag="true" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' 
                                     style="margin:3px;width:38px;height:38px;"></pe:mc_slot>
                                 </div>
                             </pe:if>
                             <pe:if condition='<%=not IsSelectedActor(Eval("slotNumber"))%>'>
                                 <div style="width: 44px;height: 44px; background:url(Texture/Aries/Creator/keepwork/Mobile/MovieClip/gezi_43x43_32bits.png#0 0 44 44)">
-                                    <pe:mc_slot onclick_empty="OnClickEmptySlot" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' bagpos ='<%=Eval("slotNumber")%>' 
+                                    <pe:mc_slot DisableClickDrag="true" onclick_empty="OnClickEmptySlot" ContainerView='<%=MovieClipController.GetActorInventoryView()%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' bagpos ='<%=Eval("slotNumber")%>' 
                                     style="margin:3px;width:38px;height:38px;"></pe:mc_slot>
                                 </div>
                             </pe:if>

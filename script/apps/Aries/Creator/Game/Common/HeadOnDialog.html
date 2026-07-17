@@ -1,0 +1,90 @@
+<!-- "script/apps/Aries/Creator/Game/Common/HeadOnDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Copilot Ask Dialog</title>
+</head>
+<body>
+<pe:mcml>
+<style type="text/css">
+    /* Button base class used by Copilot ask dialog */
+    .copilot-btn {
+        min-width: 80px;
+        height: 40px;
+        color: #000000;
+        font-size: 16px;
+        font-weight: bold;
+        spacing: 10px;
+        margin: 5px;
+    }
+
+    /* Normal button uses Button_Normal_Large texture */
+    .copilot-btn.normal {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+    }
+
+    /* Highlight button uses Button_Highlight_Large texture */
+    .copilot-btn.default {
+        background: url(Texture/Aquarius/Button_Highlight_Large.png:15 15 15 15);
+    }
+    /* Text content inside speech bubble */
+    .copilot-text {
+        color: #333333;
+        font-size: 16px;
+        padding: 8px;
+    }
+</style>
+<script refresh="false" type="text/npl" src="HeadOnDialog.lua"><![CDATA[
+HeadOnDialog = commonlib.gettable("MyCompany.Aries.Game.Common.HeadOnDialog");
+HeadOnDialog.OnInit()
+
+function ClosePage()
+    HeadOnDialog.ClosePage();
+end
+
+function GetText()
+    return HeadOnDialog.text or "";
+end
+
+function OnClickButton(name, mcmlNode)
+    local index = tonumber(name);
+    HeadOnDialog.OnClickButton(index);
+end
+
+]]></script>
+<!-- Speech bubble container -->
+<div style="width:320px;min-height:80px;background:url(Texture/Aries/HeadOn/head_speak_bg_32bits.png#0 0 128 62:24 20 64 41);padding:12px;padding-bottom:32px;">
+    <!-- Text content -->
+    <div class="copilot-text">
+        <%= GetText() %>
+    </div>
+
+    <!-- Buttons and text inputs section -->
+    <pe:if condition='<%= #(HeadOnDialog.buttons) > 0 %>'>
+        <div style="margin-top:12px;margin-left:0px;">
+            <pe:repeat DataSource="<%= HeadOnDialog.buttons %>">
+                <pe:repeatitem>
+                    <!-- Text input (full width on its own line) -->
+                    <pe:if condition='<%= Eval("type") == "text" %>'>
+                        <br/>
+                        <div style="margin-top:0px;margin-bottom:10px;">
+                            <input type="text" name='<%="text"..tostring(Eval("index"))%>' value='<%= Eval("text") %>' style="height:40px;padding:6px;font-size:18px;" />
+                        </div>
+                    </pe:if>
+                    <!-- Regular button (inline) -->
+                    <pe:if condition='<%= Eval("type") ~= "text" %>'>
+                        <input type="button" name='<%= Eval("index") %>' onclick="OnClickButton" 
+                            class='<%=(Eval("default")==true and "copilot-btn default" or "copilot-btn normal")%>'
+                            value='<%= Eval("text") %>' />
+                    </pe:if>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+    </pe:if>
+</div>
+</pe:mcml>
+</body>
+</html>
+
+

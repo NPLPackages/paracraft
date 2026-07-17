@@ -91,7 +91,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('microbit_servo(%s, "%s", %s, %s, %s)\n', self:getFieldAsString('boneName'), self:getFieldAsString('axis'), self:getFieldAsString('value'),  self:getFieldAsString('name'),  self:getFieldAsString('offset'))
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]
 }},
 },

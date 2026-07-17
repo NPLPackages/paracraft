@@ -117,7 +117,7 @@ function ContactTeacherPage.GetFunctionDesc()
 end
 
 function ContactTeacherPage.OnClickCopy()
-    local link_desc = "请点击这里联系客服申请开通：https://wpa1.qq.com/TxyKupLK?_type=wpa&qidian=true"
+    local link_desc = "请点击这里联系客服申请开通：https://work.weixin.qq.com/kfid/kfcf794bf130083e719"
     local copy_desc = string.format("尊敬的老师，您好！\n%s\n%s\n%s\n%s", ContactTeacherPage.GetSchoolDesc(), ContactTeacherPage.GetUserDesc(), ContactTeacherPage.GetFunctionDesc(), link_desc)
     ParaMisc.CopyTextToClipboard(copy_desc);
     GameLogic.AddBBS(nil,"复制成功")

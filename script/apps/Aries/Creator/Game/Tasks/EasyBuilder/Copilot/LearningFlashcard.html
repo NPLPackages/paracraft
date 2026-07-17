@@ -1,0 +1,178 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/LearningFlashcard.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Learning Flashcard</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/LearningToolUI.lua");
+local LearningToolUI = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.LearningToolUI");
+
+local page = document:GetPageCtrl();
+local autoCloseTimer = nil;
+
+function GetParams()
+    return LearningToolUI.GetParams();
+end
+
+function GetWord()
+    local params = GetParams();
+    return params.word or "";
+end
+
+function GetTranslation()
+    local params = GetParams();
+    return params.translation or "";
+end
+
+function GetPhonetic()
+    local params = GetParams();
+    return params.phonetic or "";
+end
+
+function GetExampleSentence()
+    local params = GetParams();
+    return params.exampleSentence or "";
+end
+
+function GetImageUrl()
+    local params = GetParams();
+    return params.imageUrl or "";
+end
+
+function HasImage()
+    return GetImageUrl() ~= "";
+end
+
+function GetDuration()
+    local params = GetParams();
+    return params.duration or 5;
+end
+
+function IsSpeaking()
+    return LearningToolUI.IsSpeaking();
+end
+
+function GetPlayButtonText()
+    return IsSpeaking() and "播放中..." or "🔊 播放发音";
+end
+
+function IsPlayButtonEnabled()
+    return not IsSpeaking();
+end
+
+function OnPlayWord()
+    local word = GetWord();
+    LearningToolUI.PlayDemoAudio(word);
+end
+
+function OnGotIt()
+    LearningToolUI.Close({
+        success = true,
+        viewed = true,
+        word = GetWord(),
+    });
+end
+
+function OnClose()
+    LearningToolUI.Close({
+        success = true,
+        viewed = true,
+        word = GetWord(),
+    });
+end
+
+-- Auto-play word on open
+function OnPageLoad()
+    -- Auto-play the word
+    commonlib.TimerManager.SetTimeout(function()
+        OnPlayWord();
+    end, 500);
+    
+    -- Auto-close after duration (if specified)
+    local duration = GetDuration();
+    if duration and duration > 0 then
+        autoCloseTimer = commonlib.TimerManager.SetTimeout(function()
+            OnGotIt();
+        end, duration * 1000);
+    end
+end
+
+-- Cancel auto-close on user interaction
+function OnUserInteraction()
+    if autoCloseTimer then
+        autoCloseTimer:Change();
+        autoCloseTimer = nil;
+    end
+end
+
+OnPageLoad();
+]]></script>
+
+<div style="width:440px;background-color:#ffffff;">
+    <!-- Title Bar -->
+    <div style="width:440px;height:40px;background-color:#00BCD4;position:relative;">
+        <div style="position:relative;left:15px;top:10px;color:#ffffff;font-size:16px;font-weight:bold;">
+            学习新单词
+        </div>
+        <div style="position:relative;left:402px;top:6px;">
+            <input type="button" value="✕" style="width:28px;height:28px;background-color:#00ACC1;color:#ffffff;font-size:14px;background:url();" onclick="OnClose"/>
+        </div>
+    </div>
+    
+    <!-- Content Area -->
+    <div style="width:410px;margin:15px;text-align:center;">
+        <!-- Image (if available) -->
+        <pe:if condition='<%=HasImage()%>'>
+            <div style="width:410px;height:120px;margin-bottom:15px;">
+                <img src="<%=GetImageUrl()%>" style="max-width:200px;max-height:120px;"/>
+            </div>
+        </pe:if>
+        
+        <!-- Word -->
+        <div style="font-size:36px;color:#333333;font-weight:bold;">
+            <%=GetWord()%>
+        </div>
+        
+        <!-- Phonetic -->
+        <pe:if condition='<%=GetPhonetic() ~= ""%>'>
+            <div style="font-size:16px;color:#666666;margin-top:5px;">
+                <%=GetPhonetic()%>
+            </div>
+        </pe:if>
+        
+        <!-- Translation -->
+        <pe:if condition='<%=GetTranslation() ~= ""%>'>
+            <div style="font-size:20px;color:#2196F3;margin-top:10px;font-weight:bold;">
+                <%=GetTranslation()%>
+            </div>
+        </pe:if>
+        
+        <!-- Example Sentence -->
+        <pe:if condition='<%=GetExampleSentence() ~= ""%>'>
+            <div style="margin-top:15px;width:380px;margin-left:15px;padding:10px;background-color:#f5f5f5;">
+                <div style="font-size:13px;color:#666666;">
+                    <%=GetExampleSentence()%>
+                </div>
+            </div>
+        </pe:if>
+        
+        <!-- Play Button -->
+        <div style="margin-top:20px;margin-left:150px;">
+            <input type="button" value="<%=GetPlayButtonText()%>" style="width:140px;height:38px;background-color:#4CAF50;color:#ffffff;font-size:14px;" onclick="OnPlayWord(); OnUserInteraction();" enabled="<%=IsPlayButtonEnabled()%>"/>
+        </div>
+    </div>
+    
+    <!-- Bottom Button -->
+    <div style="width:440px;margin-top:10px;margin-bottom:15px;text-align:center;">
+        <div style="margin-left:145px;">
+            <input type="button" value="知道了 ✓" style="width:150px;height:42px;background-color:#2196F3;color:#ffffff;font-size:16px;" onclick="OnGotIt"/>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

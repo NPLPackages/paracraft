@@ -50,9 +50,9 @@ function Entity:init(world, username, entityId)
 	local x, y, z = world:GetSpawnPoint();
 	self:SetLocationAndAngles(x, y, z, 0, 0);
 
-	local skin = CustomCharItems:GetSkinByAsset(self:GetMainAssetPath());
+	local skin,default_assets = CustomCharItems:GetSkinByAsset(self:GetMainAssetPath());
 	if (skin) then
-		self.mainAssetPath = CustomCharItems.defaultModelFile;
+		self.mainAssetPath = default_assets or CustomCharItems.defaultModelFile;
 		self.skin = skin;
 		self:GetDataWatcher():SetField(self.dataMainAsset, self:GetMainAssetPath());
 	end
@@ -102,9 +102,16 @@ function Entity:UpdateEntityActionState()
 	local curAnimId = self:GetAnimId();
 	if(self.lastAnimId ~= curAnimId and curAnimId) then
 		self.lastAnimId = curAnimId;
-		local obj = self:GetInnerObject();
-		if(obj) then
-			obj:SetField("AnimID", curAnimId);
+		if(curAnimId < 100000) then
+			local obj = self:GetInnerObject();
+			if(obj) then
+				obj:SetField("AnimID", curAnimId);
+			end
+			if(self:IsPlayingMovieFile()) then
+				self:PlayMovieFile(nil);
+			end
+		else
+			self:PlayCustomAnimation(tostring(curAnimId));
 		end
 	end
 	local curSkinId = self:GetSkinId();
@@ -112,19 +119,22 @@ function Entity:UpdateEntityActionState()
 		self.lastSkinId = curSkinId;
 		self:SetSkin(curSkinId, true);
 	end
-	local dataWatcher = self:GetDataWatcher();
-	local curBlockIdInHand = dataWatcher:GetField(self.dataBlockInHand);
-	if(curBlockIdInHand~=self:GetBlockInRightHand()) then
-		self:SetBlockInRightHand(curBlockIdInHand);
-		self:RefreshRightHand();
-	end
-	local curMainAsset = dataWatcher:GetField(self.dataMainAsset);
-	if(curMainAsset~=self:GetMainAssetPath()) then
-		self:SetMainAssetPath(curMainAsset);
-	end
-	local curScale = dataWatcher:GetField(self.dataFieldScale);
-	if(curScale and curScale ~= self:GetScaling()) then
-		self:SetScaling(curScale)
+
+	if(not curAnimId or curAnimId < 100000) then
+		local dataWatcher = self:GetDataWatcher();
+		local curBlockIdInHand = dataWatcher:GetField(self.dataBlockInHand);
+		if(curBlockIdInHand~=self:GetBlockInRightHand()) then
+			self:SetBlockInRightHand(curBlockIdInHand);
+			self:RefreshRightHand();
+		end
+		local curMainAsset = dataWatcher:GetField(self.dataMainAsset);
+		if(curMainAsset~=self:GetMainAssetPath()) then
+			self:SetMainAssetPath(curMainAsset);
+		end
+		local curScale = dataWatcher:GetField(self.dataFieldScale);
+		if(curScale and curScale ~= self:GetScaling()) then
+			self:SetScaling(curScale)
+		end
 	end
 	GameLogic.GetFilters():apply_filters("entity_player_mp_other_entity_action_state_updated", self);
 end
@@ -133,6 +143,9 @@ end
 function Entity:OnLivingUpdate()
 	self:UpdateEntityActionState();
 
+	if(self:HasFollowTarget()) then
+		return;
+	end
 	if (self.smoothFrames > 0) then
 		if(not self:IsRiding()) then
 			local x = self.targetX - self.x
@@ -166,4 +179,31 @@ function Entity:OnLivingUpdate()
 			obj:SetField("HeadUpdownAngle", self.rotationHeadPitch);
 		end
 	end
+end
+
+function Entity:CanHasCollisionEventWith(entity)
+	return false;
+end
+
+function Entity:GetActionName()
+	if(self:HasFollowTarget() or self.followedBy) then
+		return nil;
+	end
+	return L"互动";	
+end	
+
+function Entity:DoAction(actionIndex)
+	--[[ show user info
+	local username = self:GetUserName()
+	local UserInfoCtrl = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/UserInfoCtrl.lua");
+	UserInfoCtrl.ShowPage(username, nil, 512, 200, function()
+		UserInfoCtrl.ShowUserOperate(512+100, 200+20)
+	end)
+	return true
+	]]
+
+	-- interact
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/EasyFriendAction.lua");
+	local EasyFriendAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyFriendAction");
+	EasyFriendAction:ShowPage(self)
 end

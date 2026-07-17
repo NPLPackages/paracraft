@@ -280,6 +280,16 @@ function TouchVirtualKeyboard:GetUIControl()
 		_parent:SetScript("onmouseup", function() self:OnMouseUp() end);
 		_parent:SetScript("onmousemove", function() self:OnMouseMove() end);
 
+		self.bIsSelfPaint = true
+		if(self.bIsSelfPaint) then
+			_parent:SetField("SelfPaint", true);
+			if(not _parent:GetField("SelfPaintInParent", false)) then
+				-- if self paint parent API is not supported(Engine is not update to date), we will not use self paint. 
+				_parent:SetField("SelfPaint", false);
+				self.bIsSelfPaint = false;
+			end
+		end
+
 		self.id = _parent.id;
 	else
 		_parent:Reposition(self.alignment,self.left,self.top,self.width,self.height);

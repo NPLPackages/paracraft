@@ -17,6 +17,8 @@ CodeHelpWindow.AddCodeExamples()
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeHelpItem.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
+local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CodeHelpItem = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpItem");
 local CodeHelpWindow = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow"));
@@ -55,7 +57,7 @@ function CodeHelpWindow.SetLanguageConfigFile(filename,codeLanguageType)
 end
 
 function CodeHelpWindow.GetLanguageConfigFile()
-	return languageConfigFile;
+	return languageConfigFile, CodeHelpWindow.codeLanguageType;
 end
 
 function CodeHelpWindow.ClearAll()
@@ -86,8 +88,6 @@ end
 -- @return language config object
 function CodeHelpWindow.GetLanguageConfigByEntity(entity)
 	if(entity) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
-		local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 		local langConfig = LanguageConfigurations:LoadConfigByFilename(entity:GetLanguageConfigFile())
 		if(langConfig) then
 			return langConfig;
@@ -101,10 +101,6 @@ function CodeHelpWindow.InitCmds()
 		local filename = CodeHelpWindow.GetLanguageConfigFile()
 		LOG.std(nil, "info", "CodeHelpWindow", "code block language configuration file changed to %s", filename == "" and "default" or filename);
 
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
-		local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
-
-		
 		local langConfig = LanguageConfigurations:LoadConfigByFilename(filename)
 		if(langConfig) then
 			if(CodeHelpWindow.lastLangConfig and CodeHelpWindow.lastLangConfig~=langConfig) then
@@ -255,6 +251,7 @@ function CodeHelpWindow.OnChangeCategory(index, bRefreshPage)
 		local category = cateButtons[CodeHelpWindow.category_index];
 		if(category) then
 			CodeHelpWindow.category_name = category.name;
+			CodeHelpWindow.show_create_global_variable = category.show_create_global_variable;
 			CodeHelpWindow.currentItems = category_items[category.name] or {};
 		end
 	end
@@ -337,6 +334,8 @@ function CodeHelpWindow.OnDragEnd(name)
 	if CodeBlockWindow.IsCodeReadOnly() then
 		return
 	end
+	local draggFilter = GameLogic.GetFilters():apply_filters('CodeBlockWindow.IsDragable')
+    if draggFilter == false then return end
 	local item = CodeHelpWindow.GetCodeItemByName(name);
 	if(item) then
 		if(CodeBlockWindow.IsMousePointerInCodeEditor()) then
@@ -344,6 +343,11 @@ function CodeHelpWindow.OnDragEnd(name)
 				_guihelper.MessageBox(L"图块模式下不能直接编辑代码, 请用图块编辑器");
 			else
                 local code = item:GetNPLCode(CodeHelpWindow.codeLanguageType);
+
+				if(GameLogic.Macros:IsRecording()) then
+					GameLogic.Macros.OnTextAreaDropCodeAtCursor(CodeBlockWindow.GetTextControl(), code, not item:HasOutput())
+				end
+
 				CodeBlockWindow.InsertCodeAtCurrentLine(code, not item:HasOutput());
 			end
 		end

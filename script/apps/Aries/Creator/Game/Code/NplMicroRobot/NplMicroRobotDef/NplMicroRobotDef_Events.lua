@@ -44,7 +44,7 @@ NPL.export({
 		return string.format('registerKeyPressedEvent_NplMicroRobot("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
 	end,
 	examples = {
-{desc = L"", canRun = true, code = [[
+{desc = "", canRun = true, code = [[
 
 ]]},
 },
@@ -92,7 +92,7 @@ NPL.export({
 		return string.format('registerGestureEvent_NplMicroRobot("%s", function(msg)\n    %s\nend)\n', self:getFieldAsString('keyname'), self:getFieldAsString('input'));
 	end,
 	examples = {
-{desc = L"", canRun = true, code = [[
+{desc = "", canRun = true, code = [[
 
 ]]},
 },

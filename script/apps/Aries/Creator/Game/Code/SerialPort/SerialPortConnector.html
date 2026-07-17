@@ -1,0 +1,48 @@
+<!--script/apps/Aries/Creator/Game/Code/SerialPort/SerialPortConnector.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="SerialPortConnector.lua">
+<![CDATA[
+SerialPortConnector = commonlib.gettable("MyCompany.Aries.Game.Code.SerialPortConnector");
+SerialPortConnector.Init()
+
+function GetConnectedText()
+    local count = SerialPortConnector.GetActivePortCount()
+    if(count<=1) then
+        return format(L"已连接:%s", SerialPortConnector.GetCurrentFilename() or "")
+    else
+        return format(L"已连接:%s(共%d个)", SerialPortConnector.GetCurrentFilename() or "", count)
+    end
+end
+function GetConnectedCountText()
+    local count = SerialPortConnector.GetActivePortCount()
+    if(count>0) then
+        return format(L"已连%d个", count)
+    end
+end
+function Connect()
+    SerialPortConnector.Connect()
+end
+]]></script>
+<div class="default" style="background-color:#00000080;font-size:12px;color:#000000;" width="100%" height="100%">
+    <input type="button" uiname="SerialPortConnector.saveAndClose" name="close" tooltip='<%=L"关闭"%>' onclick="SerialPortConnector.Close()" class="mc_close_button" style="position:relative;" align="right" />
+    <div style="margin:5px">
+        <pe:if condition="<%=not SerialPortConnector.IsConnected() or SerialPortConnector.mode == 'connect'%>">
+            <select onBeforeClickDropDownButton="SerialPortConnector.onBeforeClickDropDownButton"
+                    style="float:left;width:80px;height:22px;font-size:12px;margin-right:5px;"
+                    name="portName"
+                    AllowUserEdit="false"
+                    onselect="SerialPortConnector.OnSelectPort"
+                    useTooltip="true"
+                    DataSource='<%=SerialPortConnector.GetPortNameDS()%>' />
+            <input type="button" uiname="SerialPortConnector.connect"  style="" value='<%=L"连接设备"%>' name="btnConnect" class="defaultbutton" onclick="Connect" />
+            <div style="float:left;color:#00ff00;margin-left:5px;"><%=GetConnectedCountText() or ""%></div>
+        </pe:if>
+        <pe:if condition="<%=SerialPortConnector.IsConnected() and SerialPortConnector.mode ~= 'connect'%>">
+            <div style="float:left;color:#00ff00;"><%=GetConnectedText()%></div>
+            <input type="button" uiname="SerialPortConnector.disconnect"  style="margin-left:5px;" value='<%=L"断开"%>' tooltip='<%=SerialPortConnector.GetCurrentPortName() or ""%>' name="btnDisconnect" class="defaultbutton" onclick="SerialPortConnector.DisconnectAll()" />
+            <input type="button" uiname="SerialPortConnector.back" style="margin-left:5px;" value='<%=L"返回"%>' tooltip='<%=L"返回连接界面，可以同时连接多个端口"%>' name="btnBack" class="defaultbutton" onclick="SerialPortConnector.SetConnectMode()" />
+        </pe:if>
+    </div>
+</div>
+</pe:mcml>
+

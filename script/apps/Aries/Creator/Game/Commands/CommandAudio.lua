@@ -140,20 +140,8 @@ Commands["sound"] = {
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 		local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 		if(sound_name) then
-			local url = filename or sound_name;
-			if(url and url:match("^http")) then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
-				local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
-				HttpFiles.GetHttpFilePath(url, function(err, diskfilename) 
-					if(diskfilename) then
-						NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
-						local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
-						SoundManager:PlaySound(sound_name, diskfilename);
-					end
-				end)
-			else
-				SoundManager:PlaySound(sound_name, filename, fromtime, volume, pitch);	
-			end
+			filename = filename or sound_name;
+			SoundManager:PlaySound(sound_name, filename, fromtime, volume, pitch);	
 		end
 	end,
 };
@@ -240,25 +228,42 @@ Commands["midi"] = {
 
 Commands["/recordsound"] = {
 	name="recordsound", 
-	quick_ref="/recordsound", 
-	desc=[[show sound recorder UI 
-/recordsound
+	quick_ref="/recordsound [-start|stop] [eventName]",
+	desc=[[show sound recorder UI or send message to eventName with captured data at high frame rates
+/recordsound 
+/recordsound -start onAudioRecordCallback
+/recordsound -stop
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/SoundRecorder.lua");
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoRecorder.lua");
-		local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-		local SoundRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.SoundRecorder");
-		SoundRecorder.ShowPage(function(filename)
-			if(filename) then
-				local diskFilepath = Files.GetFilePath(filename)
-				if(diskFilepath) then
-					GameLogic.AddBBS("recordsound", L"录制文件成功保存到:"..filename, 10000, "0 255 0");
-					local folder = diskFilepath:gsub("[^\\/]*$", "")
-					GameLogic.RunCommand("/open -d "..folder);
-				end
+		local mode, callback;
+		mode, cmd_text = CmdParser.ParseOption(cmd_text);
+		if(mode == "start" or not mode) then
+			callback, cmd_text = CmdParser.ParseString(cmd_text);
+			if(callback and callback~="") then
+				local event = System.Core.Event:new():init(callback)
+				AudioEngine.StartRecording(function(data)
+  					event.msg = data;
+  					GameLogic:event(event, true);
+				end);
+			else
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/SoundRecorder.lua");
+				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+				local SoundRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.SoundRecorder");
+				SoundRecorder.ShowPage(function(filename)
+					if(filename) then
+						local diskFilepath = Files.GetFilePath(filename)
+						if(diskFilepath) then
+							GameLogic.AddBBS("recordsound", L"录制文件成功保存到:"..filename, 10000, "0 255 0");
+							local folder = diskFilepath:gsub("[^\\/]*$", "")
+							GameLogic.RunCommand("/open -d "..folder);
+						end
+					end
+				end);
 			end
-		end);
+		elseif(mode == "stop") then
+			AudioEngine.StopRecording();
+		end
+
 	end,
 };
 

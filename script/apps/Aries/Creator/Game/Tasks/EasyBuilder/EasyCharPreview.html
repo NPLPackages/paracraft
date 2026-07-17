@@ -1,0 +1,67 @@
+<pe:mcml>
+<script type="text/npl" src="EasyCharPreview.lua"><![CDATA[
+local EasyCharPreview = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/EasyCharPreview.lua")
+EasyCharPreview.OnInit();
+
+-- 穿戴当前皮肤
+function OnEquipSkin()
+    EasyCharPreview.ApplySkinsToPlayer()
+end
+
+-- 关闭界面
+function OnClose()
+    EasyCharPreview.Close()
+end
+
+function OnClickLeftRotate()
+    EasyCharPreview.OnClickRotate("left")
+end
+
+function OnClickRightRotate()
+    EasyCharPreview.OnClickRotate("right")
+end
+
+function OnUnEquipSkin()
+    EasyCharPreview.RemoveSkinsFromPlayer()
+end
+
+]]>
+</script>
+
+<div style="width: 260px; height: 400px; background: url(Texture/Aries/Creator/keepwork/minigame/bag/bg_16x16_32bits.png#0 0 16 16:6 6 6 6);">
+    <!-- 标题栏 -->
+    <div style="position: relative; left: 10px; width: 360px; height: 40px;">
+        <div style="float: left; margin-left: 200px; margin-top: 10px; width: 37px; height: 39px; background: url(Texture/Aries/Creator/keepwork/minigame/bag/close_37x39_32bits.png#0 0 37 39);" onclick="OnClose()"></div>
+    </div>
+    
+    <!-- 角色预览区域 -->
+    <div style="position: relative; left: 0px; top: 40px; width: 220px; height: 280px;">
+        <div class="preview_panel" style="position: relative;">
+            <div style="position:relative;margin-top:230px; width: 250px;">
+                <input type="button" zorder="2" onclick="OnClickLeftRotate()" style="float:left;margin-left:10x;width:40px;height:32px;background:url(Texture/Aries/Desktop/CombatCharacterFrame/inventory/left_rotate_32bits.png#0 0 40 32)"/>
+                <input type="button" zorder="2" onclick="OnClickRightRotate()" style="float:left;margin-left:160px;width:40px;height:32px;background:url(Texture/Aries/Desktop/CombatCharacterFrame/inventory/right_rotate_32bits.png#0 0 40 32)"/>
+            </div>
+            <div style="position: relative; left: 20px; top: 20px; width: 220px; height: 280px; background-color: #00000000;">
+                <pe:mc_player name="EasyCharPreviewPlayer" 
+                    miniscenegraphname="EasyCharPreviewScene" 
+                    style="margin-left: -20px; margin-top: 10px; width: 260px; height: 260px;" 
+                    IsInteractive="true" 
+                    NoFrameMove="true" 
+                    DefaultCameraObjectDist="4.6" 
+                    LookAtHeight="0.9" 
+                    DefaultLiftupAngle="0.1" 
+                    fisrtFrameMove="false">
+                </pe:mc_player>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 皮肤信息和操作区域 -->
+    <div style="position: relative; margin-top: 340px; width: 260px; height: 41px;">        
+        <!-- 脱下按钮 -->
+        <input type="button" value="<%=L'脱下'%>" onclick="OnUnEquipSkin()" style="float: left; margin-left: 10px; width: 118px; height: 41px; font-size: 14px; font-weight: bold; color: #000000; text-offset-y:-2; background: url(Texture/Aries/Creator/keepwork/Quest/btn_hui_134X54_32bits.png#0 0 134 54); " />
+        <!-- 穿戴按钮 -->
+        <input type="button" value="<%=L'穿上'%>" onclick="OnEquipSkin()" style="float: left; margin-left: 10px; width: 118px; height: 41px; font-size: 14px; font-weight: bold; color: #000000; text-offset-y:-2; background: url(Texture/Aries/Creator/keepwork/Quest/btn_huang_134X54_32bits.png#0 0 134 54); " />
+    </div>
+</div>
+</pe:mcml>

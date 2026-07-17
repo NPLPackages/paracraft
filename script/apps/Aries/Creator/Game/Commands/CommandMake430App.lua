@@ -122,7 +122,8 @@ _checkDownloadWorldById = function (pid, refreshMode, failed,callback)
             local cdnArchiveUrl = GitKeepworkService:GetCdnArchiveUrl(
                                     worldInfo.worldName,
                                     worldInfo.username,
-                                    cacheWorldInfo.worldInfo.commitId)
+                                    cacheWorldInfo.worldInfo.commitId,
+                                    worldInfo.projectId)
 
             local qiniuWorld = RemoteWorld.LoadFromHref(qiniuZipArchiveUrl, 'self')
             qiniuWorld:SetProjectId(pid)
@@ -171,7 +172,8 @@ _checkDownloadWorldById = function (pid, refreshMode, failed,callback)
             local newCdnArchiveUrl = GitKeepworkService:GetCdnArchiveUrl(
                                         worldInfo.worldName,
                                         worldInfo.username,
-                                        worldInfo.commitId)
+                                        worldInfo.commitId,
+                                        worldInfo.projectId)
 
             local newQiniuWorld = RemoteWorld.LoadFromHref(newQiniuZipArchiveUrl, 'self')
             newQiniuWorld:SetProjectId(pid)
@@ -470,7 +472,7 @@ _checkDownloadWorldById = function (pid, refreshMode, failed,callback)
     -- offline mode
     local cacheWorldInfo = CacheProjectId:GetProjectIdInfo(pid)
 
-    if ((System.options.loginmode == 'local' or not System.options.networkNormal) and
+    if ((System.options.loginmode == 'local') and
        not GameLogic.GetFilters():apply_filters('is_signed_in') and
        cacheWorldInfo) then
         self_encryptWorldMode = cacheWorldInfo.worldInfo.encryptWorldMode

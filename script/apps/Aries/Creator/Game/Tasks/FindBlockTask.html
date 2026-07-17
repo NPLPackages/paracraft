@@ -12,13 +12,26 @@ GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask")
 FindBlockTask.OnInit();
 ]]></script>
-<aries:window style="width:512px;" title='<%=L"搜索"..L": 左键传送，右键预览，Alt吸取，Ctrl编辑"%>' mode="thin" uiname_onclose="FindBlockTask.OnClose" onclose="FindBlockTask.OnClose">
+<aries:window style="width:512px;" title='<%=FindBlockTask.titleText%>' mode="thin" uiname_onclose="FindBlockTask.OnClose" onclose="FindBlockTask.OnClose">
     <div style="margin:10px;color:#ffffff;font-size:14px;">
         <div class="mc_paper_panel">
-            <pe:treeview name="result" style="background:;height:256px;" VerticalScrollBarStep="20" DefaultNodeHeight="20" DataSource='<%=FindBlockTask.GetDataSource()%>' ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="true" DefaultIndentation="0">
+            <pe:treeview name="result" ShowIcon="false" style="background:;height:256px;" VerticalScrollBarStep="20" DefaultNodeHeight="20" DataSource='<%=FindBlockTask.GetDataSource()%>' ItemToggleSize="0" ItemToggleRightSpacing="0" DefaultIndentation="0">
                 <NodeTemplates>
                     <NodeTemplate DataType="block">
-                        <pe:treenode icon='<%=XPath("this|icon")%>' icon_tooltip='<%=XPath("this|class_name")%>' selected='<%=FindBlockTask.GetSelectedResultIndex() == XPath("this|index")%>' OnClick="FindBlockTask.OnClickItem" uiname='<%="FindBlockTask.sel_"..XPath("this|index")%>' text='<%=format("%s", XPath("this|name") or "")%>' ></pe:treenode>
+                        <div style="height:20px;">
+                            <img style="width:20px;height:20px;" src='<%=XPath("this|icon")%>' tooltip='<%=XPath("this|class_name")%>' />
+                            <pe:if condition='<%=FindBlockTask.GetSelectedResultIndex() == XPath("this|index")%>'>
+                                <div style="float:left;position:relative;height:20px;background:url(Texture/alphadot.png);" width="100%" ></div>
+                            </pe:if>
+                            <pe:if condition='<%=XPath("this|isLocked")%>'>
+                                <div tooltip='<%=L"锁定中(点击可解锁)"%>' onclick="FindBlockTask.OnClickUnLock" style="float:left;width:20px;height:20px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_locked_32bits.png#0 0 40 40);"></div>    
+                            </pe:if>
+                            <pe:if condition='<%=XPath("this|invisible")%>'>
+                                <div tooltip='<%=L"不可见"%>' style="float:left;width:16px;height:16px;margin:2px;background:url(texture/3dmapsystem/common/eye.png);"></div>
+                            </pe:if>
+                            <div style="float:left;position:relative;height:20px;background2:url(Texture/alphadot.png);" width="100%" onclick="FindBlockTask.OnClickItem" uiname='<%="FindBlockTask.sel_"..XPath("this|index")%>'></div>
+                            <div style="float:left;text-singleline:true"><%=commonlib.Encoding.EncodeHTMLInnerText(XPath("this|name") or "")%></div>
+                        </div>
                     </NodeTemplate>
                 </NodeTemplates>
             </pe:treeview>

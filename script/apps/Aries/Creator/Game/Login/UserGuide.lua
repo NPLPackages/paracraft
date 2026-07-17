@@ -62,7 +62,8 @@ end
 
 function UserGuide.OnMouseDown(nCode, appName, msg)
 	local input = Map3DSystem.InputMsg;
-	if(input.mouse_button == "right") then	
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if(input.mouse_button == "right" or (IsMobileUIEnabled and input.mouse_button == "left")) then	
 		isMouseDown = true;
 	end
 end
@@ -103,7 +104,9 @@ end
 
 function UserGuide.OnMouseUp(nCode, appName, msg)
 	local input = Map3DSystem.InputMsg;
-	if(input.mouse_button == "right") then
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+
+	if(input.mouse_button == "right" or (IsMobileUIEnabled and input.mouse_button == "left")) then
 		if(isMouseDown and isMouseMove) then
 			if(not UserGuide.bMoveOnly) then
 				UserGuide.Step3();

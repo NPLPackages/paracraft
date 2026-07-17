@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body>
+<pe:mcml>
+<script type="text/npl" src="KeepWorkSingleItem.lua" refresh="true"><![CDATA[
+    local KeepWorkSingleItem = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkSingleItem.lua");
+
+    function CanShowCanva3d()
+        return KeepWorkSingleItem.CanUserCanva3d()
+    end
+
+    function GetXmlInfo()
+        return KeepWorkSingleItem.GetLiveModelXmlInfo()
+    end
+
+    function GetModelValue()
+        return KeepWorkSingleItem.GetModelFile()
+    end
+
+    function GetIcon()
+        if KeepWorkSingleItem.item_data.hasIcon then
+            --print("KeepWorkSingleItem.item_data.use_little_icon====",KeepWorkSingleItem.item_data.use_little_icon)
+            if KeepWorkSingleItem.item_data.use_little_icon then
+                return string.format([[<div style="margin-left:40px;margin-top:10px;"><img zorder="0" src='%s'width="64" height="64"/></div>]],KeepWorkSingleItem.item_data.icon)
+            else
+                return string.format([[<div style="margin-left:20px;margin-top:10x;"><img zorder="0" src='%s'width="128" height="64"/></div>]],KeepWorkSingleItem.item_data.icon)
+            end
+        end
+    end
+
+    function IsSpecialModel()
+        return KeepWorkSingleItem.IsSpecialModel()
+    end
+
+    function IsLiveModel()
+        return KeepWorkSingleItem.IsLiveModel()
+    end
+
+    function GetName()
+        return KeepWorkSingleItem.item_data and KeepWorkSingleItem.item_data.name or ""
+    end
+]]></script>
+<div style="width:190px;height:180px;background:url(Texture/Aries/Creator/keepwork/Mall1/model_bg_190x180_32bits.png#0 0 190 180)">
+    <div zorder="-1" style="position: relative; width: 190px; height: 138px; background: url(Texture/Aries/Creator/keepwork/Mall1/model_bg1_190x138_32bits.png#0 0 190 138);"></div>
+    <div style="position: relative; margin-left: 0px; margin-top: 0px;">
+        <pe:if condition="<%=CanShowCanva3d()%>">
+            <pe:if condition='<%=IsSpecialModel()%>'>
+                <pe:canvas3d name='canvas3d_233'  xmlInfo ='<%=GetXmlInfo()%>' DefaultRotY="-0.785"  IsInteractive="false" autoRotateSpeed="0"
+                    miniscenegraphname='minisceneBmaxPreview_get' RenderTargetSize="128" 
+                    value='<%=GetModelValue()%>' style="position:relative;width:73px;height:73px;margin-top:25px;margin-left:45px;" />
+            </pe:if>
+            <pe:if condition='<%=not IsSpecialModel()%>'>
+                <pe:if condition='<%=IsLiveModel()%>'>
+                    <pe:canvas3d name='canvas3d_233' xmlInfo ='<%=GetXmlInfo()%>'  DefaultRotY="1.57" IsInteractive="false" autoRotateSpeed="0"
+                        miniscenegraphname='minisceneBmaxPreview_get' RenderTargetSize="128" 
+                        value='<%=GetModelValue()%>' style="position:relative;width:73px;height:73px;margin-top:25px;margin-left:45px;" />
+                </pe:if>
+                <pe:if condition='<%=not IsLiveModel()%>'>
+                    <pe:canvas3d name='canvas3d_233' xmlInfo ='<%=GetXmlInfo()%>'  DefaultRotY="-1.57" IsInteractive="false" autoRotateSpeed="0"
+                        miniscenegraphname='minisceneBmaxPreview_get' RenderTargetSize="128" 
+                        value='<%=GetModelValue()%>' style="position:relative;width:73px;height:73px;margin-top:25px;margin-left:45px;" />
+                </pe:if>
+            </pe:if> 
+        </pe:if>
+    </div>
+    <pe:if condition="<%=not CanShowCanva3d()%>">
+        <%=GetIcon()%>
+    </pe:if>
+
+    <pe:if condition="<%=CanShowCanva3d()%>">
+        <div style="margin-top: 140px; font-weight:bold;font-size:14; text-align: center;">
+            <%=GetName()%>
+        </div>
+    </pe:if>
+    
+    <pe:if condition="<%=not CanShowCanva3d()%>">
+        <div style="margin-top: 62px; font-weight:bold;font-size:14; text-align: center;">
+            <%=GetName()%>
+        </div>
+    </pe:if>
+</div>
+</pe:mcml> 
+</body>
+</html>

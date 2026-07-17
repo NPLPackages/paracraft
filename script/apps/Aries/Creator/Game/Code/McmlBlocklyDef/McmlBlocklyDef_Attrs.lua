@@ -21,7 +21,6 @@ NPL.export({
 				{ "style", "style"},
 			},
 		},
-       
         {
 			name = "start_dummy",
 			type = "input_dummy",
@@ -110,7 +109,7 @@ NPL.export({
 				{ "tooltip", "tooltip"},
 			},
 		},
-         {
+        {
 			name = "value",
 			type = "input_value",
 			shadow = { type = "text"},
@@ -156,6 +155,68 @@ NPL.export({
 	func_description = '%s="%s"',
 	ToNPL = function(self)
 		return string.format('%s="%s"',self:getFieldValue('key'),self:getFieldValue('value'));
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+]]}},
+},
+
+{
+	type = "mcml_attrs_databinding_getter", 
+	message0 = L"属性%1从全局变量%2动态读取",
+	arg0 = {
+        {
+			name = "key",
+			type = "field_dropdown",
+			options = {
+				{ "value", "value"},
+			},
+		},
+        {
+			name = "value",
+			type = "input_value",
+			shadow = { type = "text"},
+			text = "var",
+		},
+	},
+    output = {type = "null",},
+	category = "McmlAttrs", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s="<%%=%s%%>"',
+	ToNPL = function(self)
+		local key = self:getFieldValue('key');
+		return string.format('%s="<%%=%s%%>" getter="%s"', key, self:getFieldValue('value'), key);
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+]]}},
+},
+
+{
+	type = "mcml_attrs_databinding_setter", 
+	message0 = L"属性%1动态写入全局变量%2",
+	arg0 = {
+        {
+			name = "key",
+			type = "field_dropdown",
+			options = {
+				{ "value", "value"},
+			},
+		},
+        {
+			name = "value",
+			type = "input_value",
+			shadow = { type = "text"},
+			text = "var",
+		},
+	},
+    output = {type = "null",},
+	category = "McmlAttrs", 
+	helpUrl = "", 
+	canRun = false,
+	func_description = 'setter="%s:%s"',
+	ToNPL = function(self)
+		local key = self:getFieldValue('key');
+		return string.format('setter="%s:%s"', key, self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = false, code = [[
 ]]}},

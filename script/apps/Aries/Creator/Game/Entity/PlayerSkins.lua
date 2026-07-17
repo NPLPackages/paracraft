@@ -35,7 +35,7 @@ local defaultModelFile = "character/CC/02human/actor/actor.x";
 local skinGroups = {};
 -- mapping from filename to model, which is mapping from skinid to skins
 local models = {};
-
+local noSkinModels = {};
 local skin_alias_map = {};
 local skin_string_to_id = {};
 
@@ -45,13 +45,14 @@ function PlayerSkins:Init()
 		return;
 	end
 	self.is_inited = true;
+	
 	local filename = "config/Aries/creator/PlayerSkins.xml";
 	local root = ParaXML.LuaXML_ParseFile(filename);
 	if(root) then
 		local id = 0;
 		for groupNode in commonlib.XPath.eachNode(root, "/PlayerSkins/groups/group") do
 			local groupName = groupNode.attr.name;
-			local group = {}
+			local group = {tag = groupNode.attr.tag}
 			skinGroups[groupName] = group;
 
 			for node in commonlib.XPath.eachNode(groupNode, "/skin") do
@@ -166,12 +167,16 @@ end
 function PlayerSkins:GetModel(filename)
 	if(models[filename]) then
 		return models[filename];
+	elseif(noSkinModels[filename]) then
+		return;
 	else
 		for filter, model in pairs(models) do
-			if (filter:match(filter)) then
+			if (filename:match(filter)) then
+				models[filename] = model;
 				return model;
 			end
 		end
+		noSkinModels[filename] = true;
 	end
 end
 
@@ -180,4 +185,84 @@ end
 function PlayerSkins:GetSkinsById(filename, skinId)
 	local model = self:GetModel(filename);
 	return model and model[skinId or 2];
+end
+
+-- @param tag: such as "eye|mouth|body|hair|leg|foot|head"
+-- @return skins, skinId: array of replaceable skins.
+function PlayerSkins:GetSkinsByTag(filename, tag)
+	local model = self:GetModel(filename);
+	if(model) then
+		for skinId, skins in pairs(model) do
+			if(skins.tag == tag) then
+				return skins, skinId;
+			end
+		end
+	end
+end
+
+-- open the skin editor for the given entity
+-- @param entity: the entity to edit skin for.
+-- @param callbackFunc: function(bSucceed) end
+function PlayerSkins:OpenEditor(entity, callbackFunc)
+	if(entity) then
+		local assetFilename = entity:GetMainAssetPath();
+		if entity.GetSkin then
+			local old_value = entity:GetSkin();
+		end
+
+		if(entity.IsCustomModel and entity:IsCustomModel()) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.lua");
+			local EditCCSTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCCSTask");
+			EditCCSTask:ShowPage(entity, function(ccsString)
+				if(ccsString ~= old_value) then
+					entity:SetSkin(ccsString);
+					if(callbackFunc) then
+						callbackFunc(true, ccsString, old_value);
+					end
+					-- GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+					-- 	if(isVip) then
+					-- 		entity:SetSkin(ccsString);
+					-- 		if(callbackFunc) then
+					-- 			callbackFunc(true);
+					-- 		end
+					-- 	end
+					-- end)
+				end
+			end);
+		elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
+			local old_value = entity:GetSkin()
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
+			local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
+			CustomSkinPage.ShowPage(function(filename, skin)
+				if (filename and skin~=old_value) then
+					entity:SetSkin(skin);
+					if(callbackFunc) then
+						callbackFunc(true, skin, old_value);
+					end
+				end
+			end, old_value,assetFilename);
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+			local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+			assetFilename = PlayerAssetFile:GetNameByFilename(assetFilename)
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
+			local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
+			EditSkinPage.ShowPage(function(result)
+				if(result and result~=old_value) then
+					entity:SetSkin(result);
+					if(callbackFunc) then
+						callbackFunc(true, result, old_value);
+					end
+					-- GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+					-- 	if(isVip) then
+					-- 		entity:SetSkin(result);
+					-- 		if(callbackFunc) then
+					-- 			callbackFunc(true);
+					-- 		end
+					-- 	end
+					-- end)
+				end
+			end, old_value, "", assetFilename)
+		end
+	end
 end

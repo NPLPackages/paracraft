@@ -72,11 +72,76 @@ function VipPage.VipIsValidCallback()
 	VipPage.ClosePage();
 end
 
-function VipPage.ShowPage(key, desc)
+function VipPage.IsCustomGameStarted()
+    if not GameLogic.MiniGameMgr then
+        return false
+    end
+    local isCustomGameStarted = GameLogic.MiniGameMgr:IsCustomGameStarted()
+    return isCustomGameStarted
+end
+
+local vipUrl ={
+	STAGE="https://community-dev.kp-para.cn/client/recharge",
+	RELEASE="https://community-rls.kp-para.cn/client/recharge",
+	ONLINE="https://community.palaka.cn/client/recharge"
+}
+
+function VipPage.ShowPage(key, desc,uiType)
+	if VipPage.IsCustomGameStarted() then
+		local MiniGameMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameMainPage.lua");
+		MiniGameMainPage.StartWebGame("game_activities",{type="vip"}, true)
+		return
+	end
+	if System.options.isCommunity then
+		local isVerified = GameLogic.GetFilters():apply_filters('store_get', 'user/isVerified');
+		if not isVerified then
+			local username = GameLogic.GetFilters():apply_filters('store_get', 'user/username');
+			local session = GameLogic.GetFilters():apply_filters('database.sessions_data.get_session_by_username', username);
+			if not (session and type(session) == 'table' and session.doNotNoticeVerify) then
+				GameLogic.GetFilters():apply_filters('cellar.certificate.show_certificate_notice_page', function()
+					KeepWorkItemManager.LoadProfile(false, function()
+						VipPage.ShowPage(key, desc,uiType)
+					end)
+				end)
+			end
+			return
+		end
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityVipPage.lua")
+        local CommunityVipPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Tasks.Community.CommunityVipPage")
+		if (System.options.isHideVip) then
+			CommunityVipPage.ShowHideVipPage()
+			return;
+		end
+		local env = string.upper(ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE"))
+		local configUrl = ParaEngine.GetAppCommandLineByParam("community_url", "")
+		local base_url = vipUrl[env] or vipUrl.ONLINE
+		local token = Mod.WorldShare.Store:Get("user/token")
+		if not token or token == "" then
+			GameLogic.AddBBS(nil,L"该功能需要登录")
+			return
+		end
+		if configUrl and configUrl ~= "" then
+			base_url = configUrl
+		end
+		local url = base_url.."?token="..(token or "")
+		if uiType =="Vip" or uiType == "CommonVip" then
+			local vipType = uiType == "CommonVip" and "vip" or "svip"
+			url = url.."&uiType="..vipType
+		end
+		if key and key ~= "" then
+			url = url.."&from="..key
+		end
+		if System.os.IsEmscripten() then
+			url = url.."&mod=webparacraft"
+		end
+		CommunityVipPage:OpenBrowser("community_browser",url,function()
+			
+		end)
+		return 
+	end
 	if (System.options.isHideVip) then
 		return;
 	end
-
 	local VipFullPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipFullPage.lua");
 	if VipFullPage then
 		VipFullPage.ShowPage(key, desc);

@@ -24,7 +24,9 @@ KeyFrameCtrl.start_time = 0;
 KeyFrameCtrl.gridSize = nil;
 KeyFrameCtrl.key_button_width = 8;
 KeyFrameCtrl.key_button_height = 12;
-KeyFrameCtrl.key_button_background = "Texture/whitedot.png";
+KeyFrameCtrl.key_button_background = "Texture/Aries/Creator/keepwork/Mobile/MovieClip/weixuanzhon_20x33_32bits.png#0 0 20 33"; 
+--KeyFrameCtrl.key_button_background = "Texture/whitedot.png";
+KeyFrameCtrl.key_button_background_movetime = "Texture/whitedot.png";
 -- white grey: standard keyframe
 KeyFrameCtrl.key_button_color = "#808080";
 -- light blue: this is more like a bookmark position of user's last click on timeline. 
@@ -32,6 +34,7 @@ KeyFrameCtrl.key_button_color_lastclick = "#00ffffc0";
 KeyFrameCtrl.key_button_background_lastclick = "Texture/Aries/Creator/imageboarder.png:3 3 3 3";
 
 -- red denotes current time frame
+KeyFrameCtrl.key_button_background_curtime = "Texture/whitedot.png";
 KeyFrameCtrl.key_button_color_curtime = "#ff0000c0";
 KeyFrameCtrl.key_button_curtime_width = 2;
 -- when key is being shifted
@@ -306,6 +309,11 @@ function KeyFrameCtrl:SetUIObjTooltip(ui_obj, time, value)
 		end
 	end
 	ui_obj.tooltip = format("%s\n%s", tooltip or "", L"右键选;左键移;Shift左:删;Alt左:单移;Ctrl左:复制");
+	local isMobile = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	local isMobilePlatform = System.os.IsMobilePlatform()
+	if isMobile or isMobilePlatform then
+		ui_obj.tooltip = format("%s\n%s", tooltip or "", L"点击选中；划动移动；长按编辑");
+	end
 end
 
 function KeyFrameCtrl:GetTimeFromUIObj(ui_obj)
@@ -487,7 +495,7 @@ function KeyFrameCtrl:UpdateCurrentTime(curTime, bSnapToGrid)
 			local ui_obj = ParaUI.CreateUIObject("button","curtime", "_lt", 0, 0, self.key_button_curtime_width,self.key_button_height or self.height);
 			ui_obj.enabled = false;
 			ui_obj.zorder = 1;
-			ui_obj.background = self.key_button_background;
+			ui_obj.background = self.key_button_background_curtime;
 			_guihelper.SetUIColor(ui_obj, self.key_button_color_curtime);
 			_parent:AddChild(ui_obj);
 			self.btn_curtime = ui_obj;
@@ -527,51 +535,60 @@ function KeyFrameCtrl:Update(_parent, width, height)
 	local start_time = self:GetStartTime();
 	local end_time = self:GetEndTime();
 	if(variable and variable.GetKeys_Iter) then
-		
+		local background = KeyFrameCtrl.key_button_background
+					
 		local last_x = -key_button_width;
 		local single_mode = self.single_shift or self.single_copy;
+		local ignoreUntilX = 0;
 		for time, value in variable:GetKeys_Iter(1, start_time-1, end_time) do
 			if( start_time <= time and time<=end_time ) then	
-				ui_obj_name = tostring(nUIIndex);
-				ui_obj = _parent:GetChild(ui_obj_name);
-				if(not ui_obj:IsValid()) then
-					local height = self.key_button_height or self.height
-					local pos_y = 0
-					if System.options.IsTouchDevice then
-						pos_y = 2
-						height = height - 4
-					end
-					ui_obj = ParaUI.CreateUIObject("button",ui_obj_name, "_lt", 0, pos_y, key_button_width,height);
-					_parent:AddChild(ui_obj);
-					ui_obj:SetScript("onclick", function(uiobj)
-						self:OnClickKeyFrame(uiobj);
-					end)
-				end
 				local x = math_floor((time-start_time) * frame_width);
-				if((last_x + key_button_width) >= x) then
-					x = last_x + key_button_width;
-				end
-				last_x = x;
+				if(x >= ignoreUntilX) then
+					local x_original = x;
 
-				local background = System.options.IsTouchDevice and "Texture/Aries/Creator/keepwork/Mobile/MovieClip/weixuanzhon_20x33_32bits.png#0 0 20 33" or KeyFrameCtrl.key_button_background
-				ui_obj.background = background;
-				ui_obj.visible = true;
-				self:SetUIObjTooltip(ui_obj, time, nil);
+					if((last_x + key_button_width) >= x) then
+						x = last_x + key_button_width;
+					end
+					last_x = x;
+
+					if((x - x_original) >= key_button_width*2) then
+						ignoreUntilX = x + key_button_width + 2;
+					end
+
+					ui_obj_name = tostring(nUIIndex);
+					ui_obj = _parent:GetChild(ui_obj_name);
+					if(not ui_obj:IsValid()) then
+						local height = self.key_button_height or self.height
+						local pos_y = 0
+						if System.options.IsTouchDevice then
+							pos_y = 2
+							height = height - 4
+						end
+						ui_obj = ParaUI.CreateUIObject("button",ui_obj_name, "_lt", 0, pos_y, key_button_width,height);
+						_parent:AddChild(ui_obj);
+						ui_obj:SetScript("onclick", function(uiobj)
+							self:OnClickKeyFrame(uiobj);
+						end)
+					end
+
+					ui_obj.background = background;
+					ui_obj.visible = true;
+					self:SetUIObjTooltip(ui_obj, time, nil);
 				
-				if(self.is_shifting and self.shift_ui_x_offset and 
-					(not single_mode and self.shift_begin_time <= time) or (single_mode and self.shift_begin_time==time) ) then
-					ui_obj.x = x + self.shift_ui_x_offset;
-					local button_color = System.options.IsTouchDevice and "#808080" or self.key_button_color_shifting
-					_guihelper.SetUIColor(ui_obj, button_color);
-					local new_time = self:GetKeyTimeByUIPos(self.shift_ui_x_offset+self.shift_begin_ui_x)
-					self:ShowMoveTime(_parent,new_time,self.begin_click_obj)
-				else
-					ui_obj.x = x;
-					local button_color = System.options.IsTouchDevice and "#ffffff" or self.key_button_color
-					_guihelper.SetUIColor(ui_obj, button_color);
+					if(self.is_shifting and self.shift_ui_x_offset and 
+						(not single_mode and self.shift_begin_time <= time) or (single_mode and self.shift_begin_time==time) ) then
+						ui_obj.x = x + self.shift_ui_x_offset;
+						local button_color = System.options.IsTouchDevice and "#808080" or self.key_button_color_shifting
+						_guihelper.SetUIColor(ui_obj, button_color);
+						local new_time = self:GetKeyTimeByUIPos(self.shift_ui_x_offset+self.shift_begin_ui_x)
+						self:ShowMoveTime(_parent,new_time,self.begin_click_obj)
+					else
+						ui_obj.x = x;
+						local button_color = System.options.IsTouchDevice and "#ffffff" or self.key_button_color
+						_guihelper.SetUIColor(ui_obj, button_color);
+					end
+					nUIIndex = nUIIndex + 1;
 				end
-				
-				nUIIndex = nUIIndex + 1;
 			end
 		end
 	end 
@@ -607,7 +624,7 @@ function KeyFrameCtrl:ShowMoveTime(parent,time,obj)
 		if not textBg:IsValid() then
 			textBg = ParaUI.CreateUIObject("container", "move_time_bg", "_lt", posX + 40, posY, 60, 20);
 			textBg:GetAttributeObject():SetField("ClickThrough", true)
-			textBg.background = self.key_button_background;
+			textBg.background = self.key_button_background_movetime;
 			_guihelper.SetUIColor(textBg, "#0000ffc8");
 			textBg:AttachToRoot()
 

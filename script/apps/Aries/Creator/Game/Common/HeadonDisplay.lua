@@ -354,7 +354,7 @@ end
 
 -- virtual function
 function HeadonDisplay:FilterImage(filename)
-	if(not filename:match("^https?:") and not filename:match("^%w:")) then
+	if(not filename:match("^https?:") and not filename:match("^_miniscenegraph") and not filename:match("^_texture") and not filename:match("^%w:")) then
 		local filename_, params = filename:match("^([^;#:]+)(.*)$");
 		if(filename_) then
 			local filepath = Files.GetFilePath(filename_);
@@ -389,20 +389,12 @@ end
 function HeadonDisplay:EnableSelfPaint(bSelfPaint)
 end
 
--- @param name: default to "2d"
-function HeadonDisplay:getContext(name)
-	self:prepareCodeContext()
-	return self.context2d;
-end
-
--- virtual
-function HeadonDisplay:Render(painterContext)
+function HeadonDisplay:RenderContext2D(painterContext)
 	if(self.context2d) then
-		local ok, msg = pcall(self.context2d.Render, self.context2d, painterContext, true)
+		local ok, msg = pcall(self.context2d.Render, self.context2d, painterContext,true)
 		if(not ok and msg) then
 			painterContext:DrawText(0,0, "error in painting");
 			painterContext:DrawText(0,20, msg);
-		end	
+		end
 	end
-	return HeadonDisplay._super.Render(self, painterContext);
 end

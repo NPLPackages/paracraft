@@ -54,7 +54,13 @@ end
 -- if nil, it will just show up the window
 function TeleportListPage.ShowPage(data_source, bUpdateDataSource)
 	if(not data_source) then
-		data_source = EntityManager.GetPlayer():GetPosList();
+		local homeEntity = GameLogic.GetHomeEntity()
+		if(homeEntity) then
+			data_source = homeEntity:GetPosList();
+		else
+			GameLogic.AddBBS(L"你还没有出生点，请先创建一个出生点");
+			return;
+		end
 	end
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/TeleportListPage.html", 
@@ -336,7 +342,7 @@ function TeleportListPage.RemoveInstance()
 end
 
 function TeleportListPage.GetPlayerLocationList()
-	return EntityManager.GetPlayer():GetPosList();
+	return GameLogic.GetHomeEntity() and GameLogic.GetHomeEntity():GetPosList();
 end
 
 function TeleportListPage.Refresh()
@@ -346,8 +352,20 @@ function TeleportListPage.Refresh()
 end
 
 function TeleportListPage.ClearAll()
-	commonlib.resize(TeleportListPage.GetPlayerLocationList(), 0);
-	TeleportListPage.Refresh();
+	-- Clear the current instance data
+	instance_ds = {};
+	TeleportListPage.selected_index = nil;
+	
+	-- Also clear the player location list if we're editing it
+	local playerList = TeleportListPage.GetPlayerLocationList();
+	if(playerList) then
+		commonlib.resize(playerList, 0);
+	end
+	
+	-- Refresh the UI and notify data change
+	TeleportListPage.RefreshPage();
+	TeleportListPage.OnDataChanged();
+	
 	BroadcastHelper.PushLabel({id="TeleportListPage", label = L"跳转点清空了", max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 end
 
@@ -409,4 +427,66 @@ function TeleportListPage.GotoNextLocation()
 	else
 		BroadcastHelper.PushLabel({id="TeleportListPage", label = L"没有跳转点. Ctrl+F2建立或用/tp指令", max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	end
+end
+
+-- Export current teleport data to clipboard
+function TeleportListPage.ExportToClipboard()
+	if(not instance_ds or #instance_ds == 0) then
+		_guihelper.MessageBox(L"没有数据可以导出");
+		return;
+	end
+	
+	local export_data = {};
+	for index, instance in ipairs(instance_ds) do
+		export_data[#export_data + 1] = {
+			position = instance.attr.position,
+			facing = instance.attr.facing,
+			scaling = instance.attr.scaling,
+			name = instance.attr.name
+		};
+	end
+	
+	local export_string = commonlib.serialize_compact(export_data);
+	ParaMisc.CopyTextToClipboard(export_string);
+	
+	BroadcastHelper.PushLabel({id="TeleportListPage", label = string.format(L"已导出 %d 个传送点到剪贴板", #export_data), max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+end
+
+-- Import teleport data from clipboard
+function TeleportListPage.ImportFromClipboard()
+	local import_string = ParaMisc.GetTextFromClipboard();
+	if(not import_string or import_string == "") then
+		_guihelper.MessageBox(L"剪贴板中没有数据");
+		return;
+	end
+	
+	local success, import_data = pcall(loadstring("return " .. import_string));
+	if(not success or type(import_data) ~= "table") then
+		_guihelper.MessageBox(L"剪贴板中的数据格式不正确");
+		return;
+	end
+	
+	-- Validate imported data
+	for i, item in ipairs(import_data) do
+		if(type(item) ~= "table" or not item.position) then
+			_guihelper.MessageBox(string.format(L"第 %d 项数据格式不正确", i));
+			return;
+		end
+	end
+	
+	-- Clear current data and import new data
+	instance_ds = {};
+	for _, item in ipairs(import_data) do
+		TeleportListPage.AppendNode(
+			item.position or "0,0,0", 
+			item.facing or "0", 
+			item.scaling or "1",
+			item.name
+		);
+	end
+	
+	TeleportListPage.RefreshPage();
+	TeleportListPage.OnDataChanged();
+	
+	BroadcastHelper.PushLabel({id="TeleportListPage", label = string.format(L"已导入 %d 个传送点", #import_data), max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 end

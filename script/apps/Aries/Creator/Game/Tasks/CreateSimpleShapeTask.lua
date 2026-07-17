@@ -103,6 +103,7 @@ function CreateSimpleShape:Run()
 			UndoManager.PushCommand(self);
 		end
 	end
+	GameLogic.GetFilters():apply_filters("BatchModifyBlocks",self.history)
 end
 
 function CreateSimpleShape:FrameMove()

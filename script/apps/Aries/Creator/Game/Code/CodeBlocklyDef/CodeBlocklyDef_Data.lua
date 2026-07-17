@@ -156,6 +156,10 @@ say(text, 1)
 	ToNPL = function(self)
 		return string.format('set("%s", %s)\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
 	end,
+	ToPython = function(self)
+		-- set conflict with the buildin set function in python. 
+		return string.format('_G["%s"] = %s\n', self:getFieldAsString('key'), self:getFieldAsString('value'));
+	end,
 	examples = {{desc = L"也可以用_G.a", canRun = true, code = [[
 _G.a = _G.a or 1
 while(true) do
@@ -230,11 +234,12 @@ say(key, 1)
 	funcName = "registerCloneEvent",
 	func_description = 'registerCloneEvent(function(%s)\\n%send)',
     ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerCloneEvent_func(%s):\n    %s\nregisterCloneEvent(registerCloneEvent_func)\n', self:getFieldAsString('param'), input);
+		return string.format('def registerCloneEvent_func(%s):\n%s\n%sregisterCloneEvent(registerCloneEvent_func)\n', self:getFieldAsString('param'), input, block_indent);
 	end,
 	ToNPL = function(self)
 		return string.format('registerCloneEvent(function(%s)\n    %s\nend)\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
@@ -317,7 +322,7 @@ say("click")
 
 {
 	type = "delete", 
-	message0 = L"删除此克隆角色", color="#cc0000",
+	message0 = L"删除此角色", color="#cc0000",
 	arg0 = {
 	},
 	category = "Data", 
@@ -552,13 +557,13 @@ say("click us!")
 		return string.format('getActor("%s")\n', self:getFieldAsString('actorName'));
 	end,
 	examples = {
-	{desc = L"", canRun = true, code = [[
+	{desc = "", canRun = true, code = [[
 local actor = getActor("myself")
 runForActor(actor, function()
 	say("hello", 1)
 end)
 ]]},
-	{desc = L"", canRun = true, code = [[
+	{desc = "", canRun = true, code = [[
 local actor = getActor("name1")
 local data = actor:GetActorValue("some_data")
 ]]},
@@ -588,10 +593,10 @@ local data = actor:GetActorValue("some_data")
 		return string.format('GetEntity("%s")\n', self:getFieldAsString('entityName'));
 	end,
 	examples = {
-	{desc = L"", canRun = true, code = [[
+	{desc = "", canRun = true, code = [[
 local entity = GetEntity()
 ]]},
-	{desc = L"", canRun = true, code = [[
+	{desc = "", canRun = true, code = [[
 local entity = GetEntity("name1")
 entity:Say("hi")
 ]]},
@@ -836,10 +841,10 @@ log(t)
 	func_description = 'function(%s)\\n%send',
     ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def func(%s):\n    %s\n', self:getFieldAsString('param'), input);
+		return string.format('def func(%s):\n%s\n', self:getFieldAsString('param'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('function(%s)\n    %s\nend\n', self:getFieldAsString('param'), self:getFieldAsString('input'));
@@ -884,10 +889,10 @@ thinkText("Let me think");
 	func_description = 'function %s(%s)\\n%send',
     ToPython = function(self)
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def %s(%s):\n    %s\n', self:getFieldAsString('name'), self:getFieldAsString('param'), input);
+		return string.format('def %s(%s):\n%s\n', self:getFieldAsString('name'), self:getFieldAsString('param'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('function %s(%s)\n    %s\nend\n', self:getFieldAsString('name'), self:getFieldAsString('param'), self:getFieldAsString('input'));
@@ -1177,7 +1182,7 @@ hello()
 	ToNPL = function(self)
 		return string.format('import("%s")\n', self:getFieldAsString('filename'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 import("war")
 import("airsim")
 import("macroplatform")
@@ -1478,7 +1483,7 @@ print ("hello world")
 	ToNPL = function(self)
 		return string.format('-- %s', self:getFieldAsString('value'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 {
@@ -1520,7 +1525,7 @@ print ("hello world")
 	ToNPL = function(self)
 		return string.format('--[[\n%s\n]]', self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 
@@ -1575,7 +1580,7 @@ print ("hello world")
 	ToNPL = function(self)
 		return string.format('[[%s]]', self:getFieldAsString('value'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [=[
+	examples = {{desc = "", canRun = true, code = [=[
 local str = [[
 	hello 
 	world
@@ -1933,6 +1938,331 @@ echo(data)
 ]]},
 },
 },
+
+{
+	type = "mqtt_connect", 
+	message0 = L"连接MQTT %1 端口 %2", 
+	arg0 = {
+		{
+			name = "server",
+			type = "input_value",
+			text = "mqtt.keepwork.com", 
+			shadow = { type = "text", value = "mqtt.keepwork.com",},
+		},
+		{
+			name = "port",
+			type = "input_value",
+			text = "18883", 
+			shadow = { type = "text", value = "18883",},
+		},
+	},
+	message1 = "clientid=%1, user=%2, password=%3, %4", 
+	arg1 = {
+		{
+			name = "clientid",
+			type = "input_value",
+			text = "", 
+			shadow = { type = "text", value = "",},
+		},
+		{
+			name = "user",
+			type = "input_value",
+			text = "", 
+			shadow = { type = "text", value = "",},
+		},
+		{
+			name = "password",
+			type = "input_value",
+			text = "", 
+			shadow = { type = "text", value = "",},
+		},
+		{
+			-- name = "additionalParams",
+			name = "keepalive",
+			type = "input_value",
+            shadow = { type = "math_number", value = 30,},
+			text = 30, 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "mqtt_connect",
+	func_description = 'mqtt_connect({server=%s,\\n    port=%s,\\n    clientid=%s,\\n    user=%s,\\n    password=%s,\\n    keep_alive=%s\\n})',
+	ToNPL = function(self)
+		return string.format('mqtt_connect({server="%s",\n    port="%s",\n    clientid="%s",\n    user="%s",\n    password="%s",\n    keep_alive=%s\n})\n', self:getFieldAsString('server'),self:getFieldAsString('port'),self:getFieldAsString('clientid'),self:getFieldAsString('user'), self:getFieldAsString('password'), self:getFieldAsString('keepalive'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+mqtt_connect({
+    server="mqtt.keepwork.com", 
+	port="18883"
+	clientid=""
+    user="", 
+    password="",	
+	keep_alive=30,
+})
+
+mqtt_subscribe("test/topic1", function(msg)
+    say("received topic: "..msg)
+end)
+
+for i=1, 10 do
+    mqtt_publish("test/topic1", "hello"..i)
+    wait(1)
+end
+]]},
+},
+},
+
+{
+	type = "mqtt_subscribe", 
+	message0 = L"当从MQTT主题%1收到消息时", 
+	arg0 = {
+		{
+			name = "topic",
+			type = "input_value",
+			text = (System.User.username or "").."/name", 
+			shadow = { type = "text", value = (System.User.username or "").."/name",},
+		},
+	},
+	message1 = L"%1",
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "mqtt_subscribe",
+	func_description = 'mqtt_subscribe(%s, function()\\n%send)',
+	ToNPL = function(self)
+		return string.format('mqtt_subscribe("%s", function(msg)    \n%s\nend)\n', self:getFieldAsString('topic'), self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+mqtt_subscribe("test/topic1", function(msg)
+    tip("received topic: "..msg)
+end)
+]]},
+},
+},
+
+{
+	type = "mqtt_publish", 
+	message0 = L"发布MQTT 主题%1 内容%2", 
+	arg0 = {
+		{
+			name = "topic",
+			type = "input_value",
+			text = (System.User.username or "").."/name", 
+			shadow = { type = "text", value = (System.User.username or "").."/name",},
+		},
+		{
+			name = "payload",
+			type = "input_value",
+			text = "hello", 
+			shadow = { type = "text", value = "hello",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "mqtt_publish",
+	func_description = 'mqtt_publish(%s, %s)',
+	ToNPL = function(self)
+		return string.format('mqtt_publish("%s", "%s")\n', self:getFieldAsString('topic'), self:getFieldAsString('payload'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+for i=1, 10 do
+    mqtt_publish("test/topic1", "hello"..i)
+    wait(1)
+end
+]]},
+},
+},
+
+{
+	type = "serialport_send", 
+	message0 = L"串口发送 %1 %2", 
+	arg0 = {
+		{
+			name = "payload",
+			type = "input_value",
+			text = "help()", 
+			shadow = { type = "text", value = "help()",},
+		},
+		{
+			name = "datatype",
+			type = "input_value",
+			text = "code", 
+			shadow = { type = "text", value = "code",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "serialport_send",
+	func_description = 'serialport_send(%s, %s)',
+	ToNPL = function(self)
+		return string.format('serialport_send("%s", "%s")\n', self:getFieldAsString('payload'), self:getFieldAsString('datatype'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+-- send code with proper line ending
+serialport_send("print('hello')", "code")
+-- send code at port index 1
+serialport_send(1, "print('hello')", "code")
+-- send code to all ports(-1)
+serialport_send(-1, "print('hello')", "code")
+-- send raw bytes
+serialport_send("print('hello')\r\n")
+serialport_send('\001')       -- on a blank line, enter raw REPL mode
+serialport_send('\002')       -- on a blank line, enter normal REPL mode
+serialport_send('\003')       -- interrupt a running program
+serialport_send('\004')       -- on a blank line, do a soft reset of the board
+serialport_send('\005')       -- on a blank line, enter paste mode
+]]},
+},
+},
+
+{
+	type = "udp_open", 
+	message0 = L"建立 UDP 连接 端口 %1", 
+	arg0 = {
+		{
+			name = "port",
+			type = "input_value",
+			text = "8099", 
+			shadow = { type = "text", value = "8099",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "udp_open",
+	func_description = 'udp_open(%s)',
+	ToNPL = function(self)
+		return string.format('udp_open(%s)\n', self:getFieldAsString('port'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+udp_open();
+]]},
+},
+},
+
+{
+	type = "udp_broadcast", 
+	message0 = L"UDP 群发消息 %1", 
+	arg0 = {
+		{
+			name = "data",
+			type = "input_value",
+			text = "hello world", 
+			shadow = { type = "text", value = "hello world",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "udp_broadcast",
+	func_description = 'udp_broadcast(%s)',
+	ToNPL = function(self)
+		return string.format('udp_broadcast("%s")\n', self:getFieldAsString('data'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+		udp_broadcast("hello world");
+]]},
+},
+},
+
+{
+	type = "udp_send", 
+	message0 = L"UDP 发送消息 %1 %2 %3", 
+	arg0 = {
+		{
+			name = "data",
+			type = "input_value",
+			text = "hello world", 
+			shadow = { type = "text", value = "hello world",},
+		},
+		{
+			name = "ip",
+			type = "input_value",
+			text = "127.0.0.1", 
+			shadow = { type = "text", value = "127.0.0.1",},
+		},
+		{
+			name = "port",
+			type = "input_value",
+			text = "8099", 
+			shadow = { type = "text", value = "8099",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "udp_send",
+	func_description = 'udp_send(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('udp_send("%s", "%s", "%s")\n', self:getFieldAsString('data'), self:getFieldAsString('ip'), self:getFieldAsString('port'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+		udp_send("hello world", "127.0.0.1", "8099");
+]]},
+},
+},
+
+{
+	type = "udp_recv", 
+	message0 = L"当收到 UDP 消息(msg)时 %1", 
+	arg0 = {
+		{
+			name = "input_dummy",
+			type = "input_dummy",
+			text = "",
+		},
+	},
+	message1 = L"%1",
+	arg1 = {
+		{
+			name = "input",
+			type = "input_statement",
+			text = "",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "udp_recv",
+	func_description = 'udp_recv(function(msg)\\n%send)',
+	ToNPL = function(self)
+		return string.format('udp_recv(function(msg)    \n%s\nend)\n', self:getFieldAsString('input'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+udp_recv(function(msg)
+    tip("received topic: "..msg)
+end)
+]]},
+},
+},
+
 
 };
 function CodeBlocklyDef_Data.GetCmds()

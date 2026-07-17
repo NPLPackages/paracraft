@@ -99,7 +99,7 @@ function NetClientHandler:handleErrorMessage(text)
 	if(text == "ConnectionNotEstablished") then
 		BroadcastHelper.PushLabel({id="NetClientHandler", label = L"无法链接到这个服务器", max_duration=6000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 		_guihelper.MessageBox(L"无法链接到这个服务器,可能该服务器未开启或已关闭.详情请联系该服务器管理员.");
-		GameLogic.GetFilters():apply_filters("ConnectServerFailed")
+		GameLogic.GetFilters():apply_filters("ConnectServer",{result=false})
 	else --if(text == "OnConnectionLost") then
 		if(GameLogic.GetWorld() == self.worldClient) then
 			BroadcastHelper.PushLabel({id="NetClientHandler", label = L"与服务器的连接断开了", max_duration=6000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
@@ -124,7 +124,7 @@ function NetClientHandler:handleErrorMessage(text)
 			--end
 		else
 			_guihelper.MessageBox(L"服务器返回错误信息"..(text or ""));
-			GameLogic.GetFilters():apply_filters("ConnectServerFailed")
+			GameLogic.GetFilters():apply_filters("ConnectServer",{result=false})
 		end
 	end
 	self:Cleanup();
@@ -167,6 +167,7 @@ function NetClientHandler:handleAuthUser(packet_AuthUser)
 			end
 			self:AddToSendQueue(Packets.PacketLoginClient:new():Init());
 		end
+		GameLogic.GetFilters():apply_filters("ConnectServer",{result=true,packet = packet_AuthUser})
 	elseif(packet_AuthUser.result == "failed") then
 		if(not self.last_password or self.last_password=="") then
 			BroadcastHelper.PushLabel({id="NetClientHandler", label = L"连接成功：此服务器需要认证", max_duration=7000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
@@ -177,11 +178,12 @@ function NetClientHandler:handleAuthUser(packet_AuthUser)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
 		local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
 		ServerPage.ShowUserLoginPage(self,packet_AuthUser.info);
+		GameLogic.GetFilters():apply_filters("ConnectServer",{result=false,code="passworld"})
 	elseif(packet_AuthUser.result == "not allowed") then
 		local text = L"服务器暂时不允许链接， 可能是已经满了。"..(packet_AuthUser.info.errMsg or "");
 		BroadcastHelper.PushLabel({id="NetClientHandler", label = text, max_duration=7000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 		self:Cleanup();
-		GameLogic.GetFilters():apply_filters("ConnectServerFailed","isfull")
+		GameLogic.GetFilters():apply_filters("ConnectServer",{result=false,code="not allowed"})
 	end
 end
 

@@ -13,33 +13,41 @@
 
                     if System.options.channelId_431 then
                         ClientVersion = L"帕拉卡智慧教育";
+                    elseif System.options.isShenzhenAi5 then
+                        ClientVersion = L"深教AI4"
                     else
-                        ClientVersion = string.format(L"Paracraft帕拉卡 %s(%s)", options.GetBaseVersion(), options.GetClientVersion());
+                        ClientVersion = string.format(L"Paracraft 帕拉卡 %s(%s)", options.GetBaseVersion(), options.GetClientVersion());
                     end
                     LatestVersion = LatestVersion or false;
 
-                    function get_background()
-                        local filter_bg = GameLogic.GetFilters():apply_filters(
-                                            "cellar.main_login.get_login_background",
-                                            false
-                                          );
-
+                    function get_background_style()
+                        local filter_bg = GameLogic.GetFilters():apply_filters("cellar.main_login.get_login_background",false)
+                        filter_bg = filter_bg or "Texture/Aries/Creator/Paracraft/login_bg_32bits.png#0 0 1280 720"
+                        local bg_style = ""
                         if (filter_bg) then
-                            return filter_bg;
-                        else
-                            return "Texture/Aries/Creator/Paracraft/login_bg_32bits.png#0 0 1280 720";
+                            if(filter_bg:match("^background.*:")) then
+                                bg_style = filter_bg;
+                            else
+                                bg_style = format('background:url(%s)', filter_bg);
+                            end
                         end
+                        if System.options.isCommunity then
+                            if System.options.themeColor == "dark" or System.options.themeColor == "" then
+                                bg_style = "background-color:#1a1a1aff"
+                            end
+                            if System.options.themeColor == "light" then
+                                bg_style = "background-color:#F3F5F9FF"
+                            end
+                        end  
+                        return bg_style   
                     end
                 ]]>
             </script>
             <pe:if condition="<%= Eval('showbg') == 'true' %>">
-                <pe:container
-                    alignment="_fi"
-                    zorder="-1"
-                    width="100%"
-                    height="100%"
-                    style="<%= format('position: relative;background:url(%s)', get_background()) %>">
+                <div style="position:relative">
+                    <pe:container alignment="_fi" zorder="-1" width="100%" height="100%" style="<%=get_background_style() %>">
                 </pe:container>
+                </div>
             </pe:if>
             <pe:container
                 alignment="_mb"
@@ -63,9 +71,15 @@
                             <div><%= L"请到官网更新" %></div>
                         </div>
                     </pe:if>
-                    <pe:if condition="<%= not System.options.channelId_431 %>">
-                        <div style="margin-top:35px;text-shadow:true"><%= Eval("ClientVersion") %></div>
-                        <div style="margin-top:0px;text-shadow:true"><%= L"(c)Tatfook. powered by NPL and ParaEngine"%></div>
+                    <pe:if condition="<%= not System.options.isEducatePlatform %>">
+                        <pe:if condition="<%= System.options.isCommunity %>">
+                            <div style="margin-top:35px;color: #7B7A8A; text-shadow:true"><%= Eval("ClientVersion") %></div>
+                            <div style="margin-top:0px;color: #7B7A8A; text-shadow:true"><%= L"powered by NPL and ParaEngine"%></div>
+                        </pe:if>
+                        <pe:if condition="<%= not System.options.isCommunity %>">
+                            <div style="margin-top:35px;text-shadow:true"><%= Eval("ClientVersion") %></div>
+                            <div style="margin-top:0px;text-shadow:true"><%= L"powered by NPL and ParaEngine"%></div>
+                        </pe:if>
                     </pe:if>
                 </pe:container>
             </pe:container>

@@ -60,3 +60,26 @@ Examples:
 		end
 	end,
 };
+
+Commands["text2world"] = {
+	name="text2world", 
+	quick_ref="/text2world [url]", 
+	desc=[[create 3d world from markdown text or url
+@param url: any webpage from which we can extract markdown text.
+
+Examples:
+-- color blocks is black and white
+/text2world https://keepwork.com/official/docs/tutorials/codelab
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ConvertTextToBlocksTask.lua");NPL.load("(gl)script/apps/Aries/Creator/Game/Code/TextToWorld/TextToWorld.lua");
+		local TextToWorld = commonlib.gettable("MyCompany.Aries.Game.Code.TextToWorld.TextToWorld")
+		local compiler = TextToWorld:new()
+			
+		if(cmd_text and cmd_text:match("^https?://")) then 
+			compiler:RunPage(cmd_text)
+		else
+			compiler:ResetWorld()
+		end
+	end,
+};

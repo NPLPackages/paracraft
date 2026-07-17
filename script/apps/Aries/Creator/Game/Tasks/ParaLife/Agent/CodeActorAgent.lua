@@ -16,7 +16,6 @@ end
 ------------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/Agent/AgentActorBase.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemStack.lua");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
@@ -47,7 +46,9 @@ function ItemAgent:CreateAgentFromEntity(parentEntity, itemStack)
 				if(actor == nil) then
 					local item = ItemStack:new():Init(block_types.names.TimeSeriesNPC, 1);
 					actor = CodeActor:new():Init(item);
-					actor:SetName(actorName);
+					if(not actor:IsAgent()) then
+						actor:SetName(actorName);
+					end
 					GameLogic.GetCodeGlobal():AddActor(actor);
 				end
 			end

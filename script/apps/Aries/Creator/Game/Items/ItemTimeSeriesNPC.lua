@@ -40,6 +40,19 @@ function ItemTimeSeriesNPC:CreateActorFromItemStack(itemStack, movieclipEntity, 
 	return actor;
 end
 
+function ItemTimeSeriesNPC:GetDisplayName(itemStack)
+	if(itemStack) then
+		local ts = itemStack:GetDataField("timeseries");
+		if(ts and ts["name"] and ts["name"].data) then
+			local name = ts["name"].data[1];
+			if(name) then
+				return name;
+			end
+		end
+	end
+	return ItemTimeSeriesNPC._super.GetDisplayName(self, itemStack);
+end
+
 function ItemTimeSeriesNPC:GetTooltipFromItemStack(itemStack)
 	local name = itemStack:GetDisplayName();
 	if(not name and name~="") then

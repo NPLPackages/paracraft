@@ -186,8 +186,8 @@ end
 	category = "Math", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '(%s%%s)',
-	func_description_js = '(%s%%s)',
+	func_description = '(%s%%%s)',
+	func_description_js = '(%s%%%s)',
 	ToNPL = function(self)
 		return string.format('(%s%%%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,

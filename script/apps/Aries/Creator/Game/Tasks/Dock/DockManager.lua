@@ -37,6 +37,10 @@ function DockManager:RegisterEvent()
     GameLogic:Connect("WorldUnloaded", DockManager, DockManager.OnWorldUnloaded, "UniqueConnection");
     Screen:Connect("sizeChanged",DockManager,DockManager.ScreenChanged,"UniqueConnection")
     viewport:Connect("sizeChanged", DockManager, DockManager.RefreshPosition, "UniqueConnection");
+    GameLogic.GetFilters():add_filter("DesktopModeChanged", function(mode)
+        DockManager.OnChangeDesktopMode(mode);
+        return mode
+    end)
 end
 
 function DockManager.ShowCommandFilter(name)
@@ -80,6 +84,15 @@ function DockManager.ShowCommandFilter(name)
     end
     if name == "quickselectbar" or name == "desktop" then
         self:ShowEsc(true,true)
+    end
+    if name == "rocker" then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileMainPage.lua")
+        local MobileMainPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileMainPage");
+        local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+        if IsMobileUIEnabled then
+            MobileMainPage.SetRokerVisible(true)
+        end
+        return
     end
     return name
 end
@@ -126,6 +139,15 @@ function DockManager.HideCommandFilter(name)
     end
     if name == "quickselectbar" or name == "desktop" then
         self:ShowEsc(false,true)
+    end
+    if name == "rocker" then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileMainPage.lua")
+        local MobileMainPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileMainPage");
+        local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+        if IsMobileUIEnabled then
+            MobileMainPage.SetRokerVisible(false)
+        end
+        return
     end
     return name
 end
@@ -309,4 +331,16 @@ function DockManager.GenerateInfoStr(timer)
 	end
 end
 
+function DockManager.OnChangeDesktopMode()
+    if not DockManager.ChangeImpFunc then
+        DockManager.ChangeImpFunc = commonlib.debounce(function()
+            local game_mode = GameLogic.GetGameMode()
+            if DockManager.game_mode ~= game_mode then
+                DockManager.game_mode = game_mode
+                DockLayer:UpdateDockByMode()
+            end
+        end,500)
+    end
+    DockManager.ChangeImpFunc()
+end
 

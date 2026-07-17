@@ -1,0 +1,289 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type='text/npl' refresh='false'>
+                <![CDATA[
+                    WorldSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/WorldSetting.lua')
+                    WorldSetting.OnInit()
+                    local WorldCommon = commonlib.gettable('MyCompany.Aries.Creator.WorldCommon')
+                    local page = document:GetPageCtrl()
+                    local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld') or {}
+                    local isHaveCopyRight = GameLogic.options:HasCopyright()
+                    page:SetValue("saveas", isHaveCopyRight and "forbidden" or "allow")
+                    function close()
+                        page:CloseWindow()
+                    end
+
+                    function open_other()
+                        WorldSetting.ShowOtherSettingPage()
+                    end
+
+                    function set_public(val)
+                        if GameLogic.IsReadOnly() then
+                            GameLogic.AddBBS(nil, L'当前为只读模式，无法设置世界权限', 3000, '255 0 0')
+                            return
+                        end
+                        local channel = tonumber((WorldCommon.GetWorldTag("channel") or 0))
+                        local isVisibility = currentEnterWorld.visibility or 0
+                        local server_channel = currentEnterWorld.channel or 0
+                        if ((channel == 1 or server_channel == 1) and isVisibility == 1 and val and val == "public")then
+                            GameLogic.AddBBS(nil, L'课程世界不可设置公开权限', 3000, '255 0 0')
+                            --page:SetValue('private', true)
+                            page:SetValue('public', false)
+                            page:SetValue('institute_vip_checkbox', false)
+                            page:SetValue('vip_checkbox', false)
+                            page:Refresh(0.01)
+                            return 
+                        end
+                        GameLogic.IsVip(
+                            'VipPrivateWorld',
+                            true,
+                            function(result)
+                                if result then
+                                    local isHomeWorkWorld = WorldCommon.GetWorldTag('isHomeWorkWorld')
+                                    if val and val == "private" and isHomeWorkWorld then
+                                        GameLogic.AddBBS(nil, L'设置失败,作业世界不能设置成私有世界', 3000, '255 0 0')
+                                        page:SetValue('private', false)
+                                        page:Refresh(0.01)
+                                        return
+                                    end
+                                    if val and val == "private" and System.options.isEducatePlatform then
+                                        GameLogic.AddBBS(nil, L'该版本不能设置成私有世界', 3000, '255 0 0')
+                                        page:SetValue('private', false)
+                                        page:Refresh(0.01)
+                                        return
+                                    end
+                                    if val == 'public' then
+                                        page:SetValue('private', false)
+                                    end
+
+                                    if val == 'private' then
+                                        page:SetValue('public', false)
+                                        page:SetValue('institute_vip_checkbox', false)
+                                        page:SetValue('vip_checkbox', false)
+                                    end
+
+                                    page:Refresh(0.01)
+                                    WorldSetting:SetPublic(val)
+                                else
+                                    page:SetValue('private', false)
+
+                                    page:Refresh(0.01)
+                                end
+                            end
+                        )
+                    end
+
+                    function open_encode()
+                        local is_select_encode = page:GetValue("encode_world",false)
+                        if is_select_encode == "true" or is_select_encode == true then 
+                            NPL.load('(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyEncodePage.lua').Show()
+                        else
+                            GameLogic.AddBBS(nil,L"请选中当前选项")
+                        end
+                    end
+
+                    function set_encode_world(val)
+                        WorldSetting:SetEncodeWorld(val)
+                    end
+
+                    function set_vip(val)
+                        if not GameLogic.IsReadOnly() then
+                            WorldCommon.SetWorldTag('isVipWorld', val)
+                            WorldCommon.SaveWorldTag()
+                            WorldSetting:SetVip(val)
+                        end
+                    end
+
+                    function set_common_vip(val)
+                        if not GameLogic.IsReadOnly() then
+                            WorldCommon.SetWorldTag('isCommonVipWorld', val)
+                            WorldCommon.SaveWorldTag()
+                            WorldSetting:SetCommonVip(val)
+                        end
+                    end
+
+                    function is_ban_not_institute_vip_change()
+                        return WorldCommon.GetWorldTag('instituteVipChangeOnly')
+                    end
+
+                    function ban_not_institute_vip_change()
+                        local enabled = page:GetValue('ban_not_institute_vip_change')
+
+                        WorldCommon.SetWorldTag('instituteVipChangeOnly', enabled)
+                        WorldCommon.SaveWorldTag()
+                        GameLogic.QuickSave()
+                    end
+
+                    function set_ishomeworkworld()
+                        local enabled = page:GetValue('ishomeworkworld')
+                        WorldCommon.SetWorldTag('isHomeWorkWorld', enabled)
+                        WorldCommon.SaveWorldTag()
+                    end
+
+                    function get_ishomeworkworld()
+                        return WorldCommon.GetWorldTag('isHomeWorkWorld')
+                    end
+
+                    function is_ban_not_institute_vip_save_as()
+                        return WorldCommon.GetWorldTag('instituteVipSaveAsOnly')
+                    end
+
+                    function ban_not_institute_vip_save_as()
+                        local enabled = page:GetValue('ban_not_institute_vip_save_as')
+
+                        WorldCommon.SetWorldTag('instituteVipSaveAsOnly', enabled)
+                        WorldCommon.SaveWorldTag()
+                        GameLogic.QuickSave()
+                    end
+
+                    function can_modify_institute_vip()
+                        local fromProjects = WorldCommon.GetWorldTag('fromProjects')
+
+                        if fromProjects and #fromProjects > 0 then
+                            return false
+                        else
+                            return true
+                        end
+                    end
+
+                    function set_institute_vip(val)
+                        if not GameLogic.IsReadOnly() then
+                            GameLogic.IsVip(
+                                'Teacher',
+                                true,
+                                function(result)
+                                    if result then
+                                        WorldCommon.SetWorldTag('instituteVipEnabled', val)
+                                        WorldCommon.SaveWorldTag()
+                                        WorldSetting:SetInstituteVip(val)
+                                    else
+                                        page:SetValue('institute_vip_checkbox', WorldSetting.instituteVipEnabled)
+                                    end
+                                end,
+                                'Teacher'
+                            )
+                        end
+                    end
+
+                    function set_saveas()
+                        if not GameLogic.IsReadOnly() then
+                            local isVisibility = currentEnterWorld.visibility or 0
+                            local value = page:GetValue("saveas")
+                            local channel = tonumber((WorldCommon.GetWorldTag("channel") or 0))
+                            local server_channel = currentEnterWorld.channel or 0
+                            if ((channel == 1 or server_channel == 1) and isVisibility == 1 and value == "allow")then
+                                GameLogic.AddBBS(nil, L'课程世界不可设置允许另存', 3000, '255 0 0')
+                                page:SetValue("saveas", "forbidden")
+                                return 
+                            end
+                            local value = page:GetValue("saveas")
+                            GameLogic.options:SetHasCopyright(value == "forbidden")
+                        end
+                    end
+
+                    function confirm()
+                        if WorldSetting.select_tab_index == 2 then
+                            WorldSetting.select_tab_index = 1 
+                            page:Refresh(0.01)
+                            return
+                        end
+                        close()
+                    end
+
+                    function cancel()
+                        if WorldSetting.select_tab_index == 2 then
+                            WorldSetting.select_tab_index = 1 
+                            page:Refresh(0.01)
+                            return
+                        end
+                        close()
+                    end
+                ]]>
+            </script>
+            <style type='type/mcss'>
+            </style>
+            <aries:window mode='thin' title='<%= WorldSetting.GetPageTitle() %>' width='505' height='385' onclose='close()'>
+                <pe:if condition="<%=WorldSetting.select_tab_index == 1%>">
+                    <div style="width: 500px; height: 350px;">
+                        <div style="width: 500px; height: 100px;">
+                            <div style="margin-top: 20px; margin-left: 20px; color: #ffffff; font-weight: bold; font-size: 14px; base-font-size: 14px; height: 20px;"><%=L'世界访问权限：'%></div>
+                            <div style='margin-left: 120px; margin-top: 10px; color: #ffffff;'>
+                                <div>
+                                    <div><input type='radio' name='public' value='public'  onclick='set_public'/>                                   
+                                        <div for="public" style="float: left; margin-left: 6px; margin-top:  -2px;"><%= L'公开世界' %></div>
+                                    </div>
+                                    <div style='margin-left: 20px; margin-top: 10px;'>
+                                        <div>
+                                            <input type='checkbox' name='encode_world' onclick='set_encode_world' />
+                                            <div for="encode_world" style="float: left; margin-left: 6px; margin-top:  -2px;"><%= L'需要密码访问' %></div>
+                                            <input type='button' value='<%=L"设置密码"%>' onclick='open_encode' class='mc_light_grey_button_with_fillet' style='color: #FFFFFF; margin-left: 10px;' />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <pe:if condition="<%= System.options.isEducatePlatform %>">
+                                        <div tooltip="<%=L'此版本不支持该功能'%>" style="float:left; width: 16px; height: 16px; background:url(Texture/Aries/Common/ThemeKid/radio_32bits.png)"></div> 
+                                        <div tooltip="<%=L'此版本不支持该功能'%>" style="float: left; margin-left: 6px; margin-top:  -2px; color: #cccccc;"><%= L'私有世界' %></div>
+                                    </pe:if>
+                                    <pe:if condition="<%= not System.options.isEducatePlatform %>">
+                                        <input type='radio' name='private' value='private' onclick='set_public'/> 
+                                        <div for="private" style="float: left; margin-left: 6px; margin-top:  -2px;"><%= L'私有世界' %></div>
+                                    </pe:if>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div style="width: 500px; height: 100px; margin-top: 50px; ">
+                            <div style="margin-top: 20px; margin-left: 20px; color: #ffffff; font-weight: bold; font-size: 14px; base-font-size: 14px; height: 20px;"><%=L'内容权限：'%></div>
+                            <div style='margin-left: 120px; margin-top: 10px; color: #ffffff;'>
+                                <%=L"另存世界"%>
+                                <div style="position: relative; margin-left: 100px; margin-top: -20px;">
+                                    <input type='radio' name='saveas' value='allow' onclick='set_saveas'/> 
+                                    <div style="float: left; margin-left: 6px; margin-top:  -2px;"><%= L'允许' %> </div>
+                                </div>
+                                <div style="margin-left: 200px; margin-top: -20px;">
+                                    <input type='radio' name='saveas' value='forbidden' onclick='set_saveas'/>
+                                    <div style="float: left; margin-left: 6px; margin-top:  -2px;"><%= L'禁止' %> </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div style="width: 500px; height: 100px; margin-top: 10px; ">
+                            <div style="margin-top: 40px; margin-left: 200px;">
+                                <pe:if condition="<%=System.options.isCommunity %>">
+                                    <input type='button' value='<%=L"额外设置"%>' onclick='open_other' class='mc_light_grey_button_with_fillet' style='color: #ffffff;min-width:70px; margin-left: 20px;' />
+                                </pe:if>
+                                <pe:if condition="<%=not System.options.isCommunity %>">
+                                    <input type='button' enabled='false' value='' style='color: #ffffff;min-width:70px; margin-left: 20px; background: url();' />
+                                </pe:if>
+                                <input type='button' value='<%=L"确定"%>' onclick='confirm' class='mc_light_grey_button_with_fillet' style='color: #ffffff; min-width:70px;margin-left: 20px;' />
+                                <input type='button' value='<%=L"取消"%>' onclick='cancel' class='mc_light_grey_button_with_fillet' style='color: #ffffff; min-width:70px;margin-left: 20px;' />
+                            </div>
+                        </div>
+                    </div>
+                </pe:if>
+                <pe:if condition="<%=WorldSetting.select_tab_index == 2%>">
+                    <div style="width: 500px; height: 350px;">
+                        <div style="width: 500px; height: 220px; margin-top: 20px; margin-left: 10px; color: #ffffff;">
+                            <div style='margin-left: 20px; margin-top: 20px;'>
+                                <input type='checkbox' name='common_vip_checkbox' tooltip='<%= L"是否只有VIP用户可以访问" %>' onclick='set_common_vip' />
+                                <div for="common_vip_checkbox" style="float: left; margin-left: 6px; margin-top:  -2px;"><%= L'需要是帕拉卡VIP会员（访问与编辑均需登录Paracraft账号）' %> </div>
+                            </div>
+                            <div style='margin-left: 20px; margin-top: 20px;'>
+                                <input type='checkbox' name='vip_checkbox' tooltip='<%= L"是否只有SVIP用户可以访问" %>' onclick='set_vip' />
+                                <div for="vip_checkbox" style="float: left; margin-left: 6px; margin-top:  -2px;"><%= L'需要是帕拉卡SVIP会员（访问与编辑均需登录Paracraft账号）' %> </div>
+                            </div>
+                        </div>
+                        <div style="width: 500px; height: 100px; margin-top: 10px; ">
+                            <div style="margin-top: 50px; margin-left: 200px;">
+                                <input type='button' value='<%=L"确定"%>' onclick='confirm' class='mc_light_grey_button_with_fillet' style='color: #ffffff; min-width:70px; margin-left: 20px;' />
+                                <input type='button' value='<%=L"取消"%>' onclick='cancel' class='mc_light_grey_button_with_fillet' style='color: #ffffff; min-width:70px; margin-left: 60px;' />
+                            </div>
+                        </div>
+                    </div>
+                </pe:if>
+            </aries:window>
+        </pe:mcml>
+    </body>
+</html>

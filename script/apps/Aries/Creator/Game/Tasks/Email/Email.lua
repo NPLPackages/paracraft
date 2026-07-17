@@ -195,7 +195,7 @@ end
 function Email.GetUnReadMsg()
 	keepwork.msgcenter.unReadCount({
     },function(err, msg, data)
-        if err == 200 then
+        if err == 200 and data and data.data then
 			local msgdata = data.data
             UnReadMsgData.orgMsgCount = msgdata.orgMsgCount
 			UnReadMsgData.sysMsgCount = msgdata.sysMsgCount
@@ -231,12 +231,14 @@ function Email.RequestMsgByType(type)
 		msgType = type,
 		-- orgId = 0,
 	},function(err, msg, data)
-		Email.server_data = data.data
-		Email.UpdateUnReadMsg(type)
-		Email.HandleData(Email.server_data, function()
-			Email.FlushView()
-			Email.ChangeMsgState()
-		end)
+		if data and data.data then
+			Email.server_data = data.data
+			Email.UpdateUnReadMsg(type)
+			Email.HandleData(Email.server_data, function()
+				Email.FlushView()
+				Email.ChangeMsgState()
+			end)
+		end
 	end)
 end
 
@@ -323,26 +325,25 @@ function Email.HandleData(data, updata_cb)
 		userId = userId,
 		objectType = 0,
 		objectId = {["$in"] = search_id_list},
-	},function(err, msg, data)
-		FollowList = {}
-		for k, v in pairs(data.rows) do
-			FollowList[v.objectId] = v
-		end
-
-		keepwork.msgcenter.pro_search({
-			objectId = {["$in"] = pro_id_list},
-		},function(info_err, info_msg, info_data)
-			if info_err == 200 then
-				ProjectList = info_data.rows
-
-				if updata_cb then
-					updata_cb()
-				end
+	},function(err, msg, response)
+		if response and response.rows then
+			FollowList = {}
+			for k, v in pairs(response.rows) do
+				FollowList[v.objectId] = v
 			end
-			
-		end
 
-		)
+			keepwork.msgcenter.pro_search({
+				objectId = {["$in"] = pro_id_list},
+			},function(info_err, info_msg, info_data)
+				if info_err == 200 then
+					ProjectList = info_data.rows
+
+					if updata_cb then
+						updata_cb()
+					end
+				end
+			end)
+		end
 	end)
 end
 

@@ -1,0 +1,119 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/SimpleImageDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="SimpleImageDialog.lua"><![CDATA[
+SimpleImageDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.SimpleImageDialog");
+SimpleImageDialog.OnInit()
+SimpleImageDialog.lastSelectedFile = nil;
+
+function OnSelectFile(treenode)
+    local filename = treenode.mcmlNode:GetPreValue("this").filename;
+    if(filename) then
+        SimpleImageDialog.lastSelectedFile = filename
+        Page:SetValue("text", commonlib.Encoding.DefaultToUtf8(SimpleImageDialog.lastSelectedFile));
+    end
+end
+
+function GetExistData(index)
+    local fileData = SimpleImageDialog.GetAllFilesWithFilters()
+    if fileData then
+        if index == nil then
+            return #fileData
+        else
+            return fileData[index]
+        end
+    end
+end
+
+function GetIconStyle(data)
+    if type(data) == "table" then
+        local filePath = SimpleImageDialog.GetSearchDirectory()
+        return string.format([[<div style="width: 101px; height: 72px; background: %s;"></div>]],filePath..data.filename)
+    end
+    return ""
+end
+
+function GetFileName(data)
+    if type(data) == "table" then
+        return data.filename
+    end
+    return ""
+end
+
+function GetName(data)
+    if type(data) == "table" then
+        local name = data.filename:match("[^/\\]+$") 
+        return name
+    end
+    return ""
+end
+
+function OnClickIcon(name)
+    SimpleImageDialog.OnClickIcon(name)
+end
+
+function GetLimitName(name)
+    if not name or name == "" then
+        return name
+    end
+    local width = _guihelper.GetTextWidth(name,"System;11;norm")
+    if width < 70 then
+        return name
+    end
+    local leftText = commonlib.GetLimitLabelByTextWidth(name, 70, "System;11;norm")
+    return leftText
+end
+
+]]></script>
+<kp:window  title='<%=L"选择贴图"%>' width="600" height="440"  uiname_onclose="SimpleImageDialog.OnClose" onclose="SimpleImageDialog.OnClose">
+    <div style="margin-top: 36px; ">
+        <div style="margin-left: 10px; width: 600px; height: 260px;">
+            <pe:gridview uiname="SimpleImageDialog.gvImg " name="gvFilterFiles" DataSource="<%={}%>"  CellPadding="24" ItemsPerLine="4" AllowPaging="false" DefaultNodeHeight="72" >
+                <Columns>
+                    <div  style="width: 110px; height: 91px; ">  
+                    <%=GetIconStyle(Eval("attr"))%>
+                    <%=GetLimitName(commonlib.Encoding.DefaultToUtf8(GetName(Eval("attr"))),11)%> 
+                    </div>
+                    <input tooltip='<%=commonlib.Encoding.DefaultToUtf8(GetName(Eval("attr")))%>' type="button" onclick='OnClickIcon' name='<%="SimpleImageDialog.img" .. commonlib.Encoding.DefaultToUtf8(GetFileName(Eval("attr")))%>' uiname='<%="SimpleImageDialog.img" .. commonlib.Encoding.DefaultToUtf8(GetFileName(Eval("attr")))%>' style="margin-top: -90px; width: 110px; height: 90px; background: url();"/>
+                </Columns>
+            </pe:gridview>
+        </div>
+        <div style="margin-left: 2px; margin-top: 42px; width: 596px; height: 100px;  background: url(Texture/Aries/Creator/keepwork/EntityImage/huidi_58x40_32bits.png#0 0 58 40:27 18 27 18);">
+            
+            <div style="margin-top: 10px;">
+                <input type="text" SkipAutoBadWordFilter="true" EmptyText='<%= L"输入图片名或路径" %>' uiname="SimpleImageDialog.imgtext" onchange="SimpleImageDialog.OnTextChange"  name="imgtext" enable_ime="false" style="margin-left: 48px; height:31px;width:422px;background: url(Texture/Aries/Creator/keepwork/EntityImage/shulukuang_20x20_32bits.png#0 0 20 20:8 8 8 8);"/>
+                
+                <input type="button" uiname="SimpleImageDialog.openfile"  name="openfile"  style="min-width:34px;height:32px;margin-left:3px; margin-top: -1px; background: url(Texture/Aries/Creator/keepwork/EntityImage/wenjianjia_37x35_32bits.png#0 0 37 35);" onclick="SimpleImageDialog.OnOpenFileDialog"/>
+            </div>
+            <div style="margin-top:5px;">
+                <input type="button" uiname="SimpleImageDialog.OK" name="OK" DefaultButton="true" align="left" style="position: relative; margin-left:444px;width:107px; height: 38px; background: url(Texture/Aries/Creator/keepwork/EntityImage/queding_107x38_32bits.png#0 0 107 38);" onclick="SimpleImageDialog.OnOK" value='<%=L"确定"%>' />
+                <input type="button" uiname="SimpleImageDialog.Cancel" name="Cancel" align="left" style="position: relative; margin-left:354px;width:82px; height: 38px; background: url(Texture/Aries/Creator/keepwork/EntityImage/quxiao_82x38_32bits.png#0 0 82 38);" onclick="SimpleImageDialog.OnClose" value='<%=L"取消"%>' />
+            </div>
+            <div style="color:#666666;margin-top:5px; margin-left: 48px; font-size: 12px;">
+                <%=SimpleImageDialog.GetText()%>
+            </div>
+        </div>
+    </div>
+    <%
+        function SetFocus()
+            local t = Page:FindControl("text")
+            if(t) then
+                t:Focus();
+            end	
+        end
+        SetFocus()
+        local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+            SetFocus()
+        end})
+        mytimer:Change(200);
+    %>
+</kp:window>
+</pe:mcml>
+</body>
+</html>

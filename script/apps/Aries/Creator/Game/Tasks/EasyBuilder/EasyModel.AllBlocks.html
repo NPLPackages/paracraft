@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyModel.lua" refresh="true">
+<![CDATA[
+EasyModel = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyModel");
+function dummy()
+end
+]]>
+</script>
+<style>
+    .closebtn {
+        position: relative;
+        margin-right: -19px;
+        margin-top: -18px;
+        width: 56px;
+        height: 56px;
+        background: url(Texture/player/close.png);
+    }
+    .categorybtn {
+        margin-right: 8px;
+        margin-bottom: 0px;
+        color: #000000;
+        font-size: 18px;
+        font-weight: bold;
+        min-width: 80px;
+        spacing: 5px;
+        height: 56px;
+    }
+    .categorybtn_active {
+        background: url(Texture/Aquarius/Button_Highlight_Large.png:15 15 15 15);
+    }
+    .categorybtn_normal {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+    }
+</style>
+<pe:container zorder="-1" onclick="dummy()" style="padding:20px;background:url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);">
+	<input type="button" name="CloseBtn" uiname="EasyModel.CloseBtn" onclick="EasyModel.OnCloseAllBlocks" align="right" class="closebtn" />
+	<!--picked blocks-->
+	<div style="margin:5px">
+		<pe:repeat DataSource="<%=EasyModel.GetBlockCategoryButtons()%>">
+			<pe:repeatitem style="float:left;">
+				<pe:if condition='<%=EasyModel.block_category_index == Eval("index") %>' >
+					<input type="button"  uiname='<%=format("EasyModel.BlockCategory.%d", Eval("index"))%>' value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="EasyModel.OnChangeBlockCategory" class="categorybtn categorybtn_active" />
+				</pe:if>
+				<pe:if condition='<%=EasyModel.block_category_index ~= Eval("index") %>' >
+					<input type="button"  uiname='<%=format("EasyModel.BlockCategory.%d", Eval("index"))%>' value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="EasyModel.OnChangeBlockCategory" class="categorybtn categorybtn_normal" />
+				</pe:if>
+			</pe:repeatitem>
+		</pe:repeat>
+	</div>
+	<div style="">
+		<pe:gridview RememberScrollPos="true" style="margin:0px;margin-right:2px;" name="AllblocksGridviewItems" VerticalScrollBarStep="64" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="7" DefaultNodeHeight = "68" 
+			DataSource='<%=EasyModel.GetAllBlocksDS%>'>
+			<Columns>
+				<pe:if condition='<%=Eval("block_id") == EasyModel.GetPickedBlockId()%>'>
+					<div zorder="-1" style="position: relative;width:72px;height:72px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12)"></div>
+				</pe:if>
+				<pe:mc_block uiname='<%=format("EasyModel.Blocks.%d", Eval("block_id"))%>' block_id='<%=Eval("block_id")%>' style="margin-left:3px;margin-top:3px;margin-right:5px;margin-bottom:1px;width:64px;height:64px;" onclick="EasyModel.OnClickSelectBlock"/>    
+			</Columns>
+			<EmptyDataTemplate>
+			</EmptyDataTemplate>
+		</pe:gridview>
+	</div>
+</pe:container>
+</pe:mcml>
+</html>

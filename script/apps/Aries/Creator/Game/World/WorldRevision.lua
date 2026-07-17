@@ -104,12 +104,19 @@ function WorldRevision:IsModifiedAndNotAutoSaved()
 	return self.isModifiedAndNotAutoSaved;
 end
 
+function WorldRevision:SetStageLocked(stageLocked)
+	self.stageLocked = stageLocked
+end
+
+function WorldRevision:IsStageLocked()
+	return self.stageLocked
+end
+
 -- @param bForceCommit: if true, it will commit using current version regardless of conflict. 
 -- return true if commited successfully. 
 function WorldRevision:Commit(bForceCommit)
 	if(bForceCommit or not self:HasConflict()) then
 		self.current_revision = self:GetRevision() + 1;
-		self:SetUnModified();
 		self:SaveRevision();
 		return true
 	end
@@ -242,8 +249,8 @@ function WorldRevision:GeneratePackage(filename)
 						writer:AddDirectory(dest_folder, last_world_folder..file.filename, 0);
 					end
 				end
-			elseif(filename_lowercased=="blockworld") then
-				-- ignore this folder
+			elseif(filename_lowercased=="blockworld" or filename_lowercased:match("^%.%w+/?")) then
+				-- ignore blockworld, and folder that begins with . like .codeblock
 			elseif(filename) then
 				local ext = commonlib.Files.GetFileExtension(filename);
 				if(ext) then
@@ -321,7 +328,7 @@ function WorldRevision:StageChangesToFolder(autoSaveFolder, bSaveAsMode)
 
 	-- save modified raw files
 	BlockEngine:SaveToDirectory(autoSaveFolder)
-
+	
 	-- finally write the autosave.xml to disk
 	if(not bSaveAsMode) then
 		local file = ParaIO.open(autoSaveFolder.."autosave.xml", "w");
@@ -416,7 +423,7 @@ function WorldRevision:ApplyChangesFromFolder(autoSaveFolder)
 
 	for _, region in pairs(regions) do
 		local x, z = region.x, region.z;
-		if(region.regionRawFile) then
+		if(region.regionRawFile or region.regionEntityFile) then
 			local regionContainer;
 			if(region.regionEntityFile) then
 				regionContainer = EntityManager.GetRegionContainer(x*512, z*512)
@@ -426,7 +433,8 @@ function WorldRevision:ApplyChangesFromFolder(autoSaveFolder)
 
 			BlockEngine:GetRegionAttr(x, z, function(attrRegion)
 				BlockEngine:ClearRegion(x, z)
-				attrRegion:SetField("LoadFromFile", region.regionRawFile);
+				attrRegion:SetField("LoadFromFile", region.regionRawFile or "");
+				attrRegion:SetField("IsModified", true);
 				if(regionContainer) then
 					if(not BlockEngine.IsRegionLoaded(x, z)) then
 						local lastId = BlockEngine:GetSessionId()
@@ -446,11 +454,7 @@ function WorldRevision:ApplyChangesFromFolder(autoSaveFolder)
 					end
 				end
 			end)
-		elseif(region.regionEntityFile) then
-			local regionContainer = EntityManager.GetRegionContainer(x*512, z*512)
-			regionContainer:RemoveAll();
-			regionContainer:SetModified();
-			regionContainer:LoadFromFile(region.regionEntityFile);
 		end
 	end
+	self:SetModified();
 end

@@ -10,10 +10,34 @@ local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager
 local channel = MovieManager:CreateGetMovieChannel("main"):SetStartBlockPosition(x,y,z)
 channel:Play(0)
 
+-- one can play a movie block inside a given miniscenegraph texture.
 local channel = MovieManager:CreateGetMovieChannel("main");
 channel:CreateFromTemplateFile("paracraftlogo.blocks.xml", 0,0,0);
 channel:SetScene("MyMiniSceneGraph")
 channel:Play(0)
+
+-- programmatically create a movie block in memory from a block template file, that is used to
+-- play at the player's current position and bind to the player entity as an agent actor.
+local channel = MovieManager:CreateGetMovieChannel("main");
+channel:CreateFromTemplateFile("temp/blocktemplates/anim1.blocks.xml");
+channel:SetAutoStopWhenPlayFinish(true)
+local player = GameLogic.EntityManager.GetPlayer();
+local x, y, z = player:GetPosition();
+local bIgnoreSkin = true; -- if true, the skin of the entity will not be applied to the actor.
+channel:TransformActorsByFirstActor(x, y, z, player:GetFacing(), nil, player:GetScaling());
+channel:BindActorAgentToEntity(1, player, bIgnoreSkin);
+-- channel:BindActorAgentToEntity(2, GameLogic.EntityManager.GetEntity("otherPlayer"), bIgnoreSkin);
+channel:Play(0, -1)
+
+-- play from a nearby movie block in the scene
+local channel = MovieManager:CreateGetMovieChannel("main");
+channel:CloneFromEntity(GameLogic.EntityManager.GetBlockEntity(19215,5,19230));
+channel:SetAutoStopWhenPlayFinish(true)
+local player = GameLogic.EntityManager.GetPlayer();
+local x, y, z = player:GetPosition();
+channel:TransformActorsByFirstActor(x, y, z, player:GetFacing(), nil, player:GetScaling());
+channel:BindActorAgentToEntity(1, player, true);
+channel:Play(0, -1)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
@@ -32,6 +56,7 @@ MovieChannel:Property({"ReuseActor", nil, "IsReuseActor", "SetReuseActor", auto=
 MovieChannel:Property({"Speed", 1.0, "GetSpeed", "SetSpeed"});
 MovieChannel:Property({"bUseCamera", true, "IsUseCamera", "SetUseCamera", auto=true});
 MovieChannel:Property({"bLoop", false, "IsLooping", "SetLooping"});
+MovieChannel:Property({"bStopWhenPlayFinish", false, "IsAutoStopWhenPlayFinish", "SetAutoStopWhenPlayFinish"});
 
 MovieChannel:Signal("started");
 MovieChannel:Signal("stopped");
@@ -56,6 +81,10 @@ function MovieChannel:Destroy()
 	MovieChannel._super.Destroy(self);
 end
 
+function MovieChannel:ResetAll()
+	self:ResetSentientChecker()
+	self:Reset();
+end
 
 function MovieChannel:Reset()
 	if(self.clips) then
@@ -85,14 +114,19 @@ function MovieChannel:GetStartBlockPosition()
 	return self.startX, self.startY, self.startZ;
 end
 
-function MovieChannel:CreateGetStartMovieClip()
+function MovieChannel:CreateGetStartMovieClip(isUIPlaying)
 	if(not self.clips and (self.startX or self.startupMovieEntity)) then
 		local blockEntity = self.startupMovieEntity or EntityManager.GetBlockEntity(self.startX, self.startY, self.startZ);
 		if(blockEntity and blockEntity.GetMovieClip) then
 			self.clips = {}
 			local movieClip = MovieClipRaw:new():Init(blockEntity);
 			if(GameLogic.options:IsAutoMovieFPS()) then
-				movieClip:SetAutoFPS(true);
+				if isUIPlaying then
+					movieClip:SetAutoFPS(false);
+					movieClip:SetFPS(60)
+				else
+					movieClip:SetAutoFPS(true);
+				end
 			end
 			self.clips[1] = movieClip;
 			self.curClipIndex = 1;
@@ -152,8 +186,8 @@ end
 
 -- @param timeFrom: time in milliseconds, default to 0.
 -- @param timeTo: if nil, default to timeFrom. if -1, it means total movie block length. 
-function MovieChannel:Play(fromTime, toTime, bLooping)
-	local movieClip = self:CreateGetStartMovieClip()
+function MovieChannel:Play(fromTime, toTime, bLooping, isUIPlaying)
+	local movieClip = self:CreateGetStartMovieClip(isUIPlaying)
 	if(movieClip) then
 		if(movieClip:GetScene() ~= self:GetScene()) then
 			movieClip:SetScene(self:GetScene());
@@ -263,6 +297,9 @@ function MovieChannel:OnMovieTimeChange()
 					movieClip:Pause();
 					movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
 					movieClip:SetTime(self.playToTime);
+					if(self:IsAutoStopWhenPlayFinish()) then
+						movieClip:Stop()
+					end
 					self:FireFinished();
 				else
 					self:CheckSentient()
@@ -307,9 +344,14 @@ function MovieChannel:ResetSentientChecker()
 end
 
 function MovieChannel:FireFinished()
+	if(self.isFiringFinished) then
+		return;
+	end
+	self.isFiringFinished = true;
 	self:ResetSentientChecker()
 	self:finished(); -- signal
 	self:Disconnect("finished")
+	self.isFiringFinished = nil;
 end
 
 -- stop and remove all actors
@@ -335,12 +377,164 @@ function MovieChannel:GetScene()
 	return self.sceneName
 end
 
+-- we will clone the movie entity instead of using the original one, so that calling it is safe to call TransformActorsByFirstActor and binding to entities.
+-- @param movieEntity: this could be from the EntityManager:GetBlockEntity(x,y,z)
+function MovieChannel:CloneFromEntity(movieEntity)
+	if(self.startupMovieEntity) then
+		self:Reset()
+	end
+	if(movieEntity and movieEntity:isa(EntityManager.EntityMovieClip)) then
+		local xmlNode = movieEntity:SaveToXMLNode()
+		xmlNode.attr.name = nil;
+		xmlNode.attr.linkTo = nil;
+		local entity = EntityManager.EntityMovieClip:new();
+		entity:LoadFromXMLNode(xmlNode);
+		entity:SetPersistent(false);
+		self.startupMovieEntity = entity;
+	end
+end
+
 -- static function: create a movie entity in memory from a block template file. 
 -- @param filename: block template file that should only contain one movie block. 
 -- @param bx, by, bz: movie block position
+-- @param isMainPlayer: if true, it will be a player movie entity, otherwise it will be a non-player movie entity. 
+-- @param entity: if provided, it will be provide the user data of movie entity. 
 -- @return movieEntity
 function MovieChannel:CreateFromTemplateFile(filename, bx, by, bz)
+	if(self.startupMovieEntity) then
+		self:Reset()
+	end
 	local EntityMovieClip = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip")
 	local entity = EntityMovieClip:CreateFromTemplateFile(filename, bx, by, bz)
 	self.startupMovieEntity = entity;
+end
+
+-- @param x, y, z: the target position of the first actor in the movie clip in world coordinates
+-- @param scaling: if not nil, it will scale all actors relative to the first actor's scaling. so that the first actor will have this scaling at the target position.
+function MovieChannel:TransformActorsByFirstActor(x, y, z, facing, skin, scaling, bIgnoreCamera)
+	local entity = self.startupMovieEntity;
+	if(entity) then
+		if bIgnoreCamera then
+			for i=1, entity.inventory:GetSlotCount() do
+				local itemStack = entity.inventory:GetItem(i);
+				if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+					if(itemStack.id == block_types.names.TimeSeriesCamera) then
+						entity.inventory:RemoveItem(i)
+					end
+				end
+			end
+		end
+
+		local firstActorData;
+		for i=1, entity.inventory:GetSlotCount() do
+			local itemStack = entity.inventory:GetItem(i);
+			if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+				if(itemStack.id == block_types.names.TimeSeriesNPC) then
+					local timeSeries = itemStack.serverdata.timeseries;
+					if(timeSeries and timeSeries.assetfile and timeSeries.assetfile.data) then
+						local data = timeSeries.assetfile.data;
+						for i = 1, #(data) do
+							if(data[i] == "customchar" or data[i] == "character/CC/02human/CustomGeoset/actor.x") then
+								firstActorData = timeSeries
+							end
+						end
+					end
+				end
+			end
+			if(firstActorData) then break; end
+		end
+		if(firstActorData)then
+			local firstFrameX = firstActorData.x.data[1]
+			local firstFrameZ = firstActorData.z.data[1]
+			local firstFrameY = firstActorData.y.data[1]
+
+			local offset_x = x - firstFrameX
+			local offset_y = y - firstFrameY
+			local offset_z = z - firstFrameZ
+
+			offset_x = offset_x / BlockEngine.blocksize
+			offset_y = offset_y / BlockEngine.blocksize
+			offset_z = offset_z / BlockEngine.blocksize
+			entity:OffsetActorPositions(offset_x, offset_y, offset_z);
+
+			if(scaling) then
+				local firstActorScaling = firstActorData.scaling and firstActorData.scaling.data and firstActorData.scaling.data[1] or 1
+				local scale_factor = scaling / firstActorScaling
+				entity:ScaleActors(scale_factor, x, y, z);
+			end
+
+			local facing_offset
+			if(facing and firstActorData.facing and #firstActorData.facing.data > 0) then
+				local firstFrameFacing = firstActorData.facing.data[1]
+				facing_offset = mathlib.ToStandardAngle((facing or firstFrameFacing) -firstFrameFacing) 
+				entity:OffsetActorFacing(facing_offset, x,y,z);
+			end
+			if(skin) then
+				entity:OffsetActorSkin(skin)
+			end
+		end
+	end
+end
+
+
+-- bind the actorIndex-th actor in the movie clip to the given global entity.
+-- @param actorIndex: the index of the NPC actor in the movie clip, starting from 1. default to 1.
+-- @param entity: the global entity to which the actor will be bound. it should have a unique name.
+-- @param bIgnoreSkin: if true, the skin of the entity will not be applied to the actor.
+function MovieChannel:BindActorAgentToEntity(actorIndex, entity, bIgnoreSkin, preserveScale)
+	if(not entity or GameLogic.EntityManager.GetEntity(entity.name) ~= entity) then
+		LOG.std(nil, "warn", "MovieChannel", "BindActorAgentToEntity: entity with a unique name is required. %s", entity.name or "")
+		return
+	end
+	actorIndex = actorIndex or 1;
+	local movieEntity = self.startupMovieEntity;
+	local index = 0;
+	if(movieEntity) then
+		local actorData;
+		for i=1, movieEntity.inventory:GetSlotCount() do
+			local itemStack = movieEntity.inventory:GetItem(i);
+			if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+				if(itemStack.id == block_types.names.TimeSeriesNPC) then
+					index = index + 1;
+					if(index == actorIndex) then
+						actorData = itemStack.serverdata.timeseries;
+						break;
+					end
+				end
+			end
+		end
+		if(actorData) then
+			if(actorData.name) then
+				actorData.name.data[1] = entity.name;
+			else
+				actorData.name = {times={0,},data={entity.name,},ranges={{1,1,},},type="Discrete",name="name",};
+			end
+			if(actorData.isAgent) then
+				actorData.isAgent.data[1] = true;
+			else
+				actorData.isAgent = {times={0,},data={true,},ranges={{1,1,},},type="Discrete",name="isAgent",};
+			end
+			if(actorData.assetfile) then
+				actorData.assetfile.data[1] = entity:GetModelFile();
+			else
+				actorData.assetfile = {times={0,},data={entity:GetModelFile(),},ranges={{1,1,},},type="Discrete",name="assetfile",};
+			end
+			if(actorData.isIgnoreSkin) then
+				actorData.isIgnoreSkin.data[1] = bIgnoreSkin == true;
+			else
+				actorData.isIgnoreSkin = {times={0,},data={bIgnoreSkin == true,},ranges={{1,1,},},type="Discrete",name="isIgnoreSkin",};
+			end
+			if preserveScale and preserveScale > 0 then
+				local scaling = actorData.scaling and actorData.scaling.data
+				if scaling and #scaling > 0 then
+					local num = #scaling
+					for i = 1, num do
+						actorData.scaling.data[i] = actorData.scaling.data[i] * preserveScale
+					end
+				else
+					actorData.scaling = {times={0,},data={preserveScale,},ranges={{1,1,},},type="Discrete",name="scaling",};
+				end
+			end
+		end
+	end
 end

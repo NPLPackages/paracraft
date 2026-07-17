@@ -1,0 +1,46 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/SelectModelTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="EditMountPointTask.lua"><![CDATA[
+EditMountPointTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditMountPointTask")
+EditMountPointTask.OnInit(Page)
+
+function OnClose()
+    EditMountPointTask:EndEditing(false);
+end
+
+]]></script>
+
+<div style="width: 200px; height: 300px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 34 34:8 8 8 8);">
+    <div style="width: 200px;">
+        <input type="button" align="right" onclick="OnClose()" name="close" uiname="EditMountPointTask.close" style="position:relative;width: 32px; height: 32px; margin: 5px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#363 59 26 26:7 7 7 7);" />
+        <div style="font-size:14px;margin:10px;color:#ffffff">插件点</div>
+        <div style="width: 200px; height: 2px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#352 66 1 1);"></div>
+    </div>
+    <div style="margin-left:0px; margin-top: 20px; margin-bottom:20px;">
+        <div style="float: left; margin-left: 10px; margin-top:0px;color: #ffffff; font-size: 16px;"><%=L"名称:"%> </div>
+        <select name="point_name" AllowUserEdit="true" onselect="EditMountPointTask.OnPointNameChange" style="float: left; margin-left: 5px; width:120px;height: 32px; font-size: 16px; background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#430 177 20 14:8 6 8 6);">
+            <option value="sit">坐下</option>
+            <option value="lie">躺下</option>
+            <option value="eat">吃</option>
+        </select>
+        <div style="margin-top: 12px;">
+            <input type="button" style="margin-left:10px; margin-top:14px; width: 80px; height: 40px; font-size: 16px;" value='<%=L"移动"%>' tooltip='<%=L"快捷键 2"%>' name="move" uiname="EditMountPointTask.move" onclick="EditMountPointTask.DoClick" class="mc_light_grey_button_with_fillet"/>
+            <input type="button" style="margin-left:10px; margin-top:14px; width: 80px; height: 40px; font-size: 16px;" value='<%=L"旋转"%>' tooltip='<%=L"快捷键 3"%>' name="rot" uiname="EditMountPointTask.rot" onclick="EditMountPointTask.DoClick" class="mc_light_grey_button_with_fillet"/><br/>
+            <input type="button" style="margin-left:10px; margin-top:14px; width: 80px; height: 40px; font-size: 16px;" value='<%=L"缩放"%>' tooltip='<%=L"快捷键 4"%>' name="scale" uiname="EditMountPointTask.scale" onclick="EditMountPointTask.DoClick" class="mc_light_grey_button_with_fillet"/>
+            <input type="button" style="margin-left:10px; margin-top:14px; width: 80px; height: 40px; font-size: 16px;" value='<%=L"删除"%>' tooltip='<%=L"快捷键 Del"%>' name="remove" uiname="EditMountPointTask.remove" onclick="EditMountPointTask.DoClick" class="mc_light_grey_button_with_fillet"/><br/>
+            <input type="button" style="margin-left:10px; margin-top:14px; width: 80px; height: 40px; font-size: 16px;" value='<%=L"确定"%>' name="ok" uiname="EditMountPointTask.ok" onclick="EditMountPointTask.DoClick" class="mc_light_grey_button_with_fillet"/>
+            <input type="button" style="margin-left:10px; margin-top:14px; width: 80px; height: 40px; font-size: 16px;" value='<%=L"取消"%>' name="cancel" uiname="EditMountPointTask.cancel" onclick="EditMountPointTask.DoClick" class="mc_light_grey_button_with_fillet"/>
+        </div>
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>
+

@@ -34,6 +34,7 @@ Translation.TestAndExamples();
 echo(L"测试");
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/Locale.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TranslationGettext.lua");
 local TranslationGettext = commonlib.gettable("MyCompany.Aries.Game.Common.TranslationGettext")
 local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
@@ -46,6 +47,12 @@ local defaultLanguage = "enUS";
 local sourceLanguage = "zhCN";
 -- translation table. 
 local transTable = CommonCtrl.Locale:new("paracraft");
+
+local ValidLanguage = {
+	zhCN = true,
+	enUS = true,
+	zhTW = true,
+}
 
 -- call this function at the very beginning. 
 function Translation.Init()
@@ -73,6 +80,12 @@ function Translation.Init()
 			curLang = systemDefaultLang;
 		end
 	end
+
+	local systemLang = System.options.language
+	if systemLang and systemLang ~= "" and ValidLanguage[systemLang] then
+		curLang = systemLang;
+	end
+
 	--------------------------------------
 	-- TEST:  testing enUS 
 	--------------------------------------

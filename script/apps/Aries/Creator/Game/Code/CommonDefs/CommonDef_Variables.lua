@@ -411,7 +411,7 @@ end
 	ToNPL = function(self)
 		return string.format('%s\n', self:getFieldAsString('codes'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 
@@ -435,7 +435,7 @@ end
 	ToNPL = function(self)
 		return string.format('-- %s', self:getFieldAsString('value'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 
@@ -478,7 +478,7 @@ end
 	ToNPL = function(self)
 		return string.format('--[[\n%s\n]]', self:getFieldAsString('input'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 
@@ -506,7 +506,7 @@ end
 	ToNPL = function(self)
 		return string.format('"%s"', self:getFieldAsString('VARIABLE'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
 

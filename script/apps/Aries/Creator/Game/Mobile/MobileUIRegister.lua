@@ -13,10 +13,21 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 
 local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister")
-
+local forcedUIs = {};
 MobileUIRegister._mobileUIEnabled = false;
 if System.options.IsTouchDevice then
     MobileUIRegister._mobileUIEnabled = true
+end
+
+local isShowMobileUI = false;
+local function OnWorldLoaded()
+    isShowMobileUI = true;
+    forcedUIs = {}
+end
+
+local function OnWorldUnloaded()
+    isShowMobileUI = false;
+    forcedUIs = {}
 end
 
 function MobileUIRegister.GetIsDevMode()
@@ -25,17 +36,44 @@ function MobileUIRegister.GetIsDevMode()
 end
 
 function MobileUIRegister.SetMobileUIEnable(enabled)
+    if not System.options.mc then
+        MobileUIRegister._mobileUIEnabled = enabled
+        if(enabled) then
+            GameLogic.GetFilters():add_filter("GetUIPageHtmlParam",MobileUIRegister.OnGetUIPageHtmlParam)
+        end
+        GameLogic.GetFilters():add_filter("MobileUIRegister.IsMobileUIEnabled",MobileUIRegister.OnIsMobileUIEnabled)
+        return false
+    end
     if not bInitOnce then
         bInitOnce = true 
         GameLogic.GetFilters():add_filter("MobileUIRegister.IsMobileUIEnabled",MobileUIRegister.OnIsMobileUIEnabled)
+        
+        NPL.load("(gl)script/ide/System/os/os.lua");
+        if (System.os.IsEmscripten()) then
+            GameLogic:Connect("WorldLoaded", nil, OnWorldLoaded, "UniqueConnection");
+            GameLogic:Connect("WorldUnloaded", nil, OnWorldUnloaded, "UniqueConnection");
+            NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
+            local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
+            MobileUIRegister.emsShowMobileUITimer = commonlib.Timer:new({callbackFunc = function(timer)
+                local isMobilePad = GameLogic.CheckMobilePad()
+                if not isMobilePad then
+                    options:ShowMobileUI(isShowMobileUI);
+                end
+                MobileUIRegister.emsShowMobileUITimer = nil;
+                
+            end})
+
+            MobileUIRegister.emsShowMobileUITimer:Change(5000, nil)
+        end
+
     end
     MobileUIRegister._mobileUIEnabled = enabled
-    GameLogic.GetFilters():remove_filter("GetUIPageHtmlParam",MobileUIRegister.OnGetUIPageHtmlParam)
-    GameLogic.GetFilters():remove_filter("SystemSettingsPage.CheckBoxBackground",MobileUIRegister.OnSystemSettingsPageUpdateCheckBox)
-
+    GameLogic.GetFilters():add_filter("GetUIPageHtmlParam",MobileUIRegister.OnGetUIPageHtmlParam)
+    
     if MobileUIRegister._mobileUIEnabled then
-        GameLogic.GetFilters():add_filter("GetUIPageHtmlParam",MobileUIRegister.OnGetUIPageHtmlParam)
         GameLogic.GetFilters():add_filter("SystemSettingsPage.CheckBoxBackground",MobileUIRegister.OnSystemSettingsPageUpdateCheckBox)
+    else
+        GameLogic.GetFilters():remove_filter("SystemSettingsPage.CheckBoxBackground",MobileUIRegister.OnSystemSettingsPageUpdateCheckBox)
     end
 
     MobileMainPage.ShowPage(enabled)
@@ -97,8 +135,18 @@ function MobileUIRegister.OnIsMobileUIEnabled()
     return MobileUIRegister._mobileUIEnabled
 end
 
+-- temporarily force to use mobile UI even on desktop mode. 
+-- for example, when user is using touch screen on desktop, we want to use mobile UI
+function MobileUIRegister.SetForceUseMobileUI(name, bForce)
+    if(bForce) then
+        forcedUIs[name] = true;
+    else
+        forcedUIs[name] = nil;
+    end
+end
+
 function MobileUIRegister.OnGetUIPageHtmlParam(params,pageName)
-    if not MobileUIRegister._mobileUIEnabled then
+    if not MobileUIRegister._mobileUIEnabled and not forcedUIs[pageName or ""] then
         return params
     end
     
@@ -117,12 +165,20 @@ function MobileUIRegister.OnGetUIPageHtmlParam(params,pageName)
         params.height = 103
         params.allowDrag = false
     elseif pageName=="EscFramePage" then
-        params.url = "script/apps/Aries/Creator/Game/Mobile/MobileEscFramePage.html"
-        params.x = -904/2
-        params.y = -496/2
-        params.width = 904
-        params.height = 496
-        params.withBgMask = true
+        if System.options.isPapaAdventure then
+            params.url = "script/apps/Aries/Creator/Game/Areas/EscFrameTutorialPage.mobile.html"
+            params.width = 1000
+            params.height = 552
+            params.x = -1000/2
+            params.y = -552/2
+        else
+            params.url = "script/apps/Aries/Creator/Game/Mobile/MobileEscFramePageNew.html"
+            params.x = -1104/2
+            params.y = -556/2
+            params.width = 1104
+            params.height = 556
+            params.withBgMask = true
+        end
     elseif pageName == "TransformWnd" then
         params.url = "script/apps/Aries/Creator/Game/Mobile/MobileTransformWnd.html"
         params.align = "_ctt"
@@ -187,7 +243,22 @@ function MobileUIRegister.OnGetUIPageHtmlParam(params,pageName)
         params.width = 293
         params.height = 380
         params.x = -params.width-20
-        params.y = -params.height - 252        
+        params.y = -params.height - 252     
+    elseif pageName == "ServerSetting" then
+        local platform = System.os.GetPlatform()
+        if platform == "win32" then
+            params.url = "script/apps/Aries/Creator/Game/Setting/ServerSettingNew.html"
+            params.width = 960
+            params.height = 464
+            params.x = -params.width/2
+            params.y = -params.height/2
+        else
+            params.url = "script/apps/Aries/Creator/Game/Setting/ServerSettingNew2.html"
+            params.width = 1280
+            params.height = 618
+            params.x = -params.width/2
+            params.y = -params.height/2
+        end
     end
 
     params.DesignResolutionWidth = 1280

@@ -68,14 +68,19 @@
                     local opus_name = page:GetValue("opus_name");
                     Creation:SubmitWorld(opus_name, opus_desc);
                 end
+                local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+                PapaAPI:ReportLesson()
                 Desktop.is_exiting = false
             end
 
             function submitAndExit()
                 Creation.needExitWorld = true
+                GameLogic.QuickSave()
+                local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+                PapaAPI:ReportLesson()
                 GameLogic.GetFilters():add_filter("SyncWorldFinish", Creation.OnSyncWorldFinish);
                 local opus_desc = page:GetValue("opus-desc");
-                GameLogic.QuickSave()
+                
                 if (get_submit_type() == 1) then
                     Creation:SubmitWorld(nil, opus_desc);
                 elseif (get_submit_type() == 2 or get_submit_type() == 3) then
@@ -83,6 +88,7 @@
                     Creation:SubmitWorld(opus_name, opus_desc);
                 end
                 Desktop.is_exiting = false
+                
             end
 
             function close()
@@ -95,6 +101,7 @@
                 NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
                 local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
                 PapaAPI:NplClickExitWorld()
+                PapaAPI:ReportLesson()
                 local WorldExitDialog = NPL.load('Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
                 WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
             end

@@ -312,7 +312,7 @@ stop()
 	ToNPL = function(self)
 		return string.format('playBone("%s", %d, %d, %s)\n', self:getFieldValue('boneName'),  self:getFieldValue('timeFrom'), self:getFieldValue('timeTo'), self:getFieldValue('isLooping'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = "", canRun = true, code = [[
 playBone("Neck", 2000)
 -- play all bones, this is fast
 playBone("*", 1000, 2000, true)

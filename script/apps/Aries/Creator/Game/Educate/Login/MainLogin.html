@@ -70,14 +70,14 @@
             </pe:container> -->
             <!--persistent setting button-->
             <!-- <pe:container alignment="_ctb" ClickThrough="true" style="position:relative;background:;margin-left:70px;width:400px;height:105px;">
-                <!--<input type="button" enabled="false" value='<%=L"更多设定..." %>' class="mc_big_button" style="margin-top:16px;font-size:14px;width:256px;height:36px;" onclick="OnCustomCharacter" />-->
-                <pe:if condition='<%= System.options.isDevEnv == true %>'>
-                    <div style="margin-left:-40px;margin-top:6px;font-size:14px;width:336px;height:36px;color:#FF3030;text-align:center;font-weight:bold">
-                        <%=L"开发者模式" %><br/>
-                        <%= GetModDes()%>
-                    </div>
-                </pe:if>
-            </pe:container> -->
+                <input type="button" enabled="false" value='<%=L"更多设定..." %>' class="mc_big_button" style="margin-top:16px;font-size:14px;width:256px;height:36px;" onclick="OnCustomCharacter" />-->
+            <pe:if condition='<%= System.options.isDevEnv == true or System.options.isDevMode == true %>'>
+                <div style="margin-left:-40px;margin-top:6px;font-size:14px;width:336px;height:36px;color:#FF3030;text-align:center;font-weight:bold">
+                    <%=L"开发者模式" %><br/>
+                    <%= GetModDes()%>
+                </div>
+            </pe:if>
+            <!-- </pe:container> -->
         </pe:mcml>
     </body>
 </html>

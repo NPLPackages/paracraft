@@ -17,12 +17,14 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names")
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 
 local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockConductor"));
 
 -- register
 block_types.RegisterBlockClass("BlockConductor", block);
-
+-- intermediary helper data structure
+local blocksNeedingUpdate = {};
 
 function block:ctor()
 	-- whether it emit light. 
@@ -43,43 +45,18 @@ end
 
 function block:OnBlockAdded(x, y, z)
 	if(not GameLogic.isRemote) then
-		local is_indirectly_powered = self:isWeaklyPowered(x,y,z);
-
-		if ( (self.torchActive and not is_indirectly_powered) or (not self.torchActive and is_indirectly_powered)) then
-			GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self.id, self:tickRate());
-		else
-			if (self.torchActive) then
-				BlockEngine:NotifyNeighborBlocksChange(x, y - 1, z, self.id);
-				BlockEngine:NotifyNeighborBlocksChange(x, y + 1, z, self.id);
-				BlockEngine:NotifyNeighborBlocksChange(x - 1, y, z, self.id);
-				BlockEngine:NotifyNeighborBlocksChange(x + 1, y, z, self.id);
-				BlockEngine:NotifyNeighborBlocksChange(x, y, z - 1, self.id);
-				BlockEngine:NotifyNeighborBlocksChange(x, y, z + 1, self.id);
-			end
-		end
+		self:calculatePower(x, y, z, true)
 	end
 end
 
 function block:OnBlockRemoved(x,y,z, last_id, last_data)
 	if(not GameLogic.isRemote) then
-		if (self.torchActive) then
-			BlockEngine:NotifyNeighborBlocksChange(x, y - 1, z, self.id);
-			BlockEngine:NotifyNeighborBlocksChange(x, y + 1, z, self.id);
-			BlockEngine:NotifyNeighborBlocksChange(x - 1, y, z, self.id);
-			BlockEngine:NotifyNeighborBlocksChange(x + 1, y, z, self.id);
-			BlockEngine:NotifyNeighborBlocksChange(x, y, z - 1, self.id);
-			BlockEngine:NotifyNeighborBlocksChange(x, y, z + 1, self.id);
-		end
 	end
 end
 
 function block:OnNeighborChanged(x,y,z,neighbor_block_id)
 	if(not GameLogic.isRemote) then
-		local is_indirectly_powered = self:isWeaklyPowered(x,y,z);
-
-		if ( (self.torchActive and not is_indirectly_powered) or (not self.torchActive and is_indirectly_powered)) then
-			GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self.id, self:tickRate());
-		end
+		self:calculatePower(x, y, z)
 	end
 end
 
@@ -88,61 +65,35 @@ function block:canProvidePower()
     return true;
 end
 
--- this block is a diode, which is only weakly powered by the block that it sits on. 
-function block:isWeaklyPowered(x,y,z)
-	local y1 = y-1;
-	local src_block = BlockEngine:GetBlock(x,y1,z);
-	if(src_block) then
-		local src_state = src_block:GetInternalStateNumber(x,y1,z);
-		if(src_state) then
-			-- source state has priority over weak power
-			return src_state and src_state>0;
-		else
-			return BlockEngine:hasWeakPowerOutputTo(x,y1,z);
-		end
-	else
-		return false;
+function block:calculatePower(x, y, z, forceUpdate)
+    local last_wire_strength = ParaTerrain.GetBlockUserDataByIdx(x, y, z);
+    local cur_wire_strength = BlockEngine:getStrongestIndirectPower(x, y, z)
+	if(cur_wire_strength >= 1) then
+		cur_wire_strength = cur_wire_strength - 1;
 	end
-end
-
--- providing power except for the block that it sits on. 
-function block:isProvidingWeakPower(x, y, z, direction)
-	if (not self.torchActive) then
-        return 0;
-    else
-        if(direction == 4) then
-			return 0;
-		else
-			return 15;
-		end
+    if (last_wire_strength ~= cur_wire_strength or forceUpdate) then
+		BlockEngine:SetBlockDataForced(x, y, z, cur_wire_strength);
+		BlockEngine:NotifyNeighborBlocksChange(x, y, z, self.id)
     end
 end
 
--- only provide strong power to the top block
-function block:isProvidingStrongPower(x, y, z, direction)
-	if(direction == 5) then
-		return self:isProvidingWeakPower(x, y, z, direction);
+-- providing power to all directions
+function block:isProvidingWeakPower(x, y, z, direction)
+	local power_level = ParaTerrain.GetBlockUserDataByIdx(x, y, z);
+	if (power_level) then
+		return power_level;
 	else
 		return 0;
 	end
 end
 
+function block:isProvidingStrongPower(x, y, z, direction)
+	return self:isProvidingWeakPower(x, y, z, direction);
+end
+
 -- revert back to unpressed state
 function block:updateTick(x,y,z)
 	if(not GameLogic.isRemote) then
-		local is_indirectly_powered = self:isWeaklyPowered(x,y,z);
-
-		if (self.torchActive) then
-			if(not is_indirectly_powered) then
-				-- turn it off
-				BlockEngine:SetBlock(x,y,z,names.Conductor, data, 3);
-			end
-		else
-			if(is_indirectly_powered) then
-				-- turn it on
-				BlockEngine:SetBlock(x,y,z,names.Conductor_On, data, 3);
-			end
-		end
 	end
 end
 

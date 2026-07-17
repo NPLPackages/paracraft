@@ -100,13 +100,17 @@ function Entity:OnFocusOut()
 	self:focusOut();
 end
 
+function Entity:CanHasCollisionEventWith(entity)
+    return entity:IsStaticBlocker();
+end
+
 -- check collision with nearby entities and broadcast collision event
 function Entity:BroadcastCollision()
 	local entities = EntityManager.GetEntitiesByAABBOfType(Entity, self:GetCollisionAABB())
 	if (entities and #entities > 1) then
 		for i=1, #entities do
 			local entity2 = entities[i];
-			if(entity2 ~= self and entity2:IsStaticBlocker() and self:GetCollisionAABB():Intersect(entity2:GetCollisionAABB())) then
+			if(entity2 ~= self and self:CanHasCollisionEventWith(entity2) and self:GetCollisionAABB():Intersect(entity2:GetCollisionAABB())) then
 				entity2:collided(self);
 				self:collided(entity2);
 			end

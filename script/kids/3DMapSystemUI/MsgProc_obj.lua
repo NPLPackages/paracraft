@@ -102,7 +102,7 @@ end
 -- reset the history class
 function Map3DSystem.obj.ResetHistory()
 	local self = sys_obj;
-	self.history = TimeSeries:new{name = "ObjHistory",}; 
+	self.history = commonlib.TimeSeries:new{name = "ObjHistory",}; 
 	self.history:CreateVariable({name = "creations", type="Discrete"});
 	-- all shares creations
 	--self.history:CreateVariable({name = "modifications", type="Discrete"});

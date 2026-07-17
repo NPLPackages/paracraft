@@ -65,3 +65,7 @@ else
     --[[projectId	无projectId则为创建新世界 fileSize]]
     HttpWrapper.Create("keepwork.world.checkupload", "%MAIN%/edu/v0/users/onlineDisks/check", "GET", true);
 end
+
+--强行删除世界
+--https://yapi.kp-para.cn/project/32/interface/api/7916
+HttpWrapper.Create("keepwork.project.forcedelete", "%MAIN%/core/v0/projects/:id/hard", "DELETE", true);

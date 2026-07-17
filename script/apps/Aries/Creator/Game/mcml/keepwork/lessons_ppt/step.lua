@@ -10,9 +10,9 @@ local step = commonlib.gettable("MyCompany.Aries.Game.mcml.step");
 -------------------------------------------------------
 ]]
 local step = commonlib.gettable("MyCompany.Aries.Game.mcml.lessons_ppt.step");
-local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
-local RedSummerCampPPtFullPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtFullPage.lua");
+local RedSummerCampPPtPage
 function step.render_callback(mcmlNode, rootName, bindingContext, _parent, left, top, right, bottom, myLayout, css)
+	RedSummerCampPPtPage = RedSummerCampPPtPage or NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 	if RedSummerCampPPtPage.GetIsFullPage() then
 		step.create_full_page(rootName, mcmlNode, bindingContext, _parent, left, top, right, bottom, myLayout, css);
 	else

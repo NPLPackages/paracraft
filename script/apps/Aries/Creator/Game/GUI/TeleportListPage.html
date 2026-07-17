@@ -40,10 +40,14 @@ end
                 </NodeTemplate>
             </NodeTemplates>
 	        <DataNodePlaceholder xpath="*"/>
-        </pe:treeview>
+        </pe:treeview>    
     </div>
     <input type="button" name="AddInstance" value='<%=L"添加实例"%>' class="mc_light_grey_button_with_fillet" onclick="TeleportListPage.AddInstance"/>
     <input type="button" style="margin-left:5px;" name="RemoveInstance" class="mc_light_grey_button_with_fillet" value='<%=L"删除实例"%>' onclick="TeleportListPage.RemoveInstance"/>
+    <input type="button" name="ClearAll" value='<%=L"清空全部"%>' class="mc_light_grey_button_with_fillet" style="margin-left:5px;" onclick="TeleportListPage.ClearAll"/>
+    <br/>
+    <input type="button" name="ExportToClipboard" value='<%=L"导出到剪贴板"%>' class="mc_light_grey_button_with_fillet" style="margin-top:5px;" onclick="TeleportListPage.ExportToClipboard"/>
+    <input type="button" style="margin-left:5px;margin-top:5px;" name="ImportFromClipboard" class="mc_light_grey_button_with_fillet" value='<%=L"从剪贴板导入"%>' onclick="TeleportListPage.ImportFromClipboard"/>
 </form>
 </div>
 </aries:window>

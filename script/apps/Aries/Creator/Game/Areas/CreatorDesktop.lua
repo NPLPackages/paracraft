@@ -305,6 +305,8 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 			allowDrag = false,
 			-- enable_esc_key = true,
 			click_through = true, 
+			-- we need to mark dirty when new model textures are prepared.
+			SelfPaint = true, SelfPaintTextureName = "NewDesktopPage", 
 			zorder = -1,
 			refresh = true,
 			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
@@ -320,6 +322,18 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 
 	if(IsExpanded) then
 		GameLogic:Connect("desktopLayoutRequested", CreatorDesktop, CreatorDesktop.OnLayoutRequested, "UniqueConnection");
+		
+		if(CreatorDesktop.new_page_params.SelfPaint) then
+			local Item = commonlib.gettable("MyCompany.Aries.Game.Items.Item");
+			local textureAtlas = Item:GetIconAtlas();
+			if(textureAtlas) then
+				textureAtlas:Connect("TextureUpdated", CreatorDesktop, CreatorDesktop.MarkDirty, "UniqueConnection");
+			end
+			local ModelTextureAtlas = commonlib.gettable("MyCompany.Aries.Game.Common.ModelTextureAtlas");
+			if(ModelTextureAtlas and ModelTextureAtlas.Connect) then
+				ModelTextureAtlas:Connect("TextureUpdated", CreatorDesktop, CreatorDesktop.MarkDirty, "UniqueConnection");
+			end
+		end
 	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
@@ -339,6 +353,12 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 	DesktopMenuPage.ActivateMenu(IsExpanded and not CreatorDesktop.IsMovie);
 
 	GameLogic.events:DispatchEvent({type = "ShowCreatorDesktop" , bShow = IsExpanded});	
+end
+
+function CreatorDesktop:MarkDirty()
+	if(CreatorDesktop.new_page_params and CreatorDesktop.new_page_params._page) then
+		CreatorDesktop.new_page_params._page:InvalidateRect()
+	end
 end
 
 function CreatorDesktop:OnLayoutRequested(requesterName)

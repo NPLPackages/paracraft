@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>ParacraftCopilot</title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl">
+            <![CDATA[
+                NPL.load("./ParacraftCopilot.lua");
+                local ParacraftCopilot = commonlib.gettable("MyCompany.Aries.Game.Agent.ParacraftCopilot");
+
+                NPL.load("(gl)script/ide/System/Core/UniString.lua");
+                NPL.load("(gl)script/ide/System/Windows/Controls/TreeView.lua");
+                local TreeView = commonlib.gettable("System.Windows.Controls.TreeView");
+                local UniString = commonlib.gettable("System.Core.UniString");
+
+                artifacts = {};
+
+                local page = document.GetPageCtrl() or {};
+
+                -- build chat history.
+                local Page = NPL.load("script/ide/System/UI/Page.lua");
+                local ShowVuePage = function() end;
+
+                if (System.options.httpdebug) then
+                    _G.IsDevEnv = true;
+                    ShowVuePage = Page.ShowVueTestPage;
+                else
+                    ShowVuePage = Page.Show;
+                end
+
+                defaultWelcome = "Hi，我是AI助手【帕帕】 很高兴遇见你！你可以随时随地向我提问，我将知无不言～"; -- 默认欢迎语
+                welcome = defaultWelcome; -- 欢迎语
+                content = "";
+
+                -- 是否只朗读第一行
+                isOnlyReadFirstLine = false;
+
+                local messages = {}; --{{content="生成2道数学题",index=1,role="user",},{content="生成2道数学题",index=1,role="user",}};
+                local omitContent = false;
+                local messageTip = nil;
+                local promptText = "";
+                local roleName = {
+                    user = "我",
+                    assistant = "AI助教"
+                };
+                local currentPlayIndex = nil;
+                local inChat = false;
+                local referenceContent = "";
+                local msg = "";
+                local lastMsg = "";
+                local askCountMap = {}; -- ask计数表，用来处理ask命令无返回的情况。
+                local askCount = 0;
+                local askCommandReturn = false;
+                local askCommandNeedBreak = false;
+                local askCommandNeedBreakAndReadyToClear = false;
+                local askCommandEventName = "AIChat_Result";
+                local autoScrollToEnd = true;
+                local vScroll = nil;
+                local lastVScroll = 0;
+                local useAskCommand = true;
+                local model = ParacraftCopilot.model or "keepwork-pro";
+                local knowledge = nil;
+
+                textStream = "";
+                textWroteIndex = nil; -- nil or number
+                textOutputDelay = 0.02;
+
+                local start = 1;
+                local finish = nil;
+                local continueReading = true;
+                local matchStr = {"%.", "!", "?", ")", "，", "。", "！", "？", "）", "；", "~"};
+
+                local chatHistoryPage = { CloseWindow = function() end, update = function() end };
+                local chatHistoryPageTimer = {};
+
+                page.OnClose = function()
+                    stopMsg();
+                    chatHistoryPage:CloseWindow();
+                    ParacraftCopilot.init = false;
+                end
+
+                function showChatHistory()
+                    local windowControl = page:FindControl("chatHistory");
+
+                    chatHistoryPage = ShowVuePage(nil, {
+                        url="script/apps/Aries/Creator/Game/Agent/ParacraftCopilotChatHistory.html",
+                        alignment = "_fi",
+                        x = 0,
+                        y = 0,
+                        width = 0,
+                        height = 0,
+                        zorder = 3,
+                        parent = windowControl,
+                        minRootScreenWidth = 0,
+                        minRootScreenHeight = 0,
+                        draggable = false,
+                        isClickThrough = false,
+                    }) or {};
+                end
+
+                ParacraftCopilot.UpdateChatPage = function()
+                    chatHistoryPage:Update();
+                    chatHistoryPage:UpdateLayout();
+                end
+
+                page.OnCreate = function()
+                    if (not ParacraftCopilot.init) then
+                        ParacraftCopilot.init = true;
+                        showChatHistory();
+                        chatHistoryPage:SetVisible(false);
+                    end
+                end
+
+                function close()
+                    page:CloseWindow();
+                    ParacraftCopilot.isShowPage = false
+                end
+
+                function hasMessages()
+                    return #messages > 0;
+                end
+
+                function isOmitContent()
+                    return omitContent;
+                end
+
+                function getContent(s)
+                    s = commonlib.Encoding.EncodeHTMLInnerTextWithSpace(s);
+                    return s;
+                end
+
+                ParacraftCopilot.GetContent = getContent;
+
+                function getMessages()
+                    local _messages = commonlib.deepcopy(messages);
+                    local newMessages = {};
+                    local contentLength = 0;
+
+                    for i = #_messages, 1, -1 do
+                        local content = _messages[i].content;
+                        contentLength = contentLength + UniString:new(content):length();
+                        -- if contentLength > 1600 then
+                        --     omitContent = true;
+                        --     break;
+                        -- else
+                        --     omitContent = false;
+                        -- end
+                        table.insert(newMessages, 1, _messages[i]);
+                    end
+                    if messageTip then
+                        newMessages[#newMessages + 1] = {
+                            role = "assistant",
+                            content = messageTip.content,
+                            index = #newMessages + 1
+                        };
+                        return newMessages;
+                    else
+                        return newMessages;
+                    end
+                end
+
+                ParacraftCopilot.GetMessages = getMessages;
+
+                function getRoleName(role)
+                    return roleName[role];
+                end
+
+                ParacraftCopilot.GetRoleName = getRoleName;
+
+                function isShowSoundIcon(index)
+                    if messages[index] then
+                        return messages[index].role == "assistant";
+                    end
+                end
+
+                function switchSoundState(name, mcmlNode)
+                    local index = tonumber(name);
+                    if currentPlayIndex == index then
+                        PlayText.stopPlay();
+                    else
+                        currentPlayIndex = index;
+                        refreshHistoryWindow();
+                        if messages[index] then
+                            PlayText.playByIndex(index);
+                        end
+                    end
+                end
+
+                function refreshHistoryWindow(toEnd)
+                    ParacraftCopilot.RefreshAllMessages(toEnd);
+                end
+
+                function getAudioIconStyle(index)
+                    local image = "play_3.png";
+                    if currentPlayIndex == index then
+                        image = "play_2.png";
+                    end
+                    if messages[index] then
+                        return string.format(
+                            [[margin-left: 5px;
+                              margin-top: 2px;
+                              width: 16px;
+                              height: 16px;
+                              background: url(Texture/Aries/Paracraft/Mod/AIChat/%s);]],
+                            image);
+                    end
+                end
+
+                function getLineStyle(index)
+                    index = tonumber(index);
+                    local message = messages[index];
+                    local styleStr = "margin-bottom: 10px;padding: 20px;min-height: 64px;text-wrap:wrap;";
+                    local image = "chatBarBgMe_32x32_x2_32bits.png";
+                    local color = "#2E4254";
+                    if not message then
+                        image = "chatBarBg_32x32_x2_32bits.png";
+                        if messageTip and messageTip.isListening then
+                            color = "#ffffff";
+                        end
+                    else
+                        local role = message.role;
+                        local text = message.content;
+                        local textWidth = _guihelper.GetTextWidth(text, "Tahoma;18")
+                        if textWidth >= 270 then
+                            -- padding 左右都是10，width在text width基础上+20
+                            styleStr = styleStr .. "width: 290px;";
+                        end
+                        if role == "assistant" then
+                            image = "chatBarBg_32x32_x2_32bits.png";
+                        elseif role == "user" then
+                            color = "#4E5969";
+                        end
+                    end
+                    styleStr = styleStr .. string.format(
+                        "color: %s;background: url(Texture/Aries/Paracraft/ParacraftCopilot/%s#0 0 64 64:30 30 30 30);",
+                        color, image);
+                    return styleStr;
+                end
+
+                ParacraftCopilot.GetLineStyle = getLineStyle;
+
+                function getAvatarStyle(role)
+                    if role == "user" then
+                        return "float: right";
+                    else
+                        return "float: left";
+                    end
+                end
+
+                ParacraftCopilot.GetAvatarStyle = getAvatarStyle;
+
+                function isInChat()
+                    return inChat and useAskCommand and askCountMap[askCount] == nil;
+                end
+
+                function stopMsg()
+                    if askCountMap[askCount] == nil then
+                        askCommandNeedBreak = true;
+                        askCountMap[askCount] = false;
+                    end
+                end
+
+                ParacraftCopilot.StopMsg = stopMsg;
+
+                function addAssitantMessage(content)
+                    content = content or "";
+                    if messages[#messages].role == "user" then
+                        messages[#messages + 1] = {
+                            role = "assistant",
+                            content = content,
+                            index = #messages + 1
+                        };
+                    end
+                end
+
+                function clearMessageTip()
+                    messageTip = nil;
+                    refreshHistoryWindowAndScrollToEnd();
+                end
+
+                function isLastMsg()
+                    if (msg ~= "" and msg == lastMsg) or askCommandReturn then
+                        return true;
+                    end
+                    return false;
+                end
+
+                -- return true means text content updated, else no change.
+                local writeTextTimer;
+                function writeText(mustComplete, callback)
+                    callback = callback or function() end;
+                    local s = UniString:new(textStream);
+
+                    if textWroteIndex <= s:length() then
+                        textOutputDelay = 0.02;
+                        local textCount = s:length() - textWroteIndex;
+                        if textCount * textOutputDelay > 1 then
+                            textOutputDelay = 1 / textCount;
+                        end
+
+                        local i = textWroteIndex;
+                        local strLength = s:length();
+                        writeTextTimer = commonlib.Timer:new({
+                            callbackFunc = function()
+                                if i > strLength or askCommandNeedBreak then
+                                    writeTextTimer:Change();
+                                    textWroteIndex = s:length() + 1;
+                                    callback(true);
+                                    return;
+                                end
+
+                                local char = s[i];
+                                if char == "<" and s:sub(i, i + 4).text == "<br/>" then
+                                    i = i + 4; -- Skip the "<br/>" tag
+                                else
+                                    local content = s:sub(1, i).text;
+                                    messages[#messages].content = content;
+                                    ParacraftCopilot.RefreshLastMessage(content);
+
+                                    writeTextTimer:Change();
+                                    commonlib.TimerManager.SetTimeout(function()
+                                        if not mustComplete and (askCommandNeedBreak or askCommandNeedBreakAndReadyToClear) then
+                                            textWroteIndex = i + 1;
+                                            callback(false, messages[#messages].content);
+                                        else
+                                            writeTextTimer:Change(0, 5);
+                                        end
+                                    end, textOutputDelay);
+                                    i = i + 1;
+                                end
+                            end
+                        });
+
+                        writeTextTimer:Change(0, 5);
+                    else
+                        callback(false);
+                    end
+                end
+
+                local handleAskTimer;
+                local function handleAskCommandResult(_, _msg)
+                    if not _msg then
+                        return;
+                    end
+
+                    if askCommandNeedBreak then
+                        handleAskTimer:Change();
+                        unregisterMsgEvent();
+                        return "abort";
+                    end
+
+                    _msg = _msg.msg or "";
+
+                    -- msg from keepwork
+                    if not useAskCommand then
+                        addAssitantMessage(formatMsgContent(_msg))
+                        inChat = false;
+                        clearMessageTip();
+                        return;
+                    end
+
+                    -- if msg is the same as last msg, return
+                    if msg ~= "" then
+                        lastMsg = msg;
+                    end
+                    msg = _msg;
+                    if isLastMsg() then
+                        print("### is last msg, end receive msg ###");
+                        return;
+                    end
+
+                    -- start chat
+                    textStream = formatMsgContent(_msg);
+                    inChat = true;
+                    messageTip = nil;
+                    addAssitantMessage();
+
+                    -- start write text
+                    if textStream ~= "" and textWroteIndex == nil then
+                        local timeout = 0;
+
+                        print("### start to write text ###");
+                        autoScrollToEnd = true;
+                        textWroteIndex = 1;
+
+                        handleAskTimer = commonlib.Timer:new({
+                            callbackFunc = function()
+                                if isLastMsg() then
+                                    handleAskTimer:Change();
+                                    writeText(nil, function()
+                                        writeTextFinish();
+                                        unregisterMsgEvent();
+                                    end);
+                                    return;
+                                end
+
+                                handleAskTimer:Change();
+                                writeText(nil, function(_updated, _textStream)
+                                    if askCommandNeedBreakAndReadyToClear then
+                                        print("### ask command need break and ready to clear, end receive msg ###");
+                                        handleAskTimer:Change();
+                                        return;
+                                    end
+
+                                    if askCommandNeedBreak then
+                                        print("### ask command need break, end receive msg ###");
+                                        textStream = (_textStream or "") .. "<br/>（...已停止生成）";
+                                        writeText(true, function()
+                                            writeTextFinish();
+                                        end);
+                                        handleAskTimer:Change();
+                                        return;
+                                    end
+
+                                    handleAskTimer:Change(0, 5);
+
+                                    -- local function handle()
+                                    --     if timeout >= 3 then
+                                    --         print("### msg return timeout, end receive msg ###");
+                                    --         askCountMap[askCount] = false;
+                                    --         textStream = textStream .. "<br/>（...内容较长，已省略）";
+                                    --         handleAskTimer:Change();
+                                    --     else
+                                    --         handleAskTimer:Change(0, 5);
+                                    --     end
+                                    -- end
+
+                                    -- if not _updated then
+                                    --     timeout = timeout + 0.1;
+                                    --     commonlib.TimerManager.SetTimeout(function()
+                                    --         handle();
+                                    --     end, 100);
+                                    -- else
+                                    --     timeout = 0;
+                                    --     handle();
+                                    -- end
+                                end);
+                            end
+                        });
+
+                        handleAskTimer:Change(0, 5);
+                    end
+                end
+
+                function writeTextFinish()
+                    if not askCommandNeedBreak and not askCommandNeedBreakAndReadyToClear then
+                        -- 需断句总数大于返回消息次数的时候，需要补充未添加到待读文本的内容
+                        -- print("self.msg:", self.msg)
+                        -- print("s:", finish + 1)
+                        -- print("f:", finish)
+                        if finish ~= nil then
+                            local s, f, m, i = finish + 1, finish, msg, #messages;
+                            for _, str in ipairs(matchStr) do
+                                local _, __end = string.find(m, str, s);
+                                if __end then
+                                    f = __end;
+                                    break;
+                                end
+                            end
+                            -- print("f:", f)
+                            if continueReading then
+                                while f ~= nil and f > s do
+                                    local sentence = string.sub(m, s, f);
+                                    sentence = sentence:gsub("<br/>", "\n");
+                                    if isOnlyReadFirstLine then
+                                        local pos = string.find(sentence, "\n");
+                                        if pos then
+                                            sentence = string.sub(sentence, 1, pos - 1);
+                                            continueReading = false;
+                                        end
+                                    end
+                                    sentence = sentence:gsub("\n", "");
+                                    sentence = sentence:gsub("[%*#]", "");
+                                    if trim(sentence) ~= "" then
+                                        -- PlayText.addPrepareText(sentence, i)
+                                    end
+                                    s = f + 1;
+                                    for _, str in ipairs(matchStr) do
+                                        local _, __end = string.find(m, str, s);
+                                        if __end then
+                                            f = __end;
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    if (ParacraftCopilot.ExternalEndCallback) then
+                        ParacraftCopilot.ExternalEndCallback(textStream);
+                    end
+                    local sendEmptyMessage = askCommandNeedBreakAndReadyToClear;
+                    askCountMap[askCount] = true;
+                    msg = "";
+                    lastMsg = "";
+                    askCommandReturn = false;
+                    askCommandNeedBreakAndReadyToClear = false;
+                    textStream = "";
+                    textWroteIndex = nil;
+                    start = 1;
+                    finish = nil;
+                    continueReading = true;
+                    inChat = false;
+                    print("### write text finish ###");
+                    -- refreshHistoryWindow();
+                    if useAskCommand then
+                        if type(System.os.IsEmscripten) == "function" and System.os.IsEmscripten() then
+                            local Emscripten = NPL.load("(gl)script/apps/Aries/Creator/Game/Emscripten/Emscripten.lua");
+                            local _messages = commonlib.deepcopy(messages);
+                            for _, message in ipairs(_messages) do
+                                message.content = message.content:gsub("<br/>", "\n");
+                            end
+                            local t = "";
+                            if sendEmptyMessage then
+                                _messages = {};
+                            else
+                                t = _messages[#_messages].content;
+                            end
+                            Emscripten:SendMsg("@keepwork_Chat", {
+                                name = roleName.assistant,
+                                messages = _messages,
+                                text = t
+                            }, nil, nil, "external");
+                        end
+                    end
+                end
+
+                function registerMsgEvent()
+                    askCount = askCount + 1;
+                    GameLogic.GetCodeGlobal():RegisterTextEvent(askCommandEventName .. askCount, handleAskCommandResult);
+                end
+
+                function unregisterMsgEvent()
+                    if askCount > 0 and askCountMap[askCount] ~= nil then
+                        GameLogic.GetCodeGlobal():UnregisterTextEvent(askCommandEventName .. askCount, handleAskCommandResult);
+                    end
+                end
+
+                function onScrollEnd()
+                    autoScrollToEnd = true
+                end
+
+                function trim(s)
+                    return s:match("^%s*(.-)%s*$")
+                end
+
+                function onSend()
+                    if not inChat then
+                        input = page:GetValue("input")
+                        if input and trim(input) ~= "" then
+                            -- PlayText.stopPlay()
+                            local inputText = commonlib.deepcopy(input);
+                            input = "";
+                            inChat = true;
+                            askCommandNeedBreak = false;
+                            chat(inputText);
+                            page:SetValue("input", "");
+                        end
+                    else
+                        tip("稍等片刻，等待回复后再发送哦~");
+                    end
+                end
+
+                function onExternalSend(text)
+                    page:SetValue("input", text)
+                    onSend()
+                end
+
+                ParacraftCopilot.OnExternalSend = onExternalSend
+
+                function tableToString(tbl)
+                    local result = '{'
+                    for k, v in pairs(tbl) do
+                        if type(k) == 'string' then
+                            k = string.format('%q', k)
+                        end
+                        if type(v) == 'table' then
+                            v = tableToString(v)
+                        elseif type(v) == 'string' then
+                            v = string.format('%q', v)
+                        end
+                        result = result .. '[' .. k .. ']=' .. tostring(v) .. ','
+                    end
+                    result = result .. '}'
+                    return result
+                end
+
+                function chat(text)
+                    if text and string.len(text) > 0 then
+                        if text == "服务器内部错误" then
+                            tip("没有听清你说的话");
+                            return;
+                        end
+
+                        ParacraftCopilot.artifactStarted = false;
+                        ParacraftCopilot.isAddedArtifact = false;
+                        ParacraftCopilot.artifactEnded = false;
+
+                        page:FindControl("welcomeMsg").visible = false;
+
+                        addUserMessage(text);
+                        -- self.AIEntity:Say("思考中..", -1);
+                        local _messages = commonlib.deepcopy(messages);
+                        _messages[1].content = promptText .. " " .. _messages[1].content;
+                        if type(referenceContent) == "string" and referenceContent ~= "" then
+                            _messages[1].content = referenceContent .. _messages[1].content;
+                        end
+                        for _, message in ipairs(_messages) do
+                            message.content = message.content:gsub("<br/>（...已停止生成）", "");
+                            message.content = message.content:gsub("<br/>（...内容较长，已省略）", "");
+                        end
+
+                        chatHistoryPage:SetVisible(true);
+                        setMessageTip("思考中..");
+                        registerMsgEvent();
+                        local cmdString = string.format("/ask -model %s", model);
+                        if knowledge and knowledge ~= "" then
+                            cmdString = cmdString .. " -knowledge " .. knowledge;
+                        end
+                        cmdString = cmdString .. string.format(" -event AIChat_Result%s %s", askCount, tableToString(_messages));
+                        LOG.std(nil, "debug", "ParacraftCopilot", cmdString);
+                        msg = GameLogic.RunCommand(cmdString);
+                        print("### ask command return: ↓↓↓ ###\n", msg)
+                        print("### ask command return: ↑↑↑ ###")
+                        -- refreshHistoryWindow();
+
+                        local checkChatTimer;
+                        checkChatTimer = commonlib.Timer:new({
+                            callbackFunc = function()
+                                if (isInChat()) then
+                                    return;
+                                end
+
+                                checkChatTimer:Change();
+                                -- scrollToEnd();
+                                if askCountMap[askCount] == nil then
+                                    textStream = formatMsgContent(msg);
+                                    print("### askCommandReturn = true ###");
+                                    askCommandReturn = true;
+                                    askCountMap[askCount] = true;
+                                end
+                            end
+                        });
+                        checkChatTimer:Change(0, 100);
+                    end
+                end
+
+                function formatMsgContent(content)
+                    local formatContent = content:gsub("#+ ", "")
+                    formatContent = formatContent:gsub("%* ", "")
+                    formatContent = formatContent:gsub("%*%*%*([^%*]+)%*%*%*", "%1")
+                    formatContent = formatContent:gsub("%*%*([^%*]+)%*%*", "%1")
+                    formatContent = formatContent:gsub("%*([^%*]+)%*", "%1")
+                    return formatContent
+                end
+
+                function tip(text)
+                    GameLogic.AddBBS(nil, text, 5000, "255 0 0")
+                end
+
+                function addUserMessage(content)
+                    content = content or "";
+                    messages[#messages + 1] = {
+                        role = "user",
+                        content = content,
+                        index = #messages + 1
+                    };
+                end
+
+                function setMessageTip(text, isListening)
+                    messageTip = {
+                        isListening = isListening,
+                        content = text
+                    };
+                    refreshHistoryWindowAndScrollToEnd();
+                end
+
+                function refreshHistoryWindowAndScrollToEnd()
+                    refreshHistoryWindow(true);
+                    -- scrollToEnd();
+                end
+
+                function addArtifacts(item)
+                    artifacts[#artifacts + 1] = item;
+
+                    page:CallMethod("artifactsWindow", "Refresh", true, nil, true);
+                end
+                ParacraftCopilot.AddArtifacts = addArtifacts;
+
+                function GoToArtifact(index)
+                    ParacraftCopilot.GoToArtifact('artifact_' .. index);
+                end
+
+                function getArtifacts()
+                    return artifacts;
+                end
+                ParacraftCopilot.GetArtifacts = getArtifacts;
+
+                function setArtifacts(_artifacts)
+                    artifacts = _artifacts;
+                end
+                ParacraftCopilot.SetArtifacts = setArtifacts;
+
+                function GetArtifactIcon(isActive)
+                    if isActive then
+                        return [[
+                            width: 32px;
+                            height: 32px;
+                            margin-left: -4px;
+                            margin-top: 10px;
+                            background: url(Texture/Aries/Paracraft/ParacraftCopilot/artifact_active_32x32_x2_32bits.png#0 0 64 64);
+                        ]];
+                    else
+                        return [[
+                            width: 32px;
+                            height: 32px;
+                            margin-left: -4px;
+                            margin-top: 10px;
+                            background: url(Texture/Aries/Paracraft/ParacraftCopilot/artifact_inactive_32x32_x2_32bits.png#0 0 64 64);
+                        ]];
+                    end
+                end
+
+                function OnInputKeyUp()
+                    if (virtual_key == Event_Mapping.EM_KEY_RETURN) then
+                        onSend();
+                    end
+                end
+                -- function scrollToEnd(forced)
+                --     local messageWindow = page:GetNode("messageWindow");
+                --     if not page or not messageWindow then
+                --         return;
+                --     end
+                    
+                --     if autoScrollToEnd or forced then
+                --         page:CallMethod("messageWindow", "Refresh", true, nil, true);
+                --         -- messageWindow.control:scrollToEnd()
+                --         -- messageWindow:ScrollToEnd();
+                --     end
+                --     -- if not messageWindow.control.__overwriteUpdateViewportPosFunction__ then
+                --     --     function messageWindow.control:updateViewportPos()
+                --     --         self.viewport:updatePos(self.hscroll, self.vscroll)
+                --     --         if vScroll ~= nil then
+                --     --             lastVScroll = vScroll;
+                --     --         end
+                --     --         vScroll = self.vscroll
+                --     --         if inChat and vScroll - lastVScroll < 0 then
+                --     --             autoScrollToEnd = false;
+                --     --         end
+                --     --     end
+                --     -- end
+                -- end
+            ]]>
+        </script>
+        <style type="text/mcss">
+        </style>
+        <pe:container alignment="_lt"
+                      style="width: 384px;
+                             height: 640px;
+                             padding: 0;
+                             position: relative;
+                             background: url(Texture/Aries/Paracraft/ParacraftCopilot/windowBg_384x640_x2_32bits.png#0 0 768 1280:0 0 0 0);">
+            <div align="right"
+                 onclick="close()"
+                 zorder="2"
+                 style="width: 18px;
+                        height: 18px;
+                        position: absolute;
+                        margin-right: 12px;
+                        top: 12px;
+                        zorder: 30;
+                        background: url(Texture/Aries/Paracraft/ParacraftCopilot/close_18x18_x2_32bits.png#0 0 36 36:0 0 0 0);"></div>
+            <div style="height: 625px;padding: 0;">
+                <div style="height: 500px;">
+                    <!-- Artifacts -->
+                    <div style="position: relative;
+                                height: 384px;
+                                width: 56px;
+                                padding-top: 16px;
+                                background-color:;">
+                        <!-- Avatar -->
+                        <div align="center"
+                             style="width: 28px;
+                                    height: 28px;
+                                    margin-bottom: 26px;
+                                    background: url(Texture/Aries/Paracraft/ParacraftCopilot/avatar_28x28_x2_32bits.png#0 0 56 56:0 0 0 0);">
+                        </div>
+                        <pe:treeview name="artifactsWindow"
+                                     VerticalScrollBarStep="32"
+                                     style="overflow-y: hidden;background:;">
+                            <pe:repeat DataSource="<%= artifacts %>">
+                                <pe:repeatitem style="padding: 0px;margin: 0px;">
+                                    <div onclick="GoToArtifact()"
+                                         name="<%= Eval('index') %>"
+                                         style="<%= GetArtifactIcon(true) %>"></div>
+                                </pe:repeatitem>
+                            </pe:repeat>
+                        </pe:treeview>
+                    </div>
+                    <!-- Chat -->
+                    <div style="position: relative;
+                                height: 500px;
+                                width: 328px;
+                                left: 56px;
+                                background-color:;">
+                        <!-- dialog -->
+                        <pe:container visible="true" name="welcomeMsg" style="background:;">
+                            <div style="padding: 10px;
+                                        margin-top: 40px;
+                                        margin-left: 10px;
+                                        line-height: 25px;
+                                        color: #2E4254;
+                                        max-width: 308px;
+                                        background: url(Texture/Aries/Paracraft/ParacraftCopilot/chatBarBg_32x32_x2_32bits.png#0 0 64 64:30 30 30 30);">
+                                <%= welcome %>
+                            </div>
+                        </pe:container>
+                        <pe:if condition="<%= isOmitContent() %>">
+                            <div style="padding: 10px;
+                                        margin-bottom: 10px;
+                                        line-height: 25px;
+                                        color: #2E4254;
+                                        background: url(Texture/Aries/Paracraft/Mod/AIChat/bubble_1_32x32_32bits.png#0 0 32 32:15 15 15 15);">
+                                ...
+                            </div>
+                        </pe:if>
+                        <pe:container name="chatHistory"
+                                      zorder="1"
+                                      style="position: absolute;
+                                             top: 0px;
+                                             background:;
+                                             width: 326px;
+                                             margin-top: 40px;
+                                             height: 460px;
+                                             overflow: hidden;">
+                            <!-- use lua-vue TemplateList to render treeview -->
+                            <!-- <pe:treeview name="messageWindow"
+                                        VerticalScrollBarStep="24"
+                                        style="margin-top: 0px;
+                                                padding: 16px;
+                                                width: 345px;
+                                                height: 437px;
+                                                overflow-y: hidden;"
+                                                onscrollend="onScrollEnd">
+                                <pe:repeat DataSource="<%= getMessages() %>">
+                                    <pe:repeatitem style="margin-bottom:10px;">
+                                        <div style="margin-bottom: 4px;
+                                                    color: #2B4A6B;">
+                                            <%= getRoleName(Eval('role')) %>
+                                            <pe:if condition="<%= isShowSoundIcon(Eval('index')) %>">
+                                                <span onclick="switchSoundState"
+                                                    name="<%= Eval('index') %>"
+                                                    style="<%= getAudioIconStyle(Eval('index')) %>">
+                                                </span>
+                                            </pe:if>
+                                        </div>
+                                        <div uiname="<%= 'dialog_' .. Eval('index') %>"
+                                            style="<%= getLineStyle(Eval('index')) %>">
+                                            <%= 'dialog_' .. Eval('index') %>
+                                            <%= getContent(content) %>
+                                        </div>
+                                    </pe:repeatitem>
+                                </pe:repeat>
+                                <pe:if condition="<%= isInChat() %>">
+                                    <div style="margin-left: 10px;
+                                                margin-top: -10px;
+                                                font-size: 10px;
+                                                color: #106CEF;"
+                                        onclick="stopMsg">
+                                        停止生成
+                                    </div>
+                                </pe:if>
+                            </pe:treeview> -->
+                        </pe:container>
+                    </div>
+                </div>
+                <!-- Bottom -->
+                <div style="position: absolute;
+                            height: 140px;
+                            width: 384px;
+                            top: 500px;">
+                    <div align="left"
+                         style="width: 56px;
+                                height: 140px;">
+                        <!-- TODO... -->
+                    </div>
+                    <div align="right"
+                         style="width: 328px;
+                                margin-top: -140px;">
+                        <!-- @nearby ... -->
+                        <div style="height: 24px;
+                                    width: 80px;
+                                    margin-left: 16px;
+                                    margin-top: 16px;
+                                    margin-bottom: 8px;">
+                            <select name="at"
+                                    contentBg="Texture/Aries/Paracraft/ParacraftCopilot/fieldBg_16x16_32bits.png#0 0 16 16:7 7 7 7"
+                                    listBg="Texture/Aries/Paracraft/ParacraftCopilot/fieldBg_16x16_32bits.png#0 0 16 16:7 7 7 7"
+                                    dropBg="Texture/Aries/Paracraft/ParacraftCopilot/dropBtn_8x4_x2_32bits.png#0 0 16 8"
+                                    dropWidth="10"
+                                    dropHeight="5"
+                                    fontColor="#1D2129"
+                                    style="width: 80px;
+                                           height: 24px;
+                                           font-size: 12px;
+                                           base-font-size: 12px;
+                                           background-color:;">
+                                <option value="nearby"
+                                        selected="true">@nearby</option>
+                                <option value="all">所有</option>
+                            </select>
+                        </div>
+                        <!-- Input -->
+                        <div style="height: 80px;
+                                    width: 296px;
+                                    background: url(Texture/Aries/Paracraft/ParacraftCopilot/fieldBg_32x32_32bits.png#0 0 32 32:15 15 15 15);
+                                    margin-left: 16px;">
+                            <textarea style="width: 296px;
+                                            height: 80px;
+                                            background:;
+                                            textcolor: #86909C;"
+                                      name="input"
+                                      fontsize="14"
+                                      value="帮我写一份paracraft的商业计划书"
+                                      EmptyText="<%= L'输入文本，可输入@' %>"
+                                      rows="5"
+                                      onkeyup="OnInputKeyUp">
+                            </textarea>
+                            <input type="button"
+                                   name="send"
+                                   onclick="onSend"
+                                   style="background: url(Texture/Aries/Paracraft/ParacraftCopilot/sendBtn_44x28_x2_32bits.png#0 0 92 61);
+                                          width: 44px;
+                                          height: 28px;
+                                          margin-left: 242px;
+                                          margin-top: -38px;"
+                                   value="" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

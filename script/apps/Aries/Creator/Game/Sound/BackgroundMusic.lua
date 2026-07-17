@@ -12,7 +12,7 @@ BackgroundMusic:Play(filename)
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
 local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
-
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 
 local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
@@ -60,12 +60,11 @@ function BackgroundMusic:GetMusic(filename)
 
 	local audio_src = AudioEngine.Get(filename);
 	if(not audio_src) then
-		if(not ParaIO.DoesAssetFileExist(filename, true)) then
-			filename = ParaWorld.GetWorldDirectory()..filename;
-			if(not ParaIO.DoesAssetFileExist(filename, true)) then
-				return;
-			end
+		filename = Files.GetFilePath(filename)
+		if(not filename)then
+			return;
 		end
+
 		-- just in case it is midi file 
 		if(self:CheckPlayMidiFile(filename)) then
 			return;
@@ -76,7 +75,14 @@ function BackgroundMusic:GetMusic(filename)
 			-- tricky: do not loop for recorded files
 			audio_src.loop = true;
 		end
-		audio_src.file = filename;
+		if(filename and filename:match("^https?://")) then
+			audio_src.file = nil;
+			HttpFiles.GetHttpFilePath(filename, function(err, diskfilename) 
+				audio_src.file = diskfilename;
+			end)
+		else
+			audio_src.file = filename;
+		end
 		audio_src.isBackgroundMusic = true;
 	end
 	

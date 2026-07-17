@@ -5,6 +5,8 @@
     local MobileRecordFinish = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileRecordFinish.lua") 
     MobileRecordFinish.ShowView()
 ]]
+local ScreenRecorderHandler = commonlib.gettable("MyCompany.Aries.Game.Mobile.ScreenRecorderHandler");
+
 local MobileRecordFinish = NPL.export()
 local page = nil
 local file_Path = ParaIO.GetWritablePath().."temp/mobile_screen/"
@@ -71,6 +73,7 @@ function MobileRecordFinish.PlayCutDown()
     deleteButton.background = "Texture/Aries/Creator/keepwork/Paralife/record/shanchu_71x71_32bits.png;0 0 71 71"
     deleteButton:SetScript("onclick", function()
         MobileRecordFinish.CloseView()
+        GameLogic.RunCommand("/screenrecorder delete");
     end)
     blueBg:AddChild(deleteButton);
 
@@ -98,9 +101,17 @@ end
 
 function MobileRecordFinish.SaveAnPlay()
     GameLogic.RunCommand("/screenrecorder save")
-    commonlib.TimerManager.SetTimeout(function()  
-        GameLogic.RunCommand("/screenrecorder play")
-    end, 1000)
+
+    Mod.WorldShare.MsgBox:Show(L"正在保存...")
+    ScreenRecorderHandler.SetSavedCallbackFunc(function(savedPath)
+        Mod.WorldShare.MsgBox:Close();
+
+        if (savedPath == ScreenRecorderHandler.savedPath) then
+            GameLogic.RunCommand("/screenrecorder play")
+        else
+            LOG.std(nil, "error", "ScreenRecorderHandler", "different video saved path.");
+        end
+    end);
 end
 
 function MobileRecordFinish.CloseView()

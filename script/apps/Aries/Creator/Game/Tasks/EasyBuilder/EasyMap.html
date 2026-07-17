@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyMap.lua" refresh="false">
+<![CDATA[
+EasyMap = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyMap");
+EasyMap.InitPage(Page);
+function OnClickDummy() 
+end
+]]>
+</script>
+<pe:container onclick="OnClickDummy" style="padding:5px;background-color:#000000a0;color:#ffffff;width:800px;">
+    <div style="color:#FFD166;">地图传送：
+        <pe:if condition='<%=not GameLogic.IsReadOnly()%>'>
+            <input type="button" onclick="EasyMap.OnClickEditTeleportPoints" value = "编辑传送点" visible='<%=GameLogic.GetGameMode()=="edit"%>'  name="EditTeleportPage" style="position:relative;margin-left:10px;margin-top:0px;color:#FFD166;" />
+        </pe:if>
+    </div>
+    <pe:treeview style="margin:0px;max-height:150px;background:;" 
+            VerticalScrollBarStep="45"
+            ScrollBarTrackWidth="32" 
+            CustomScrollBar="true"
+            UpLeftBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_upleft.png"
+            DownRightBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_downright.png"
+            TrackBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_track.png"
+            ThumbBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_thumb.png"
+            >
+        <pe:repeat style="margin:0px;" DataSource='<%=EasyMap.Maps_DS%>'>
+            <pe:repeatitem style="float:left;">
+                <input type="button" name='<%=Eval("index")%>' value='<%=Eval("displayname") or Eval("name")%>' onclick="EasyMap.OnClickMap" spacing="5" 
+                    style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8);margin-right:5px;margin-top:5px;min-width:64px;height:42px;color:#ffffff;font-size:16px;"/>
+            </pe:repeatitem>
+        </pe:repeat>
+    </pe:treeview>
+    
+    <div style="color:#FFD166;margin-top: 10px;">
+        <div style="margin-top:5px;float:left;">切换(附身)角色：</div>
+        <!--
+        <input type="checkbox" id="FollowCharacter" name="FollowCharacter" checked='<%=EasyMap.isLastPlayerFollowTarget%>' onclick="EasyMap.OnFollowCharacterChanged" style="margin-left:10px;width:32px;height:32px;" />
+        <div for="FollowCharacter" style="float:left;margin-top:5px;margin-left:5px;">是否跟随附身的角色</div>
+        -->
+    </div>
+    <pe:treeview style="margin:0px;max-height:150px;background:;" 
+            VerticalScrollBarStep="45"
+            ScrollBarTrackWidth="32" 
+            CustomScrollBar="true"
+            UpLeftBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_upleft.png"
+            DownRightBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_downright.png"
+            TrackBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_track.png"
+            ThumbBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_thumb.png"
+            >
+        <pe:repeat style="margin:0px;" DataSource='<%=EasyMap.Chars_DS%>'>
+            <pe:repeatitem style="float:left;">
+                <input type="button" name='<%=Eval("index")%>' value='<%=Eval("displayname") or Eval("name")%>' onclick="EasyMap.OnClickChar" spacing="5" 
+                    style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8);margin-right:5px;margin-top:5px;min-width:64px;height:42px;color:#ffffff;font-size:16px;"/>
+            </pe:repeatitem>
+        </pe:repeat>
+    </pe:treeview>
+</pe:container>
+<pe:container ClickThrough="true" style="width:800px;height:56px;background:;">
+    <input type="button" name="CloseBtn" onclick="EasyMap.OnClickClose" align="right" style="position:relative;width:56px;height:56px;background:url(Texture/player/close.png)" />
+</pe:container>    
+</pe:mcml>
+</html>

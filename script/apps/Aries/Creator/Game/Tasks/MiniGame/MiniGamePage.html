@@ -1,0 +1,60 @@
+<html>
+<body> 
+<pe:mcml>
+    <script type="text/npl">
+<![CDATA[
+local MiniGamePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGamePage.lua")
+MiniGamePage.OnInit()
+
+function get_url()
+    if (MiniGamePage) then
+        return MiniGamePage.url;
+    end
+end
+
+function OnClose()
+    if (MiniGamePage) then
+        MiniGamePage:ClosePage();
+        GameLogic.MiniGameMgr:CheckTodayGameFinished(3000)
+    end
+end
+
+function IsLandScape()
+    if not System.os.IsEmscripten() then
+        return false
+    end
+    local isLandscapeMode = ParaEngine.GetAttributeObject():GetField("IsScreenRotated", false)
+    return isLandscapeMode
+end
+]]>
+</script>
+<pe:container alignment="_fi" uiname="minigame_container" name="minigame_container" style="background-color:#914bd3;">
+    <pe:container alignment="_ct" style='position: relative; width:140px;height:140px; margin-left:-70px;margin-top:-80px; background:url()'>
+        <div style="float:left;width:70px;height:72px;">
+            <img style="width:140px;height:140px;background:url(Texture/Aries/NPCs/RainbowFlower/Clock_bg_32bits.png#0 0 70 72)" animstyle="36"/>
+        </div>
+         <div style="text-align:center;
+                        margin-top:72px;
+                        font-size:18px;
+                        base-font-size:18px;
+                        color:#ffffff;
+                        font-weight:bold;"><%=L"页面加载中..."%></div>
+    </pe:container>
+    <pe:if condition="<%=IsLandScape()%>">
+        <div heigth="100%" style="position: relative; width: 64px; ">
+            <pe:container onclick="OnClose" uiname="btn_close_minigame" style="background:url()">
+                <input  type="button" onclick="OnClose" style="width: 64px; height: 64px; background: url(Texture/Aries/Creator/keepwork/minigame/close.png);" />
+                <div style="text-align: center; font-weight: bold; color: #ffffffc0;"><%=L"返回游戏"%></div>
+            </pe:container>
+        </div>
+    </pe:if>
+    <div align="right" heigth="100%" style="position: relative; width: 64px; margin-right:0px">
+        <pe:container onclick="OnClose" uiname="btn_close_minigame1" style="background:url()">
+            <input type="button" onclick="OnClose" style="width: 64px; height: 64px; background: url(Texture/Aries/Creator/keepwork/minigame/close.png);" />
+            <div style="text-align: center; font-weight: bold; color: #ffffffc0;"><%=L"返回游戏"%></div>
+        </pe:container>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

@@ -31,7 +31,7 @@ end
 -- reset the history class
 function Map3DSystem.Env.ResetHistory()
 	local self = Map3DSystem.Env;
-	self.history = TimeSeries:new{name = "EnvHistory",};
+	self.history = commonlib.TimeSeries:new{name = "EnvHistory",};
 	self.history:CreateVariable({name = "env", type="Discrete"});
 end
 

@@ -185,8 +185,54 @@ function MobileSaveWorldPage.OnSaveWorldAndExit()
 	callback()
 end
 
+function MobileSaveWorldPage.on_exit_to_login()
+    Mod.WorldShare.MsgBox:Close()
+    local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+    CreateNewWorld.profile = nil
+    System.options.cmdline_world = nil
+    MyCompany.Aries.Game.MainLogin:set_step({HasInitedTexture = true}); 
+    MyCompany.Aries.Game.MainLogin:set_step({IsPreloadedTextures = true}); 
+    MyCompany.Aries.Game.MainLogin:set_step({IsLoadMainWorldRequested = true}); 
+    MyCompany.Aries.Game.MainLogin:set_step({IsCreateNewWorldRequested = true});
+    MyCompany.Aries.Game.MainLogin:next_step({IsLoginModeSelected = false})
+end
+
+function MobileSaveWorldPage.on_exit_game()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+    local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+    CustomCharItems:Init();
+    local Game = commonlib.gettable("MyCompany.Aries.Game")
+    if(Game.is_started) then
+        Game.Exit()
+    end
+
+    GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true)
+
+    local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+    CreateNewWorld.profile = nil
+    ParaUI.GetUIObject('root'):RemoveAll()
+    NPL.load("(gl)script/ide/TooltipHelper.lua");
+    local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
+    if(type(BroadcastHelper.Reset) == "function") then
+        BroadcastHelper.Reset();
+    end
+    AudioEngine.Init()
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/MainLogin.lua");
+    local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
+    if MainLogin then
+        MainLogin:SetWindowTitle()
+    end
+end
+
 function MobileSaveWorldPage.OnExitWorld()
     MobileSaveWorldPage.is_in_sysnc = false
+    if System.options.isOffline then
+        MobileSaveWorldPage.ClosePage()
+        MobileSaveWorldPage.on_exit_game()
+        MobileSaveWorldPage.on_exit_to_login()
+        return 
+    end
     local WorldExitDialog = NPL.load('(gl)Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
     -- if MobileSaveWorldPage.exit_world_callback then
     --     local WorldExitDialogPage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.WorldExitDialog')
@@ -200,7 +246,7 @@ function MobileSaveWorldPage.SaveName()
     local node_name = GameLogic.IsReadOnly() and "worldname" or "edit_worldname"
     local name = page and page:GetUIValue(node_name) or "";
     if name ~= MobileSaveWorldPage.worldname then
-        local temp = MyCompany.Aries.Chat.BadWordFilter.FilterString(name);
+        local temp = MyCompany.Aries.Chat.BadWordFilter.FilterString2(name);
         if temp~=name then 
             _guihelper.MessageBox(L"该世界名称不可用，请重新设定");
             return
@@ -234,7 +280,7 @@ end
 function MobileSaveWorldPage.SaveDesc(desc)
     if not desc or desc == "" then
         local desc_node_name = GameLogic.IsReadOnly() and "save_world_multilineedit" or "edit_save_world_multilineedit"
-        desc = page:GetValue(desc_node_name)
+        desc = page and page:GetValue(desc_node_name)
     end
     
     if desc ~= MobileSaveWorldPage.default_desc or not MobileSaveWorldPage.desc_uploa then

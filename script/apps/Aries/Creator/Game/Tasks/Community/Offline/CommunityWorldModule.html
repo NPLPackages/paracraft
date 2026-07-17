@@ -1,0 +1,63 @@
+<!-- script/apps/Aries/Creator/Game/Tasks/Community/CommunityWorldModule.html -->
+<body>
+    <pe:mcml>
+        <script type='text/npl'>
+            <![CDATA[
+                local CommunityWorldModule = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/Offline/CommunityWorldModule.lua")
+                CommunityWorldModule.OnInit()
+                local page = document:GetPageCtrl()
+
+                function close_page()
+                    page:CloseWindow()
+                end
+
+                function GetProjectData(index)
+                    if index == nil then
+                        return #CommunityWorldModule.project_datas
+                    else
+                        return CommunityWorldModule.project_datas[index]
+                    end
+                end
+
+                function OnClickProject(name,mcmlNode)
+                    local data = mcmlNode:GetAttribute("param1");
+                    CommunityWorldModule.OnClickProject(data)
+                end
+            ]]>
+        </script>
+        <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+            <pe:container alignment="_ct" width="850" height="550" style="margin-left:-400px;margin-top:-275px;background-color: #2e2e2e; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+                <div style="width: 850;height: 550px;">
+                    <div style="width: 850;height: 40px;margin-top: 0px;">
+                        <div style="float: left;margin-left: 12px;margin-top: 12px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;"><%=L"新建项目"%></div>
+                        <div onclick="close_page()" style="float: left;margin-left: 820px;margin-top: -20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+                    </div>
+                    <div style="position: relative; width: 850px; height: 1px; margin-top: 10px; background-color: #313131ff"></div>
+                    <div style="float: left; width: 840px; margin-left: 3px; height: 500px; margin-top: 10px;" >
+                        <div style="width: 870px; height: 500px;">
+                            <pe:gridview RememberScrollPos="true" AllowPaging="false" name="CommunityWorldModule.slot_gridview1" CellPadding="8" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="14" ItemsPerLine="4" DefaultNodeHeight = "180" 
+                                DataSource='<%=GetProjectData%>'>
+                                <Columns>
+                                    <div zorder="-3"  style=" width: 200px; height: 180px; background-color: #2E2E2E; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                        <img zorder="-2" src="<%=Eval('img_bg')%>" style="position: relative; margin-left: 0px; margin-top: 0px; width: 200px; height: 150px;"/>
+                                       
+                                        <div style="position: relative; margin-top: 156px; color: #ffffff; font-size: 16px; base-font-size: 16px; font-weight: bold; width: 200px; height: 24px; text-align: center;"><%=Eval("name")%></div>
+                                        <input type="button" value="" param1="<%=XPath('this')%>" onclick="OnClickProject" style="width: 200px; height: 180px; background: url();" />
+                                    </div>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <div style='font-weight: bold;'>
+                                        <div align='center'style='width: 160px;height: 128px; margin-top: 160px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#2 2 160 128)'>
+                                        </div>
+                                        <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: -10px; color: #A8A7B0;" ><%=L"世界模板为空"%></div>
+                                    </div>
+                                </EmptyDataTemplate>
+                            </pe:gridview>
+                        </div>
+                    </div>
+                </div>
+            </pe:container>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

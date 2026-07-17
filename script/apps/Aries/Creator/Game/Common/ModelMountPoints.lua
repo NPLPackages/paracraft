@@ -62,15 +62,43 @@ function ModelMountPoints:AddMountPoint(point)
 		end
 		point = MountPoint:new(point)
 	end
+	point.parentEntity = self.parentEntity;
 	self.points:push_back(point)
 
 	-- tricky: we will make mount point vertically spaced by default. 
 	point.name = point.name or tostring(self:GetCount());
 	point.index = self:GetCount()
 	if(autoPos) then
-		point.y = 0.4 * self:GetCount()
+		point.y = self:CalcNextMountPointHeight()
 	end
 	self:SetTransformDirty()
+end
+
+function ModelMountPoints:DeleteMountPoint(point)
+	if(self:GetCount() > 0 and point) then
+		for i = point:GetIndex(), #self.points do
+			self.points[i] = self.points[i + 1]
+			if(self.points[i]) then
+				self.points[i].index = self.points[i].index - 1
+			end
+		end
+		self:SetTransformDirty()
+	end
+end
+
+function ModelMountPoints:CalcNextMountPointHeight()
+	local y = 0;
+	local count = self:GetCount();
+	if(count < 10) then
+		y = count * 0.4;
+	else
+		for i = 1, count do
+			local mp = self:GetMountPoint(i);
+			y = math.max(y, mp.y);
+		end
+		y = y + 0.4;
+	end
+	return y;
 end
 
 function ModelMountPoints:GetMountPoint(index)
@@ -229,7 +257,7 @@ end
 function ModelMountPoints:TransformLocalPointToWorldSpace(point)
 	if(point) then
 		local worldMat = self:CalculateWorldMatrix(nil, true);
-		math3d.Vector4MultiplyMatrix(point, point, worldMat);
+		math3d.VectorMultiplyMatrix(point, point, worldMat);
 		local origin = Cameras:GetCurrent():GetRenderOrigin();
 		return point[1]+origin[1], point[2]+origin[2], point[3]+origin[3]
 	end
@@ -363,5 +391,35 @@ function ModelMountPoints:GetMountPointByXY(x, y, maxDiff)
 			closetDistSq = math.sqrt(closetDistSq);
 		end
 		return self:GetMountPoint(closetIndex), closetDistSq;
+	end
+end
+
+function ModelMountPoints:GetMountPointByName(mountname)
+	for i= 1, self:GetCount() do
+		local mountpoint = self:GetMountPoint(i);
+		if(mountpoint.name == mountname) then
+			return mountpoint;
+		end
+	end
+end
+
+function ModelMountPoints:HasAnchorPoints()
+	for i= 1, self:GetCount() do
+		local mountpoint = self:GetMountPoint(i);
+		if(mountpoint:IsAnchor()) then
+			return true;
+		end
+	end
+end
+
+function ModelMountPoints:ForEachAnchorPoint(callback)
+	for i= 1, self:GetCount() do
+		local mountpoint = self:GetMountPoint(i);
+		if(mountpoint:IsAnchor()) then
+			local breakFlag = callback(mountpoint, i);
+			if(breakFlag) then
+				break;
+			end
+		end
 	end
 end

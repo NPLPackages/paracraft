@@ -285,6 +285,30 @@ function Macros.OnWindowGUIEvent(window, event)
 	end
 end
 
+-- replace ContainerDragEnd with TextAreaDragEnd to drop code at current cursor position. 
+-- @param ctl: TextArea control object
+function Macros.OnTextAreaDropCodeAtCursor(ctl, code, bForceNewLine)
+	if(not Macros:IsRecording()) then
+		return
+	end
+	if(ctl) then
+		local cursorPos = ctl:CursorPos();
+		local lastMacro = Macros:GetLastMacro(0)
+		if (lastMacro and lastMacro.name== "ContainerDragEnd") then
+			local lastLastMacro = Macros:GetLastMacro(-1)
+			local hasTrigger;
+			if(lastLastMacro and lastLastMacro.name == "ContainerDragEndTrigger") then
+				Macros:PopMacro()
+				hasTrigger = true;
+			end
+			Macros:PopMacro()
+			local params = lastMacro:GetParams()
+			local fromUIName = params and params[1];
+			Macros:AddMacro("TextAreaDragEnd", fromUIName, ctl:GetUIName(true), code, bForceNewLine, cursorPos.line, cursorPos.pos);
+		end
+	end
+end
+
 function Macros.OnTreeViewEvent(treeviewCtrl, eventName, data)
 	if(not Macros:IsRecording()) then
 		return
@@ -626,6 +650,7 @@ function Macros:EndRecord(bHideBBS)
 	end
 	if(self.macros) then
 		local out = {};
+		out[#out+1] = "-- SetAutoPlay(true)";
 		for _, m in ipairs(self.macros) do
 			out[#out+1] = m:ToString();
 		end
@@ -685,18 +710,20 @@ function Macros:LoadMacrosFromText(text)
 
 	local last_text_duration = 0;
 	local last_total_idle = 0;
-	local add_idle = false;
+	local add_idle_between_text = false;
 
 	for line in text:gmatch("([^\r\n]*)\r?\n?") do
 		lineNumber = lineNumber + 1;
 		line = line:gsub("^%s+", "")
 
-		if (add_idle) then
+		if (add_idle_between_text) then
 			local name, params = line:match("(%w[%w%.]*)%((.*)%)");
 			if (name == "text" and params) then
+				-- this ensures that there is at least enough idle time between two text commands.
+				-- the minimum idle time is the duration of the first text command. 
 				local t = last_text_duration - last_total_idle;
 				if (t > 0) then
-					local m = Macro:new():Init(string.format("Idle(%d)", t + 200), lineNumber);
+					local m = Macro:new():Init(string.format("Idle(%d, false, 'text')", t + 200), lineNumber);
 					if (m:IsValid()) then
 						macros[#macros+1] = m;
 						lineNumber = lineNumber + 1;
@@ -713,8 +740,8 @@ function Macros:LoadMacrosFromText(text)
 		if(m:IsValid()) then
 			macros[#macros+1] = m;
 			if (m.name == "text" and m.params) then
-				if (not add_idle) then
-					add_idle = true;
+				if (not add_idle_between_text) then
+					add_idle_between_text = true;
 				end
 				last_total_idle = 0;
 				local params = type(m.params) == "table" and m.params or commonlib.split(m.params,",")
@@ -944,7 +971,7 @@ function Macros:PlayMacros(macros, fromLine, speed)
 			Macros.SetPlaySpeed(speed);
 		end
 	end
-
+	
 	self.macros = macros;
 	self.needResumePlay = false;
 

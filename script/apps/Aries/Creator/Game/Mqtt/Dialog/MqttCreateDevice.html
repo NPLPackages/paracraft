@@ -1,0 +1,43 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type='text/npl' refresh='false'>
+                <![CDATA[
+                    MqttCreateDevice = NPL.load('(gl)script/apps/Aries/Creator/Game/Mqtt/Dialog/MqttCreateDevice.lua')
+                    MqttCreateDevice.OnInit()
+
+                    local page = document:GetPageCtrl()
+                    function close()
+                        page:CloseWindow()
+                    end
+
+                    function onclickNewDevice()
+                        MqttCreateDevice.OnClickAddDevice()
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    
+                }
+            </style>
+            <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+                <pe:container alignment="_ct" width="420" height="200" style="margin-left:-210px;margin-top:-125px;background: url();">
+                    <aries:window mode='thin' title='<%= L"新增设备" %>' width='420' height='200' onclose='close()'>
+                        <div style="position: relative;margin-left: 32px; margin-top: 30px;">
+                            <div style="float: left; font-size: 15px; base-font-size: 15px; color: #ffffff; font-weight: bold;"><%=L"设备名称："%></div>
+                            <div style="float:left;margin-left:5px">
+                                <input type="text" name="text_mqtt_name_create"  class="mc_text" style="width:250px;height:24px;"/>
+                            </div>
+                        </div>
+                        
+                        <div style="position: relative; margin-left: 60px; margin-top: 100px;">
+                            <input type='button' value='<%=L"确定"%>' onclick='onclickNewDevice' class='mc_light_grey_button_with_fillet' style='float: left; color: #FFFFFF; width: 100px; height: 30px;' />
+                            <input type='button' value='<%=L"取消"%>' onclick='close' class='mc_light_grey_button_with_fillet' style='float: left; color: #FFFFFF; margin-left: 90px; width: 100px; height: 30px;' />
+                        </div>
+                    </aries:window>
+                </pe:container>
+            </pe:container>     
+        </pe:mcml>
+    </body>
+</html>

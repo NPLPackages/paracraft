@@ -80,6 +80,11 @@ function MacroRecorder.OnClickAddSubTitle()
 end
 
 function MacroRecorder.ShowMacroRecordArea(bShow)
+	if bShow then
+		GameLogic.RunCommand("/ggs user hidden")
+	else
+		GameLogic.RunCommand("/ggs user visible")
+	end
     local _parent = ParaUI.GetUIObject("RecordSafeArea");
     if(not bShow) then
         if(_parent:IsValid()) then

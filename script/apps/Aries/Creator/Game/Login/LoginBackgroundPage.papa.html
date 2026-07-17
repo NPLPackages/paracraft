@@ -6,30 +6,7 @@
         <pe:mcml>
             <script type="text/npl" refresh="false">
                 <![CDATA[
-                    showbg = Page:GetRequestParam("showbg") or "true";
-
-                    NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
-                    local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
-
-                    if System.options.channelId_431 then
-                        ClientVersion = L"帕拉卡智慧教育";
-                    else
-                        ClientVersion = string.format(L"Paracraft帕拉卡 %s(%s)", options.GetBaseVersion(), options.GetClientVersion());
-                    end
-                    LatestVersion = LatestVersion or false;
-
-                    function get_background()
-                        local filter_bg = GameLogic.GetFilters():apply_filters(
-                                            "cellar.main_login.get_login_background",
-                                            false
-                                          );
-
-                        if (filter_bg) then
-                            return filter_bg;
-                        else
-                            return "Texture/Aries/Creator/Paracraft/login_bg_32bits.png#0 0 1280 720";
-                        end
-                    end
+                    showbg = Page:GetRequestParam("showbg") or "true";                    
                 ]]>
             </script>
             <pe:if condition="<%= Eval('showbg') == 'true' %>">

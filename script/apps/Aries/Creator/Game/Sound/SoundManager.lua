@@ -8,23 +8,59 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 SoundManager:Init();
+
+-- Connect to TTS signals to pause/resume voice recording:
+-- SoundManager:Connect("ttsStarted", function() ... end);
+-- SoundManager:Connect("ttsStopped", function() ... end);
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 NPL.load("(gl)script/ide/AudioEngine/AudioEngine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+NPL.load("(gl)script/ide/System/os/Text2Audio.lua");
+local Text2Audio = commonlib.gettable("System.os.Text2Audio");
 local AudioEngine = commonlib.gettable("AudioEngine");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
-local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local UniString = commonlib.gettable("System.Core.UniString")
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+
+local SoundManager = commonlib.inherit(
+	commonlib.gettable("System.Core.ToolBase"),
+	commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager")
+);
+
+SoundManager:Property("Name", "SoundManager");
+SoundManager:Signal("ttsStarted");  -- Emitted when TTS playback starts
+SoundManager:Signal("ttsStopped");  -- Emitted when TTS playback stops
 
 local Diskfolder = nil
 
 local VoiceNarratorDefaulSpd = {
+	-- 旧版发音人
 	[10012] = 7,
-	[20011] = 7,
+	-- Microsoft 发音人默认语速
+	[20001] = 5, -- 晓晓
+	[20002] = 5, -- 云扬
+	[20003] = 5, -- 晓辰
+	[20004] = 5, -- 晓涵
+	[20005] = 5, -- 晓墨
+	[20006] = 5, -- 晓秋
+	[20007] = 5, -- 晓睿
+	[20008] = 5, -- 晓双
+	[20009] = 5, -- 晓萱
+	[20010] = 5, -- 晓颜
+	[20011] = 7, -- 晓悠
+	[20012] = 5, -- 云希
+	[20013] = 5, -- 云野
+	[20014] = 5, -- 云哲
+	[20015] = 5, -- 曉佳 (粤语)
+	[20016] = 5, -- 雲龍 (粤语)
+	[20017] = 5, -- 曉臻 (台湾)
+	[20018] = 5, -- 曉雨 (台湾)
+	[20019] = 5, -- 晓伊
+	[20021] = 5, -- 晓雨女(多语言)
 }
 
 -- 20007: 'zh-CN-XiaoruiNeural', // 晓睿 （女）
@@ -33,6 +69,12 @@ local VoiceNarratorDefaulSpd = {
 -- 20016: 'zh-HK-WanLungNeural', // 雲龍 （男）
 -- 20017: 'zh-TW-HsiaoChenNeural', // 曉臻
 -- 20018: 'zh-TW-HsiaoYuNeural', // 曉雨
+-- 20020: 'zh-CN-XiaoxiaoMultilingualNeural', //晓晓女 ,暂时不能用
+-- 20021: 'zh-CN-XiaoyuMultilingualNeural'， //晓雨女
+-- 20022: 'zh-CN-YunyiMultilingualNeural', //云伊男 ,暂时不能用
+-- 20023: 'zh-CN-YunfanMultilingualNeural', //云凡男 ,暂时不能用
+-- 20024: 'zh-CN-YunxiaoMultilingualNeural', //云晓男 ,暂时不能用
+
 
 -- 小燕	Xiaoxuan 晓萱
 -- 许久	Yunxi 云希
@@ -65,10 +107,22 @@ local PlayTextToMicrosoft = {
 	[10015] = 20002,
 }
 
+--------------------------------------------------------------------------------
+-- Constructor (called by InitSingleton)
+--------------------------------------------------------------------------------
+function SoundManager:ctor()
+	self.playingSounds = {};
+	self.ttsPlayingCount = 0;  -- Counter for nested TTS calls
+end
+
 -- @param filename: sound name or a table array of sound names. 
 function SoundManager:Init()
-	-- mapping from name to sound 
-	self.playingSounds = {};
+	if self.isInitialized then
+		return self;
+	end
+	SoundManager:InitSingleton();
+	self.isInitialized = true;
+	return self;
 end
 
 -- Stops all currently playing sounds
@@ -119,6 +173,16 @@ end
 --  one can also use the sound filename as the channel name.
 -- @param filename: if nil it is the channel_name
 function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch, play_start_cb, play_end_cb)
+	if(filename and filename:match("^https?://")) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
+		local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
+		HttpFiles.GetHttpFilePath(filename, function(err, diskfilename) 
+			if(diskfilename) then
+				self:PlaySound(channel_name, diskfilename, from_time, volume, pitch, play_start_cb, play_end_cb);
+			end
+		end)
+		return
+	end
     local sound_name = channel_name;
 	local sound = self.playingSounds[sound_name];
 	if(filename) then
@@ -133,6 +197,9 @@ function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch
 				filename = nil;
 			end
 		end
+	end
+	if not sound_name then
+		return
 	end
     if (sound) then
         if(filename and sound.file ~= filename) then
@@ -432,7 +499,8 @@ end
 -- @param play_end_cb: 播放结束时的回调
 -- @param prepare_cb: 下载音效完成后的回调
 -- @param play_entity: 播放音效的entity对象 3d音效
-function SoundManager:PlayText(text,  voiceNarrator, nTimeoutSeconds, channel, play_start_cb, play_end_cb, prepare_cb, play_entity)
+-- @param speed: 语速 [1-10], 默认为5，数字越大语速越快
+function SoundManager:PlayText(text, voiceNarrator, nTimeoutSeconds, channel, play_start_cb, play_end_cb, prepare_cb, play_entity, speed)
 	if nil == text or text == "" or text == '""' then
 		return
 	end
@@ -442,49 +510,149 @@ function SoundManager:PlayText(text,  voiceNarrator, nTimeoutSeconds, channel, p
 		voiceNarrator = 0;
 	end
 	nTimeoutSeconds = nTimeoutSeconds or 7
+	
+	-- 语速参数处理 [1-10]
+	speed = tonumber(speed)
+	if speed then
+		speed = math.max(1, math.min(10, speed))
+	end
 
 	-- 一部分参数转变
 	if PlayTextToMicrosoft[voiceNarrator] then
 		voiceNarrator = PlayTextToMicrosoft[voiceNarrator]
 	end
-
+	
+	-- Emit ttsPreparing signal BEFORE starting download
+	-- This allows VoiceContextManager to pause recording during download
+	self.ttsPlayingCount = (self.ttsPlayingCount or 0) + 1;
+	self:ttsStarted();
+	local ttsSignalEmitted = true;  -- Track if we've emitted the signal
+	
 	local start_timestamp = commonlib.TimerManager.GetCurrentTime();
-	self:PrepareText(text,  voiceNarrator, function(file_path)
+	self:PrepareText(text, voiceNarrator, function(file_path)
 		if (commonlib.TimerManager.GetCurrentTime() - start_timestamp)/1000 > nTimeoutSeconds then
+			-- Timeout - emit ttsStopped to balance the ttsStarted
+			if ttsSignalEmitted then
+				self.ttsPlayingCount = math.max(0, (self.ttsPlayingCount or 1) - 1);
+				self:ttsStopped();
+			end
 			if prepare_cb then
 				prepare_cb(false)
 			end
 			if play_end_cb then
 				play_end_cb(false)
 			end
+			LOG.std(nil, "info", "SoundManager", "PlayText download text voice data timeout, text:%s, voiceNarrator:%s", text, tostring(voiceNarrator))
 			return
 		end
 
 		channel = channel or "playtext" .. voiceNarrator
 		self:SetPlayTextChannel(channel)
+		
+		-- Wrap callbacks - note: ttsStarted already emitted at PlayText start
+		-- wrapped_start_cb just calls user callback, no need to emit again
+		local wrapped_start_cb = function(...)
+			-- ttsStarted already emitted at PlayText start, just call user callback
+			if play_start_cb then
+				play_start_cb(...);
+			end
+		end
+		
+		local wrapped_end_cb = function(...)
+			-- Emit ttsStopped to balance the ttsStarted from PlayText start
+			self.ttsPlayingCount = math.max(0, (self.ttsPlayingCount or 1) - 1);
+			self:ttsStopped();
+			if play_end_cb then
+				play_end_cb(...);
+			end
+		end
+		
 		if play_entity then
-			self:PlayEntitySound(file_path, play_entity, 5, nil, nil, false, play_start_cb, play_end_cb, true, channel, true)
+			self:PlayEntitySound(file_path, play_entity, 5, nil, nil, false, wrapped_start_cb, wrapped_end_cb, true, channel, true)
 		else
-			self:PlaySound(channel, file_path, nil, nil, nil, play_start_cb, play_end_cb)
+			self:PlaySound(channel, file_path, nil, nil, nil, wrapped_start_cb, wrapped_end_cb)
 		end
 
 		if prepare_cb then
 			prepare_cb(true, channel)
 		end
 	end,function()
+		LOG.std(nil, "info", "SoundManager", "PlayText download text voice data fail, text:%s, voiceNarrator:%s", text, tostring(voiceNarrator))
+		-- Try fallback to SpeekText (which will manage its own TTS signals)
+		if self:SpeekText(text, voiceNarrator, play_start_cb, play_end_cb, prepare_cb, play_entity, speed) then
+			-- SpeekText succeeded, it will handle the TTS signals, so emit ttsStopped to balance our ttsStarted
+			self.ttsPlayingCount = math.max(0, (self.ttsPlayingCount or 1) - 1);
+			self:ttsStopped();
+			return
+		end
+		-- Both download and SpeekText failed - emit ttsStopped to balance the ttsStarted
+		self.ttsPlayingCount = math.max(0, (self.ttsPlayingCount or 1) - 1);
+		self:ttsStopped();
 		if prepare_cb then
 			prepare_cb(false)
 		end
 		if play_end_cb then
 			play_end_cb(false)
 		end
-	end)
+	end, speed)
+end
+
+-- @param text: 合成文本
+-- @param voiceNarrator: 发音人
+-- @param play_start_cb: 播放开始回调
+-- @param play_end_cb: 播放结束回调
+-- @param prepare_cb: 准备完成回调
+-- @param play_entity: 3D音效实体
+-- @param speed: 语速 [1-10], 默认为5 (注意: 本地TTS可能不支持语速调整)
+function SoundManager:SpeekText(text, voiceNarrator, play_start_cb, play_end_cb, prepare_cb, play_entity, speed)
+	if not Text2Audio.IsSupport() then
+		return false
+	end
+	local key = self:GetPlayTextMd5(text, voiceNarrator, speed)
+	if not self.speeks then
+		self.speeks = {}
+	end
+	if not self.speeks[key] then
+		self.speeks[key] = {
+			play_start_cb = play_start_cb,
+			play_end_cb = play_end_cb,
+			prepare_cb = prepare_cb,
+			play_entity = play_entity,
+			voiceNarrator = voiceNarrator,
+			text = text,
+			md5_value = key,
+			speed = speed,
+		}
+	end
+	
+	-- Emit ttsStarted signal
+	self.ttsPlayingCount = (self.ttsPlayingCount or 0) + 1;
+	self:ttsStarted();
+	
+	if self.speeks[key] and self.speeks[key].play_start_cb then
+		self.speeks[key].play_start_cb(true)
+	end
+	
+	-- 本地TTS播放，speed参数传递给Text2Audio (如果API支持)
+	Text2Audio.PlayText(text, function()
+		-- Emit ttsStopped signal
+		self.ttsPlayingCount = math.max(0, (self.ttsPlayingCount or 1) - 1);
+		self:ttsStopped();
+		
+		if self.speeks[key] and self.speeks[key].play_end_cb then
+			self.speeks[key].play_end_cb(true)
+		end
+		self.speeks[key] = nil
+	end, speed);
+	return true
 end
 
 -- @param text: 合成文本
 -- @param voiceNarrator: 发音人, 0为女声，1为男声， 3为情感合成-逍遥，4为情感合成-丫丫，默认为丫丫(女童音)
 -- @param callbackFunc: 下载声音后的回调函数
-function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc,onFail)
+-- @param onFail: 下载失败的回调函数
+-- @param speed: 语速 [1-10], 默认为5
+function SoundManager:PrepareText(text, voiceNarrator, callbackFunc, onFail, speed)
 	if nil == text or text == "" or text == '""' then
 		return
 	end
@@ -494,17 +662,16 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc,onFail)
 		GameLogic.AddBBS(nil, L"该文本超过字数上限，最多200个文字");
 		return
 	end
-
-	voiceNarrator = voiceNarrator or 10012
+	if not voiceNarrator or voiceNarrator == "" or not tonumber(voiceNarrator) then
+		voiceNarrator = 10012
+	end
 	voiceNarrator = tonumber(voiceNarrator)
-	
-	-- 一部分参数转变
 	if PlayTextToMicrosoft[voiceNarrator] then
 		voiceNarrator = PlayTextToMicrosoft[voiceNarrator]
 	end
 	
-	local md5_value = self:GetPlayTextMd5(text, voiceNarrator)
-	-- 检测是否有本地文件
+	-- 缓存 key 必须包含 speed，否则不同语速会返回错误的缓存音频
+	local md5_value = self:GetPlayTextMd5(text, voiceNarrator, speed)
 	local file_path = SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
 	if file_path then
 		if callbackFunc then
@@ -513,25 +680,32 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc,onFail)
 		return
 	end
 
-	-- 判断cdn上有无缓存
+	-- 判断cdn上有无缓存 (注意: CDN缓存只对默认语速有效)
+	-- 如果指定了自定义语速，跳过CDN缓存检查直接下载
+	local defaultSpd = VoiceNarratorDefaulSpd[voiceNarrator] or 5
+	local useCustomSpeed = speed and speed ~= defaultSpd
+	if useCustomSpeed then
+		-- 自定义语速，直接下载
+		self:DownloadSound(text, voiceNarrator, md5_value, function(download_data)
+			if type(download_data)~="string" then 
+				return
+			end
+			LOG.std(nil, "info", "SoundManager", "download text voice data success (custom speed), text:%s, voiceNarrator:%s, speed:%s", text, tostring(voiceNarrator), tostring(speed))
+			local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, download_data)
+			if callbackFunc then
+				callbackFunc(file_path)
+			end
+		end, onFail, speed)
+		return
+	end
+	
 	local httpwrapper_version = HttpWrapper.GetDevVersion();
-	local url = httpwrapper_version == "ONLINE" and "http://qiniu-audio.keepwork.com" or "http://qiniu-audio-dev.keepwork.com"
+	local url = httpwrapper_version == "ONLINE" and "https://qiniu-audio.keepwork.com" or "https://qiniu-audio-dev.keepwork.com"
 	url = string.format("%s/%s?%s", url, md5_value, math.random(1, 100))
 
 	System.os.GetUrl(url, function(err, msg, data)
 		if err == 200 and data then
 			if type(data)~="string" then 
-				keepwork.burieddata.uploadLog({
-					type = "NPLDebug",
-					logs = {
-						file = "script/apps/Aries/Creator/Game/Sound/SoundManager.lua",
-						line = "514",
-						msg = "System.os.GetUrl, download text voice data is not string",
-						url = url,
-					}
-				},function(err,msg,data)
-					
-				end)
 				if onFail then
 					onFail()
 				end
@@ -544,42 +718,34 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc,onFail)
 		else
 			self:DownloadSound(text, voiceNarrator, md5_value, function(download_data)
 				if type(download_data)~="string" then 
-					keepwork.burieddata.uploadLog({
-						type = "NPLDebug",
-						logs = {
-							file = "script/apps/Aries/Creator/Game/Sound/SoundManager.lua",
-							line = "534",
-							msg = "self:DownloadSound ,download text voice data is not string",
-							url = url,
-						}
-					},function(err,msg,data)
-						
-					end)
 					return
 				end
+				LOG.std(nil, "info", "SoundManager", "download text voice data success, text:%s, voiceNarrator:%s, md5_value:%s", text, tostring(voiceNarrator), md5_value)
 				local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, download_data)
 				if callbackFunc then
 					callbackFunc(file_path)
 				end
-			end,onFail)
+			end, onFail, speed)
 		end
 	end);
-
-	-- if GameLogic.IsVip() or GameLogic.IsReadOnly() then
-
-	-- elseif not GameLogic.IsReadOnly() then
-	-- 	self:DownloadSoundByBaiDu("您需要成为会员才能播放这段文字", callbackFunc)
-	-- end
 end
 
 function SoundManager:StopPlayText()
 	if self.playtext_sound_channel then
 		local sound_name = self.playtext_sound_channel;
+		local wasPlaying = self.playingSounds[sound_name] ~= nil;
 		if (self.playingSounds[sound_name]) then
 			AudioEngine.Stop(sound_name);
 			self.playingSounds[sound_name] = nil;
 		end
 		self.playtext_sound_channel = nil
+		
+		-- Emit ttsStopped signal to balance any pending ttsStarted
+		-- This ensures VoiceContextManager can resume recording
+		if wasPlaying and self.ttsPlayingCount > 0 then
+			self.ttsPlayingCount = math.max(0, (self.ttsPlayingCount or 1) - 1);
+			self:ttsStopped();
+		end
 	end
 end
 
@@ -637,9 +803,10 @@ function SoundManager:GetPlayTextFileSuffix(voiceNarrator)
 	return ".mp3"
 end
 
-function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback,onFail)
+function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback, onFail, speed)
 	-- 没登录的话不允许请求这个接口
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+		LOG.std(nil, "error", "SoundManager", "user not signed in, can not download text voice data, text:%s, voiceNarrator:%s, md5_value:%s", text, tostring(voiceNarrator), md5_value)
 		if onFail then
 			onFail()
 		end
@@ -647,8 +814,9 @@ function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback,onF
     end
 
 
-	local spd = VoiceNarratorDefaulSpd[voiceNarrator] or 5
-
+	-- 优先使用传入的speed参数，否则使用默认值
+	local spd = speed or VoiceNarratorDefaulSpd[voiceNarrator] or 5
+	LOG.std(nil, "info", "SoundManager", "download text voice data, text:%s, voiceNarrator:%s, md5_value:%s, spd:%s", text, tostring(voiceNarrator), md5_value, tostring(spd))
 	keepwork.user.playtext({
 		text = text,
 		key = md5_value,
@@ -721,13 +889,21 @@ function SoundManager:GetSoundDuration(channel_name, filename)
     end
 end
 
-function SoundManager:GetPlayTextMd5(text, voiceNarrator)
-	local spd = VoiceNarratorDefaulSpd[voiceNarrator]
-	if spd and spd ~= 5 then
-		return ParaMisc.md5(string.format("%s_%s_%s", text, voiceNarrator, spd))
+function SoundManager:GetPlayTextMd5(text, voiceNarrator, speed)
+	-- 优先使用传入的speed，否则使用默认值
+	local spd = speed or VoiceNarratorDefaulSpd[voiceNarrator] or 5
+	local key_parts = {text}
+	
+	-- 添加速度参数(如果不是默认值5)
+	if spd ~= 5 then
+		table.insert(key_parts, spd)
 	end
 	
-	return ParaMisc.md5(string.format("%s_%s", text, voiceNarrator, spd))
+	-- 生成基础MD5
+	local base_md5 = ParaMisc.md5(table.concat(key_parts, "_"))
+	local result = "paracraft/" .. base_md5 .. "_" .. voiceNarrator
+	
+	return result
 end
 
 function SoundManager:GetPlayTextDiskFolder()

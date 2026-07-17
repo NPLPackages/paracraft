@@ -35,11 +35,11 @@ end
         <input type="button" name="title" value='<%=SelectBlocks.GetBlockCountText() %>' style="background:;font-size:12px;width:120px;color:#cccccc"/>
     </div>
     <div style="margin-top:2px;">
-        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"保存"%>' tooltip='<%=L"存为模板"%>' uiname="SelectBlocksTask.btn_template" name="btn_template" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
-        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"删除"%>' tooltip='<%=L"全部删除(快捷键 Del)"%>' uiname="SelectBlocksTask.delete" name="delete" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
-        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"全选"%>' tooltip='<%=L"选择上方全部联通的方块. 快捷键Ctrl+A\nCtrl+shift+click切换单选\nCtrl+alt+click过滤同种方块"%>' uiname="SelectBlocksTask.btn_selectall" name="btn_selectall" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"保存"%>' uiname="SelectBlocksTask.btn_template" name="btn_template" tooltip='<%=L"存为模板"%>' onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"删除"%>' uiname="SelectBlocksTask.delete" name="delete" tooltip='<%=L"全部删除(快捷键 Del)"%>' onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"全选"%>' uiname="SelectBlocksTask.btn_selectall" name="btn_selectall" tooltip='<%=L"选择上方全部联通的方块. 快捷键Ctrl+A\nCtrl+shift+click切换单选\nCtrl+alt+click过滤同种方块"%>' onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
         <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"镜像"%>' uiname="SelectBlocksTask.btn_mirror" name="btn_mirror" tooltip='<%=L"Alt+左键设定参考点"%>' onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
-        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"变换"%>' tooltip='<%=L"shift+左键移动到鼠标所在位置\nShift+点击下方箭头拉伸(-/+)\n放大/缩小(Ctrl -/+)"%>' uiname="SelectBlocksTask.btn_transform" name="btn_transform" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"变换"%>' uiname="SelectBlocksTask.btn_transform" name="btn_transform" tooltip='<%=L"shift+左键移动到鼠标所在位置\nShift+点击下方箭头拉伸(-/+)\n放大/缩小(Ctrl -/+)"%>' onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
         <pe:if condition='<%=SelectBlocks.selected_count == 1 %>'>
             <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"编程"%>' tooltip='<%=L"进入编程模式"%>' name="NeuronMode" uiname="SelectBlocksTask.EnterNeuronEditMode" onclick="SelectBlocks.EnterNeuronEditMode" class="mc_light_grey_button_with_fillet"/>
         </pe:if>
@@ -48,6 +48,9 @@ end
         </pe:if>
         <pe:if condition='<%=SelectBlocks.selected_count > 1 %>'>
             <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"分享"%>' tooltip='<%=L"点击后分享给好友"%>' uiname="SelectBlocksTask.btn_share" name="btn_share" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        </pe:if>
+        <pe:if condition='<%=SelectBlocks.selected_count == 0 and SelectBlocks.liveEntityCount == 1%>'>
+            <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"编辑"%>' tooltip='<%=L"编辑"%>' name="editentity" uiname="SelectBlocksTask.editentity" onclick="SelectBlocks.OnClickEditEntity" class="mc_light_grey_button_with_fillet"/>
         </pe:if>
     </div>
     <div style="margin-left:12px;margin-top:4px;height:60px;">

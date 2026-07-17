@@ -47,6 +47,9 @@ function Entity:ctor()
 	self.inventory:SetParentEntity(self);
 
 	self:SetRuleBagSize(16);
+	
+	-- Initialize teleport position list
+	self.tp_list = {};
 end
 
 -- bool: whether has command panel
@@ -85,6 +88,11 @@ function Entity:LoadFromXMLNode(node)
 	if (generatorName == "paraworld" and not System.options.isPapaAdventure) then
 		ParaWorldNPC.LoadNPCFromHomePoint(node);
 	end
+	for _, subnode in ipairs(node) do 
+		if(subnode.name == "teleport_list") then
+			self.tp_list = NPL.LoadTableFromString(subnode[1] or "");
+		end
+	end
 end
 
 function Entity:SaveToXMLNode(node, bSort)
@@ -96,6 +104,9 @@ function Entity:SaveToXMLNode(node, bSort)
 			npcList[i] = {name = 'npc', attr = ParaWorldNPC.npcList[i]};
 		end
 		node[#node+1] = npcList;
+	end
+	if(self.tp_list) then
+		node[#node+1] = {[1]=commonlib.serialize_compact(self.tp_list, bSort), name="teleport_list"};
 	end
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	return node;
@@ -176,6 +187,12 @@ function Entity:GetNewItemsList()
 	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.CommandLine,1);
 	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.Code,1);
 	return itemStackArray;
+end
+
+-- get teleport position list
+function Entity:GetPosList()
+	self.tp_list = self.tp_list or {};
+	return self.tp_list;
 end
 
 -- called every frame

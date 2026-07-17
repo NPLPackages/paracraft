@@ -11,17 +11,21 @@ NPL.load("(gl)script/ide/System/localserver/localserver.lua");
 
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 
-if System.options.channelId_431 then
+if System.options.isEducatePlatform then
     --http://yapi.kp-para.cn/project/32/interface/api/cat_97
     HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/edu/users/login", "POST", false)
 else
     HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/users/login", "POST", false)
 end
 
+--班级码登录
+--http://yapi.kp-para.cn/project/655/interface/api/7673
+HttpWrapper.Create("keepwork.classcode.login", "%MAIN%/core/v0/edu/users/loginByCode", "POST", false)
+
 --http://yapi.kp-para.cn/project/32/interface/api/5593
 HttpWrapper.Create("keepwork.user.judgeTokenEnough", "%MAIN%/core/v0/user/judgeTokenEnough", "GET", true)
 
-if System.options.channelId_431 then
+if System.options.isEducatePlatform then
 --http://yapi.kp-para.cn/project/32/interface/api/492
     HttpWrapper.Create("keepwork.user.profile", "%MAIN%/core/v0/edu/users/profile", "GET", true)
 else
@@ -32,7 +36,14 @@ end
 HttpWrapper.Create("keepwork.user.setinfo", "%MAIN%/core/v0/users/:id", "PUT", true);
 
 --http://yapi.kp-para.cn/project/32/interface/api/2552
-HttpWrapper.Create("keepwork.user.getinfo", "%MAIN%/core/v0/users/:id/detail", "GET", true, nil,
+HttpWrapper.Create("keepwork.user.getinfo", "%MAIN%/core/v0/users/:id/detail_mini", "GET", true, nil,
+-- PreProcessor
+HttpWrapper.default_prepFunc,
+-- Post Processor
+HttpWrapper.default_postFunc
+)
+
+HttpWrapper.Create("keepwork.user.getinfoFull", "%MAIN%/core/v0/users/:id/detail", "GET", true, nil,
 -- PreProcessor
 HttpWrapper.default_prepFunc,
 -- Post Processor
@@ -82,6 +93,12 @@ HttpWrapper.Create("keepwork.user.buySingleSkinUseBean", "%MAIN%/core/v0/clothes
 
 -- 查询
 HttpWrapper.Create("keepwork.user.search", "%MAIN%/core/v0/users/search", "POST", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/4397
+-- 根据用户ID获取用户信息(多人)
+HttpWrapper.Create("keepwork.user.getUsersByIds", "%MAIN%/core/v0/users/getUsersByIds", "POST", true)
+
+
 
 -- 是否关注(多人)
 HttpWrapper.Create("keepwork.user.focus", "%MAIN%/core/v0/favorites/search", "POST", true)

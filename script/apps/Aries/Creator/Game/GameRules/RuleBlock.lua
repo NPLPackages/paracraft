@@ -34,7 +34,10 @@ function RuleBlock:Init(rule_name, rule_params)
 	local name, value = rule_name:match("^(%w+)%s+(.*)$");
 	if(not name) then	
 		return
-	elseif(name == "CanPlace") then
+	end
+	self.name = name
+	self.value = value
+	if(name == "CanPlace") then
 		local from_block, to_block = value:match("^(%S+)%s+(.*)$");
 		if(from_block and to_block) then
 			if(self:SetCanPlace(from_block, to_block)) then

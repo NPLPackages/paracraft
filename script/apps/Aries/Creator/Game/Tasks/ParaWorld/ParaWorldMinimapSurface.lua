@@ -314,7 +314,7 @@ end
 
 -- @return true if we have finished drawing
 function ParaWorldMinimapSurface:DrawSome(painter)
-	if self.map_left then
+	if not self.map_left then
 		return
 	end
 	local step_size = self.step_size or 1;
@@ -330,7 +330,6 @@ function ParaWorldMinimapSurface:DrawSome(painter)
 	while (true) do
 		local color = self:GetHighmapColor(from_x+self.last_x*step_size, from_y+self.last_y*step_size);
 		if(color) then
-			-- echo({color,from_x+self.last_x*step_size, from_y+self.last_y*step_size})
 			painter:SetPen(color);
 			painter:DrawRect(self:x() + width - self.last_y*block_size, self:y() + height - self.last_x*block_size, block_size, block_size);
 		end

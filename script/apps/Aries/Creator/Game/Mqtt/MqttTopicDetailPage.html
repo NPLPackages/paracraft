@@ -1,0 +1,356 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type='text/npl' refresh='true'>
+                <![CDATA[
+                    MqttTopicDetailPage = NPL.load('(gl)script/apps/Aries/Creator/Game/Mqtt/MqttTopicDetailPage.lua')
+                    MqttTopicDetailPage.OnInit()
+
+                    local page = document:GetPageCtrl()
+                    function close()
+                        page:CloseWindow()
+                        --MqttTopicDetailPage.RefreshPage()
+                    end
+
+                    
+                    function DS_TopicList(index)
+                        if index == nil then
+                            return #MqttTopicDetailPage.mqttTopicList
+                        else
+                            return MqttTopicDetailPage.mqttTopicList[index]
+                        end
+                    end
+
+                    function load_topic_more()
+                        MqttTopicDetailPage.LoadTopicMore(Eval("index"))
+                    end
+
+                    function onclickTopicClear(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            MqttTopicDetailPage.OnClickTopicClear(index)
+                        end
+                    end
+
+                    function GetProjectName()
+                        return "测试项目"
+                    end
+
+                    function OnClickPreYear(name)
+                        MqttTopicDetailPage.cur_year = MqttTopicDetailPage.cur_year - 1
+                        print("preyea=========",MqttTopicDetailPage.cur_year,name)
+                        MqttTopicDetailPage.RefreshPage()
+                    end
+                    function OnClickNextYear(name)
+                    print("nextyea=========",MqttTopicDetailPage.cur_year,name)
+                        MqttTopicDetailPage.cur_year = MqttTopicDetailPage.cur_year + 1
+                        MqttTopicDetailPage.RefreshPage()
+                    end
+                    function OnClickPreMonth(name)
+                        --MqttTopicDetailPage.OnClickPreMonth()
+                        MqttTopicDetailPage.cur_month = MqttTopicDetailPage.cur_month - 1
+                        if  MqttTopicDetailPage.cur_month == 0 then
+                            MqttTopicDetailPage.cur_month = 12
+                            MqttTopicDetailPage.cur_year = MqttTopicDetailPage.cur_year - 1
+                        end
+                        MqttTopicDetailPage.RefreshPage()
+                    end
+                    function OnClickNextMonth(name)
+                        --print("name=======",name)
+                        MqttTopicDetailPage.cur_month = MqttTopicDetailPage.cur_month + 1
+                        if  MqttTopicDetailPage.cur_month > 12 then
+                            MqttTopicDetailPage.cur_month = 1
+                            MqttTopicDetailPage.cur_year = MqttTopicDetailPage.cur_year + 1
+                        end
+                        MqttTopicDetailPage.RefreshPage()
+                        --MqttTopicDetailPage.OnClickNextMonth()
+                    end
+                    function OnClickDay(name)
+                        --print("name===========",name)
+                        MqttTopicDetailPage.OnClickDay(name)
+                    end
+
+                    function GetCurrYear()
+                        return MqttTopicDetailPage.cur_year
+                    end
+                    function GetCurrMonth()
+                        return MqttTopicDetailPage.cur_month
+                    end
+
+                    function GetNextYear()
+                        return MqttTopicDetailPage.cur_year1
+                    end
+                    function GetNextMonth()
+                        return MqttTopicDetailPage.cur_month1
+                    end
+
+                    function OnClickPreYear1(name)
+                        MqttTopicDetailPage.cur_year1 = MqttTopicDetailPage.cur_year1 - 1
+                        MqttTopicDetailPage.RefreshPage()
+                    end
+                    function OnClickNextYear1(name)
+                        MqttTopicDetailPage.cur_year1 = MqttTopicDetailPage.cur_year1 + 1
+                        MqttTopicDetailPage.RefreshPage()
+                    end
+                    function OnClickPreMonth1(name)
+                        MqttTopicDetailPage.cur_month1 = MqttTopicDetailPage.cur_month1 - 1
+                        if  MqttTopicDetailPage.cur_month1 == 0 then
+                            MqttTopicDetailPage.cur_month1 = 12
+                            MqttTopicDetailPage.cur_year1 = MqttTopicDetailPage.cur_year1 - 1
+                        end
+                        MqttTopicDetailPage.RefreshPage()
+                    end
+                    function OnClickNextMonth1(name)
+                        MqttTopicDetailPage.cur_month1 = MqttTopicDetailPage.cur_month1 + 1
+                        if  MqttTopicDetailPage.cur_month1 > 12 then
+                            MqttTopicDetailPage.cur_month1 = 1
+                            MqttTopicDetailPage.cur_year1 = MqttTopicDetailPage.cur_year1 + 1
+                        end
+                        MqttTopicDetailPage.RefreshPage()
+                    end
+                    function OnClickDay1(name)
+                        --print("name===========",name)
+                        MqttTopicDetailPage.OnClickDay1(name)
+                    end
+
+                    function IsShowCalendar()
+                        return MqttTopicDetailPage.mIsShowCalendar 
+                    end
+
+                    function IsShowCalendar1()
+                        return MqttTopicDetailPage.mIsShowCalendar1 
+                    end
+
+                    function OnClickShowCalendar(name)
+                        MqttTopicDetailPage.OnClickShowCalendar(name)
+                    end
+
+                    function onclickSearch()
+                        MqttTopicDetailPage.OnClickSearch()
+                    end
+
+                    function onclickClearSearch()
+                        MqttTopicDetailPage.OnClickClearSearch()
+                    end
+
+                    function GetProjectName()
+                        return MqttTopicDetailPage.mqttProjectData and MqttTopicDetailPage.mqttProjectData.name or "测试项目"
+                    end
+
+                    function GetTopicName()
+                        return MqttTopicDetailPage.mqttTopicData and MqttTopicDetailPage.mqttTopicData.desc or "测试主题"
+                    end
+
+                    function DS_TopicDataList(index)
+                        if index == nil then
+                            return #MqttTopicDetailPage.mqttShowTopicDataList
+                        else
+                            return MqttTopicDetailPage.mqttShowTopicDataList[index]
+                        end
+                    end
+
+                    function GetLimitMsg(msg)
+                        if msg == nil or msg == "" then
+                            return ""
+                        end
+                        local fontName = "System;12;norm"
+                        local maxWidth = 350
+                        local width = _guihelper.GetTextWidth(msg, fontName)
+                        local isUtf8String = commonlib.IsUtf8String(msg)
+                        if width > maxWidth then
+                            local trimText = isUtf8String and _guihelper.TrimUtf8TextByWidth(msg, maxWidth, fontName) or _guihelper.AutoTrimTextByWidth(msg, maxWidth, fontName)
+                            return trimText.."..."
+                        end
+                        return msg
+                    end
+
+                    function IsLimitMsg(msg)
+                        if msg == nil or msg == "" then
+                            return false
+                        end
+                        local fontName = "System;12;norm"
+                        local width = _guihelper.GetTextWidth(msg, fontName)
+                        return width and width > 350
+                    end
+
+                    function IsLittleSize()
+                        return MqttTopicDetailPage.mqttShowTopicDataList and #MqttTopicDetailPage.mqttShowTopicDataList < 11
+                    end
+
+                    function onclickDetail(name)
+                        local index = name and tonumber(name)
+                        if index then
+                            local topicData = MqttTopicDetailPage.mqttShowTopicDataList[index]
+                            if topicData then
+                                MqttTopicDetailPage.OnClickDetail(topicData)
+                            end
+                        end
+                    end
+
+                    function IsLimitDeviceName(name)
+                        if name == nil or name == "" then
+                            return false
+                        end
+                        local fontName = "System;12;norm"
+                        local width = _guihelper.GetTextWidth(name, fontName)
+                        return width and width > 100
+                    end
+
+                    function GetLimitDeviceName(name)
+                        return commonlib.GetLimitLabelByTextWidth(name,100,"System;12;norm")
+                    end
+
+                    function onclickRefresh()
+                        MqttTopicDetailPage.OnClickRefresh()
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    flat_button = {
+                        color = "#cccccc",
+                        ["margin-top"] = 0,
+                        background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8"
+                    },
+                }
+            </style>
+            <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+                <pe:container alignment="_ct" width="900" height="520" style="margin-left:-450px;margin-top:-260px;background: ;">
+                    <aries:window mode='thin' title='<%= L"查看详情" %>' width='900' height='520' onclose='close()'>
+                        <div style="height: 120px;">
+                            <div style="margin-left: 20px; margin-top: 10px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=L"搜索"%></div>
+                            <div style="float: left; margin-left: 32px; margin-top: 10px;">
+                                <div style="float: left; font-size: 15px; base-font-size: 15px; color: #ffffff; font-weight: bold;"><%=L"设备"..'：'%></div>
+                                <div style="float:left;margin-left:5px">
+                                    <input type="text" name="text_mqtt_device"  value="<%=MqttTopicDetailPage.search_device_name%>" class="mc_text" style="width:150px;height:24px;"/>
+                                </div>
+                            </div>
+                            <div style="float: left; margin-left: 42px; margin-top: 10px;">
+                                <div style="float: left; font-size: 15px; base-font-size: 15px; color: #ffffff; font-weight: bold;"><%=L"时间"..'：'%></div>
+                                <div style="float:left;margin-left:5px">
+                                    <input type="text" name="text_mqtt_time_start" value="<%=MqttTopicDetailPage.search_timeStart%>"  class="mc_text" style="width:150px;height:24px;"/>
+                                </div>
+                                <pe:if condition="<%=IsShowCalendar()%>">
+                                    <input type="button" zorder="2" name="calendar1" onclick="OnClickShowCalendar" style="float: left; margin-top: 4px; margin-left: -20px; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/Activity/wintercamp/huishang_45x40_32bits.png#0 0 45 40);" />
+                                </pe:if>
+                                <pe:if condition="<%=not IsShowCalendar()%>">
+                                    <input type="button" zorder="2" name="calendar2" onclick="OnClickShowCalendar" style="float: left; margin-top: 4px; margin-left: -20px; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/Activity/wintercamp/huixia_45x40_32bits.png#0 0 45 40);" />
+                                </pe:if>
+                                <pe:container uiname="calendar_container_start" zorder="2" visible="false" style="position: relative; margin-left: 52px; width: 200px; height: 200px;">
+                                    <kp:calendar 
+                                        year_value="<%=GetCurrYear()%>" 
+                                        month_value="<%=GetCurrMonth()%>" 
+                                        on_preyear="OnClickPreYear" 
+                                        on_nextyear="OnClickNextYear" 
+                                        on_premonth="OnClickPreMonth" 
+                                        on_nextmonth="OnClickNextMonth" 
+                                        on_click_day="OnClickDay"  
+                                        style="width: 200px; 
+                                            height: 200px; 
+                                            background: url(Texture/Aries/Creator/paracraft/Educate/shurukuang_46x46_32bits.png#0 0 46 46: 20 20 20 20);">
+                                        
+                                    </kp:calendar>
+                                </pe:container>
+                            </div>
+
+                            <div style="float: left; margin-left: 10px; margin-top: 10px;">
+                                <div style="float: left; font-size: 15px; base-font-size: 15px; color: #ffffff; font-weight: bold;"><%=L"到"%></div>
+                                <div style="float:left;margin-left:10px">
+                                    <input type="text" name="text_mqtt_time_end" value="<%=MqttTopicDetailPage.search_timeEnd%>"  class="mc_text" style="width:150px;height:24px;"/>
+                                </div>
+                                <pe:if condition="<%=IsShowCalendar1()%>">
+                                    <input type="button" zorder="2" name="calendar3" onclick="OnClickShowCalendar" style="float: left; margin-top: 4px; margin-left: -20px; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/Activity/wintercamp/huishang_45x40_32bits.png#0 0 45 40);" />
+                                </pe:if>
+                                <pe:if condition="<%=not IsShowCalendar1()%>">
+                                    <input type="button" zorder="2" name="calendar4" onclick="OnClickShowCalendar" style="float: left; margin-top: 4px; margin-left: -20px; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/Activity/wintercamp/huixia_45x40_32bits.png#0 0 45 40);" />
+                                </pe:if>
+                                <pe:container uiname="calendar_container_end" zorder="2" visible="false" style="position: relative; margin-left: 26px; width: 200px; height: 200px;">
+                                    <kp:calendar 
+                                        year_value="<%=GetNextYear()%>" 
+                                        month_value="<%=GetNextMonth()%>" 
+                                        on_preyear="OnClickPreYear1" 
+                                        on_nextyear="OnClickNextYear1" 
+                                        on_premonth="OnClickPreMonth1" 
+                                        on_nextmonth="OnClickNextMonth1" 
+                                        on_click_day="OnClickDay1"  
+                                        style="width: 200px; 
+                                            height: 200px; 
+                                            background: url(Texture/Aries/Creator/paracraft/Educate/shurukuang_46x46_32bits.png#0 0 46 46: 20 20 20 20);">
+                                        
+                                    </kp:calendar>
+                                </pe:container>
+                            </div>
+
+                            <div style="position: relative; margin-left: 32px; margin-top: 18px;">
+                                <div style="float: left; font-size: 15px; base-font-size: 15px; color: #ffffff; font-weight: bold;"><%=L"数据"..'：'%></div>
+                                <div style="float:left;margin-left:5px">
+                                    <input type="text" name="text_mqtt_device_data" value="<%=MqttTopicDetailPage.search_device_data%>"  class="mc_text" style="width:150px;height:24px;"/>
+                                </div>
+                            </div>
+
+                            <div style="float: left; margin-left: 580px; margin-top: 20px;">
+                                <input type='button' value='<%=L"搜索"%>' onclick='onclickSearch' class='mc_light_grey_button_with_fillet' style='float: left; color: #FFFFFF; margin-left: 15px; width: 100px; height: 32px;' />
+                                <input type='button' value='<%=L"清空"%>' onclick='onclickClearSearch' class='mc_light_grey_button_with_fillet' style='float: left; color: #FFFFFF; margin-left: 15px; width: 100px; height: 32px;' />
+                            </div>
+                        </div>
+                       
+                        <div style="margin-left: -5px; margin-top: 20px; width: 900px; height: 1px; background-color: #ffffffdd;"></div>
+                        <div style="margin-left: 15px; margin-top: 15px;width: 860px; height: 320px;">
+                            <div style="float: left; font-size: 18px; base-font-size: 18px; color: #ffffff; font-weight: bold; "><%=L"项目名："..GetProjectName()%></div>
+                            <div style="float: left; margin-left: 80px; font-size: 18px; base-font-size: 18px; color: #ffffff; font-weight: bold;"><%=L"主题："..GetTopicName()%></div>
+                            <div style="color: #ffffff;"><%=L"注意：系统只保留最近500条数据，请谨慎使用"%></div>
+                            <input type='button' value='<%=L"刷新"%>' onclick='onclickRefresh' class='mc_light_grey_button_with_fillet' style='position: relative; color: #FFFFFF; margin-left: 735px; margin-top: -44px; width: 100px; height: 32px;' />
+                            <div style="position: relative; width: 870px; height: 314px; margin-top: 8px;">
+                                <div style="margin-top: 0px; width:870px; height:22px; text-align:center;font-size: 16px;color:#000000;" >
+                                    <div style="float: left; width: 160px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"设备名称"%></div>
+                                    <div style="float: left; width: 160px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"时间"%></div>
+                                    <pe:if condition="<%=IsLittleSize()%>">
+                                        <div style="float: left; width: 540px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"数据"%></div>
+                                    </pe:if>
+                                    <pe:if condition="<%=not IsLittleSize()%>">
+                                        <div style="float: left; width: 536px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=L"数据"%></div>
+                                    </pe:if>
+                                </div>
+                                <div style="width: 870px; height: 240px;">
+                                    <pe:gridview RememberScrollPos="true"
+                                                AllowPaging="false"
+                                                VerticalScrollBarStep="50"
+                                                DefaultNodeHeight="24"
+                                                ItemsPerLine="1"
+                                                VerticalScrollBarOffsetX="-2"
+                                                DataSource="<%=DS_TopicDataList%>"
+                                                name="mqtt_message_list">
+                                        <Columns>
+                                            <div style="margin-top: 0px; width:870px; height:24px; text-align:center;font-size: 12px;" >
+                                                <div style="float: left; width: 160px; height: 24px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                    <pe:if condition='<%=IsLimitDeviceName(Eval("deviceName"))%>'>
+                                                        <div style="position: relative; width: 160px; height: 24px;"><%=GetLimitDeviceName(Eval("deviceName"))%></div>
+                                                        <div tooltip='<%=Eval("deviceName")%>' style="position: relative; width: 160px; height: 24px;"></div>
+                                                    </pe:if>
+                                                    <pe:if condition='<%=not IsLimitDeviceName(Eval("deviceName"))%>'>
+                                                        <%=Eval("deviceName")%>
+                                                    </pe:if>
+                                                </div>
+                                                <div style="float: left; width: 160px; height: 24px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);"><%=Eval("publishAt")%></div>
+                                                <div style="float: left; width: 540px; height: 24px; background: url(Texture/Aries/Creator/keepwork/vip/baidiheikuang_32x32_32bits.png:3 3 3 3);">
+                                                    <pe:if condition='<%=IsLimitMsg(Eval("msg"))%>'>
+                                                        <%=GetLimitMsg(Eval("msg"))%>
+                                                        <input type="button" name="<%=Eval('index')%>" onclick="onclickDetail" value="<%=L'[详情]'%>" style="float: left; color: #0000ff; background: url();" />
+                                                    </pe:if>
+                                                    <pe:if condition='<%=not IsLimitMsg(Eval("msg"))%>'>
+                                                        <%=GetLimitMsg(Eval("msg"))%>
+                                                    </pe:if>
+                                                </div>
+                                            </div>
+                                        </Columns>
+                                    </pe:gridview>
+                                </div>
+                            </div>
+                        </div>
+                    </aries:window>
+                </pe:container>
+                
+            </pe:container>            
+        </pe:mcml>
+    </body>
+</html>

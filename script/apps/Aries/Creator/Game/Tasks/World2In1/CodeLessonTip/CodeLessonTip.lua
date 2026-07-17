@@ -507,11 +507,17 @@ function CodeLessonTip.GetVisible()
 end
 
 function CodeLessonTip.OnLeaveWorld()
-    local titlename = System.options.channelId_431 and GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡智慧教育") or GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡 Paracraft")
+    local titlename = GameLogic.GetFilters():apply_filters('GameName', L"Paracraft 帕拉卡")
+    if System.options.channelId_431 then
+        titlename = GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡智慧教育")
+    end
+    if System.options.isShenzhenAi5 then
+        titlename = GameLogic.GetFilters():apply_filters('GameName', L"深教AI4")
+    end
     local desc = GameLogic.GetFilters():apply_filters('GameDescription', L"3D动画编程创作工具")
 
-    System.options.WindowTitle = System.options.channelId_431 and titlename or string.format("%s -- ver %s", titlename, GameLogic.options.GetClientVersion());
-    if System.options.channelId_431 then
+    System.options.WindowTitle = System.options.isEducatePlatform and titlename or string.format("%s -- ver %s", titlename, GameLogic.options.GetClientVersion());
+    if System.options.isEducatePlatform then
 		ParaEngine.SetWindowText(System.options.WindowTitle);
 	else
 		ParaEngine.SetWindowText(format("%s : %s", System.options.WindowTitle, desc));

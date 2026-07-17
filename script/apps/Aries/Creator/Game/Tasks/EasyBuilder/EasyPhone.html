@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyPhone.lua" refresh="false">
+<![CDATA[
+EasyPhone = commonlib.gettable("MyCompany.Aries.Creator.Game.Tasks.EasyBuilder.EasyPhone");
+EasyPhone.InitPage(Page);
+
+
+
+function GetPhoneButtons()
+    return EasyPhone.GetPhoneButtons();
+end
+
+function CheckShowRedPoint(index)
+    local usedPhoneButtons = EasyPhone.GetPhoneButtons()
+    local index = tonumber(index)
+    if not index or index <= 0 or index > #usedPhoneButtons then
+        return false
+    end
+    local button = usedPhoneButtons[index]
+    return button and button.is_show_red_point
+end
+]]>
+</script>
+
+<!-- 手机主体容器 -->
+<pe:container style="width:370px;padding-bottom:5px;background: url(Texture/Aries/Creator/keepwork/Window/dikuang_opaque_64x69_32bits.png#0 0 64 69:26 44 24 22);">
+    
+    <!-- 关闭按钮 -->
+    <input type="button" name="CloseBtn" onclick="EasyPhone.OnClose" align="right" 
+        style="position:relative;margin-right:0px;width:56px;height:56px;background:url(Texture/player/close.png)" />
+    
+    <!-- 时间信息条 -->
+    <div style="margin-left:20px;height:40px;">
+        <div style="float:left;color:#e4e3e3;font-size:16px;margin-top:8px;">
+            <span><%=EasyPhone.GetCurrentDateTime()%></span>
+        </div>
+    </div>
+    
+    <!-- 内容区域 -->
+    <div style="margin: 15px;">
+        <pe:treeview ShowIcon="false" name="tvwPhoneButtons"
+            VerticalScrollBarStep="60"
+            DefaultNodeHeight="90"
+            style="background:url();height:400px;">
+            <pe:repeat DataSource='<%=GetPhoneButtons()%>'>
+                <pe:repeatitem style="float:left;">
+                    <div name='<%=Eval("name")%>' tooltip='<%=Eval("tooltip")%>' onclick="EasyPhone.OnClickButton"
+                        style="float:left;width:96px;height:128px;margin-right:10px;margin-bottom:10px;">
+                        <pe:if condition="<%=CheckShowRedPoint(Eval('index'))%>">
+                            <div style="position: relative; margin-left: 85px; width: 12px; height: 12px; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#458 106 8 8)"></div>
+                        </pe:if>
+                        <!-- button background with icon and text inside -->
+                        <div style='<%=format("width:96px;height:96px;background:url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);background-color:%s;", Eval("color") or "#ffffff")%>'>
+                            <!-- icon -->
+                            <div style='<%=format("position:relative;margin:auto;margin-top:12px;width:64px;height:64px;background:url(%s);", Eval("icon"))%>'></div>
+                        </div>
+                        <!-- text inside button -->
+                        <div style='<%=format("position:relative;margin-top:5px;text-align:center;color:%s;font-size:14px;", Eval("textColor") or "#ffffff")%>'>
+                            <%=Eval("text")%>
+                        </div>
+                    </div>
+                </pe:repeatitem>
+            </pe:repeat>
+        </pe:treeview>
+    </div>
+</pe:container>
+
+</pe:mcml>
+</html>

@@ -31,12 +31,15 @@ end
 function AutoSave.CloseWindow()
 	if(page) then
 		page:CloseWindow()
-		page = nil;
 	end
 end
 
 function AutoSave:ShowPage()
 	curInstance = self;
+	local allowDrag = true;
+	if System.options.isEducatePlatform then
+		allowDrag = false;
+	end
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Tasks/AutoSaveTask.html", 
 		name = "AutoSaveTask.ShowPage", 
@@ -45,7 +48,7 @@ function AutoSave:ShowPage()
 		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		zorder = -10,
-		allowDrag = true,
+		allowDrag = allowDrag,
 		directPosition = true,
 			align = "_mt",
 			x = 0,
@@ -53,7 +56,17 @@ function AutoSave:ShowPage()
 			width = 0,
 			height = 48,
 	}
+	if System.options.isEducatePlatform then
+		params.url = "script/apps/Aries/Creator/Game/Educate/Project/AutoSaveTask.431.html";
+		params.align = "_fi"
+		params.height = 0
+	end
+	GameLogic.world_revision:SetStageLocked(true)
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	params._page.OnClose = function()
+		page = nil;
+		GameLogic.world_revision:SetStageLocked(false)
+	end
 end
 
 -- @param bIsDataPrepared: true if data is prepared. if nil, we will prepare the data from input params.
@@ -66,12 +79,10 @@ end
 function AutoSave:DoApplyStagedChanges()
 	AutoSave.CloseWindow()
 	GameLogic.world_revision:ApplyChangesFromFolder();
-	GameLogic.world_revision:SetUnModified()
 end
 
 function AutoSave:DoNotApplyStagedChanges()
 	AutoSave.CloseWindow()
-	GameLogic.world_revision:SetUnModified()
 	GameLogic.world_revision:DeleteStagedChangesInFolder()
 end
 

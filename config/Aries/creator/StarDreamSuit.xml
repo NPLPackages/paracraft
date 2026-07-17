@@ -1,0 +1,146 @@
+
+<customsuitlist>
+	<suit id="110001" price="800" name="小屁孩套装" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit01.png" type="4" skin="80001;81010;82001;83215;84076;85097;87005;88019;"/>
+	<suit id="110002" price="800" name="捣蛋鬼套装" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit02.png" type="4" skin="80001;81033;82001;83219;84077;85100;87005;88002;"/>
+	<suit id="110003" price="1200" name="大象睡衣套装" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit03.png" type="4" skin="80001;81036;82001;83182;84120;85133;86016;87159;88021;"/>
+	<suit id="110004" price="1200" name="狮子原始人" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit04.png" type="4" skin="80001;81005;82001;83184;84114;85128;86013;87176;88023;"/>
+	<suit id="110005" price="1200" name="可爱女套装" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit05.png" type="4" skin="80001;81049;82001;83081;84107;85084;86039;87064;88016;"/>
+	<suit id="110006" price="1200" name="混搭小恶魔" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit06.png" type="4" skin="80001;81005;82001;83160;84003;85007;86003;87129;88023;"/>
+	<suit id="110007" price="1500" name="合金白银套装" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit07.png" type="4" skin="80001;81018;82001;83164;84056;85075;87188;88002;"/>
+	
+	<!-- 原始5套套装 (110008-110012) -->
+	<suit id="110008" price="1200" name="星空幻想" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81014;82001;84021;85058;86020;88017;"/>
+	<suit id="110009" price="1500" name="梦幻公主" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit12.png" skin="80001;81040;83054;84118;85029;86039;88004;"/>
+	<suit id="110010" price="2000" name="未来战士" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit12.png" skin="80001;81101;83164;84056;85075;86041;87188;88002;"/>
+	<suit id="110010" price="2000" name="未来战士" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81101;83164;84056;85075;86041;87188;88002;"/>
+	<suit id="110011" price="1800" name="古风仙侠" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81047;82001;84041;85058;86017;87112;88017;"/>
+	<suit id="110012" price="800" name="校园青春" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81005;82001;84065;85083;86008;88042;"/>
+
+	<!-- 职业系列套装 (110013-110032) -->
+	<suit id="110013" price="1000" name="医生" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84088;85001;88013;"/>
+	<suit id="110014" price="900" name="护士" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit09.png" skin="80001;81040;83054;84088;85002;88013;"/>
+	<suit id="110015" price="1200" name="警察" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81011;82001;84089;85003;88002;"/>
+	<suit id="110016" price="1100" name="消防员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81011;82001;84055;85004;88002;"/>
+	<suit id="110017" price="800" name="厨师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81008;83036;84015;85005;88013;"/>
+	<suit id="110018" price="950" name="教师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85006;88017;"/>
+	<suit id="110019" price="1050" name="律师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85007;88017;"/>
+	<suit id="110020" price="1300" name="飞行员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81101;83167;84059;85008;88002;"/>
+	<suit id="110021" price="1150" name="探险家" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81069;82001;84099;85009;88017;"/>
+	<suit id="110022" price="850" name="农夫" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84109;85010;88017;"/>
+	<suit id="110023" price="750" name="园丁" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84109;85011;88017;"/>
+	<suit id="110024" price="700" name="邮递员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85012;88017;"/>
+	<suit id="110025" price="1400" name="宇航员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81101;83167;84059;85013;88013;"/>
+	<suit id="110026" price="900" name="建筑师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85014;88017;"/>
+	<suit id="110027" price="1000" name="工程师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85015;88017;"/>
+	<suit id="110028" price="800" name="司机" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85016;88017;"/>
+	<suit id="110029" price="950" name="记者" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85017;88017;"/>
+	<suit id="110030" price="1100" name="摄影师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85018;88017;"/>
+	<suit id="110031" price="850" name="画家" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83216;84116;85019;88004;"/>
+	<suit id="110032" price="750" name="音乐家" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83221;84117;85020;88004;"/>
+	
+	<!-- 动物主题系列 (110033-110052) -->
+	<suit id="110033" price="1200" name="熊猫宝宝" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;83133;84070;85094;88017;"/>
+	<suit id="110034" price="1200" name="棕色小猫" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit09.png" skin="80001;81040;83161;84118;85095;88004;"/>
+	<suit id="110035" price="1400" name="大象守护" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81101;83181;84056;85096;86041;87188;88002;"/>
+	<suit id="110036" price="1300" name="熊猫战士" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81011;83134;84056;85097;86041;87188;88002;"/>
+	<suit id="110037" price="1000" name="狐狸精灵" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83073;84118;85098;88004;"/>
+	<suit id="110038" price="1500" name="森林守护者" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81047;83074;84041;85099;86032;87112;88017;"/>
+	<suit id="110039" price="1300" name="野生探险" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit11.png" skin="80001;81069;83075;84099;85100;88017;"/>
+	<suit id="110040" price="1200" name="猫咪公主" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit09.png" skin="80001;81040;83162;84118;85102;86039;88004;"/>
+	<suit id="110041" price="1400" name="熊猫武士" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81011;83133;84055;85103;87188;88002;"/>
+	<suit id="110042" price="1000" name="小狐仙" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83073;84041;85104;86016;87112;88017;"/>
+	<suit id="110043" price="1300" name="猫女侠" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81011;83161;84055;85105;87188;88002;"/>
+	<suit id="110044" price="1000" name="熊猫学者" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit11.png" skin="80001;81081;83134;84065;85106;88017;"/>
+	<suit id="110045" price="1400" name="猫咪魔法师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83162;84041;85107;86015;87112;88017;"/>
+	<suit id="110046" price="1300" name="狐狸战士" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit11.png" skin="80001;81011;83074;84055;85108;87188;88002;"/>
+	<suit id="110047" price="1600" name="大象法师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81047;83181;84041;85109;86017;87112;88017;"/>
+	
+	<!-- 现代生活系列 (110048-110067) -->
+	<suit id="110048" price="1500" name="商务精英" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85109;88017;"/>
+	<suit id="110049" price="1200" name="时尚达人" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit12.png" skin="80001;81040;83054;84118;85110;88004;"/>
+	<suit id="110050" price="1000" name="休闲青年" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81005;82001;84065;85111;88017;"/>
+	<suit id="110051" price="1300" name="都市白领" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85112;88017;"/>
+	<suit id="110052" price="1100" name="学生制服" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85113;88017;"/>
+	<suit id="110053" price="1400" name="运动健将" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81019;83126;84100;85114;87187;88018;"/>
+	<suit id="110054" price="1600" name="摇滚歌手" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81011;83126;84055;85115;87188;88013;"/>
+	<suit id="110055" price="1200" name="咖啡师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81008;83036;84015;85116;88007;"/>
+	<suit id="110056" price="1000" name="快递员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit11.png" skin="80001;81005;82001;84065;85117;88017;"/>
+	<suit id="110057" price="1300" name="程序员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit11.png" skin="80001;81005;82001;84065;85118;88017;"/>
+	<suit id="110058" price="1500" name="设计师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85119;88004;"/>
+	<suit id="110059" price="1100" name="销售员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85120;88017;"/>
+	<suit id="110060" price="1400" name="记者" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85121;88017;"/>
+	<suit id="110061" price="1200" name="导游" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85122;88017;"/>
+	<suit id="110062" price="1600" name="模特" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit12.png" skin="80001;81040;83054;84118;85123;88004;"/>
+	<suit id="110063" price="1000" name="司机" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85124;88017;"/>
+	<suit id="110064" price="1300" name="银行职员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85125;88017;"/>
+	<suit id="110065" price="1500" name="律师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit11.png" skin="80001;81005;82001;84065;85126;88017;"/>
+	<suit id="110066" price="1200" name="会计师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85127;88017;"/>
+	<suit id="110067" price="1400" name="心理咨询师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81005;82001;84065;85128;88017;"/>
+	
+	<!-- 梦想职业系列 (110068-110187) -->
+	<suit id="110068" price="1000" name="小小医生" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84088;85021;88013;"/>
+	<suit id="110069" price="1200" name="动物医生" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84088;85022;88013;"/>
+	<suit id="110070" price="900" name="牙医叔叔" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81040;83054;84088;85023;88004;"/>
+	<suit id="110071" price="1100" name="救护车司机" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84088;85024;88017;"/>
+	<suit id="110072" price="1300" name="超级警察" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81011;82001;84089;85025;88002;"/>
+	<suit id="110073" price="1400" name="交通警察" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit11.png" skin="80001;81011;82001;84089;85026;88002;"/>
+	<suit id="110074" price="1200" name="特勤队员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81011;82001;84089;85027;88002;"/>
+	<suit id="110075" price="1500" name="法官大人" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85028;88017;"/>
+	<suit id="110076" price="1400" name="律师先生" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85029;88017;"/>
+	<suit id="110077" price="1000" name="图书管理员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81005;82001;84065;85030;88017;"/>
+	<suit id="110078" price="1800" name="火箭工程师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81101;83167;84059;85031;88002;"/>
+	<suit id="110079" price="1600" name="机器人工程师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85032;88017;"/>
+	<suit id="110080" price="1500" name="游戏程序员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81005;82001;84065;85033;88017;"/>
+	<suit id="110081" price="1300" name="发明家" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85034;88017;"/>
+	<suit id="110082" price="1200" name="房屋设计师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85035;88017;"/>
+	<suit id="110083" price="1100" name="室内装饰师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85036;86016;88004;"/>
+	<suit id="110084" price="1000" name="海报设计师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81040;83054;84118;85037;86016;88004;"/>
+	<suit id="110085" price="1400" name="银行经理" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85038;88017;"/>
+	<suit id="110086" price="1300" name="理财顾问" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit11.png" skin="80001;81005;82001;84065;85039;88017;"/>
+	<suit id="110087" price="1200" name="数学老师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85040;88017;"/>
+	
+	<!-- 校园生活系列 (110088-110107) -->
+	<suit id="110088" price="600" name="奶茶店员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81008;83036;84015;85041;88007;"/>
+	<suit id="110089" price="700" name="蛋糕师傅" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81008;83036;84015;85042;88007;"/>
+	<suit id="110090" price="500" name="送货小哥" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85043;88017;"/>
+	<suit id="110091" price="800" name="小主播" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85044;88004;"/>
+	<suit id="110092" price="900" name="游戏解说员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85045;88017;"/>
+	<suit id="110093" price="600" name="外卖骑手" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85046;88017;"/>
+	<suit id="110094" price="800" name="体育老师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85047;88017;"/>
+	<suit id="110095" price="700" name="舞蹈老师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81040;83054;84118;85048;88004;"/>
+	<suit id="110096" price="600" name="美甲师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85049;88004;"/>
+	<suit id="110097" price="800" name="化妆师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85050;88004;"/>
+	<suit id="110098" price="500" name="理发师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit11.png" skin="80001;81005;82001;84065;85051;88017;"/>
+	<suit id="110099" price="900" name="小摄影师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85052;88017;"/>
+	<suit id="110100" price="800" name="小导演" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85053;88017;"/>
+	<suit id="110101" price="700" name="故事作家" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85054;88017;"/>
+	<suit id="110102" price="600" name="小演员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85055;88004;"/>
+	<suit id="110103" price="800" name="时装模特" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit09.png" skin="80001;81040;83054;84118;85056;88004;"/>
+	<suit id="110104" price="500" name="商店店员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85057;88017;"/>
+	<suit id="110105" price="600" name="客服姐姐" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit12.png" skin="80001;81040;83054;84118;85058;88004;"/>
+	<suit id="110106" price="700" name="活动策划" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85059;88017;"/>
+	<suit id="110107" price="800" name="品牌推广员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85060;88017;"/>
+	
+	<!-- 儿童可爱系列 (110108-110127) -->
+	<suit id="110108" price="800" name="小天使" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85029;86011;88004;"/>
+	<suit id="110109" price="700" name="小恶魔" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85029;86004;88004;"/>
+	<suit id="110110" price="600" name="小公主" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit09.png" skin="80001;81040;83054;84118;85030;88004;"/>
+	<suit id="110111" price="650" name="小王子" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81005;82001;84065;85031;88017;"/>
+	<suit id="110112" price="750" name="小精灵" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83071;84118;85032;86011;88004;"/>
+	<suit id="110113" price="800" name="小仙女" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit12.png" skin="80001;81040;83073;84118;85033;86011;88004;"/>
+	<suit id="110114" price="600" name="小学生" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84065;85034;88017;"/>
+	<suit id="110115" price="700" name="小护士" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit09.png" skin="80001;81040;83054;84118;85035;88004;"/>
+	<suit id="110116" price="650" name="小医生" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84118;85036;88013;"/>
+	<suit id="110117" price="750" name="小警察" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84089;85037;88017;"/>
+	<suit id="110118" price="800" name="小消防员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84055;85038;88017;"/>
+	<suit id="110119" price="600" name="小厨师" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81008;83036;84015;85039;88007;"/>
+	<suit id="110120" price="700" name="小画家" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85040;88004;"/>
+	<suit id="110121" price="650" name="小音乐家" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81040;83054;84118;85041;88004;"/>
+	<suit id="110122" price="750" name="小舞蹈家" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81040;83054;84118;85042;88004;"/>
+	<suit id="110123" price="800" name="小探险家" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84099;85043;88017;"/>
+	<suit id="110124" price="600" name="小农夫" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81005;82001;84109;85044;88017;"/>
+	<suit id="110125" price="700" name="小园丁" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84109;85045;88017;"/>
+	<suit id="110126" price="650" name="小邮递员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit10.png" skin="80001;81005;82001;84065;85046;88017;"/>
+	<suit id="110127" price="750" name="小宇航员" type="4" icon="Texture/Aries/Creator/keepwork/minigame/suit/suit08.png" skin="80001;81005;82001;84059;85047;88017;"/>
+
+</customsuitlist>

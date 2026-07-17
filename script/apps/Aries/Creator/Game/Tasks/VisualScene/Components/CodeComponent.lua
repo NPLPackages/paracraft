@@ -9,10 +9,6 @@ local CodeComponent = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualS
 ------------------------------------------------------------
 --]]
 local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
-NPL.load("(gl)script/ide/timer.lua");
-
 local BaseComponent = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/BaseComponent.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local CodeComponent = commonlib.inherit(BaseComponent, NPL.export());

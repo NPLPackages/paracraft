@@ -1,0 +1,116 @@
+﻿<!-- "script/apps/Aries/BBSChat/ChatSystem/ChatWindow.community.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>ChatWndow, by zrf, 2011/3/9</title>
+    </head>
+    <body>
+        <pe:mcml>
+            <script type="text/npl" >
+                <![CDATA[
+                    KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+                    local page = document:GetPageCtrl();
+                    MyCompany.Aries.ChatSystem.ChatWindow.Init();
+
+                    function OnSwitchChannelDisplay(name, tabitem_mcmlNode)
+                        -- Click to change input
+                        MyCompany.Aries.ChatSystem.ChatWindow.OnSwitchChannelDisplay(name);
+                        if(name == "0") then
+                            name = "1"; -- click 0 channels will write to all.
+                        end
+                        MyCompany.Aries.ChatSystem.ChatEdit.OnClickChannel(name, tabitem_mcmlNode:GetAttribute("text"));
+                    end
+
+                    function IsOpened_BulletScreen()
+                        local isOpen = KpChatChannel.BulletScreenIsOpened()
+                        return isOpen
+                    end
+
+                    function OnClickBulletScreen()
+                        MyCompany.Aries.ChatSystem.ChatEdit.CloseSmiley()
+                        if(IsOpened_BulletScreen()) then
+                            KpChatChannel.SetBulletScreen(false)
+                        else
+                            KpChatChannel.SetBulletScreen(true)
+                        end
+                        if page then
+                            page:Refresh(0.2)
+                        end
+                    end
+
+                    function GetBulletTip()
+                        local tipBullet = IsOpened_BulletScreen() and L"关闭弹幕" or L"开启弹幕"
+                        return tipBullet
+                    end
+
+                    local switchA = "Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png;218 2 22 22";
+                    local switchB = "Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png;204 54 22 22";
+                    function UpdateBulletBg()
+                        if not page then return end
+                        local bg = IsOpened_BulletScreen() and switchB or switchA;
+                        page:CallMethod("btnBulletScreen","SetUIBackground",bg);
+                    end
+
+                    
+                    commonlib.TimerManager.SetTimeout(function()
+                        UpdateBulletBg()
+                    end,0)
+                ]]>
+            </script>
+            <div style="margin-left: 3px;">
+                <div width="100%" style="position:relative;margin-top:-80px;height:72px;">
+                    <div style="position:relative;width:400px;">
+                        <pe:custom id="1" oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateBroadTreeView" style="margin-left:10px;height:72px;" />
+                    </div>
+                </div>
+                <pe:container name="canvas_tab_btn" width="100%" style="position:relative;height:48px; background: url();">
+                    <pe:if condition="<%= not System.options.isOffline%>">
+                        <div  style="position: relative; margin-left:14px; width: 240px; height: 32px; margin-top:12px;background:url(Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png#154 172 64 32:30 14 30 14)">
+                            <pe:tabs name="tabChannel"
+                                    onclick="OnSwitchChannelDisplay" 
+                                    SelectedMenuItemBG="Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png;2 120 60 32"
+                                    UnSelectedMenuItemBG="" 
+                                    style="height:32px; margin-top: 0px; margin-left: -5px; background:;"
+                                    TextOffsetY="-1"
+                                    TextColor="#ffffff"
+                                    SelectedTextColor="#020100" 
+                                    ItemSpacing="0"
+                                    DefaultIconSize = "8"
+                                    TextFont="System;12;norm" >
+                                <pe:tab-item name="0" text='<%=L"全部"%>' selected="true" width="60" height="32" />
+                                <pe:tab-item name="21" text='<%=L"本地"%>' width="60" height="32" /> 
+                                <pe:tab-item name="26" text='<%=L"队伍"%>' width="60" height="32"/> <!--组队-->
+                                <pe:tab-item name="27" text='<%=L"私聊"%>' width="60" height="32"/> <!--私聊-->
+                            </pe:tabs>
+                        </div>
+                        <input type="button" name="btnBulletScreen" value="" tooltip="<%=GetBulletTip()%>" onclick="OnClickBulletScreen"  style="position: relative; margin-left: 360px; margin-top: 8px; width: 22px; height: 22px; background: url(Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png#218 2 22 22);"/>
+                        <input type="button" value="" tooltip="<%=L'展开'%>" onclick="MyCompany.Aries.ChatSystem.ChatWindow.OnExpandChatWindow()"  style="position: relative; margin-left: 390px; margin-top: 8px; width: 22px; height: 22px; background: url(Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png#218 28 22 22);"/>
+                    </pe:if>
+                    <pe:if condition="<%= System.options.isOffline%>">
+                        <div style="margin-top: 6px; font-size: 20px; base-font-size: 20px; font-weight: bold; color: #d3d3d3; text-align: center;"><%=L"离线模式"%></div>
+                        <div width="100%" style="margin-top: 6px; height: 1px; background-color: #ffffff88;"></div>
+                    </pe:if>
+                </pe:container>
+                <pe:container height="300" name="canvas"
+                                ClickThrough="true"
+                                style="position: relative;
+                                        margin: 0px;
+                                        padding: 0px;
+                                        background: url(Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png#154 104 64 64:30 30 30 30);"
+                                zorder="-1">
+                    <div align="center" style="position:relative; width:212px; height:42px; background: url(Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png#2 2 212 42);"></div>
+                    <div width="100%" height="100%" style="margin-top:50px;margin-bottom:1px; ">
+                        <div style="float:left; margin-left: 400px; margin-top:-10px;margin-bottom:1px; " height="250">
+                            <pe:custom oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateTreeViewScrollBar()" style="width:10px;" />
+                        </div>
+                    </div>
+                </pe:container>
+                  
+                <div style="margin-top:60px;margin-bottom:0px; margin-left: 5px;" width="100%" height="246">
+                    <pe:custom oncreate="MyCompany.Aries.ChatSystem.ChatWindow.CreateTreeView()" style="margin-left:10px;" />
+                </div>
+            </div>
+        </pe:mcml> 
+    </body>
+</html>

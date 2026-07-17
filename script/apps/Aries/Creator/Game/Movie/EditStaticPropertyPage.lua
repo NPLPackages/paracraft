@@ -19,6 +19,7 @@ local DefaultAgentStyles = {
     {value="true", text=L"全局"},
     {value="false", text=L"本地"},
     {value="relative", text=L"相对位置的全局"},
+	{value="relativeToPlayer", text=L"相对全局角色"},
     {value="searchNearPlayer", text=L"在主角附近搜索"},
 }
 
@@ -91,6 +92,8 @@ function EditStaticPropertyPage.OnOK()
 				v.isAgent = "relative";
 			elseif(isAgent == "searchNearPlayer") then
 				v.isAgent = "searchNearPlayer";
+			elseif(isAgent == "relativeToPlayer") then
+				v.isAgent = "relativeToPlayer";
 			else
 				v.isAgent = false;
 			end

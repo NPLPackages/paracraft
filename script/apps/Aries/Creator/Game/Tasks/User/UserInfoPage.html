@@ -11,6 +11,8 @@
 local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
 UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
 UserInfoPage.OnInit()
+SKIN_ITEM_TYPE = UserInfoPage.SKIN_ITEM_TYPE
+FRIEND_TYPE = UserInfoPage.FRIEND_TYPE
 function ClosePage()
     UserInfoPage.ClosePage()
 end
@@ -242,6 +244,9 @@ function RenderButtonInfo(type,price,gsid,id)
 end
 
 function OnClickExchangeSkin(name,mcmlNode)
+    if System.options.isHideVip then
+        return
+    end
     local param1 = mcmlNode:GetAttribute("param1")
     UserInfoPage.OnClickExchangeSkin(param1)
 end
@@ -291,10 +296,10 @@ end
             </div>
         </pe:container>            
 
-        <pe:container ClickThrough = "true" alignment="_rt" style="background:url();">
+        <!-- <pe:container ClickThrough = "true" alignment="_rt" style="background:url();">
             <input type="button" onclick="GoHomeWorld" style="margin-right:24px;margin-top:15px; width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/jiayuan_64x70_32bits.png#0 0 64 70);" />
             <input type="button" onclick="OpenMainPage" style="margin-right:34px;margin-top:15px;width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/zhuye_64x70_32bits.png#0 0 64 70);" />
-        </pe:container>
+        </pe:container> -->
         
         <pe:container ClickThrough = "true" alignment="_ct" zorder="-1" style="margin-left:-640px;margin-top:-360px;background: url();">
            <!--背景水印-->
@@ -480,7 +485,7 @@ end
                             <div style="margin-left: 113px; margin-top: -24px; font-size: 14px; base-font-size: 14px; color: #333333;"><%=UserInfoPage.GetRegisterTimeStr()%></div>
                         </div>
                         <!-- 学校 -->
-                        <div style="margin-top: 8px; margin-left: 16px; width: 250px; height: 30px;">
+                        <!-- <div style="margin-top: 8px; margin-left: 16px; width: 250px; height: 30px;">
                             <div style="position: relative; width: 70px; height: 26px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/biaotidi_38x24_32bits.png#0 0 38 24:16 10 16 10);">
                                 <div align="center" style="margin-top: 5px; width: 34px; height: 17px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/xuexiao_34x17_32bits.png#0 0 34 17)"></div>
                             </div>
@@ -488,9 +493,9 @@ end
                             <pe:if condition="<%=UserInfoPage.IsAuthUser()%>">
                                 <input type="button" name="school" onclick="UserInfoPage.OnClickEditInfo" style="margin-left: 230px; margin-top: -16px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/bianji_20x20_32bits.png#0 0 20 20);" />
                             </pe:if>
-                        </div>
+                        </div> -->
                         <!-- 班级 -->
-                        <div style="margin-top: 8px; margin-left: 16px; width: 250px; height: 30px;">
+                        <!-- <div style="margin-top: 8px; margin-left: 16px; width: 250px; height: 30px;">
                             <div style="position: relative; width: 70px; height: 26px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/biaotidi_38x24_32bits.png#0 0 38 24:16 10 16 10);">
                                 <div align="center" style="margin-top: 5px; width: 34px; height: 17px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/banji_34x17_32bits.png#0 0 34 17)"></div>
                             </div>
@@ -498,7 +503,7 @@ end
                             <pe:if condition="<%=UserInfoPage.IsAuthUser()%>">
                                 <input type="button" name="class" onclick="UserInfoPage.OnClickEditInfo" style="margin-left: 230px; margin-top: -16px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/bianji_20x20_32bits.png#0 0 20 20);" />
                             </pe:if>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -568,8 +573,8 @@ end
                                                 </pe:if>
                                             </div>
                                             <div style="position: relative; margin-left: 170px;">
-                                                <input type="button" onclick="OnClickShareWorld" param1='<%= XPath("this") %>' style="margin-left: 0px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#109 459 40 40);" />
-                                                <input type="button" onclick="OnClickGotoWorld" param1='<%= XPath("this") %>' style="margin-left: 6px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/ggs/user/btn_jingru_40X40_32bits.png#0 0 40 40);" />
+                                                <!-- <input type="button" onclick="OnClickShareWorld" param1='<%= XPath("this") %>' style="margin-left: 0px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#109 459 40 40);" /> -->
+                                                <input type="button" onclick="OnClickGotoWorld" param1='<%= XPath("this") %>' style="margin-left: 46px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/ggs/user/btn_jingru_40X40_32bits.png#0 0 40 40);" />
                                             </div>
                                         </div>
                                     </div>
@@ -675,18 +680,31 @@ end
                 <pe:if condition='<%=UserInfoPage.category_name == "security" %>' >
                     <div style="position: relative; margin-top: 24px; margin-left: 33px; width: 584px; height: 490px;">
                         <div style="width: 94px; height: 21px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/xiugaimima_94x21_32bits.png#0 0 94 21)"></div>
-                        <input type="button" onclick="UserInfoPage.UpdatePassworld()" value="<%=L'修改密码'%>" style="margin-top: 10px; width: 83px; height: 32px; font-size: 14px; base-font-size: 14px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/baianniu_83x32_32bits.png#0 0 83 32);" />
+                        <input type="button" onclick="UserInfoPage.UpdatePassworld()" value="<%=L'修改密码'%>" style="margin-top: 10px; min-width: 83px; height: 32px; font-size: 14px; base-font-size: 14px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/baianniu_83x32_32bits.png#0 0 83 32);" />
                         <div style="margin-top: 20px; width: 93px; height: 21px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/shimingrengzheng_93x21_32bits.png#0 0 93 21)"></div>
                         <pe:if condition="<%=UserInfoPage.IsRealName()%>">
                             <div style="margin-top: 13px; width: 220px; height: 46px;">
                                 <div style="font-size: 16px; base-font-size: 16px;">
                                     <%=L"认证状态:"%>
-                                    <div style="margin-left: 127px; margin-top: -22px;"><%="已认证"%></div>
-                                    <div style="margin-left: 178px; margin-top: -17px; width: 14px; height: 14px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/renzhengwancheng_14x14_32bits.png#0 0 14 14)"></div>
+                                    <pe:if condition='<%=not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        <div style="margin-left: 127px; margin-top: -22px;"><%=L"已认证"%></div>
+                                        <div style="margin-left: 178px; margin-top: -17px; width: 14px; height: 14px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/renzhengwancheng_14x14_32bits.png#0 0 14 14)"></div>
+                                    </pe:if>
+
+                                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        <div style="margin-left: 147px; margin-top: -22px;"><%=L"已认证"%></div>
+                                    <div style="margin-left: 198px; margin-top: -17px; width: 14px; height: 14px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/renzhengwancheng_14x14_32bits.png#0 0 14 14)"></div>
+                                    </pe:if>
+                                    
                                 </div>
                                 <div style="font-size: 16px; base-font-size: 16px; width: 240px;">
                                     <%=L"认证手机:"%>
-                                    <div style="margin-left: 127px; margin-top: -22px;"><%=UserInfoPage.GetRealNameCellPhone()%></div>
+                                    <pe:if condition='<%=not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        <div style="margin-left: 127px; margin-top: -22px;"><%=UserInfoPage.GetRealNameCellPhone()%></div>
+                                    </pe:if>
+                                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        <div style="margin-left: 177px; margin-top: -22px; width: 240px;"><%=UserInfoPage.GetRealNameCellPhone()%></div>
+                                    </pe:if>
                                 </div>
                             </div>
                         </pe:if>

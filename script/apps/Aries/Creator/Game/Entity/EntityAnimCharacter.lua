@@ -74,7 +74,9 @@ function Entity:FrameMove(deltaTime)
 				local distSqToPlayer = self:DistanceSqTo(px, py, pz);
 				if(distSqToPlayer > 10*10) then
 					local x, y, z = self:GetRandomMovePos();
-					self:MoveTo(x,y,z);
+					if(x) then
+						self:MoveTo(x,y,z);
+					end
 					self:Wait(1);
 				elseif(distSqToPlayer > 4*4) then
 					self:SetBlockTarget(px,py,pz);

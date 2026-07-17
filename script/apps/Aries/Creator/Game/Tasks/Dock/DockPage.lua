@@ -172,34 +172,17 @@ function DockPage.HandleFriendsRedTip(is_repeat)
 		return
     end
 
-    local function repeat_cb()
-        if is_repeat then
-            commonlib.TimerManager.SetTimeout(function()
-                if not DockPage.is_show then
-                    return
-                end            
-                DockPage.HandleFriendsRedTip(is_repeat)
-            end, 60000)
-        end
-    end
-
-    local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
-    if FriendsPage.GetIsOpen() then
-        repeat_cb()
-    else
-        FriendManager:LoadAllUnReadMsgs(function ()
-            -- 处理未读消息
-            if FriendManager.unread_msgs and FriendManager.unread_msgs.data then
-                for k, v in pairs(FriendManager.unread_msgs.data) do
-                    if v.unReadCnt and v.unReadCnt > 0 then
-                        DockPage.ChangeFriendRedTipState(true)
-                        break
-                    end
+    FriendManager:LoadAllUnReadMsgs(function ()
+        -- 处理未读消息
+        if FriendManager.unread_msgs and FriendManager.unread_msgs.data then
+            for k, v in pairs(FriendManager.unread_msgs.data) do
+                if v.unReadCnt and v.unReadCnt > 0 then
+                    DockPage.ChangeFriendRedTipState(true)
+                    break
                 end
             end
-            repeat_cb()
-        end, true);
-    end
+        end
+    end, true);
 end
 
 function DockPage.HandleFriendsFansLocalData()
@@ -320,7 +303,7 @@ function DockPage.HandMsgCenterMsgData(callbackFunc)
             if err == 200 and data and data.data then
                 local all_count = 0
                 for k, v in pairs(data.data) do
-                    all_count = all_count + v
+                    all_count = all_count + (type(v) == "table" and 1 or tonumber(v))
                 end
                 DockPage.SetMsgCenterUnReadNum(all_count)
                 GameLogic.GetFilters():apply_filters('update_msgcenter_unread_num', all_count)

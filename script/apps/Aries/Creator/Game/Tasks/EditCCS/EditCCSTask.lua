@@ -15,6 +15,8 @@ EditCCSTask:ShowPage(entity, function(ccs)
 end);
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCCS/CustomCharSkinItems.lua");
+local CustomCharSkinItems = commonlib.gettable("MyCompany.Aries.Game.Tasks.CustomCharSkinItems");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
 NPL.load("(gl)script/kids/3DMapSystemUI/CCS/ccs.lua");
 local CCS = commonlib.gettable("Map3DSystem.UI.CCS");
@@ -28,6 +30,51 @@ local curPlayer;
 local page;
 -- this is always a top level task. 
 EditCCSTask.is_top_level = true;
+
+function EditCCSTask.DownloadCharactersDB()
+	if(ParaIO.DoesFileExist("Database/characters.db", true)) then
+		return
+	end
+	local db_url = "https://webparacraft.keepwork.com/Database/characters.db";
+    NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");
+    local FileDownloader = commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader");
+    local downloader = FileDownloader:new();
+    downloader:SetSilent(true)
+    local filename = db_url:match("([^/]+)$");
+    local diskDirectory = ParaIO.GetWritablePath() .. "Database/";
+    local diskFilePath = diskDirectory .. filename;
+
+    if(ParaIO.DoesFileExist(diskFilePath, true)) then
+        LOG.std(nil, "info", "EmscriptenAPI", "db url %s already exist", db_url)
+        if(callback) then
+            callback(true)
+        end
+    else
+        ParaIO.CreateDirectory(diskDirectory);
+        downloader:Init(L"下载美术资源", db_url, diskFilePath, function(bSucceed, localFile)
+            if(bSucceed and localFile) then
+                GameLogic.FlushDiskIO();
+            else
+                LOG.std(nil, "warn", "WorldCommon", "failed to prepare asset url %s, because %s", assetUrl, tostring(localFile))
+            end
+            if(callback) then
+                callback(bSucceed)
+            end
+        end, "access plus 1 year");
+    end
+end
+
+function EditCCSTask.GetCCSInfoString(obj_params)
+	if(obj_params and obj_params:IsValid()) then
+		local facial_info_string = CCS.Predefined.GetFacialInfoString(obj_params) or "";
+		local cartoonface_info_string = CCS.DB.GetCartoonfaceInfoString(obj_params) or "";
+		local characterslot_info_string = CCS.Inventory.GetCharacterSlotInfoString(obj_params) or "";
+
+		local skin_color_mask = obj_params:ToCharacter():GetSkinColorMask();
+		
+		return string.format("%s@%s@%s@%s", facial_info_string, cartoonface_info_string, characterslot_info_string, skin_color_mask);
+	end	
+end
 
 function EditCCSTask:ctor()
 end
@@ -51,15 +98,42 @@ function EditCCSTask:OnExit()
 	end
 end
 
+function EditCCSTask:RefreshRegionPaths()
+	if(EditCCSTask.isTeenModel) then
+		ParaScene.SetCharacterRegionPath(32, "character/v6/Item/Head/");
+		ParaScene.SetCharacterRegionPath(34, "character/v6/Item/Weapon/");
+		ParaScene.SetCharacterRegionPath(19, "character/v6/Item/ShirtTexture/");
+		ParaScene.SetCharacterRegionPath(20, "character/v6/Item/ShirtTexture/");
+		ParaScene.SetCharacterRegionPath(23, "character/v6/Item/FootTexture/");
+		ParaScene.SetCharacterRegionPath(38, "character/v6/Item/WingTexture/");
+		ParaScene.SetCharacterRegionPath(39, "character/v6/Item/Back/");
+	else
+		ParaScene.SetCharacterRegionPath(32, "character/v3/Item/ObjectComponents/Head/");
+		ParaScene.SetCharacterRegionPath(34, "character/v3/Item/ObjectComponents/Weapon/");
+		ParaScene.SetCharacterRegionPath(19, "character/v3/Item/TextureComponents/AriesCharShirtTexture/");
+		ParaScene.SetCharacterRegionPath(20, "character/v3/Item/TextureComponents/AriesCharShirtTexture/");
+		ParaScene.SetCharacterRegionPath(23, "character/v3/Item/TextureComponents/AriesCharFootTexture/");
+		ParaScene.SetCharacterRegionPath(38, "character/v3/Item/TextureComponents/AriesCharWingTexture/");
+		ParaScene.SetCharacterRegionPath(39, "character/v3/Item/ObjectComponents/Back/");
+	end
+end
+
 -- this function can be called as a static function. 
 -- @param callbackFunc: function(ccs) end
 function EditCCSTask:ShowPage(entity, callbackFunc)
 	entity = entity or EntityManager.GetPlayer()
+	
+	CustomCharSkinItems:Init();
 	if(not entity:IsCustomModel()) then
 		entity:SetMainAssetPath("character/v3/Elf/Female/ElfFemale.xml")
 	end
 	curPlayer = entity:GetInnerObject();
 
+	local assetfile = entity:GetMainAssetPath()
+	EditCCSTask.isTeenModel = assetfile:match("Teen") ~= nil;
+	EditCCSTask.isFemaleModel = string.find(string.lower(assetfile), "female") ~= nil;
+
+	-- self:RefreshRegionPaths() -- this is done in C++ 
 
 	NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
@@ -69,7 +143,7 @@ function EditCCSTask:ShowPage(entity, callbackFunc)
 	
 	local width, height = 400, 600;
 	local params = {
-		url="script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.html",
+		url= EditCCSTask.isTeenModel and "script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask2.html" or "script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.html",
 		name="EditCCSTask", 
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		isShowTitleBar = false,
@@ -87,7 +161,7 @@ function EditCCSTask:ShowPage(entity, callbackFunc)
 	}
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	params._page.OnClose = function(bDestroy)
-		local ccsString = CCS.GetCCSInfoString(curPlayer);
+		local ccsString = EditCCSTask.GetCCSInfoString(curPlayer);
 		curPlayer = nil;
 		page = nil;
 		if(curInstance) then
@@ -99,46 +173,9 @@ function EditCCSTask:ShowPage(entity, callbackFunc)
 	end
 end
 
-
-
 -- on init show the current avatar in pe:avatar
 function EditCCSTask.OnInit()
 	page = document:GetPageCtrl();
-end
-
-function EditCCSTask.UpdateDragonSkin_Purple()
-	EditCCSTask.UpdateDragonSkin(1)
-end
-
-function EditCCSTask.UpdateDragonSkin_Red()
-	EditCCSTask.UpdateDragonSkin(2)
-end
-
-function EditCCSTask.UpdateDragonSkin_Green()
-	EditCCSTask.UpdateDragonSkin(3)
-end
-
-function EditCCSTask.UpdateDragonSkin_Orange()
-	EditCCSTask.UpdateDragonSkin(4)
-end
-
-function EditCCSTask.UpdateDragonSkin_DarkPurple()
-	EditCCSTask.UpdateDragonSkin(5)
-end
-
-function EditCCSTask.UpdateDragonSkin_DarkRed()
-	EditCCSTask.UpdateDragonSkin(6)
-end
-
-function EditCCSTask.UpdateDragonSkin(i)
-	local replaceable_r1;
-	local assetname = curPlayer:GetPrimaryAsset():GetKeyName();
-	if(string.find(assetname, "character/v3/PurpleDragonMajor/Female/")) then
-		replaceable_r1 = "character/v3/PurpleDragonMajor/Female/SkinColor0"..i..".dds";
-	end
-	if(replaceable_r1) then
-		curPlayer:SetReplaceableTexture(1, ParaAsset.LoadTexture("", replaceable_r1, 1));
-	end
 end
 
 function EditCCSTask.OnChangeAsset()
@@ -151,13 +188,6 @@ function EditCCSTask.OnChangeAsset()
 			_obj:ToCharacter():ResetBaseModel(asset);
 		end
 	end	
-end
-
-function EditCCSTask.ClickDBUpdate()
-	_guihelper.MessageBox("确认更新数据库？\n\n请确认database/characters.db文件为只读，数据更新需要花些时间，请耐心等待\n", function ()
-				Map3DSystem.UI.CCS.DB.AutoGenerateItems();
-				_guihelper.CloseMessageBox();
-			end);
 end
 
 function EditCCSTask.ClickLeftHandUpdate(name, mcmlNode)
@@ -194,8 +224,15 @@ function EditCCSTask.ClickBackUpdate(name, mcmlNode)
         if(gsid) then
 			local playerChar = curPlayer:ToCharacter();
 			playerChar:SetCharacterSlot(26, 0);
+			playerChar:SetCharacterSlot(21, 0);
 		end
 	end
+end
+
+function EditCCSTask.ClickNoClothes()
+	local playerChar = curPlayer:ToCharacter();
+	playerChar:SetCharacterSlot(28, 1); -- suits
+	playerChar:SetCharacterSlot(19, 1); -- shoes
 end
 
 function EditCCSTask.HandUpdate(gsid, hand)
@@ -1049,39 +1086,33 @@ function EditCCSTask.DS_Func_Hairs(index)
 end
 
 function EditCCSTask.TestHair(style, color)
-	
 	local player = curPlayer;
 	local playerChar = player:ToCharacter();
-	playerChar:SetBodyParams(-1, -1, -1, style, -1);
-	
-	playerChar:SetBodyParams(-1, -1, color-1, -1, -1);
+	if(EditCCSTask.isTeenModel) then
+		playerChar:SetBodyParams(-1, -1, -1, 0, -1);
+		playerChar:SetBodyParams(-1, -1, 0, -1, -1);
+	else
+		playerChar:SetBodyParams(-1, -1, -1, style, -1);
+		playerChar:SetBodyParams(-1, -1, color-1, -1, -1);
+	end
 end
 
 function EditCCSTask.DS_Func_BaseSkins(index)
 	if(index ~= nil) then
-		if(index == 1) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_00.dds", color = index-1};
-		elseif(index == 2) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_01.dds", color = index-1};
-		elseif(index == 3) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_02.dds", color = index-1};
-		elseif(index == 4) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_03.dds", color = index-1};
-		elseif(index == 5) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_04.dds", color = index-1};
-		elseif(index == 6) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_05.dds", color = index-1};
-		elseif(index == 7) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_06.dds", color = index-1};
-		elseif(index == 8) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_07.dds", color = index-1};
-		elseif(index == 9) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_08.dds", color = index-1};
-		elseif(index == 10) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_09.dds", color = index-1};
-		elseif(index == 11) then
-			return {img = "character/v3/Elf/Female/ElfFemaleSkin00_10.dds", color = index-1};
+		if(index > (EditCCSTask.isTeenModel and 7 or 11)) then
+			return
 		end
+		local filename
+		if(EditCCSTask.isTeenModel) then
+			if(EditCCSTask.isFemaleModel) then
+				filename = string.format("character/v3/TeenElf/Female/TeenElfFemaleSkin00_%02d.dds", index-1)
+			else
+				filename = string.format("character/v3/TeenElf/Male/TeenElfMaleSkin00_%02d.dds", index-1)
+			end
+		else
+			filename = string.format("character/v3/Elf/Female/ElfFemaleSkin00_%02d.dds", index-1)
+		end
+		return {img = filename, color = index-1}
 	elseif(index == nil) then
 		return 11;
 	end
@@ -1091,7 +1122,15 @@ function EditCCSTask.TestSkin(color)
 	local player = curPlayer;
 	local playerChar = player:ToCharacter();
 	playerChar:SetBodyParams(color, -1, -1, -1, -1);
-	playerChar:SetCartoonFaceComponent(0, 0, color);
+	if(EditCCSTask.isTeenModel) then
+		if(EditCCSTask.isFemaleModel) then
+			playerChar:SetCartoonFaceComponent(0, 0, color + 200);
+		else
+			playerChar:SetCartoonFaceComponent(0, 0, color + 100);
+		end
+	else
+		playerChar:SetCartoonFaceComponent(0, 0, color);
+	end
 end
 
 function EditCCSTask.TestEyeAddon(index)
@@ -1122,22 +1161,28 @@ end
 
 function EditCCSTask.GetDS_Func_CartoonFace(index_Func)
 	return function (index)
-		if(index ~= nil) then
+		if(index~=nil) then
 			if(index_Func == 1) then
 				if(index > 40) then
-					return;
+					return
 				end
 				local filename = "character/v3/CartoonFace/FaceDeco/marks_"..string.format("%02d", index-1)..".png";
 				return {img = filename, tooltip = filename, type = index_Func, style = index,};
 			elseif(index_Func == 6) then
-				if(index > 11) then
-					return;
+				if(index > (EditCCSTask.isTeenModel and 6 or 11)) then
+					return
 				end
-				local filename = "character/v3/CartoonFace/Mark/marks_"..string.format("%02d", index+9)..".png";
+				local filename
+				if(EditCCSTask.isTeenModel) then
+					local offset = EditCCSTask.isFemaleModel and 200 or 100;
+					filename = "character/v3/CartoonFace/Mark/components_"..string.format("%02d", index+offset-1)..".dds";
+				else
+					filename = "character/v3/CartoonFace/Mark/marks_"..string.format("%02d", index+9)..".png";
+				end
 				return {img = filename, tooltip = filename, type = index_Func, style = index,};
 			else
 				if(index > 100) then
-					return;
+					return
 				end
 				if(index_Func == 2) then
 					local filename = "character/v3/CartoonFace/Eye/Eye_"..string.format("%02d", index-1)..".png";
@@ -1157,7 +1202,7 @@ function EditCCSTask.GetDS_Func_CartoonFace(index_Func)
 			if(index_Func == 1) then
 				return 40;
 			elseif(index_Func == 6) then
-				return 11;
+				return EditCCSTask.isTeenModel and 6 or 11;
 			else
 				return 100;
 			end
@@ -1165,8 +1210,31 @@ function EditCCSTask.GetDS_Func_CartoonFace(index_Func)
 	end
 end
 
-function EditCCSTask.TestCartoonFace(type, style)
+function EditCCSTask.TestFace(index)
+	index = tonumber(index);
+	local player = ParaScene.GetPlayer();
+	local playerChar = player:ToCharacter();
+	if(EditCCSTask.isFemaleModel) then
+		playerChar:SetBodyParams(-1, -1, -1, -1, 1);
+		playerChar:SetCartoonFaceComponent(6, 0, index + 100 - 1);
+	else
+		playerChar:SetBodyParams(-1, -1, -1, -1, 1);
+		playerChar:SetCartoonFaceComponent(6, 0, index + 200 - 1);
+	end
+	if(EditCCSTask.isTeenModel) then
+		playerChar:SetCartoonFaceComponent(1, 0, -1);
+		playerChar:SetCartoonFaceComponent(2, 0, -1);
+		playerChar:SetCartoonFaceComponent(3, 0, -1);
+		playerChar:SetCartoonFaceComponent(4, 0, -1); -- mouse is still used
+		playerChar:SetCartoonFaceComponent(5, 0, -1);
+	end
+	local _this = ParaUI.GetUIObject("Custom_ComposedFace");
+    if(_this:IsValid() == true) then
+		_this.background = curPlayer:GetReplaceableTexture(7):GetFileName();
+    end
+end
 
+function EditCCSTask.TestCartoonFace(type, style)
 	local player = curPlayer;
 	local playerChar = player:ToCharacter();
 	-- set to cartoon face
@@ -1277,535 +1345,9 @@ function EditCCSTask.GetDS_Func_CharacterSlot(index_Func)
 end
 
 function EditCCSTask.TestCharacterSlot(type, style)
-
 	local player = curPlayer;
 	local playerChar = player:ToCharacter();
 	-- set to cartoon face
 	playerChar:SetBodyParams(-1, -1, -1, -1, 1);
 	playerChar:SetCartoonFaceComponent(type, 0, style);
-	
-    --local _this = ParaUI.GetUIObject("Custom_ComposedFace");
-    --if(_this:IsValid() == true) then
-		--_this.background = curPlayer:GetReplaceableTexture(7):GetFileName();
-    --end
-end
-
---local SkinTexSize = 256;
---
---function EditCCSTask.Custom_ComposedSkin(params)
---end
-
-
-
---function EditCCSTask.TestNameConvention()
-	---- get the current character 
-	---- check the naming and convension in the character directory
-	--local player = curPlayer;
-	--local playerAsset = player:GetPrimaryAsset():GetKeyName();
-	--if(playerAsset ~= nil) then
-		--local ext = string.lower(ParaIO.GetFileExtension(playerAsset));
-		--local fileName;
-		--local directory;
-		--if(ext ~= "x") then
-			---- this is a Para-X file
-			--fileName = ParaIO.GetFileName(playerAsset);
-			--directory = string.gsub(playerAsset, fileName, "");
-		--elseif(ext ~= "xml") then
-			---- this is an xml desc character file with LoD
-			--fileName = ParaIO.GetFileName(playerAsset);
-			--directory = string.gsub(playerAsset, fileName, "");
-		--else
-			---- not an engine acceptable file extension
-		--end
-			--
-		--local nMaxNumFiles = 5000;
-		---- check the base skins
-		--local search_result = ParaIO.SearchFiles(directory, "*.dds", "", 0, nMaxNumFiles, 0);
-		--local nCount = search_result:GetNumOfResult();
-		--local i = 0;
-		--for i = 0, nCount - 1 do
-			--local skins = search_result:GetItem(i);
-			--
-			--local nGeoSetPos = string.find(sTexFileName_TU, "Hairs_");
-			--
-			--search_result
-		--end
-		--if(search_result) then
-		--end
-		--
-		--searchfiles
-		--directory
-		--
-		---- check the hair styles
-		--
-		---- check the wings styles
-		--
-		---- check the wings styles
-			--
-	--end
---end
-
-
-
-
-
--- take screen shot of the character pe:avatar. 
-function EditCCSTask.TakeAvatarSnapshot()
-	-- taking the snapshot calling the AvatarRegPage.lua function
-	NPL.load("(gl)script/kids/3DMapSystemUI/CCS/AvatarRegPage.lua");
-	Map3DSystem.App.CCS.AvatarRegPage.TakeAvatarSnapshot();
-end
-
--- load the current player to canvas
-function EditCCSTask.OnRefreshAvatar()
-	local self = document:GetPageCtrl();
-	if(not self) then 
-		log("warning: page control not found\n")
-		return 
-	end
-	
-	local ctl = self:FindControl("avatar");
-	if(ctl and curPlayer:IsValid()) then
-		ctl:ShowModel({
-			["IsCharacter"] = true,
-			["y"] = 0,
-			["x"] = 0,
-			["facing"] = -1.57,
-			["name"] = "avatar",
-			["z"] = 0,
-			["AssetFile"] = curPlayer:GetPrimaryAsset():GetKeyName(),
-			["CCSInfoStr"] = Map3DSystem.UI.CCS.GetCCSInfoString(curPlayer),
-		});
-	end
-end
-
--- save the user avatar information
-function EditCCSTask.OnClickSave()
-
-	local self = document:GetPageCtrl();
-	if(not self) then 
-		log("warning: page control not found")
-		return 
-	end
-	
-	if(name ~= Map3DSystem.User.Name) then
-		-- LXZ: is it really needed? 2008.6.21
-		-- paraworld.ShowMessage("请先切换到你的主角\n");
-		-- return 
-	end
-	
-	local player = curPlayer;
-	local name = curPlayer.name;
-	
-	local PlayerAsset = player:GetPrimaryAsset():GetKeyName();
-	local ccsinfo = Map3DSystem.UI.CCS.GetCCSInfoString(player);
-	
-	local profile = Map3DSystem.App.CCS.app:GetMCMLInMemory() or {};
-	if(type(profile) ~= "table") then
-		profile = {};
-	end
-	profile.CharParams = profile.CharParams or {};
-	
-	-- modified lxz 2008.6.21
-	local CharParams = {
-		AssetFile = PlayerAsset,
-		CCSInfoStr = ccsinfo,
-	}
-	if(not commonlib.partialcompare(profile.CharParams, CharParams)) then
-		self:SetUIValue("result", "正在更新, 请稍候...");
-		commonlib.partialcopy(profile.CharParams, CharParams);
-		
-		Map3DSystem.App.CCS.app:SetMCML(nil, profile, function (uid, appkey, bSucceed)
-			if(bSucceed) then
-				self:SetUIValue("result", "更新成功！ 谢谢！")
-			else
-				self:SetUIValue("result", "暂时无法更新，请稍候再试")
-			end	
-		end)
-	else
-		self:SetUIValue("result", "您并没有做任何修改")
-	end	
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- 26 for IT_MASK, CS_FACE_ADDON
-
-
-function EditCCSTask.Custom_OriginalCCSMain(params)
-    
-    ParaUI.Destroy("Custom_OriginalCCSMain");
-    
-    local _this = ParaUI.CreateUIObject("container", "Custom_OriginalCCSMain", params.alignment, params.left, params.top, params.width, params.height);
-	_this.background = "";
-	params.parent:AddChild(_this);
-	
-	local _parent = _this;
-	
-	NPL.load("(gl)script/kids/3DMapSystemUI/InGame/TabGrid.lua");
-	
-	NPL.load("(gl)script/kids/3DMapSystemUI/CCS/DB.lua");
-	
-	local _tab_INV = ParaUI.CreateUIObject("container", "Tab_INV", "_mr", 0, 0, 60, 0);
-	_tab_INV.background = "";
-	_parent:AddChild(_tab_INV);
-	
-	local _inventorySelector = ParaUI.CreateUIObject("container", "Selector", "_fi", 0, 0, 60, 0);
-	_inventorySelector.background = "";
-	_parent:AddChild(_inventorySelector);
-	
-	
-	NPL.load("(gl)script/ide/TreeView.lua");
-	local tabPagesNode_INV = CommonCtrl.TreeNode:new({Name = "CCS_TabControlRootNode_INV"});
-	tabPagesNode_INV:AddChild(CommonCtrl.TreeNode:new({tooltip = "Hat", icon = "Texture/3DMapSystem/CCS/RightPanel/IT_Head.png"}));
-	tabPagesNode_INV:AddChild(CommonCtrl.TreeNode:new({tooltip = "Shoulder", icon = "Texture/3DMapSystem/CCS/RightPanel/IT_Shoulder.png"}));
-	tabPagesNode_INV:AddChild(CommonCtrl.TreeNode:new({tooltip = "Shirt", icon = "Texture/3DMapSystem/CCS/RightPanel/IT_Chest.png"}));
-	tabPagesNode_INV:AddChild(CommonCtrl.TreeNode:new({tooltip = "Gloves", icon = "Texture/3DMapSystem/CCS/RightPanel/IT_Gloves.png"}));
-	tabPagesNode_INV:AddChild(CommonCtrl.TreeNode:new({tooltip = "Pants", icon = "Texture/3DMapSystem/CCS/RightPanel/IT_Pants.png"}));
-	tabPagesNode_INV:AddChild(CommonCtrl.TreeNode:new({tooltip = "Boots", icon = "Texture/3DMapSystem/CCS/RightPanel/IT_Boots.png"}));
-	tabPagesNode_INV:AddChild(CommonCtrl.TreeNode:new({tooltip = "LeftHand", icon = "Texture/3DMapSystem/CCS/RightPanel/IT_HandLeft.png"}));
-	tabPagesNode_INV:AddChild(CommonCtrl.TreeNode:new({tooltip = "RightHand", icon = "Texture/3DMapSystem/CCS/RightPanel/IT_HandRight.png"}));
-	tabPagesNode_INV:AddChild(CommonCtrl.TreeNode:new({tooltip = "Tabard", icon = "Texture/3DMapSystem/CCS/RightPanel/IT_Cape.png"}));
-	
-	NPL.load("(gl)script/ide/TabControl.lua");
-    
-    CommonCtrl.DeleteControl("CCS_TabControl_Inventory");
-    
-	local ctl = CommonCtrl.TabControl:new{
-			name = "CCS_TabControl_Inventory",
-			parent = _tab_INV,
-			background = nil,
-			alignment = "_fi",
-			wnd = nil,
-			left = 0,
-			top = 0,
-			width = 0,
-			height = 0,
-			zorder = 0,
-			
-			TabAlignment = "Right", -- Left|Right|Top|Bottom, Top if nil
-			TabPages = tabPagesNode_INV, -- CommonCtrl.TreeNode object, collection of tab pages
-			TabHeadOwnerDraw = function(_parent, tabControl) 
-					local _head = ParaUI.CreateUIObject("container", "Item", "_fi", 0, 0, 0, 0);
-					_head.background = "Texture/3DMapSystem/Creator/tabcontrol_bg_32bits.png;32 0 32 14:20 13 11 0";
-					_head.enabled = false;
-					_parent:AddChild(_head);
-					local _head = ParaUI.CreateUIObject("button", "Item", "_lb", 20, -40, 32, 32);
-					_head.background = "Texture/3DMapSystem/Creator/PageUp.png";
-					_head.onclick = ";CommonCtrl.TabControl.PageBackward(\""..tabControl.name.."\");";
-					_parent:AddChild(_head);
-				end, --function(_parent, tabControl) end, -- area between top/left border and the first item
-			TabTailOwnerDraw = function(_parent, tabControl) 
-					local _tail = ParaUI.CreateUIObject("container", "Item", "_fi", 0, 0, 0, 0);
-					_tail.background = "Texture/3DMapSystem/Creator/tabcontrol_bg_32bits.png;32 52 32 12:20 0 11 11";
-					_tail.enabled = false;
-					_parent:AddChild(_tail);
-					local _tail = ParaUI.CreateUIObject("button", "Item", "_lt", 20, 8, 32, 32);
-					_tail.background = "Texture/3DMapSystem/Creator/PageDown.png";
-					_tail.onclick = ";CommonCtrl.TabControl.PageForward(\""..tabControl.name.."\");";
-					_parent:AddChild(_tail);
-				end, --function(_parent, tabControl) end, -- area between the last item and buttom/right border
-			TabStartOffset = 40, -- start of the tabs from the border
-			TabItemOwnerDraw = function(_parent, index, bSelected, tabControl) 
-					if(bSelected == true) then
-						local _item = ParaUI.CreateUIObject("container", "Item", "_fi", 0, 0, 0, 0);
-						_item.background = "Texture/3DMapSystem/Creator/tabcontrol_bg_32bits.png;32 14 32 37:17 16 14 16";
-						_item.enabled = false;
-						_parent:AddChild(_item);
-					else
-						local _item = ParaUI.CreateUIObject("container", "Item", "_fi", 0, 0, 0, 0);
-						_item.background = "Texture/3DMapSystem/Creator/tabcontrol_bg_32bits.png;32 11 32 3:20 1 11 1";
-						_item.enabled = false;
-						_parent:AddChild(_item);
-					end
-					local node = tabControl.TabPages:GetChild(index);
-					local _item = ParaUI.CreateUIObject("button", "Item", "_lt", 22, 8, 32, 32);
-					_item.background = node.icon;
-					_item.onclick = string.format(";CommonCtrl.TabControl.OnClickTab(%q, %s);", tabControl.name, index);
-					_parent:AddChild(_item);
-				end, --function(_parent, index, bSelected, tabControl) end, -- owner draw item
-			TabItemWidth = 60, -- width of each tab item
-			TabItemHeight = 48, -- height of each tab item
-			MaxTabNum = 8, -- maximum number of the tabcontrol, pager required when tab number exceeds the maximum
-			OnSelectedIndexChanged = function(fromIndex, toIndex)
-				local ctl = CommonCtrl.GetControl("InventoryTabGrid");
-				if(ctl ~= nil) then
-					ctl:SetLevelIndex(toIndex);
-				end
-			end,
-		};
-	ctl:Show(true);
-	
-	-- default to shirt
-	ctl:SetSelectedIndex(3);
-	
-	-- unmount the item according to current character slot on the current character
-	function OnClickUnmountCurrentCharacterSlot()
-		
-		local ctl = CommonCtrl.GetControl("InventoryTabGrid");
-		if(ctl ~= nil) then
-			local level1index, _ = ctl:GetLevelIndex();
-			local component;
-			if(level1index == 1) then
-				component = Map3DSystem.UI.CCS.DB.CS_HEAD;
-			elseif(level1index == 2) then
-				component = Map3DSystem.UI.CCS.DB.CS_SHOULDER;
-			elseif(level1index == 3) then
-				component = Map3DSystem.UI.CCS.DB.CS_SHIRT;
-			elseif(level1index == 4) then
-				component = Map3DSystem.UI.CCS.DB.CS_GLOVES;
-			elseif(level1index == 5) then
-				component = Map3DSystem.UI.CCS.DB.CS_PANTS;
-			elseif(level1index == 6) then
-				component = Map3DSystem.UI.CCS.DB.CS_BOOTS;
-			elseif(level1index == 7) then
-				component = Map3DSystem.UI.CCS.DB.CS_HAND_LEFT;
-			elseif(level1index == 8) then
-				component = Map3DSystem.UI.CCS.DB.CS_HAND_RIGHT;
-			elseif(level1index == 9) then
-				component = Map3DSystem.UI.CCS.DB.CS_CAPE;
-			end
-			
-			
-			Map3DSystem.SendMessage_obj({type = Map3DSystem.msg.OBJ_SelectObject, obj = curPlayer});
-			
-			-- temporarily directly mount the item on the selected character
-			local player, playerChar = Map3DSystem.UI.CCS.DB.GetPlayerChar();
-			if(playerChar~=nil) then
-				playerChar:SetCharacterSlot(component, 0);
-			end
-			
-			-- TODO: general implementation
-			-- mount the default shirt or pant for human female and male
-			local player = curPlayer;
-			local assetName = player:GetPrimaryAsset():GetKeyName();
-			
-			if(string.find(assetName, "HumanFemale.x") ~= nil) then
-				if(component == Map3DSystem.UI.CCS.DB.CS_SHIRT) then
-					playerChar:SetCharacterSlot(component, 10);
-				elseif(component == Map3DSystem.UI.CCS.DB.CS_PANTS) then
-					playerChar:SetCharacterSlot(component, 12);
-				end
-			end
-			
-			if(string.find(assetName, "HumanMale.x") ~= nil) then
-				if(component == Map3DSystem.UI.CCS.DB.CS_SHIRT) then
-					playerChar:SetCharacterSlot(component, 11);
-				elseif(component == Map3DSystem.UI.CCS.DB.CS_PANTS) then
-					playerChar:SetCharacterSlot(component, 13);
-				end
-			end
-			
-			Map3DSystem.SendMessage_obj({type = Map3DSystem.msg.OBJ_DeselectObject, obj = nil});
-		end
-	end
-	
-	CommonCtrl.DeleteControl("InventoryTabGrid");
-	local ctl = CommonCtrl.GetControl("InventoryTabGrid");
-	if(ctl == nil) then
-		local param = {
-			name = "InventoryTabGrid",
-			parent = _inventorySelector,
-			background = "Texture/3DMapSystem/Creator/tabcontrol_bg_32bits.png;0 0 32 64:16 16 1 16",
-			wnd = wnd,
-			
-			----------- CATEGORY REGION -----------
-			Level1 = "Right",
-			Level1BG = "",
-			Level1HeadBG = "Texture/3DMapSystem/Desktop/RightPanel/BarBGTop.png; 0 0 50 24",
-			Level1TailBG = "Texture/3DMapSystem/Desktop/RightPanel/BarBGBottom.png; 0 0 50 64: 1 0 1 63",
-			Level1Offset = 24,
-			Level1ItemWidth = 0,
-			Level1ItemHeight = 50,
-			--Level1ItemGap = 8,
-			
-			Level1ItemOwnerDraw = function (_parent, level1index, bSelected, tabGrid)
-				-- background
-				if(bSelected) then
-					local _back = ParaUI.CreateUIObject("container", "back", "_fi", 0, 0, 0, 0);
-					_back.background = tabGrid.GetLevel1ItemSelectedBackImage(level1index);
-					_parent:AddChild(_back);
-				else
-					local _back = ParaUI.CreateUIObject("container", "back", "_fi", 0, 0, 0, 0);
-					_back.background = tabGrid.GetLevel1ItemUnselectedBackImage(level1index);
-					_parent:AddChild(_back);
-				end
-				
-				-- icon
-				local _btn = ParaUI.CreateUIObject("button", "btn"..level1index, "_lt", 11, 9, 32, 32);
-				if(bSelected) then
-					_btn.background = tabGrid.GetLevel1ItemSelectedForeImage(level1index);
-				else
-					_btn.background = tabGrid.GetLevel1ItemUnselectedForeImage(level1index);
-				end
-				_btn.onclick = string.format([[;Map3DSystem.UI.TabGrid.OnClickCategory("%s", %d, nil);]], 
-						tabGrid.name, level1index);
-				_parent:AddChild(_btn);
-			end,
-			
-			--Level2 = "Top",
-			--Level2Offset = 48,
-			--Level2ItemWidth = 32,
-			--Level2ItemHeight = 48,
-			--Level2ItemGap = 0,
-			
-			----------- GRID REGION -----------
-			nGridBorderLeft = 0,
-			nGridBorderTop = 8,
-			nGridBorderRight = 0,
-			nGridBorderBottom = 0,
-			
-			nGridCellWidth = 48,
-			nGridCellHeight = 48,
-			nGridCellGap = 8, -- gridview gap between cells
-			
-			----------- PAGE REGION -----------
-			pageRegionHeight = 48,
-			pageNumberWidth = 40,
-			pageDefaultMargin = 16,
-			pageNumberColor = "0 0 0",
-			
-			pageLeftImage = "Texture/3DMapSystem/Desktop/RightPanel/PreviousPage32.png",
-			pageLeftWidth = 24,
-			pageLeftHeight = 24,
-			
-			pageRightImage = "Texture/3DMapSystem/Desktop/RightPanel/NextPage32.png",
-			pageRightWidth = 24,
-			pageRightHeight = 24,
-			
-			isAlwaysShowPager = true,
-			
-			isGridView3D = true, -- show 3D grid
-			
-			----------- FUNCTION REGION -----------
-			GetLevel1ItemCount = function() return 9; end,
-			GetLevel1ItemSelectedForeImage = function(index)
-					if(index == 1) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Head.png";
-					elseif(index == 2) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Shoulder.png";
-					elseif(index == 3) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Chest.png";
-					elseif(index == 4) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Gloves.png";
-					elseif(index == 5) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Pants.png";
-					elseif(index == 6) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Boots.png";
-					elseif(index == 7) then return "Texture/3DMapSystem/CCS/RightPanel/IT_HandLeft.png";
-					elseif(index == 8) then return "Texture/3DMapSystem/CCS/RightPanel/IT_HandRight.png";
-					elseif(index == 9) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Cape.png";
-					end
-				end,
-			GetLevel1ItemSelectedBackImage = function(index)
-					return "Texture/3DMapSystem/Desktop/RightPanel/TabSelected.png; 0 0 50 64: 24 16 12 12";
-				end,
-			GetLevel1ItemUnselectedForeImage = function(index)
-					if(index == 1) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Head.png";
-					elseif(index == 2) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Shoulder.png";
-					elseif(index == 3) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Chest.png";
-					elseif(index == 4) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Gloves.png";
-					elseif(index == 5) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Pants.png";
-					elseif(index == 6) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Boots.png";
-					elseif(index == 7) then return "Texture/3DMapSystem/CCS/RightPanel/IT_HandLeft.png";
-					elseif(index == 8) then return "Texture/3DMapSystem/CCS/RightPanel/IT_HandRight.png";
-					elseif(index == 9) then return "Texture/3DMapSystem/CCS/RightPanel/IT_Cape.png";
-					end
-				end,
-			GetLevel1ItemUnselectedBackImage = function(index)
-					return "Texture/3DMapSystem/Desktop/RightPanel/TabUnSelected.png; 0 0 50 64";
-				end,
-			
-			
-			GetGridItemEnabled = function()
-					return true;
-				end,
-			
-			GetGridItemCount = function(level1index, level2index)
-					return table.getn(Map3DSystem.UI.CCS.DB.AuraInventoryID[level1index]);
-				end,
-			GetGrid3DItemModel = function(level1index, level2index, itemindex)
-					return Map3DSystem.UI.CCS.DB.AuraInventoryPreview[level1index][itemindex].model;
-				end,
-			GetGrid3DItemSkin = function(level1index, level2index, itemindex)
-					return Map3DSystem.UI.CCS.DB.AuraInventoryPreview[level1index][itemindex].skin;
-				end,
-			
-			OnClickItem = function(level1index, level2index, itemindex)
-					
-					if(mouse_button == "right") then
-						local param = {
-							AssetFile = Map3DSystem.UI.CCS.DB.AuraInventoryPreview[level1index][itemindex].model, 
-							x = 0, y = 0, z = 0, 
-							ReplaceableTextures = {
-								[2] = Map3DSystem.UI.CCS.DB.AuraInventoryPreview[level1index][itemindex].skin[1],
-								[3] = Map3DSystem.UI.CCS.DB.AuraInventoryPreview[level1index][itemindex].skin[2],
-								[4] = Map3DSystem.UI.CCS.DB.AuraInventoryPreview[level1index][itemindex].skin[3],
-								[5] = Map3DSystem.UI.CCS.DB.AuraInventoryPreview[level1index][itemindex].skin[4],},
-						};
-						Map3DSystem.UI.Creator.ShowPreview(param);
-					elseif(mouse_button == "left") then
-						local component;
-						if(level1index == 1) then
-							component = Map3DSystem.UI.CCS.DB.CS_HEAD;
-						elseif(level1index == 2) then
-							component = Map3DSystem.UI.CCS.DB.CS_SHOULDER;
-						elseif(level1index == 3) then
-							component = Map3DSystem.UI.CCS.DB.CS_SHIRT;
-						elseif(level1index == 4) then
-							component = Map3DSystem.UI.CCS.DB.CS_GLOVES;
-						elseif(level1index == 5) then
-							component = Map3DSystem.UI.CCS.DB.CS_PANTS;
-						elseif(level1index == 6) then
-							component = Map3DSystem.UI.CCS.DB.CS_BOOTS;
-						elseif(level1index == 7) then
-							component = Map3DSystem.UI.CCS.DB.CS_HAND_LEFT;
-						elseif(level1index == 8) then
-							component = Map3DSystem.UI.CCS.DB.CS_HAND_RIGHT;
-						elseif(level1index == 9) then
-							component = Map3DSystem.UI.CCS.DB.CS_CAPE;
-						end
-						
-						Map3DSystem.SendMessage_obj({type = Map3DSystem.msg.OBJ_SelectObject, obj = curPlayer});
-						
-						-- temporarily directly mount the item on the selected character
-						local player, playerChar = Map3DSystem.UI.CCS.DB.GetPlayerChar();
-						if(playerChar~=nil) then
-							--playerChar:SetCharacterSlot(component, Map3DSystem.UI.CCS.DB.AuraInventoryID[level1index][itemindex]);
-							Map3DSystem.UI.CCS.Inventory.SetCharacterSlot(player, component, Map3DSystem.UI.CCS.DB.AuraInventoryID[level1index][itemindex]);
-						end
-						
-						Map3DSystem.SendMessage_obj({type = Map3DSystem.msg.OBJ_DeselectObject, obj = nil});
-						
-					end
-				end,
-		};
-		ctl = Map3DSystem.UI.TabGrid:new(param);
-	end
-	
-	ctl:Show(true);
-	
-	-- default to shirt 
-	ctl:SetLevelIndex(3);
-	
-	local _tools = ParaUI.CreateUIObject("container", "Tools", "_lb", 4, -44, 245, 40);
-	_tools.background = "Texture/3DMapSystem/Creator/container_32bits.png:7 7 7 7";
-	_parent:AddChild(_tools);
-	
-	-- remove item button
-	local _remove = ParaUI.CreateUIObject("button", "Remove", "_lt", 4, 4, 32, 32);
-	_remove.background = "Texture/3DMapSystem/common/reset.png";
-	_remove.onclick = ";OnClickUnmountCurrentCharacterSlot();";
-	_remove.tooltip = "卸下当前装备";
-	_tools:AddChild(_remove);
 end

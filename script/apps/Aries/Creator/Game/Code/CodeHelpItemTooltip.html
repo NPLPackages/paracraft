@@ -83,8 +83,12 @@
         local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
         CodeBlockWindow.ShowHelpWndForCodeName(name);
     end
+    function onclickBg()
+
+    end
 ]]></script>
 <div style="font-size:12px;padding:3px;background-color:#292929;" class="default">
+    <pe:container onclick="onclickBg" width="100%" height="100%" zorder="-2" style="position: relative; "></pe:container>
     <pe:if condition="<%=not IsShortTip()%>">
         <pe:if condition="<%=IsShowCloseBtn()%>">
             <input class="mc_close_button" type="button" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="OnClickClose" style="margin-top:3px;margin-left:0px;" />
@@ -131,6 +135,7 @@
             <%=L"右键查看..."%>
         </div>
     </pe:if>
+    
 </div>
 </pe:mcml>
 

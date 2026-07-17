@@ -74,7 +74,7 @@ local cmds = {
 			text = 1, 
 		},
 	},
-	hide_in_toolbox = true,
+	--hide_in_toolbox = true,
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,
@@ -84,7 +84,7 @@ local cmds = {
 	func_description = 'scale(%s,%s,%s)',
 	func_description_js = 'scale(%s,%s,%s)',
 	ToNPL = function(self)
-		return string.format('scale(%s,%,%s)\n', 
+		return string.format('scale(%s,%s,%s)\n', 
 			self:getFieldValue('x'),self:getFieldValue('y'),self:getFieldValue('z')
 			);
 	end,
@@ -254,7 +254,7 @@ local cmds = {
 		},
 		
 	},
-	hide_in_toolbox = true,
+	-- hide_in_toolbox = true,
 	category = "ShapeOperators", 
 	helpUrl = "", 
 	canRun = false,

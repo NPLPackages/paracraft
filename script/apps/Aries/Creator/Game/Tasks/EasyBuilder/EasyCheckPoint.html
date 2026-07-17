@@ -1,0 +1,268 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyCheckPoint.lua" refresh="false">
+<![CDATA[
+    EasyCheckPoint = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/EasyCheckPoint.lua");
+    EasyCheckPoint.OnInit()
+    
+    -- 获取模型显示文本
+    function getModelDisplayText(model)
+        if not model then return "" end
+        local name = model.name or L"未命名模型"
+        local downloads = model.downloads or 0
+        local likes = model.likes or 0
+        return string.format("%s\n下载: %d | 收藏: %d", name, downloads, likes)
+    end
+    
+    -- 获取模型工具提示
+    function getModelTooltip(model)
+        if not model then return "" end
+        local tooltip = {}
+        table.insert(tooltip, string.format(L"名称: %s", model.name or L"未命名"))
+        table.insert(tooltip, string.format(L"作者: %s", model.username or L"未知"))
+        table.insert(tooltip, string.format(L"下载数: %d", model.downloads or 0))
+        table.insert(tooltip, string.format(L"收藏数: %d", model.likes or 0))
+        if model.updatedAt then
+            table.insert(tooltip, string.format(L"更新时间: %s", model.updatedAt))
+        end
+        if model.desc and model.desc ~= "" then
+            table.insert(tooltip, string.format(L"描述: %s", model.desc))
+        end
+        return table.concat(tooltip, "\n")
+    end
+    
+    -- 获取排序选项显示文本
+    function getSortDisplayText(sortConfig)
+        local current = EasyCheckPoint.current_sort or {}
+        local text = sortConfig.desc
+        if current.name == sortConfig.name then
+            text = text .. (current.order == "desc" and " ↓" or " ↑")
+        end
+        return text
+    end
+    
+    -- 检查是否正在加载
+    function isLoading()
+        return EasyCheckPoint.isLoading == true
+    end
+    
+    -- 获取当前页面信息
+    function getPageInfo()
+        local models = EasyCheckPoint.showModels or {}
+        local totalCount = EasyCheckPoint.totalCount
+        local currentCount = #models
+        
+        if totalCount then
+            return string.format(L"显示 %d / %d 个模型", currentCount, totalCount)
+        else
+            return string.format(L"已显示 %d 个模型", currentCount)
+        end
+    end
+
+    function DS_ModelItems(index)
+        if index == nil then
+            return #EasyCheckPoint.showModels
+        else
+            return EasyCheckPoint.showModels[index]
+        end
+    end
+
+    function IsRecommend(index)
+        local model = EasyCheckPoint.showModels[index]
+        return model and model.isRecommend == true
+    end
+
+    function GetLikedStyle(index)
+        local model = EasyCheckPoint.showModels[index]
+        if model and model.isLiked then
+            return "float:left; margin-top: 20px; margin-left: 12px; width: 24px; height: 24px; background:url(Texture/Aries/CrazyTower/star_32bits.png#0 0 23 23)"
+        else
+            return "float:left; margin-top: 20px; margin-left: 12px; width: 24px; height: 24px; background:url(Texture/Aries/CrazyTower/star_empty_32bits.png#0 0 23 23)"
+        end
+    end
+
+    function load_more()
+        EasyCheckPoint.LoadMore(Eval("index"))
+    end
+
+    function GetOccupyStr(modelUser)
+        local username = Mod.WorldShare.Store:Get('user/username') or ""
+        local isMine = tostring(username) == tostring(modelUser)
+        if isMine then
+            return L"我已加载"
+        else
+            return modelUser .. L"加载中"
+        end
+    end
+]]>
+</script>
+
+<style>
+    .closebtn {
+        position: relative;
+        margin-right: -8;
+        margin-top: -16;
+        width: 56px;
+        height: 56px;
+        background: url(Texture/player/close.png);
+    }
+    .actionbtn {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        font-size: 14px;
+        spacing:10px;
+        height: 45px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        color: #000000;
+    }
+    .actionbtn_highlight {
+        background: url(Texture/Aquarius/Button_Highlight_Large.png:15 15 15 15);
+        font-size: 14px;
+        spacing:10px;
+        height: 45px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        color: #000000;
+    }
+    .maincontainer {
+        padding: 10px;padding-top:20px;
+        background: url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);
+        color: #ffffff;
+    }
+    .slot_bg {
+        background: url(Texture/Aries/Common/ThemeKid/monsterhandbook/fram_bg_32bits.png: 6 6 8 8);
+    }
+</style>
+
+<div class="maincontainer" style="width:900px;height:630px;">
+    <div style="position:relative">
+        <input type="button" name="CloseBtn" onclick="EasyCheckPoint.CloseWindow" align="right" class="closebtn" />
+    </div>
+    <div style="position: relative; margin-top:10px;">
+        <input type="button" align="right" onclick="EasyCheckPoint.OnClickMine" value='<%=string.format(L"我在#%s的存档", EasyCheckPoint.GetActionName())%>' class="actionbtn_highlight"
+               style="position: relative; margin-right:90px;min-width:200px;height:45px; font-size:16px; font-weight: bold;" />
+    </div>
+    <div style="margin-left: 16px; margin-top: 10px;">
+        <span style="font-size:20px; font-weight:bold;color:#50FA7B;"><%="#"..EasyCheckPoint.GetActionName()%></span>
+        <pe:if condition="<%=not GameLogic.IsReadOnly()%>">
+            <input type="button" name="UpdateBtn" onclick="EasyCheckPoint.OnClickUpdate" tooltip="<%=L'编辑存档点'%>" 
+                    style="margin-left:12px; width: 24px; height: 24px; background:url(Texture/Aries/Creator/keepwork/ggs/user/bianji_20X20_32bits.png#0 0 20 20);" />
+        </pe:if>
+    </div>
+
+    <div style="margin-top:25px;margin-left:16px;">
+        <div  style="float: left; ">
+            <div style="float: left;">
+                <input type="text"
+                    name="checkpoint" 
+                    SkipAutoBadWordFilter='true'
+                    RemoveSpaces='true'
+                    EmptyText='<%= L"请输入存档ID" %>'
+                    MoveViewWhenAttachWithIME='true'
+                    style="font-size: 16px; width: 120px;margin-top:5px; height: 36px; "
+                />
+            </div>
+            <input type="button" class="actionbtn" value="<%=L'加载'%>" onclick="EasyCheckPoint.OnClickSearch" style="float: left;margin-left:5px" />
+        </div>
+        <div style="float: left; margin-left: 20px;">
+            <div style="float:left;margin-top:9px;color:#FFD700;font-size: 16px; font-weight: bold;"><%=L"排序:"%></div>
+            <div style="float:left;margin-left:5px;">
+                <pe:repeat DataSource="<%=EasyCheckPoint.GetSortOptions()%>">
+                    <pe:repeatitem style="float:left;">
+                        <input type="button" name='<%=Eval("index")%>' onclick="EasyCheckPoint.OnClickSort" value='<%=EasyCheckPoint.GetSortDisplayText(Eval("index"))%>' class="actionbtn" style="float:left;" />
+                    </pe:repeatitem>
+                </pe:repeat>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模型网格视图 -->
+    <div style="width:910px">
+        <pe:gridview name="modelGridView" 
+                    AllowPaging="false" 
+                    CellPadding="18"
+                    ItemsPerLine="3" 
+                    DefaultNodeHeight="110" 
+                    RememberScrollPos="true" 
+                    DataSource='<%=DS_ModelItems%>'>
+            <Columns>
+                <div style="width:267px; height: 108px;">
+                    <pe:if condition="<%=Eval('isPlaceholder')%>">
+                        <pe:if condition="<%=Eval('isOccupied')%>">
+                            <div class="slot_bg" zorder="-1" style="position: relative; width: 267px; height: 108px; color: #f8868e">
+                                <div style="float: left; margin-top: 8px; margin-left: 12px; font-size: 14px;"><%="#"..Eval('id')%></div>
+                                <pe:if condition="<%=(Eval('desc') or '') ~= '' %>">
+                                    <div style="float: left; position:relative;margin-top: 8px; margin-left: 12px; font-size: 14px;"><%=Eval('desc')%></div>
+                                </pe:if>
+                                <div style="width:300px;color: #d3d3d3;">
+                                    <div style="float: left; margin-left: 12px; margin-top: 6px; width: 120px; font-size: 12px; "><%="大小："..EasyCheckPoint.FormatFileSize(Eval("size"))%></div>
+                                    <div style="float: left; margin-left: 20px; margin-top: 6px; width: 120px; font-size: 12px; "><%="人气："..Eval("downloads")%></div>
+                                </div>
+                                <div style="position: relative; margin-left: 12px; margin-top: 6px; width: 130px; font-size: 14px;"><%=GetOccupyStr(Eval('occupiedUser'))%></div>
+                                <pe:if condition="<%=Eval('isMine')%>">
+                                    <div style="float: left; margin-top: 8px; margin-left: 144px; width: 108px; height: 36px;"></div>
+                                </pe:if>
+                                <pe:if condition="<%=not Eval('isMine')%>">
+                                    <pe:if condition="<%=EasyCheckPoint.IsModelDataLoaded(Eval('id'))%>">
+                                        <input type="button" name="<%=Eval('index')%>" value="<%='卸载'%>" onclick="EasyCheckPoint.OnClickRemoveDownloaded" class="actionbtn" style="float: left; margin-top: 8px; margin-left: 144px; width: 108px; height: 36px; font-size: 14px;" />
+                                    </pe:if>
+                                    <pe:if condition="<%=not EasyCheckPoint.IsModelDataLoaded(Eval('id'))%>">
+                                        <input type="button" name="<%=Eval('index')%>" value="<%='加载'%>" onclick="EasyCheckPoint.OnClickDownloaded" class="actionbtn" style="float: left; margin-top: 8px; margin-left: 144px; width: 108px; height: 36px; font-size: 14px;" />
+                                    </pe:if>
+                                </pe:if>
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%=not Eval('isOccupied')%>">
+                            <div class="slot_bg" zorder="-1" onclick="EasyCheckPoint.OnClickMine" style="position: relative; width: 267px; height: 108px;">
+                                <div style="position: relative; margin-left: 116px; margin-top: 18px; width: 40px; height: 38px; background:url(Texture/Aries/Creator/keepwork/Mall/btn_add_40X38_32bits.png#0 0 40 38);">
+                                </div>
+                                <div style="text-align: center; margin-top: 70px; font-size: 16px; font-weight: bold; color: #e4b178;"><%=L"我要入驻"%></div>
+                            </div>
+                        </pe:if>
+                    </pe:if>
+                    <pe:if condition="<%=not Eval('isPlaceholder')%>">
+                        <div class="slot_bg" zorder="-1" style="position: relative; width: 267px; height: 108px;"></div>
+                        <pe:if condition="<%=IsRecommend(Eval('index'))%>">
+                            <div style="position: relative; margin-left:246px; margin-top: 0; width: 28px; height: 34px; background:url(Texture/Aries/Creator/keepwork/Mall/icon_hot_28X34_32bits.png#0 0 28 34)"></div>
+                        </pe:if>
+                        <div style="float: left; margin-top: 8px; margin-left: 12px; font-size: 14px; color: #acd78e"><%="#"..Eval('id')%></div>
+                        <pe:if condition="<%=(Eval('desc') or '') ~= '' %>">
+                            <div style="float: left; position:relative;margin-top: 8px; margin-left: 12px; font-size: 14px; color: #b8c7a0;"><%=Eval('desc')%></div>
+                        </pe:if>
+                        <div style="width:300px;color: #d3d3d3;">
+                            <div style="float: left; margin-left: 12px; margin-top: 6px; width: 120px; font-size: 12px;"><%="大小："..EasyCheckPoint.FormatFileSize(Eval("size"))%></div>
+                            <div style="float: left; margin-left: 20px; margin-top: 6px; width: 120px; font-size: 12px;"><%="人气："..Eval("downloads")%></div>
+                        </div>
+                        <pe:if condition="<%=Eval('isLiked')%>">
+                            <input type="button" name="<%=Eval('index')%>" onclick="EasyCheckPoint.OnClickLiked" value="<%='已收藏    ' .. Eval('likes')%>" class="actionbtn" style="float: left; margin-top: 8px; margin-left: 8px; width: 108px; height: 36px; font-size: 14px;" />
+                        </pe:if>
+                        <pe:if condition="<%=not Eval('isLiked')%>">
+                            <input type="button" name="<%=Eval('index')%>" value="<%=''..Eval('likes')%>" onclick="EasyCheckPoint.OnClickLiked" icon="Texture/Aries/Common/ThemeTeen/others/red_heart_32bits.png" icon_off_x="-30" icon_off_y="0" icon_width="16" icon_height="16" class="actionbtn" style="float: left; margin-top: 8px; margin-left: 8px; width: 108px; height: 36px; font-size: 14px;" />
+                        </pe:if>
+                        <pe:if condition="<%=EasyCheckPoint.IsModelDataLoaded(Eval('id'))%>">
+                            <input type="button" name="<%=Eval('index')%>" value="<%='卸载'%>" onclick="EasyCheckPoint.OnClickRemoveDownloaded" class="actionbtn" style="float: left; margin-top: 8px; margin-left: 20px; width: 108px; height: 36px; font-size: 14px;" />
+                        </pe:if>
+                        <pe:if condition="<%=not EasyCheckPoint.IsModelDataLoaded(Eval('id'))%>">
+                            <input type="button" name="<%=Eval('index')%>" value="<%='加载'%>" onclick="EasyCheckPoint.OnClickDownloaded" class="actionbtn" style="float: left; margin-top: 8px; margin-left: 20px; width: 108px; height: 36px; font-size: 14px;" />
+                        </pe:if>
+                        <pe:custom oncreate='<%= load_more() %>'></pe:custom>
+                    </pe:if>
+                </div>
+            </Columns>
+            <EmptyDataTemplate>
+                <div style="color:#d7dae4;font-size:16px;">
+                    <%=L"暂无存档数据"%>
+                </div>
+                
+            </EmptyDataTemplate>
+            <FetchingDataTemplate>
+                <div style="color:#FFB86C;font-size:16px;">
+                    <%=L"正在加载存档数据..."%>
+                </div>
+            </FetchingDataTemplate>
+        </pe:gridview>
+    </div>
+</div>
+</pe:mcml>
+</html>

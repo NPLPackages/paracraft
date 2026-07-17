@@ -99,9 +99,10 @@ local MakeApp = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"
 MakeApp.mode = {
     android = 0,
     UI = 1,
+    ppt = 2,
 }
 
-MakeApp.curAndroidVersion = "2.0.23";
+MakeApp.curAndroidVersion = "2.1.45_palakaAbiDefault_(2025-04-16-14.48.07)"
 MakeApp.androidBuildRoot = "temp/build_android_resource/";
 MakeApp.iOSBuildRoot = "temp/build_ios_resource/";
 MakeApp.iOSResourceBaseCDN = "https://cdn.keepwork.com/paracraft/ios/";
@@ -133,11 +134,20 @@ function MakeApp:Run(...)
         _guihelper.MessageBox(L"您没有权限打包此世界");
         return;
     end
-    GameLogic.QuickSave()
+    if not GameLogic.IsReadOnly() then
+        GameLogic.QuickSave()
+    end
     local platform = System.os.GetPlatform();
-
+    local params = {...};
     if (platform == "win32" or platform == "mac") then
-        self:RunImp(...);
+        GameLogic.IsVip("MakeApp", true, function(result) 
+            if (result) then
+                self:RunImp(table.unpack(params));
+            else
+                GameLogic.ShowVipGuideTip("MakeApp")
+            end
+        end)
+        
     else
         _guihelper.MessageBox(L"此功能暂不支持该操作系统");
     end
@@ -146,7 +156,11 @@ end
 function MakeApp:RunImp(mode, ...)
     local platform = System.os.GetPlatform();
 
-    if (mode == self.mode.UI) then
+    if (mode == self.mode.ppt) then
+        -- open url in external browser
+        local url = "https://keepwork.com/official/docs/UserGuide/share/ppt";
+        ParaGlobal.ShellExecute("open", url, "", "", 1);
+    elseif (mode == self.mode.UI) then
         System.App.Commands.Call(
             "File.MCMLWindowFrame",
             {
@@ -217,14 +231,90 @@ function MakeApp:MakeWindows()
     end, _guihelper.MessageBoxButtons.YesNo);
 end
 
-function MakeApp:MakeApp()
-    if(self:GenerateFiles()) then
-        if(self:MakeZipInstaller()) then
-            GameLogic.AddBBS(nil, L"恭喜！成功打包为独立应用程序", 5000, "0 255 0")
-            System.App.Commands.Call("File.WinExplorer", self:GetOutputDir());
-            return true;
+function MakeApp:GenerateWorldPkgOrZip(autoUpdateWorld)
+    local ZipFile = commonlib.gettable("System.Util.ZipFile");
+    local zipFile = ZipFile:new();
+    local filename =  self.output_folder.."data.zip"
+    if(zipFile:open(filename, "w")) then
+        zipFile:AddDirectory("/", self.output_folder.."data/*",10);
+        zipFile:close();
+        if not autoUpdateWorld then
+            zipFile:SaveAsPKG()
         end
     end
+    if autoUpdateWorld then
+        ParaIO.DeleteFile(self.output_folder.."data/")
+        local dest_path = self.output_folder.."data/data.zip"
+        ParaIO.CreateDirectory(dest_path)
+        ParaIO.CopyFile(filename, dest_path, true);
+    end
+    ParaIO.DeleteFile(filename);
+    return true
+end
+
+function MakeApp:MakeApp()
+    local isReadOnly = true
+    local needCef3 = false
+    local autoUpdateWorld = false
+    local makeZipFunc = function(autoUpdateWorld)
+        if self:GenerateWorldPkgOrZip(autoUpdateWorld) then
+            if(self:MakeZipInstaller()) then
+                local tip_fuc = function()
+                    GameLogic.AddBBS(nil, L"恭喜！成功打包为独立应用程序", 5000, "0 255 0")
+                    System.App.Commands.Call("File.WinExplorer", self:GetOutputDir());
+                end
+                if isReadOnly then
+                    ParaIO.DeleteFile(self:GetBatFile());
+                    if self:MakeStartupExe(isReadOnly,autoUpdateWorld) then
+                        tip_fuc()
+                    end
+                else
+                    tip_fuc()
+                end
+                return true;
+            end
+        end
+    end
+    local handle = function (isReadOnly,autoUpdateWorld)
+        if(self:GenerateFiles(isReadOnly,autoUpdateWorld)) then
+            if needCef3 then
+                self:IndtallCef3(function(bSucceed)
+                    if bSucceed then
+                        makeZipFunc(autoUpdateWorld)
+                    else
+                        GameLogic.AddBBS(nil, L"无法下载插件cef3", 5000, "0 255 0")
+                    end
+                end)
+            else
+                makeZipFunc(autoUpdateWorld)
+            end
+        end
+    end
+    _guihelper.MessageBox(format(L"是否将世界设置为自动更新?", self.name), function(res)
+        if(res and res == _guihelper.DialogResult.Yes) then
+            autoUpdateWorld = true
+        end
+        _guihelper.MessageBox(L"是否需要打包cef3?", function(res)
+            if(res and res == _guihelper.DialogResult.Yes) then
+                needCef3 = true
+            end
+            handle(isReadOnly,autoUpdateWorld)
+        end, _guihelper.MessageBoxButtons.YesNo);
+    end, _guihelper.MessageBoxButtons.YesNo);
+    -- _guihelper.MessageBox(format(L"是否将世界%s 设置为只读世界?", self.name), function(res)
+    --     isReadOnly = true
+    --     _guihelper.MessageBox(format(L"是否将世界设置为自动更新?", self.name), function(res)
+    --         if(res and res == _guihelper.DialogResult.Yes) then
+    --             autoUpdateWorld = true
+    --         end
+    --         _guihelper.MessageBox(L"是否需要打包cef3?", function(res)
+    --             if(res and res == _guihelper.DialogResult.Yes) then
+    --                 needCef3 = true
+    --             end
+    --             handle(isReadOnly,autoUpdateWorld)
+    --         end, _guihelper.MessageBoxButtons.YesNo);
+    --     end, _guihelper.MessageBoxButtons.YesNo);
+    -- end, _guihelper.MessageBoxButtons.YesNo);
 end
 
 function MakeApp:GetOutputDir()
@@ -235,10 +325,9 @@ function MakeApp:GetBinDir()
     return self.output_folder .. "bin/"
 end
 
-function MakeApp:GenerateFiles()
+function MakeApp:GenerateFiles(isReadOnly,autoUpdateWorld)
     ParaIO.CreateDirectory(self:GetBinDir())
-
-    if(self:MakeStartupExe() and self:CopyWorldFiles() and self:GenerateHelpFile()) then
+    if(self:MakeStartupExe(isReadOnly,autoUpdateWorld) and self:CopyWorldFiles() and self:GenerateHelpFile()) then
         if(self:CopyParacraftFiles()) then
             return true;
         end
@@ -249,15 +338,32 @@ function MakeApp:GetBatFile()
     return self.output_folder .. "start" .. ".bat";
 end
 
-function MakeApp:MakeStartupExe()
+function MakeApp:MakeStartupExe(isReadOnly,autoUpdateWorld)
     local file = ParaIO.open(self:GetBatFile(), "w")
     if(file:IsValid()) then
         file:WriteString("@echo off\n");
         file:WriteString("cd bin\n");
         local worldPath = Files.ResolveFilePath(GameLogic.GetWorldDirectory()).relativeToRootPath or GameLogic.GetWorldDirectory()
-        local strCmd = "start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" mc=\"true\"  bootstrapper=\"script/apps/Aries/main_loop.lua\" world=\"../data/\""
-        if (System.options.channelId and System.options.channelId ~= "") then
-            strCmd = string.format("start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" mc=\"true\" channelId=\"%s\"  bootstrapper=\"script/apps/Aries/main_loop.lua\" world=\"../data/\"",System.options.channelId)
+        local strCmd
+        isReadOnly = true--暂不支持导出非只读，相对路径有问题
+        if isReadOnly then
+            strCmd = "start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" mc=\"true\" bootstrapper=\"script/apps/Aries/main_loop.lua\" "
+            local world = autoUpdateWorld and "world=\"../data/data.zip\" auto_update_world=\"true\"" or "world=\"../data.pkg\""
+            if (System.options.channelId and System.options.channelId ~= "") then
+                strCmd = string.format("start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" mc=\"true\" channelId=\"%s\" bootstrapper=\"script/apps/Aries/main_loop.lua\" ",System.options.channelId)
+                strCmd = strCmd ..world
+            else
+                strCmd = strCmd ..world
+            end
+        else
+            strCmd = "start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" mc=\"true\" bootstrapper=\"script/apps/Aries/main_loop.lua\" "
+            local world = autoUpdateWorld and "world=\"../data/data.zip\" auto_update_world=\"true\"" or "world=\"../data/\""
+            if (System.options.channelId and System.options.channelId ~= "") then
+                strCmd = string.format("start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" mc=\"true\" channelId=\"%s\" bootstrapper=\"script/apps/Aries/main_loop.lua\" ",System.options.channelId)
+                strCmd = strCmd ..world
+            else
+                strCmd = strCmd ..world
+            end
         end
         file:WriteString(strCmd);
         file:close();
@@ -287,7 +393,7 @@ end
 
 local excluded_files = {
     ["log.txt"] = true,
-    [string.lower(System.options.launcherExeName or "ParaCraft.exe")] = true,
+    [string.lower(System.options and System.options.launcherExeName or "ParaCraft.exe")] = true,
     ["haqilauncherkids.exe"] = true,
     ["haqilauncherkids.mem.exe"] = true,
     ["auto_update_log.txt"] = true,
@@ -301,6 +407,7 @@ local bin_files = {
     ["physicsbt.dll"] = true,
     ["ParaEngine.sig"] = true,
     ["lua.dll"] = true,
+    ["parawebview.dll"] = true,
     ["FreeImage.dll"] = true,
     ["libcurl.dll"] = true,
     ["sqlite.dll"] = true,
@@ -336,6 +443,52 @@ function MakeApp:CopyParacraftFiles()
     return true;
 end
 
+function MakeApp:IndtallCef3(cb)
+    local redist_root = self:GetBinDir();
+    local sdk_root = ParaIO.GetCurDirectory(0);
+    local cef3Dir = sdk_root.."cef3"
+    local copy = function(bcheck)
+        local complete = false
+        if bcheck then
+            if ParaIO.DoesFileExist(cef3Dir, false) then
+                local CommonLib = NPL.load("(gl)script/ide/System/Util/CommonLib.lua");
+                CommonLib.CopyDirectory(cef3Dir, redist_root.."cef3", true)
+                complete = true
+            end
+        else
+            CommonLib.CopyDirectory(cef3Dir, redist_root.."cef3", true)
+            complete = true
+        end
+        if cb then
+            cb(complete)
+        end
+    end
+    if ParaIO.DoesFileExist(cef3Dir, false) then
+        copy()
+    else
+        NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+		local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+		NplBrowserLoaderPage.InstallNewCef3(function(bSucceed, errMsg)
+			if(bSucceed) then
+                if not NplBrowserLoaderPage.isOnlyInstallCef3 then
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua")
+                    local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin")
+				    -- also try to install webview2 just once for win10 or above. 
+				    NplBrowserPlugin.InstallWin32Webview2()
+                end
+                copy(true)
+				-- load with newly installed cef3 or webview
+			end
+		end, function(state, text, currentFileSize, totalFileSize)
+			if(text) then
+				if(state == 0) then
+				elseif(state == 2) then
+				end
+			end
+		end)
+    end
+end
+
 function MakeApp:CopyWorldFiles()
     WorldCommon.CopyWorldTo(self.output_folder.."data/")
     return true
@@ -369,6 +522,9 @@ function MakeApp:MakeZipInstaller()
             local destFolder = (appFolder..filename):gsub("[/\\][^/\\]+$", "");
             writer:AddDirectory(destFolder, output_folder..filename, 0);
         end
+    end
+    if isReadOnly then
+        
     end
     writer:close();
     LOG.std(nil, "info", "MakeZipInstaller", "successfully generated package to %s", commonlib.Encoding.DefaultToUtf8(zipfile))
@@ -419,7 +575,7 @@ function MakeApp:AndroidDecodeApkThread()
 end
 
 function MakeApp:AndroidDownloadApk(callback)
-    local apkUrl = "https://cdn.keepwork.com/paracraft/android/paracraft_" .. self.curAndroidVersion .. ".apk";
+    local apkUrl = "https://cdn.keepwork.com/paracraft/android/Paracraft_" .. self.curAndroidVersion .. ".apk";
 
     local fileDownloader = FileDownloader:new();
     fileDownloader.isSilent = true;

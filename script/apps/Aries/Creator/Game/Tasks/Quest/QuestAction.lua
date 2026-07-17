@@ -1383,7 +1383,7 @@ function QuestAction.ReportLoginTime()
 
     local data = {
         duration = duration,
-        machineCode = ParaEngine.GetAttributeObject():GetField('MachineID', ''),
+        machineCode = GameLogic.GetMachineID(ParaEngine.GetAttributeObject():GetField('MachineID', '')),
         machineCode_old = ParaEngine.GetAttributeObject():GetField('MachineID_old', ''),
         platform = System.os.GetPlatform(),
     }

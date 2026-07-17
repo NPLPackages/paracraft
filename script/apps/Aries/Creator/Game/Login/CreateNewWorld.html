@@ -15,7 +15,8 @@
                     CreateNewWorld.page = page;
                     CreateNewWorld.OnInit();
                     local cur_mode = CreateNewWorld.init_mode;
-
+                    is_only_close = page:GetRequestParam("is_only_close") == "true";
+                    is_force_create = page:GetRequestParam("is_force_create")  == "true";
                     function getBGStyle()
                         return MyCompany.Aries.ExternalUserModule:GetConfig().game_login_bg or "";
                     end
@@ -112,6 +113,10 @@
                         return CreateNewWorld.LastWorldName;
                     end
 
+                    function GetLimitWorldName()
+                        return commonlib.GetLimitLabel(CreateNewWorld.LastWorldName,10,true)
+                    end
+
                     function OnWorldNameChange()
                         CreateNewWorld.LastWorldName = Page:GetUIValue("new_world_name", "");
                     end
@@ -161,7 +166,7 @@
                                             font-size: 14px;">
                                     <%= L"世界名称" %>
                                 </div>
-                                <input type="text" SkipAutoBadWordFilter="true" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" onkeyup="OnWorldNameChange" style="float:left;margin-top:0px;margin-left:10px;width:150px;height:25px;" class="mc_text"/>
+                                <input type="text" SkipAutoBadWordFilter="true" ReadOnly="<%= is_force_create %>" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" onkeyup="OnWorldNameChange" style="float:left;margin-top:0px;margin-left:10px;width:150px;height:25px;" class="mc_text"/>
                             </div>
                             <!--<div style="margin-top:30px;">
                                 <div style="float:left;margin-left:28px;margin-top:2px;color:#ffffffff;font-weight:bold;font-size:14px;">

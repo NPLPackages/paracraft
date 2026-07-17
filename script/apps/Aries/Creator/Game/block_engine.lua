@@ -198,7 +198,7 @@ function BlockEngine.OnLoadBlockRegion()
 	if(BlockEngine:IsRemote()) then
 		return;
 	end
-	LOG.std(nil, "system", "BlockEngine", "loading block region %d %d", msg.x, msg.y);
+	LOG.std(nil, "info", "BlockEngine", "loading block region %d %d", msg.x, msg.y);
 
 	local startChunkX, startChunkY, startChunkZ = msg.x*32, 0, msg.y*32;
 	local endChunkX, endChunkY, endChunkZ = startChunkX+32-1, 15, startChunkZ+32-1;
@@ -208,7 +208,7 @@ function BlockEngine.OnLoadBlockRegion()
 	region:LoadFromFile();
 	if(results.count and results.count>0) then
 		
-		LOG.std(nil, "system", "BlockEngine", "calling onload for %d blocks in region %d %d", results.count, msg.x, msg.y);
+		LOG.std(nil, "info", "BlockEngine", "calling onload for %d blocks in region %d %d", results.count, msg.x, msg.y);
 
 		local results_x, results_y, results_z, results_tempId, results_data = results.x, results.y, results.z, results.tempId, results.data;
 		for i = 1, results.count do
@@ -231,7 +231,7 @@ function BlockEngine.OnUnLoadBlockRegion()
 		end
 	end
 	if(not BlockEngine:IsRemote()) then
-		LOG.std(nil, "system", "BlockEngine", "unloading block region %d %d", msg.x, msg.y);
+		LOG.std(nil, "info", "BlockEngine", "unloading block region %d %d", msg.x, msg.y);
 	end
 end
 
@@ -342,7 +342,7 @@ end
 function BlockEngine:IsBlockFreeSpace(bx, by, bz)
 	local block_id = ParaTerrain.GetBlockTemplateByIdx(bx, by, bz);
 	local block = block_types.get(block_id)
-	if(not block or (not block.solid and block.obstruction)) then
+	if(not block or (not block.solid and not block.obstruction)) then
 		return true;
 	end
 end
@@ -377,7 +377,7 @@ function BlockEngine:ConvertToRealPosition_float(x,y,z)
 	return real_x, real_y, real_z;
 end
 
--- only call this function when math is in 64 bits double, otherwise use the 32bits float version above, which is compatible with C++
+-- only call this function when math is in 64 bits double, otherwise use the 32bits local version above, which is compatible with C++
 function BlockEngine:ConvertToRealPosition(x,y,z)
 	return (x+0.5)*blocksize, (y+0.5)*blocksize+offset_y, (z+0.5)*blocksize;
 end
@@ -429,7 +429,7 @@ function BlockEngine:ConvertToBlockIndex_float(x,y,z)
 	return idx_x, idx_y, idx_z, sparse_index;
 end
 
--- only call this function when math is in 64 bits double, otherwise use the 32bits float version above, which is compatible with C++
+-- only call this function when math is in 64 bits double, otherwise use the 32bits local version above, which is compatible with C++
 function BlockEngine:ConvertToBlockIndex(x,y,z)
 	return math_floor(x*blocksize_inverse), math_floor((y-offset_y)*blocksize_inverse), math_floor(z*blocksize_inverse);
 end
@@ -549,7 +549,7 @@ end
 
 -- get the y pos of the first block of nBlockID, start searching from x, y, z in the side direction
 -- @param x,y,z: y default to 0
--- @param nBlockId: the block id to search for
+-- @param nBlockId: the block attr to search for. 5 for non-water solid block, 6 for water block
 -- @param nSide: default to 5, which is downward, 4 if upward.
 -- @param max_dist: default to 255
 -- @return -1 if not found
@@ -744,11 +744,9 @@ function BlockEngine:SetBlock(x,y,z,block_id, block_data, flag, entity_data)
 					block:OnBlockAdded(x,y,z, block_data, entity_data);
 				end
 			end
-
-			GameLogic.GetFilters():apply_filters("SchoolCenter.AddEvent", "create.world.block");
 		end
 
-		if(flag and flag >= 3) then
+		if(flag and type(flag) == "number" and flag >= 3) then
 			BlockEngine:NotifyNeighborBlocksChange(x, y, z, block_id);
 		end
 		
@@ -1157,35 +1155,139 @@ function BlockEngine:Dump()
 end
 
 -- real world ray picking obstruction blocks. 
--- @return nil if hit nothing, or dist, bx, by, bz, block_id 
+-- @param bReturnAccurateDist: if nil, we may not return accurate distance, but just a rough distance. 
+-- @return nil if hit nothing, or dist, bx, by, bz, block_id, side
 -- realX, realY, realZ are the hit point in real coordinates
 function BlockEngine:RayPicking(fromX, fromY, fromZ, dirX, dirY, dirZ, length)
-	length = length or 100;
-	local dist = 1;
-	local ray;
-	while(dist <= length) do
-		local x, y, z = fromX + dist * dirX, fromY + dist * dirY, fromZ + dist * dirZ
-		local bx, by, bz = self:block(x, y, z);
-		local block = self:GetBlock(bx, by, bz);
-		if(block and block.obstruction) then
-			if(block.solid) then
-				return dist, bx, by, bz, block.id
+	-- use 3D DDA algorithm to find hit block more detail see 
+	local startBlockIdX, startBlockIdY, startBlockIdZ = self:block(fromX, fromY, fromZ);
+	local curBlockIdX = startBlockIdX;
+	local curBlockIdY = startBlockIdY;
+	local curBlockIdZ = startBlockIdZ;
+	-- ray tracing direction
+	local blockStepX, blockStepY, blockStepZ;
+	-- setup 3d dda init value
+	local nextBlockPosx, nextBlockPosy, nextBlockPosz;
+	if (dirX > 0) then
+		blockStepX = 1;
+		nextBlockPosx = (curBlockIdX + 1) * BlockEngine.blocksize;
+	else
+		blockStepX = -1;
+		nextBlockPosx = curBlockIdX * BlockEngine.blocksize;
+	end
+
+	if (dirY > 0) then
+		blockStepY = 1;
+		nextBlockPosy = (curBlockIdY + 1) * BlockEngine.blocksize;
+	else
+		blockStepY = -1;
+		nextBlockPosy = curBlockIdY * BlockEngine.blocksize;
+	end
+
+	if (dirZ > 0) then
+		blockStepZ = 1;
+		nextBlockPosz = (curBlockIdZ + 1) * BlockEngine.blocksize;
+	else
+		blockStepZ = -1;
+		nextBlockPosz = curBlockIdZ * BlockEngine.blocksize;
+	end
+	-- distance we can travel along the ray before hitting a block boundary, in either of the three axis.
+	local errDistx, errDisty, errDistz;
+	-- the delta distance to travel in the three axis, before we move to next block. This is a constant;
+	local deltax, deltay, deltaz;
+
+	local maxRayDist = 100000;
+	if (dirX ~= 0) then
+		local invX = 1 / dirX;
+		errDistx = (nextBlockPosx - fromX) * invX;
+		deltax = BlockEngine.blocksize * blockStepX * invX;
+	else
+		errDistx = maxRayDist;
+	end
+
+	if (dirY ~= 0) then
+		local invY = 1 / dirY;
+		errDisty = (nextBlockPosy - fromY + BlockEngine.offset_y) * invY;
+		deltay = BlockEngine.blocksize * blockStepY * invY;
+	else
+		errDisty = maxRayDist;
+	end
+
+	if (dirZ ~= 0) then
+		local invZ = 1 / dirZ;
+		errDistz = (nextBlockPosz - fromZ) * invZ;
+		deltaz = BlockEngine.blocksize * blockStepZ * invZ;
+	else
+		errDistz = maxRayDist;
+	end
+	local side;
+	while (true) do
+		-- find the smallest value of traveledDist and going alone that direction
+		local distTraveled = 0;
+		if (errDistx < errDisty) then
+			if (errDistx < errDistz) then
+				distTraveled = errDistx;
+				errDistx = errDistx + deltax;
+				curBlockIdX = curBlockIdX + blockStepX;
+				side = 0;
 			else
-				local aabb = block:GetCollisionBoundingBoxFromPool(bx, by, bz)
+				distTraveled = errDistz;
+				errDistz = errDistz + deltaz;
+				curBlockIdZ = curBlockIdZ + blockStepZ;
+				side = 2;
+			end
+		else
+			if (errDisty < errDistz) then
+				distTraveled = errDisty;
+				errDisty = errDisty + deltay;
+				curBlockIdY = curBlockIdY + blockStepY;
+				side = 4;
+			else
+				distTraveled = errDistz;
+				errDistz = errDistz + deltaz;
+				curBlockIdZ = curBlockIdZ + blockStepZ;
+				side = 2;
+			end
+		end
+		local block = self:GetBlock(curBlockIdX, curBlockIdY, curBlockIdZ);
+		if(block and block.obstruction) then
+			local rayLength
+			if(block.solid) then
+				rayLength = distTraveled
+			else
+				local aabb = block:GetCollisionBoundingBoxFromPool(curBlockIdX, curBlockIdY, curBlockIdZ)
 				if(aabb) then
 					ray = ray or ShapeRay:new():init({fromX, fromY, fromZ}, {dirX, dirY, dirZ})
 					local hit, dist2 = ray:intersectsAABB(aabb)
 					if(hit) then
 						 if(dist2 <= length) then
-							return dist2, bx, by, bz, block.id
+							rayLength = dist2
 						else
 							break;
 						end
 					end
 				end
 			end
+			if(rayLength) then
+				if(rayLength <= length) then
+					if (side == 0 and blockStepX <= 0) then
+						side = 1;
+					end
+					if (side == 2 and blockStepZ <= 0) then
+						side = 3;
+					end
+					if (side == 4 and blockStepY <= 0) then
+						side = 5;
+					end
+					return distTraveled, curBlockIdX, curBlockIdY, curBlockIdZ, block.id, side
+				else
+					break;
+				end
+			end
 		end
-		dist = dist + 1;
+		if (distTraveled > length) then
+			break;
+		end
 	end
 end
 
@@ -1232,16 +1334,21 @@ end
 -- save all modified raw files to disk
 -- @param bIgnoreModified: if true we will save all loaded regions regardless whether it is modified.
 function BlockEngine:SaveToDirectory(parentDirectory, bIgnoreModified)
-	parentDirectory = parentDirectory or ParaWorld.GetWorldDirectory();
+	local isBackupMode = parentDirectory and parentDirectory ~= GameLogic.GetWorldDirectory()
+	parentDirectory = parentDirectory or GameLogic.GetWorldDirectory();
 
 	local attrBlockWorld = ParaTerrain.GetBlockAttributeObject()
 	for i=0, attrBlockWorld:GetChildCount(0)-1, 1 do
 		local attrRegion = attrBlockWorld:GetChildAt(i)
-		if(bIgnoreModified or attrRegion:GetField("IsModified", false)) then
+		local isModified = attrRegion:GetField("IsModified", false)
+		if(bIgnoreModified or isModified) then
 			local regionX = attrRegion:GetField("RegionX", 0)
 			local regionZ = attrRegion:GetField("RegionZ", 0)
 			local filename = format("%sblockWorld.lastsave/%d_%d.raw", parentDirectory, regionX, regionZ)
 			attrRegion:SetField("SaveToFile", filename);
+			if isBackupMode and isModified then
+				attrRegion:SetField("IsModified", true)
+			end
 		end
 	end
 end
@@ -1314,4 +1421,11 @@ function BlockEngine:ClearRegion(regionX, regionY)
 		BlockEngine.SetRegionLoaded(regionX, regionY, false)
 		return true;
 	end
+end
+
+-- blocks above this value will have full sun light values. 
+-- @param height: default to 255. set this to 0, if you want sunlight to be everywhere.
+function BlockEngine:SetSkyHeight(height)
+	local attr = ParaTerrain.GetBlockAttributeObject():GetChild("LightGrid")
+	attr:SetField("SkyHeight", height);
 end

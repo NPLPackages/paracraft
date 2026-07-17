@@ -80,6 +80,16 @@
         <script type="text/npl" src="VipPageScript.lua">
             local VipFullPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipFullPage.lua");
             VipFullPage.OnInit()
+
+            function OnOpenVipProtocolPage()
+                local url = "https://keepwork.com/official/docs/protocol/quote_vip_service"
+                local platform = System.os.GetPlatform()
+                if platform == "win32" or platform == "emscripten" then
+                    GameLogic.RunCommand("/open "..url)
+                    return
+                end
+                GameLogic.RunCommand("/open -e "..url)
+            end
         </script>
         <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
             <div>
@@ -693,6 +703,16 @@
                                                                                 float: left;
                                                                                 background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/zhifubao_42x42_32bits.png#0 0 42 42)">
                                                                     </div>
+                                                                    <div onclick="OnOpenVipProtocolPage" style="margin-top: 20px; margin-left: 20px;">
+                                                                        <span style="margin-left: 0px;
+                                                                                color: #666666;
+                                                                                font-size: 12px;">
+                                                                        <%= L"支付即视为您同意" %></span>
+                                                                        <span  style="margin-left: 0px;
+                                                                                color: #455cf5;
+                                                                                font-size: 12px;">
+                                                                        <%= L"《帕拉卡会员服务协议》" %></span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div style="float: left;
@@ -708,7 +728,7 @@
                                                                             height: 190px;" />       
                                                             </div>
                                                         </div>
-                                                        <div style="margin-left: 179px;
+                                                        <!-- <div style="margin-left: 179px;
                                                                     width: 917px;
                                                                     text-align: center;
                                                                     margin-top: 28px;"
@@ -721,15 +741,15 @@
                                                                     font-size: 24px;
                                                                     base-font-size: 24px;">
                                                             <%= L"如果您的孩子想要学习更多帕拉卡3D动画编程课程内容请与您所在地的帕拉卡3D动画编程授权合作学校及校外培训机构联系，查找所在地授权合作学校及校外教培机构老师联系方式，请联系童老师：13058184926（微信同号）。" %>
-                                                        </div>
-                                                        <input type="button"
+                                                        </div> -->
+                                                        <!-- <input type="button"
                                                                value=""
                                                                onclick="OnOpenVipQuestionPage"
                                                                style="margin-left: 177px;
                                                                       margin-top: 15px;
                                                                       width: 100px;
                                                                       height: 27px;
-                                                                      background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/changjianwenti_97x27_32bits.png#0 0 100 27)" />
+                                                                      background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/changjianwenti_97x27_32bits.png#0 0 100 27)" /> -->
                                                     </div>
                                                 </div>
                                             </Columns>

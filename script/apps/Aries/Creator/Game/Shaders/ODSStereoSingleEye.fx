@@ -157,7 +157,7 @@ float4 StereoPS(float2 texCoord:TEXCOORD0) :COLOR
 
 float4 StereoPS_debug_ods(float2 texCoord:TEXCOORD0) :COLOR
 {
-	if (texCoord.y <= 0.5)
+	if (texCoord.y <= 0.75)
 	{
 		float4 color0 = tex2D(sourceSp0, float2(texCoord.x, texCoord.y));
 		color0.a = 1.0;

@@ -7,6 +7,7 @@ Use Lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/YellowCodeLimitPage.lua");
 local YellowCodeLimitPage = commonlib.gettable("MyCompany.Aries.Game.YellowCodeLimitPage");
+YellowCodeLimitPage.ShowPage("2023-10-30T06:52:43.000Z")
 YellowCodeLimitPage.CheckShow()
 --]]
 
@@ -31,29 +32,33 @@ function YellowCodeLimitPage.OnBecomeVip()
     YellowCodeLimitPage.ClosePage()
 end
 
-YellowCodeLimitPage.phoneNumber = "13058184926"--童老师电话
-
 function YellowCodeLimitPage.CheckShow()
-    if (true) then return end -- BugID 1003005
-    if System.options.channelId_431 then --智慧教育版，屏蔽黄码弹窗
+    if System.options.isEducatePlatform or System.options.isPapaAdventure then --智慧教育版，屏蔽黄码弹窗
         return
     end
-    keepwork.checkYellowCodeLimit({},function(err, msg, data)           
-		print("err",err)
-        if(err ~= 200)then
-            return
+    GameLogic.IsVip("SkipYellowCode",true,function(result)
+        if not result then
+            keepwork.checkYellowCodeLimit({},function(err, msg, data)           
+                print("err",err)
+                if(err ~= 200)then
+                    return
+                end
+        
+                local data = data.data
+                if data and data.limit then
+                    YellowCodeLimitPage.ShowPage(data.deadline)
+                end
+            end)
         end
+    end)
+end
 
-        local data = data.data
-        if data and data.limit then
-            YellowCodeLimitPage.ShowPage(data.deadline)
-        end
-	end)
+function YellowCodeLimitPage.CheckShowImpl()
+
 end
 
 function YellowCodeLimitPage.ShowPage(deadline)
-    if (true) then return end -- BugID 1003005
-    if System.options.channelId_431 then --智慧教育版，屏蔽黄码弹窗
+    if System.options.isEducatePlatform or System.options.isPapaAdventure or System.options.channelId_tutorial then --智慧教育版，屏蔽黄码弹窗
         return
     end
     YellowCodeLimitPage.deadlineStramp = commonlib.timehelp.GetTimeStampByDateTime(deadline)
@@ -76,9 +81,9 @@ function YellowCodeLimitPage.ShowPage(deadline)
         isTopLevel = true,
         directPosition = true,
             align = "_ct",
-            x = -572/2,
+            x = -700/2,
             y = -392/2,
-            width = 572,
+            width = 700,
             height = 392,
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);

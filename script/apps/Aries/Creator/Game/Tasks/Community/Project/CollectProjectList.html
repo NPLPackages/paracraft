@@ -1,0 +1,546 @@
+<!-- script/apps/Aries/Creator/Game/Tasks/Community/Project/CollectProjectList.html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="CollectProjectList.lua" ><![CDATA[
+    local KeepworkServiceSession = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceSession.lua')
+    local CollectProjectList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/Project/CollectProjectList.lua")
+    CollectProjectList.OnInit()
+
+    function GridsItems(index)
+        if index == nil then
+            return #CollectProjectList.worksTree
+        else
+            return CollectProjectList.worksTree[index]
+        end
+    end
+
+    function IsProjectSelected(index)
+        return CollectProjectList.IsProjectSelected(index)
+    end
+
+    function get_world_preview()
+        return Eval("cover") and Eval("cover") or ""
+    end
+
+    function switch_world(index)
+        CollectProjectList.OnSwitchWorld(index)
+    end
+
+    function get_world_text()
+        local name = Eval('name')
+        name = MyCompany.Aries.Chat.BadWordFilter.FilterString(name)
+        local pid = ""
+        if Eval("id") and Eval("id") > 0 then
+            pid =  "#" .. Eval("id")
+        end
+        return Mod.WorldShare.Utils.WordsLimit(name) .. pid
+    end
+
+    function get_world_date()
+        local datetime = Mod.WorldShare.Utils:RecentDatetimeFormat(Mod.WorldShare.Utils:UnifiedTimestampFormat(Eval('updated_at')))
+        return datetime
+    end
+
+    function is_load_more_items(index)
+        if index == #CollectProjectList.worksTree then
+            return true
+        end
+    end
+
+    function lazy_load()
+        if CollectProjectList.worksTree[#CollectProjectList.worksTree].isLoaded then
+            return
+        end
+
+        CollectProjectList.worksTree[#CollectProjectList.worksTree].isLoaded = true
+        CollectProjectList.curPage = CollectProjectList.curPage + 1
+        
+        CollectProjectList.GetProjectList()
+
+        Mod.WorldShare.MsgBox:Close()
+    end
+
+    function get_project_views()
+        local total_view = Eval('total_view')
+
+        if total_view and type(total_view) == 'number' then
+            return total_view
+        else
+            return 0
+        end
+    end
+
+    function get_project_thumbs()
+        local total_like = Eval('total_like')
+
+        if total_like and type(total_like) == 'number' then
+            return total_like
+        else
+            return 0
+        end 
+    end
+
+    function get_project_favorites()
+        local total_mark = Eval('total_mark')
+
+        if not total_mark or
+        type(total_mark) ~= 'number' or
+        total_mark < 0 then
+            return 0
+        end
+
+        return Eval('total_mark')
+    end
+
+    function get_project_comments()
+        local total_comment = Eval('total_comment')
+
+        if total_comment and type(total_comment) == 'number' then
+            return total_comment
+        else
+            return 0
+        end 
+    end
+
+    function be_selected()
+        return IsProjectSelected(Eval('index'))
+    end
+
+    function OnclickSelectWorld(name, mcmlNode)
+        local index = tonumber(name)
+        if index then
+            switch_world(index)
+        end
+    end
+
+    function share(name)
+        local index = tonumber(name)
+        if index then
+            local currentWorld = CollectProjectList.worksTree[index]
+
+            if currentWorld and currentWorld.id then
+                local WorldSharePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareWorld/WorldSharePage.lua") 
+                if not currentWorld.kpProjectId then
+                    currentWorld.kpProjectId = currentWorld.id
+                end
+                WorldSharePage.ShowView(currentWorld)
+            end
+        end
+    end
+
+    function enter(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnOpenProject(index)
+    end
+
+    function get_username()
+        local user = Eval('user')
+        local ret
+        if not user or type(user) ~= 'table' then
+            ret = Eval('username') or '<%= "暂无" %>'
+        else 
+            if user.username then
+                ret = user.username
+            else
+                ret = Eval('username') or '<%= "暂无" %>'
+            end
+        end
+        ret = MyCompany.Aries.Chat.BadWordFilter.FilterString(ret)
+        return ret
+    end
+
+    function has_username()
+        local username = Eval('username')
+
+        if username then
+            return true
+        else
+            return false
+        end
+    end
+
+    function be_allow()
+        local username = Mod.WorldShare.Store:Get('user/username')
+        local user = Eval('user')
+        local isSystemGroupMember = Eval('isSystemGroupMember')
+        local isFreeWorld = Eval('isFreeWorld')
+        local visibility = Eval('visibility')
+        local level = Eval('level')
+        local extra = Eval('extra')
+
+        if not user or
+            type(user) ~= 'table' or
+            not user.username then
+            return false
+        end
+
+        if isSystemGroupMember == nil or
+            type(isSystemGroupMember) ~= 'boolean' then
+            return false
+        end
+
+        if isFreeWorld == nil or
+            type(isFreeWorld) ~= 'number' then
+            return false
+        end
+
+        if not visibility or
+            type(visibility) ~= 'number' then
+            return false
+        end
+
+        if not level or
+            type(level) ~= 'number' then
+            return false
+        end
+
+        if not extra or
+            type(extra) ~= 'table' then
+            return false
+        end
+
+        -- private world verfied
+        if visibility == 1 then
+            if not KeepworkServiceSession:IsSignedIn() then
+                return false
+            else
+                if level == 0 then
+                    return false
+                end
+            end
+        end
+
+        -- vip enter
+        if not isSystemGroupMember and
+            ((extra.vipEnabled and extra.vipEnabled == 1) or
+            (extra.isVipWorld and extra.isVipWorld == 1)) then
+            if not KeepworkServiceSession:IsSignedIn() then
+                return false
+            else
+                if user.username ~= username then
+                    if not GameLogic.IsVip() then
+                        return false
+                    end
+                end
+            end
+        end
+
+        -- vip institute enter
+        --[[
+        if  extra.instituteVipEnabled and
+            extra.instituteVipEnabled == 1 then
+            if not KeepworkServiceSession:IsSignedIn() then
+                return false
+            else
+                if not MainPage.isOrgan then
+                    return false
+                end
+            end
+        end]]
+
+        -- system group world
+        if isSystemGroupMember then
+            if level == 0 then
+                return false
+            end
+        end
+
+        return true
+    end
+
+    function is_favorite()
+        local worldinfo = CollectProjectList.worksTree[Eval('index')]
+        if not worldinfo then return 'false' end
+        return worldinfo.isFavorite == true  or  worldinfo.isFavorite == "true"
+    end
+
+    function favorite(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnFavoriteProject(index)
+    end
+
+    function unfavorite(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnUnfavoriteProject(index)
+    end
+
+    function is_star()
+        local worldinfo = CollectProjectList.worksTree[Eval('index')]
+        if not worldinfo then return 'false' end
+        return worldinfo.isStar == true  or  worldinfo.isStar == "true"
+    end
+
+    function star(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnStarProject(index)
+    end
+
+    function unstar(index)
+        if true then
+            return
+        end
+
+        CollectProjectList.OnUnstarProject(index)
+    end
+
+    function OnMouseEnter(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnBgMouseEnter(index)
+    end
+
+    function OnMouseLeave(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnBgMouseLeave(index)
+    end
+
+    function OnMousePreviewEnter(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnPreviewMouseEnter(index)
+    end
+
+    function OnMousePreviewLeave(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnPreviewMouseLeave(index)
+    end
+
+    function OnMouseShareEnter(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnShareMouseEnter(index)
+    end
+
+    function OnMouseShareLeave(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnShareMouseLeave(index)
+    end
+
+    function OnMouseFavoriteEnter(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnFavoriteMouseEnter(index)
+    end
+
+    function OnMouseFavoriteLeave(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnFavoriteMouseLeave(index)
+    end
+
+    function OnMouseStarEnter(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnStarMouseEnter(index)
+    end
+
+    function OnMouseStarLeave(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnStarMouseLeave(index)
+    end
+
+    function OnClickFavorite(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        CollectProjectList.OnClickFavorite(index)
+    end
+
+    function OnClickStar(name)
+        local index = tonumber(name)
+        if not index then
+            return
+        end
+        local isStar = CollectProjectList.worksTree[index].isStar
+        if isStar == true or isStar == "true" then
+            return
+        end
+        star(name)
+    end
+
+]]></script>
+<style type='text/mcss' src='Mod/WorldShare/cellar/Theme/Mcss/Theme1.mcss'>
+    {
+        share_world_name = {
+            ['text-singleline'] = 'true',
+            width = 200,
+            height = 30,
+            float = 'left',
+            ['font-size'] = 16,
+            ['base-font-size'] = 16,
+            ['margin-top'] = 3,
+            ['text-align'] = 'left',
+            color = '#d3d3d3',
+        },
+    }
+</style>
+<!-- <pe:container alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc"> </pe:container> -->
+<pe:container style="width:1160px;height:600px;background:url();">       
+    <!-- RIGHT -->
+    <div style="float:left;width:1160px;height:600px;">        
+        <!-- 项目列表 -->
+        <div style="margin-top: 6px; margin-left: 10px;  width: 1160px; height: 600px; ">
+            <pe:gridview name='gw_collect_ds' 
+                    VerticalScrollBarOffsetX="20"  
+                    RememberScrollPos='true' 
+                    AllowPaging='false' 
+                    VerticalScrollBarStep='70' 
+                    DefaultNodeHeight='260' 
+                    CellPadding='4' 
+                    ItemsPerLine='4'
+                    onmousewheel='NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/Project/CollectProjectList.lua").OnMouseWheel()'
+                    DataSource="<%= GridsItems %>">
+                <Columns>
+                    <div style="width: 278px; height: 260px;">
+                        <pe:container ClickThrough="true" visible="true" name="<%='project_bg'..Eval('index')%>" zorder="-3" style="position: relative; width: 278px; height: 258px; background: url();"></pe:container>
+                        <pe:container ClickThrough="true" visible="false" name="<%='project_select_bg'..Eval('index')%>" zorder="-3" style="position: relative; width: 278px; height: 258px; background-color: #262626; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#188 6 32 32:14 14 14 14);"></pe:container>
+                        <input type="button" zorder="-3" name="<%=Eval('index')%>" onmouseenter="OnMouseEnter" onmouseleave="OnMouseLeave" style="position: relative; width: 278px; height: 258px; background: url();" />
+                        <input type="button" zorder="-2" name="<%=Eval('index')%>" onmouseenter="OnMousePreviewEnter" onmouseleave="OnMousePreviewLeave" onclick="enter" style="position: relative; margin-left: 12px; margin-top: 12px; width: 254px; height: 142px; background: url();" />
+                                                
+                        <!-- preview -->
+                        <div style="position: relative; width: 254px; height: 142px; margin-left: 12px; margin-top: 12px; background: url();">
+                            <div style='<%= "position: relative; width: 253px; height: 141px;  background: url(" .. get_world_preview() .. ")" %>'></div>
+                            <!-- 圆角遮挡 -->
+                            <pe:container ClickThrough="true" visible="true" name='<%="project_preview_border_normal_bg"..Eval("index")%>' zorder="2" style='position: relative;   width: 254px; height: 142px;background-color: #1a1a1a; background: url(Texture/Aries/Creator/keepwork/corner/corner10_32x32_32bit.png#0 0 32 32:14 14 14 14);'></pe:container>
+                            <pe:container ClickThrough="true" visible="false" name='<%="project_preview_border_select_bg"..Eval("index")%>' zorder="2" style='position: relative;  width: 254px; height: 142px;background-color: #262626; background: url(Texture/Aries/Creator/keepwork/corner/corner10_32x32_32bit.png#0 0 32 32:14 14 14 14);'></pe:container>
+
+                            <pe:container ClickThrough="true" visible="false" name='<%="project_preview_select1_bg"..Eval("index")%>' zorder="1" style='position: relative; margin-left: -1px; margin-top: -1px; width: 254px; height: 142px;background-color: #0000007F; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#188 6 32 32:14 14 14 14);'>
+                                <div align="center" style="margin-top: 54px; width: 72px; height: 32px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#418 145 32 32:14 14 14 14);">
+                                    <pe:if condition="<%=not Mod.WorldShare.Utils.IsEnglish()%>">
+                                        <div style="float: left; margin-left: 13px; font-size: 12px; base-font-size: 12px; font-weight: bold; color: #ffffff; margin-top: 6px;"><%=L"进入"%></div>
+                                        <div style="float: left; margin-left: 4px; margin-top: 8px;width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#190 78 16 16); "></div>
+                                    </pe:if>
+                                    <pe:if condition="<%=Mod.WorldShare.Utils.IsEnglish()%>">
+                                        <div style="float: left; margin-left: 10px; font-size: 12px; base-font-size: 12px; font-weight: bold; color: #ffffff; margin-top: 6px;"><%=L"进入"%></div>
+                                        <div style="float: left; margin-left: 4px; margin-top: 8px;width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#190 78 16 16); "></div>
+                                    </pe:if>
+                                </div>
+                            </pe:container>
+                            <pe:container ClickThrough="true" visible="false" name='<%="project_preview_select2_bg"..Eval("index")%>' zorder="1" style='position: relative; margin-left: -1px; margin-top: -1px; width: 254px; height: 142px;background-color: #0000008F; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#188 6 32 32:14 14 14 14);'>
+                                <div align="center" style="margin-top: 54px;width: 180px; height: 34px;">
+                                    <div style="float: left; width: 32px; height: 32px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#246 50 33 33);">
+                                    </div>
+                                    <div style="float: left; margin-left: 22px; width: 72px; height: 32px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#418 145 32 32:14 14 14 14);">
+                                        <pe:if condition="<%=not Mod.WorldShare.Utils.IsEnglish()%>">
+                                            <div style="float: left; margin-left: 13px; font-size: 12px; base-font-size: 12px; font-weight: bold; color: #ffffff; margin-top: 6px;"><%=L"进入"%></div>
+                                            <div style="float: left; margin-left: 4px; margin-top: 8px;width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#190 78 16 16); "></div>
+                                        </pe:if>
+                                        <pe:if condition="<%=Mod.WorldShare.Utils.IsEnglish()%>">
+                                            <div style="float: left; margin-left: 10px; font-size: 12px; base-font-size: 12px; font-weight: bold; color: #ffffff; margin-top: 6px;"><%=L"进入"%></div>
+                                            <div style="float: left; margin-left: 4px; margin-top: 8px;width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#190 78 16 16); "></div>
+                                        </pe:if>
+                                    </div>
+                                    <div style="float: left; margin-left: 22px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#246 50 33 33);">
+                                    </div>
+                                </div>
+                            </pe:container>
+                            <div style='position: relative; margin-left: -1px; margin-top: -1px; width: 254px; height: 142px;background-color: #000000B2; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#188 6 32 32:14 14 14 14);'>
+                                <div align="center" style="margin-top: 54px;width: 180px; height: 34px;">
+                                    <input zorder="3" visible="false" type="button" name="<%=Eval('index')%>" uiname="<%='CreateEmbed.favorite'..Eval('index')%>" onmouseenter="OnMouseFavoriteEnter" onmouseleave="OnMouseFavoriteLeave" onclick="OnClickFavorite"  style='width: 16px;height: 16px;margin-top: 9px; margin-left: 9px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#318 102 16 16);' />
+                                    <input zorder="3" visible="false" type="button" name="<%=Eval('index')%>" uiname="<%='CreateEmbed.star'..Eval('index')%>" onmouseenter="OnMouseStarEnter" onmouseleave="OnMouseStarLeave" onclick="OnClickStar"  style='width: 16px;height: 16px;margin-top: 9px; margin-left: 132px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#341 102 16 16);' />
+                                </div>
+                            </div>
+                        </div>
+
+                        <pe:container ClickThrough="true" zorder="2" name='<%="project_info_bg"..Eval("index")%>' style="position: relative; width: 254px; height: 30px; margin-left: 12px; margin-top: 124px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#268 6 32 32:14 14 14 14);">
+                            <div style='font-size: 12px;base-font-size: 12px;color: #ffffff;margin-top: 6px; margin-left: 8px;'>
+                                <div style='float:left;'tooltip='<%= L"观看：" .. get_project_views() %>'>
+                                    <img src='Texture/Aries/Creator/keepwork/community_32bits.png#294 103 16 11' style='width: 16px;height: 11px;margin-top: 6px;' />
+                                    <div style='float:left;margin-left: 2px; margin-top: 2px;'><%= get_project_views() %></div>
+                                </div>
+                                <div style='float: left;margin-left: 16px;'>
+                                    <img src='<%=is_star() and "Texture/Aries/Creator/keepwork/community_32bits.png#386 238 16 16" or "Texture/Aries/Creator/keepwork/community_32bits.png#341 102 16 16"%>'style='margin-top:3px; width: 16px;height: 16px;' />
+                                    <div style='float:left;margin-left: 2px; margin-top: 2px;'><%= get_project_thumbs() %></div>
+                                </div>
+                                <div style='float:left;margin-left: 16px;'>
+                                    
+                                    <img src='<%= is_favorite() and "Texture/Aries/Creator/keepwork/community_32bits.png#266 238 16 16" or "Texture/Aries/Creator/keepwork/community_32bits.png#318 102 16 16"%>' style='width: 16px;height: 16px;margin-top: 3px;'/>
+                                    <div style='float: left;margin-left: 2px; margin-top: 2px;'><%= get_project_favorites() %></div>
+                                </div>
+                            </div>
+                        </pe:container>
+
+                        <!-- 显示锁 -->
+                        <pe:if condition='<%= not be_allow() %>'>
+                            <div style="position: relative; margin-left: 238px; margin-top: 165pxpx; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#326 238 16 16)"></div>
+                        </pe:if>
+                        <!-- info -->
+                        <div style="width: 242px; height: 120px;  margin-left: 14px; margin-top: 162px;">
+                            <!-- 显示项目内容 -->
+                            <div style='width: 240px; height: 32px;'>
+                                <div style="width: 210px; height: 40px; float: left; font-size: 14px; base-font-size: 14px; text-align: left; color: #d3d3d3; margin-top: 2px;">
+                                    <%= get_world_text() %>
+                                </div>
+                            </div>
+
+                            <div style="width: 242px; height: 32px;  margin-top: 22px;">
+                                <!-- 更新时间 -->
+                                <div style='float: left; margin-top: 2px;  height: 20px; width: 200px; font-size: 12px;base-font-size: 12px;color: #b2b2b2;'>
+                                    <%= get_world_date()%>
+                                </div>
+                            </div>
+
+                            <div style="width: 160px; height: 32px; margin-top: -20px; margin-left: 90px;">
+                                <input type='button' name='<%= Eval("index") %>' onmouseenter="OnMouseShareEnter" onmouseleave="OnMouseShareLeave" onclick='share' value="" tooltip="<%=L'分享'%>" uiname='<%="CreateEmbed.share" .. Eval("index")%>'style='float: left; margin-left: 134px; width: 20px;height: 20px;background: url(Texture/Aries/Creator/keepwork/community_32bits.png#188 99 20 20);' />
+                            </div>
+                        </div>
+                        <pe:if condition='<%= is_load_more_items(Eval("index")) %>'>
+                            <pe:custom oncreate='<%= lazy_load %>'></pe:custom>
+                        </pe:if>
+                    </div>
+                </Columns>
+                <EmptyDataTemplate>
+                    <div style='font-weight: bold;'>
+                        <div align='center'style='width: 160px;height: 128px; margin-top: 160px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#2 2 160 128)'>
+                        </div>
+                        <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: -10px; color: #A8A7B0;" ><%=L"当前没有收藏项目"%></div>
+                    </div>
+                </EmptyDataTemplate>
+            </pe:gridview>
+
+        </div>
+        
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

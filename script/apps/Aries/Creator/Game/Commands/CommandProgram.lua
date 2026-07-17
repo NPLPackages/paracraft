@@ -287,11 +287,15 @@ e.g.
 /compile
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text)
+		local poweredOnly = options.poweredOnly;
+
 		local entities = GameLogic.EntityManager.FindEntities({category="b", type="EntityCode"});
 		if(entities and #entities>0) then
 			local count = 0
 			for _, entity in ipairs(entities) do
-				if(not entity:IsCodeLoaded()) then
+				if(not entity:IsCodeLoaded() and entity.languageConfigFile == "") then
 					if(not entity:Compile()) then
 						count = count + 1
 					end
@@ -300,6 +304,19 @@ e.g.
 			if(count > 0) then
 				GameLogic.AddBBS("compile", format(L"场景中存在%d个代码方块编译错误, 请看日志", count), 10000, "255 0 0");
 			end
+			return count == 0;
 		end
+		return true;
+	end,
+};
+
+-- only used by CommandManager for multiline commands.
+Commands["wait"] =  {
+	name="wait", 
+	quick_ref="/wait [seconds]", 
+	desc=[[wait to execute following commands. Only used in command block.]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local time = CmdParser.ParseInt(cmd_text) or 1
+		return false, "wait", time;
 	end,
 };

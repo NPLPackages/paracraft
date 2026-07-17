@@ -55,9 +55,7 @@ NPL.export({
         }
     ]],
 	ToNPL = function(self)
-		return string.format('<div>\n%s\n</div>\n', 
-            self:getFieldAsString('code')
-        );
+		return string.format('<div>\n%s\n</div>\n', self:getFieldAsString('code'));
 	end,
 	examples = {{desc = "", canRun = false, code = [[
 ]]}},
@@ -326,6 +324,31 @@ NPL.export({
 	func_description = '<br/>',
 	ToNPL = function(self)
 		return '<br/>';
+	end,
+	examples = {{desc = "", canRun = false, code = [[
+]]}},
+},
+
+{
+	type = "mcml_attrs_databinding_text", 
+	message0 = L"动态绑定全局变量%1",
+	arg0 = {
+        {
+			name = "value",
+			type = "input_value",
+			shadow = { type = "text"},
+			text = "var",
+		},
+	},
+    output = {type = "null",},
+	category = "McmlControls", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = '<pe:label value="<%%=%s%%>" getter="value"/>',
+	ToNPL = function(self)
+		return string.format('<pe:label value="<%%=%s%%>" getter="value"/>', self:getFieldValue('value'));
 	end,
 	examples = {{desc = "", canRun = false, code = [[
 ]]}},

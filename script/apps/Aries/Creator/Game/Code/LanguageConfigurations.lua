@@ -48,6 +48,16 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
 	elseif(filename == "npl_ppt") then   -- npl blockly 重新定义的CAD图块类型分类
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplPPT/NplPPT.lua");
+	elseif(filename == "clang") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/clangDef/clang.lua");
+	elseif(filename == "cpp") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CppDef/Cpp.lua");
+	elseif(filename == "arduino") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/Arduino/Arduino.lua");
+	elseif(filename == "micropython") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/MicroPython/MicroPython.lua");
+	elseif(filename == "npl_python" or filename == "python") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua");
 	else
 		filename = Files.GetWorldFilePath(filename)
 		if(filename) then
@@ -71,6 +81,8 @@ function LanguageConfigurations:IsBuildinFilename(filename)
 	or filename=="npl_blockpen" 
 	or filename=="npl_teacher"
 	or filename=="microbit"
+	or filename=="micropython"
+	or filename=="python"
 	or filename=="npl_camera"
 end
 

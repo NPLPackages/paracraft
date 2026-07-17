@@ -1,0 +1,600 @@
+<html>
+    <body> 
+        <pe:mcml>
+            <script type='text/npl' src='MainLoginRegister.script.lua'>
+                <![CDATA[
+                    local page = document:GetPageCtrl()
+                    local MainLogin = NPL.load('(gl)Mod/WorldShare/cellar/MainLogin/MainLogin.lua')
+                    MainLogin.registerPage = page
+
+                    page.phone_step = 1
+
+                    MainLogin.registerValidates = {
+                        account = {
+                            [1] = nil,
+                            [2] = nil,
+                            [3] = nil,
+                            [4] = nil,
+                            [5] = nil,
+                            [6] = nil,
+                            [7] = nil,
+                            [8] = nil,
+                        },
+                        phone = {
+                            [1] = nil,
+                            [2] = nil,
+                            [3] = nil,
+                            [4] = nil,
+                            [5] = nil,
+                            [6] = nil,
+                            [7] = nil,
+                            [8] = nil,
+                            [9] = nil,
+                        }
+                    }
+
+                    -- don't remove, beacause set account mode button realtime
+                    Mod.WorldShare.Utils.SetTimeOut(function()
+                        set_account_mode()
+                        local val = page:GetValue('phonepassword_show')
+                        page:SetValue('phonepassword_hide', val)
+                        page:SetValue('phonepassword', val)
+
+                        page:FindControl('phonepassword_show').visible = false
+                        page:FindControl('phonepassword_hide').visible = true
+                    end, 0)
+
+                    -- don't remove
+                    Mod.WorldShare.Utils.SetTimeOut(function()
+                        local val = page:GetValue('register_account_password_show')
+                        page:SetValue('register_account_password_hide', val)
+                        page:SetValue('register_account_password', val)
+
+                        page:FindControl('register_account_password_show').visible = false
+                        page:FindControl('register_account_password_hide').visible = true
+                    end, 0)
+                ]]>
+            </script>
+            <style type='text/mcss' src='Mod/WorldShare/cellar/Theme/Mcss/MainLoginMcss.mcss'>
+                {
+                    
+                }
+            </style>
+            <pe:container
+                alignment='_rt'
+                zorder='-1'
+                width='305px'
+                height='100px'
+                style='position: relative;
+                    background:;
+                    margin-top: 20px;
+                    margin-right: -10px;'>
+                <!-- exit -->
+                <div style='float: left;
+                            width: 80px;
+                            margin-left: 210px;'>
+                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                        <input type='button'
+                                onclick='on_click_exit'
+                                style='text-align: center; color: #d3d3d3; width: 67px; height: 52px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                value='<%= L"QUIT" %>' />
+                    </pe:if>
+                    <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                        <input type='button'
+                                onclick='on_click_exit'
+                                style='text-align: center; color: #d3d3d3; width: 67px; height: 52px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                value='<%= L"退出" %>' />
+                    </pe:if>
+                    
+                </div>
+            </pe:container>
+            <pe:container alignment='_ct' style="position: relative; width: 450px; height: 550px; margin-left: -225px; margin-top: -275px;  background-color: #353536; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">                
+                <div style="padding-left: 75px; padding-right: 75px; color: #d3d3d3; font-size: 16px; base-font-size: 16px;">
+                    
+                    <pe:container name='register_not_finish'  visible='true' style='position: relative;  width: 300px; height: 550px; background: url();'>
+                        <div style='position: relative;'>
+                            <div style='margin-left: 0px; margin-top: 40px;'>
+                                <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                    <input type='button' onclick='back' value='<%= L"返回登录" %>'
+                                        icon="Texture/Aries/Creator/keepwork/community_32bits.png;306 238 16 16" icon_width="16" icon_height="16" icon_off_x="-44"
+                                        style='width: 100px; height: 30px; background: url(); color: #d3d3d3; font-size: 14px; text-offset-x:4;'  />
+                                </pe:if>
+                                <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                    <input type='button' onclick='back' value='<%= L"返回登录" %>'
+                                        icon="Texture/Aries/Creator/keepwork/community_32bits.png;306 238 16 16" icon_width="16" icon_height="16" icon_off_x="-44"
+                                        style='width: 100px; height: 30px; background: url(); color: #d3d3d3; font-size: 14px; text-offset-x:-10;'  />
+                                </pe:if>
+                           </div>
+                       </div>
+                        <pe:container name='account_register_mode' visible='true' style="position: relative; margin-top: 87px; background:;">
+                            <pe:container name="register_account_field_error" visible="false" style="position: relative; margin-left: 0px; margin-top: 134px; background: url();">
+                                <div>
+                                    <label style="font-size: 12px;base-font-size: 12px;color: #FC3632;" name="register_account_field_error_msg" />
+                                </div>
+                            </pe:container>
+                            <pe:container name="register_account_password_field_error" visible="false" style="position: relative; margin-left: 0px; margin-top: 224px; background: url();">
+                                <div>
+                                    <label style="font-size: 12px;base-font-size: 12px;color: #FC3632;" name="register_account_password_field_error_msg" />
+                                </div>
+                            </pe:container>
+                            <div style="margin-top: 0px;
+                                        height: 44px;
+                                        width: 300px;
+                                        background-color: #2b2b2b; 
+                                        background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                <div style="float: left;
+                                            width: 150px;
+                                            height: 36px;
+                                            margin-top: 4px;
+                                            margin-left: 4px;
+                                            background-color: #353535 
+                                            background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <div style='font-size: 14px;
+                                            base-font-size: 14px;
+                                            text-align: center;
+                                            margin-top: 8px;
+                                            height: 36px;
+                                            line-height: 5px;
+                                            color: #d3d3d3; 
+                                            width: 150px;
+                                            font-weight: bold;'>
+                                        <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                            Account
+                                        </pe:if>
+                                        <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                            <%= L'账号注册' %>
+                                        </pe:if>
+                                    </div>
+                                </div>
+                                <div onclick='set_phone_mode'
+                                        style='float:left;font-size: 14px;
+                                            base-font-size: 14px;
+                                            text-align: center;
+                                            margin-top: 4px;
+                                            color: #d3d3d3;
+                                            height: 36px;
+                                            line-height: 5px;
+                                            width: 140px;'>
+                                    <div style="margin-top: 8px; margin-left: 10px;">
+                                        <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                            Phone
+                                        </pe:if>
+                                        <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                            <%= L'手机号注册' %>
+                                        </pe:if>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style='width: 300px;height: 165px; margin-top: 20px;'>
+                                <div>
+                                    <div style="width: 120px; height: 20px;">
+                                        <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#414 106 16 16);"></div>
+                                        <div style="float: left; margin-left: 10px; margin-top: -2px; color: #d3d3d3;"><%=L"账号"%></div>
+                                    </div>
+                                    <div style="margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                        <input type="text"
+                                            EmptyText='<%= L"请输入账号" %>'
+                                            onchange='on_change_account_account'
+                                            onfocusin='on_focus_account_account'
+                                            style='background:;
+                                                    textcolor: #d3d3d3;
+                                                    height: 30px;
+                                                    width: 260px;
+                                                    margin-top: 6px;
+                                                    margin-left: 12px;
+                                                    font-size: 14px;
+                                                    base-font-size: 14px;'
+                                            name='register_account' />
+                                    </div>
+                                    
+                                </div>
+                                <div style="margin-top: 20px;">
+                                    <div style="width: 120px; height: 20px;">
+                                        <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#346 238 16 16);"></div>
+                                        <div style="float: left; margin-left: 10px; margin-top: -2px; color: #d3d3d3;"><%=L"密码"%></div>
+                                    </div>
+                                    <div style='float: left;width: 300px;margin-top: 10px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);'>
+                                        <input type="text"
+                                                onchange='on_change_account_password'
+                                                onfocusin='on_focus_account_password'
+                                                SkipAutoBadWordFilter="true"
+                                                EmptyText='<%= L"请输入4位以上的密码" %>'
+                                                style='background:;
+                                                        textcolor: #d3d3d3;
+                                                        height: 30px;
+                                                        width: 260px;
+                                                        margin-top: 6px;
+                                                        margin-left: 12px;
+                                                        font-size: 14px;
+                                                        base-font-size: 14px;'
+                                                name='register_account_password_show'
+                                                visible="false" />
+                                        <input type="text"
+                                                onchange="on_change_account_password"
+                                                onfocusin='on_focus_account_password'
+                                                PasswordChar="*"
+                                                SkipAutoBadWordFilter="true"
+                                                EmptyText='<%= L"请输入4位以上的密码" %>'
+                                                style='background:;
+                                                        textcolor: #d3d3d3;
+                                                        height: 30px;
+                                                        width: 260px;
+                                                        margin-top: 6px;
+                                                        font-size: 14px;
+                                                        base-font-size: 14px;
+                                                        margin-left: -260px;'
+                                                name="register_account_password_hide"
+                                                visible="true" />
+                                        <input type="hidden"
+                                                name="register_account_password"
+                                                value="" />
+                                    </div>
+                                    <input name="checkbox_password"
+                                        type="checkbox"
+                                        checked="false"
+                                        iconsize="20"
+                                        style="position: relative;margin-left: -30px;margin-top: 20px;"
+                                        CheckedBG="Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#272 52 20 20"
+                                        UncheckedBG="Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#297 52 20 20"
+                                        onclick="set_show_password"/>
+                                </div>
+                            </div>
+                            <pe:container name="agree_field_error" visible="false" style="position: relative; margin-left: 62px; margin-top: 68px; background:">
+                                <div>
+                                    <label style="font-size: 12px;base-font-size: 12px;color: #FC3632;" name="agree_field_error_msg" />
+                                </div>
+                            </pe:container>
+                            <div style="width: 300px;margin-top: 50px;margin-bottom: 5px;">
+                                <input name="agree"
+                                        type="checkbox"
+                                        checked="true"
+                                        iconsize="16"
+                                        CheckedBG="Texture/Aries/Creator/keepwork/community_32bits.png#446 238 16 16"
+                                        UncheckedBG="Texture/Aries/Creator/keepwork/community_32bits.png#426 238 16 16"
+                                        style="float:left;margin-top:3px;min-width:90px;"
+                                        onclick="set_register_agree" />
+                                <div style="float:left; color: white; margin-top: 2px; base-font-size: 11px;font-size: 11px;margin-left: 4px;">
+                                    <div style="float:left;width: 2px;"></div>
+                                    <%= L"我同意" %>
+                                    <div style="float:left;color: #EDB853" onclick="user_agreement()"><%= L"《用户许可协议》" %></div>
+                                    <%= L'与' %>
+                                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        <br />
+                                    </pe:if>
+                                    <div style="float:left;color: #EDB853" onclick="user_privacy()"><%= L"《用户隐私协议》" %></div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 18px;">
+                                <input type="button"
+                                        name='account_register_button'
+                                        style="width: 300px;
+                                        height: 44px;
+                                        color: #d3d3d3;
+                                        background-color: #404BF5;
+                                        background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"
+                                        onclick="account_register()"
+                                        value='<%= L"注册"%>' />
+                            </div>
+                        </pe:container>
+                        <!-- phone number register -->
+                        <pe:container name='phone_register_mode' visible='false' style='position: relative; margin-top: 87px; width: 300px; height: 550px; background:;'>
+                            <div style = "margin-top: 0px;
+                                            height: 44px;
+                                            width: 300px;
+                                            background-color: #2b2b2b; 
+                                            background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                <div onclick='set_account_mode'
+                                    style='float: left;
+                                            font-size: 14px;
+                                            base-font-size: 14px;
+                                            text-align: center;
+                                            margin-top: 8px;
+                                            color: #d3d3d3;
+                                            height: 36px;
+                                            width: 140px;'>
+                                    <div style="margin-top: 4px; margin-left: 5px;">
+                                        <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                            <%= L'账号注册' %>
+                                        </pe:if>
+                                        <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                            Account
+                                        </pe:if>
+                                    </div>
+                                </div>
+                                <div style="float: left;
+                                                width: 150px;
+                                                height: 36px;
+                                                margin-top: 4px;
+                                                margin-left: 4px;
+                                                background-color: #353535 
+                                                background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <div style='font-size: 14px;
+                                                base-font-size: 14px;
+                                                text-align: center;
+                                                margin-top: 8px;
+                                                height: 36px;
+                                                line-height: 5px;
+                                                color: #d3d3d3; 
+                                                width: 150px;
+                                                font-weight: bold;'>
+                                        <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                            <%= L'手机号注册' %>
+                                        </pe:if>
+                                        <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                            Phone
+                                        </pe:if>
+                                    </div>
+                                </div>
+                            </div>
+                            <pe:container name='phone_register_mode_step_1' visible='true' style='position: relative;background:;'>
+                                <pe:container name="register_phone_field_error" visible="false" style="position: relative; margin-left: 0px; margin-top: 93px; background: url(); ">
+                                    <div>
+                                        <label style="font-size: 12px;base-font-size: 12px;color: #FC3632;"  name="register_phone_field_error_msg" />
+                                    </div>
+                                </pe:container>
+                                <pe:container name="register_captcha_field_error" visible="false" style="position: relative; margin-left: 0px; margin-top: 184px; background: url(); ">
+                                    <div>
+                                        <label style="font-size: 12px;base-font-size: 12px;color: #FC3632;"  name="register_captcha_field_error_msg" />
+                                    </div>
+                                </pe:container>
+                                <pe:container name="register_phone_password_field_error" visible="false"  style="position: relative; margin-left: 0px; margin-top: 280px;  background: url(); ">
+                                    <div>
+                                        <label style="font-size: 12px;base-font-size: 12px;color: #FC3632;" name="register_phone_password_field_error_msg" />
+                                    </div>
+                                </pe:container>
+                                <div style="color: #d3d3d3;">
+                                    <div style='width: 300px; margin-top: 20px;'>
+                                        <div>
+                                            <div style="width: 140px; height: 20px;">
+                                                <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#366 238 16 16);"></div>
+                                                <div style="float: left; margin-left: 10px; margin-top: -4px; color: #d3d3d3;"><%=L"手机号"%></div>
+                                            </div>
+                                            <div style="margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                                <input type="text"
+                                                    EmptyText='<%= L"请输入手机号" %>'
+                                                    style='background:;
+                                                            textcolor: #d3d3d3;
+                                                            height: 30px;
+                                                            width: 260px;
+                                                            margin-top: 6px;
+                                                            margin-left: 12px;
+                                                            font-size: 14px;
+                                                            base-font-size: 14px;'
+                                                    onchange='on_change_phone_phone'
+                                                    onfocusin='on_focus_phone_phone'
+                                                    name="phonenumber" />
+                                            </div>            
+                                            
+                                        </div>
+                                        <div style="margin-top: 28px;">
+                                            <div style="width: 140px; height: 20px;">
+                                                <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#666 2 20 20);"></div>
+                                                <div style="float: left; margin-left: 10px; margin-top: -4px; color: #d3d3d3;"><%=L"验证码"%></div>
+                                            </div>
+                                            <div style="margin-top: 10px; width: 165px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                                <input
+                                                    type="text"
+                                                    EmptyText='<%= L"请输入验证码" %>'
+                                                    style='background:;
+                                                            textcolor: #d3d3d3;
+                                                            height: 30px;
+                                                            width: 155px;
+                                                            margin-top: 6px;
+                                                            margin-left: 12px;
+                                                            font-size: 14px;
+                                                            base-font-size: 14px;'
+                                                    onchange='on_change_phone_captcha'
+                                                    onfocusin='on_focus_phone_captcha'
+                                                    name="phonecaptcha" />
+                                            </div>
+                                            
+                                            <input
+                                                type="button"
+                                                name="get_phone_captcha"
+                                                style="margin-top: -40px;
+                                                    margin-left:182px;
+                                                    color: #3E9CE5;
+                                                    font-size: 14px;
+                                                    base-font-size: 14px;
+                                                    width: 120px;
+                                                    height:40px;
+                                                    color: #d3d3d3;
+                                                    background: url(Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#331 70 90 22:5 5 5 5)"
+                                                onclick="get_phone_captcha()"
+                                                disabled="disabled"
+                                                value='<%= L"获取验证码"%>'
+                                            />
+                                        </div>
+                                        <div style="margin-top: 20px;">
+                                            <div style="width: 140px; height: 20px;">
+                                                <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#346 238 16 16);"></div>
+                                                <div style="float: left; margin-left: 10px; margin-top: -4px; color: #d3d3d3;"><%=L"密码"%></div>
+                                            </div>
+                                            <div style="float: left;margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                                <input type="text"
+                                                    EmptyText='<%= L"请输入4位以上的密码" %>'
+                                                    SkipAutoBadWordFilter="true"
+                                                    style='background:;textcolor: #d3d3d3;height: 30px;width: 260px;margin-top: 6px; margin-left: 12px; font-size: 12px;'
+                                                    name="phonepassword_show"
+                                                    onchange='on_change_phone_password'
+                                                    onfocusin='on_focus_phone_password'
+                                                    visible="false" />
+                                                <input type="text"
+                                                    PasswordChar="*"
+                                                    SkipAutoBadWordFilter="true"
+                                                    EmptyText='<%= L"请输入4位以上的密码" %>'
+                                                    style='background:;textcolor: #d3d3d3;height: 30px;width: 260px;margin-top: 6px;font-size: 12px;margin-left: -260px;'
+                                                    name="phonepassword_hide"
+                                                    onchange='on_change_phone_password'
+                                                    onfocusin='on_focus_phone_password'
+                                                    visible="true" />
+                                                <input type='hidden' name='phonepassword' value="" />
+                                            </div>
+                                            <input type="checkbox"
+                                                    checked="false"
+                                                    iconsize="20"
+                                                    CheckedBG="Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#272 52 20 20"
+                                                    UncheckedBG="Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#297 52 20 20"
+                                                    style="position: relative;margin-left: 270px;margin-top: -30px;"
+                                                    onclick="set_show_password1"/>
+                                        </div>
+                                    </div>
+                                    <pe:container name='phone_agree_field_error'
+                                                    visible='false'
+                                                    style='background:'>
+                                        <div>
+                                            <label style='font-size: 12px;
+                                                            base-font-size: 12px;
+                                                            color: #FC3632;
+                                                            margin-left: 62px;'
+                                                    name='phone_agree_field_error_msg' />
+                                        </div>
+                                    </pe:container>
+                                    <div style='width: 300px;margin-top: 10px;margin-bottom: 5px;'>
+                                        <input type='checkbox'
+                                                iconsize='16'
+                                                CheckedBG="Texture/Aries/Creator/keepwork/community_32bits.png#446 238 16 16"
+                                                UncheckedBG="Texture/Aries/Creator/keepwork/community_32bits.png#426 238 16 16"
+                                                style='float:left;margin-top:3px;min-width:90px;'
+                                                name='phone_agree'
+                                                onclick='set_phone_agree'
+                                                checked='checked' />
+                                        <div style='float: left;
+                                                    color: white;
+                                                    base-font-size: 12px;
+                                                    font-size: 12px;
+                                                    margin-left: 4px;'>
+                                            <div style='float: left;
+                                                        width: 2px;'></div>
+                                            <%= L"我同意" %>
+                                            <div style="float:left;color: #EDB853" onclick="user_agreement()"><%= L"《用户许可协议》" %></div>
+                                            <%= L'与' %>
+                                            <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                                <br />
+                                            </pe:if>
+                                            <div style="float:left;color: #EDB853" onclick="user_privacy()"><%= L"《用户隐私协议》" %></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <input type='button'
+                                                name='phone_register_next_button'
+                                                style='margin-top: 20px;width: 300px;
+                                                height: 44px;
+                                                color: #d3d3d3;
+                                                background-color: #404BF5;
+                                                background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);'
+                                                onclick='phone_register_next()'
+                                                value='<%= L"下一步"%>' />
+                                    </div>
+                                </div>
+                            </pe:container>
+                            <pe:container name='phone_register_mode_step_2' visible='false' style='position: relative;background:;'>
+                                <pe:container name="register_account_field_error_step" visible="false" style="position: relative; margin-left: 70px; margin-top: 44px; background:">
+                                    <div>
+                                        <label style="font-size: 12px;base-font-size: 12px;color: #FC3632;"  name="register_account_field_error_msg_step" />
+                                    </div>
+                                </pe:container>
+                                <div style="width: 60px; height: 20px; margin-top: 30px;">
+                                    <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#414 106 16 16);"></div>
+                                    <div style="float: left; margin-left: 10px; color: #d3d3d3;"><%=L"账号"%></div>
+                                </div>
+                                <div style="margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <input type='text'
+                                        name='phone_register_account'
+                                        onchange='on_change_phone_account'
+                                        onfocusin='on_focus_phone_account'
+                                        EmptyText='<%= L"为自己取一个个性账号名吧" %>'
+                                        style='width: 210px;
+                                                height: 30px;
+                                                textcolor: #d3d3d3;
+                                                base-font-size: 14px;
+                                                font-size: 14px;
+                                                margin-left: 12px;
+                                                margin-top: 6px;
+                                                background:; ' />
+                                </div>
+                                <div>
+                                    <input type='button'
+                                            name='phone_register_button'
+                                            style='margin-top: 250px;
+                                                width: 300px;
+                                                height: 44px;
+                                                color: #d3d3d3;
+                                                background-color: #404BF5;
+                                                background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);'
+                                            onclick='phone_register()'
+                                            value='<%= L"注册"%>' />
+                                </div>
+                            </pe:container>
+                        </pe:container>
+                    </pe:container>
+                    <pe:container name='register_finish' visible='false'
+                                    style='position: relative; margin-top: 40px; width: 300px; height: 550px; background: url();'>
+                        <div>
+                            <div style="font-size: 24px;base-font-size: 24px;color: #d3d3d3; text-align: center; font-weight: bold;"><%=L"注册完成"%></div>
+                            <div style="margin-top: 25px; font-size: 14px;base-font-size: 14px;color: #d3d3d3; text-align: center; font-weight: bold;"><%=L"帐号密码一定要记牢，找个稳妥的地方抄下来"%></div>
+                            <div style="margin-top: 25px;width: 300px;">
+                                <div >
+                                    <div style="width: 140px; height: 20px;">
+                                        <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#414 106 16 16);"></div>
+                                        <div style="float: left; margin-top: -2px; margin-left: 10px; color: #d3d3d3;"><%=L"账号名"%></div>
+                                    </div>
+                                    <div style="margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                        <input type='text'
+                                            name='account_result'
+                                            style='width: 160px;
+                                                    textcolor: #d3d3d3;
+                                                    height: 30px;
+                                                    font-weight: bolder;
+                                                    base-font-size: 16px;
+                                                    font-size: 16px;
+                                                    text-singleline: true;
+                                                    margin-left: 12px;
+                                                    margin-top: 6px;
+                                                    background:;'
+                                            value='' />
+                                    </div>
+                                    
+                                </div>
+                                <div style="margin-top: 20px;">
+                                    <div style="width: 120px; height: 20px;">
+                                        <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#346 238 16 16);"></div>
+                                        <div style="float: left; margin-left: 10px; color: #d3d3d3;"><%=L"密码"%></div>
+                                    </div>
+                                    <div style="float: left; margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                        <input type='text'
+                                            name='password_result'
+                                            style='width: 160px;
+                                                    textcolor: #d3d3d3;
+                                                    height: 30px;
+                                                    font-weight: bolder;
+                                                    base-font-size: 16px;
+                                                    font-size: 16px;
+                                                    text-singleline: true;
+                                                    margin-left: 12px;
+                                                    margin-top: 6px;
+                                                    background:;'
+                                            value='' />
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div style="margin-top: 130px;">
+                                <div style=" font-size: 16px; base-font-size: 16px; color:#D9D9D9">回家后可登录paracraft.cn安装帕拉卡</div>
+                                <input type="button"
+                                        style="margin-top: 16px;
+                                            width: 300px;
+                                            height: 44px;
+                                            color: #d3d3d3;
+                                            background-color: #404BF5;
+                                            background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"
+                                        onclick="finish()"
+                                        value='<%= L"已完成"%>' />
+                            </div>
+                        </div>
+                    </pe:container>
+                </div>
+            </pe:container>
+        </pe:mcml>
+    </body>
+</html>

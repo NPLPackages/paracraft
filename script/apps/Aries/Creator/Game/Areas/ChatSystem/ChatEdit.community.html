@@ -1,0 +1,138 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.community.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ChatEdit, by lixizhi, 2011/3/14</title>
+</head>
+<body>
+    <pe:mcml>
+        <script type="text/npl" src="ChatEdit.lua">
+            <![CDATA[
+                KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+                local ChatEdit = MyCompany.Aries.ChatSystem.ChatEdit;
+                local page = document:GetPageCtrl();
+                ChatEdit.Init();
+
+                function OnQuickword(sName)
+                    local btn = page:FindUIControl(sName);
+                    if(btn and btn:IsValid())then
+                        local name = btn.name;
+                        local x,y,width, height = btn:GetAbsPosition();
+                        local KpQuickWord = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpQuickWord.lua");
+                        KpQuickWord.OnQuickword(x,y,width, height);
+                    end
+                    ChatEdit.CloseSmiley()
+                end
+
+                function OnClickSmiley()
+                    local NewSmileyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/NewSmileyPage.lua");
+                    NewSmileyPage.ShowPage()
+                end
+
+                function OnClickAnim()
+                    local NewSmileyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/NewSmileyPage.lua");
+                    NewSmileyPage.ShowAnimatePage()
+                end
+
+                function IsEnableIme()
+                    if ChatEdit.enable_ime ~= nil then
+                        return ChatEdit.enable_ime
+                    end
+                    return not ChatEdit.IsShowIMEBt()
+                end
+
+                function on_focus_chat()
+                    ChatEdit.CloseSmiley()
+                end
+
+                function GetChatEditTextDiv()
+                    local div_str = ""
+                    if IsEnableIme() then
+                        div_str = [[<input type="text" uiname="ChatEdit.text" name="chatedit_words" MoveViewWhenAttachWithIME="true" onfocusin='on_focus_chat' onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF"  style="%s;position:relative;margin-top:4px; margin-left:5px; width:217px; height:%s;background:;" class="bordertext"/>]]
+                    else
+                        div_str = [[<input type="text" uiname="ChatEdit.text" name="chatedit_words" MoveViewWhenAttachWithIME="true" enable_ime="false" onfocusin='on_focus_chat' onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" style="%s;position:relative;margin-top:4px; margin-left:5px; width:217px; height:%s;background:;" class="bordertext"/>]]
+                    end
+
+                    local height = "24px"
+                    local size_str = ""
+
+                    div_str = string.format(div_str, size_str, height)
+                    return div_str
+                end
+                function dummy() 
+                end
+                function OnClickSend()
+                    MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend()
+                    MyCompany.Aries.ChatSystem.ChatWindow.HideAll()
+                end
+            ]]>
+        </script>
+        <div zorder="-1" onclick="dummy" style="margin-left: 3px; width: 418px; height: 48px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#118 162 32 32:14 14 14 14);">
+
+            <div style="position: relative;
+                        margin-top: 8px;
+                        margin-left: 8px;
+                        height: 32px;
+                        width: 200px;
+                        background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#228 40 32 32:14 14 14 14);">
+                <input type="text" uiname="ChatEdit.text" name="chatedit_words" MoveViewWhenAttachWithIME="true" onfocusin='on_focus_chat' 
+                        onkeyup="<%=(not System.options.IsMobilePlatform) and 'MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp' or nil %>" 
+                        onchange="MyCompany.Aries.ChatSystem.ChatEdit.OnChangeText"
+                        textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF"  style="%s;position:relative;margin-top:4px; margin-left:5px; width:217px; height:24px;background:;" class="bordertext"/>
+            </div>
+            <div style="position: relative; margin-left:210px;margin-top:8px;">
+                <input type="button"
+                    tooltip="魔法表情"
+                    style="margin-left: 1px;
+                        width: 32px;
+                        height:32px;background:url(Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png#229 162 20 20);" 
+                    onclick="OnClickAnim()"
+                    uiname="ChatEdit.Anim_btn"
+                    name="smiley_btn"/>
+                <input type="button"
+                        tooltip="表情"
+                        style="margin-left: 2px;
+                                width: 32px;
+                                height:32px;background:url(Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png#230 78 20 20);" 
+                        onclick="OnClickSmiley()"
+                        uiname="ChatEdit.smiley_btn"
+                        name="smiley_btn"/>
+                <input type="button"
+                        tooltip="快捷语言"
+                        style="margin-left: 2px;
+                                width: 32px;
+                                height:32px;background:url(Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png#228 102 20 20);" 
+                        onclick="OnQuickword()"
+                        uiname="ChatEdit.quickword_btn"
+                        name="quickword_btn"/>                    
+            </div>
+            <div style="position: relative; margin-left: 350px; margin-top: 8px;">
+                <input type="button" align="right" style="position: relative;
+                            margin-right: 52px;
+                            width: 52px;
+                            margin-top: 0px;
+                            height: 32px;
+                            background: url(Texture/Aries/Creator/keepwork/Community/chat_v2_32bits.png#69 141 52 33);"
+                    name="send"
+                    uiname="ChatEdit.send"
+                    tooltip='<%= L"发送" %>'
+                    onclick="OnClickSend"/>
+                <input type="button"
+                    align="right"
+                    style="position: relative;
+                            margin-right: 0px;
+                            width: 50px;
+                            margin-top: -8px;
+                            height: 50px;
+                            background: url(Texture/player/close.png);" 
+                    name="cancel"
+                    tooltip='<%= L"取消" %>'
+                    onclick="MyCompany.Aries.ChatSystem.ChatWindow.HideAll()"/>
+                </div>
+            </div>
+        </div>
+        
+    </pe:mcml> 
+</body>
+</html>

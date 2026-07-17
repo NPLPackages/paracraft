@@ -50,11 +50,12 @@ function SysInfoStatistics.uploadSysInfo(_info)
     obj.installPath = ParaIO.GetWritablePath()
     obj.ip = NPL.GetExternalIP()
     
-    obj.machineID = ParaEngine.GetAttributeObject():GetField('MachineID', '')
+    obj.machineID = GameLogic.GetMachineID(ParaEngine.GetAttributeObject():GetField('MachineID', ''))
     obj.machineID_old = ParaEngine.GetAttributeObject():GetField('MachineID_old', '')
     -- obj.version = getVersionByPath(ParaIO.GetWritablePath())
     obj.version = GameLogic.options.GetClientVersion()
     obj.channelId = System.options.channelId
+    obj.appId = System.options.appId
     obj.commandLine = ParaEngine.GetAppCommandLine()
     obj.isDevEnv = System.options.isDevEnv
     obj.isDevMode = System.options.isDevMode
@@ -63,6 +64,10 @@ function SysInfoStatistics.uploadSysInfo(_info)
     obj.winwidth = win_width
     obj.winheight = win_height
     obj.scalling = scalling
+
+    if (System.os.GetPlatform() == "ios" and System.os.CompareParaEngineVersion('1.6.1.0')) then
+        obj.IDFA = IDFA.get()
+    end
 
     local SessionsData = NPL.load('(gl)Mod/WorldShare/database/SessionsData.lua')
     local bak_sessions = SessionsData:GetSessions()
@@ -93,7 +98,7 @@ function SysInfoStatistics.uploadSysInfo(_info)
     end)
 end
 
-function SysInfoStatistics.checkGetSysInfoAndUpload()
+function SysInfoStatistics.checkGetSysInfoAndUpload(preInfo)
     local platform = System.os.GetPlatform()
     if platform=="android" or platform=="ios" or platform=="mac" then
         local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
@@ -103,7 +108,11 @@ function SysInfoStatistics.checkGetSysInfoAndUpload()
         for k,v in pairs(appInfo) do
             sysInfo[k] = v
         end
-
+        if preInfo and type(preInfo) == "table" then
+            for k,v in pairs(preInfo) do
+                sysInfo[k] = v
+            end
+        end
         SysInfoStatistics.uploadSysInfo(sysInfo)
         return
     end
@@ -177,7 +186,7 @@ function SysInfoStatistics.checkGetSysInfoAndUpload()
                                     newArr[j] = temp
                                 end
                                 for key,vals in pairs(_map) do
-                                    temp[key] = commonlib.Encoding.DefaultToUtf8(vals[j])
+                                    temp[key] = ParaMisc.EncodingConvert("gb2312", "utf-8", vals[j])
                                 end
                             end
                         end
@@ -205,6 +214,11 @@ function SysInfoStatistics.checkGetSysInfoAndUpload()
                     end
                     -- print("test log-----规范化")
                     -- echo(newRet,true)
+                    if preInfo and type(preInfo) == "table" then
+                        for k,v in pairs(preInfo) do
+                            newRet[k] = v
+                        end
+                    end
                     SysInfoStatistics.uploadSysInfo(newRet)
                 end
             end));

@@ -142,10 +142,10 @@ function ParaWorldLoginDocker.InitParaWorldClient()
 							if(data and data.kp and data.kp.token) then
 								_guihelper.MessageBox(nil);
 								if(data.kp.user and data.kp.user.nickname) then
-									System.User.nickname = data.kp.user.nickname;
+									System.User.NickName = data.kp.user.nickname;
 								end
 								commonlib.setfield("System.User.keepworktoken", data.kp.token);
-								LOG.std(nil, "info", "paraworldclient", "successfully logged in with QQ account %s  nickname: %s", user_id, System.User.nickname or "");
+								LOG.std(nil, "info", "paraworldclient", "successfully logged in with QQ account %s  nickname: %s", user_id, System.User.NickName or "");
 								return
 							else
 								_guihelper.MessageBox(L"登陆信息过期了，请重新启动", function()

@@ -1,0 +1,419 @@
+<html>
+<body> 
+<pe:mcml>
+<script type="text/npl">
+<![CDATA[
+    KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+    local ChatEdit = MyCompany.Aries.ChatSystem.ChatEdit;
+    local ChatChannelPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatChannelPage.lua");
+    ChatChannelPage.OnInit()
+
+    function OnClose()
+        ChatChannelPage.ClosePage()
+    end
+
+    function GetMenuData()
+        return ChatChannelPage.chatChanels
+    end
+
+    function GetSelectChanelIndex()
+        return ChatChannelPage.selectedChatChanelIndex
+    end
+
+    function OnChangeTabview(name)
+        ChatChannelPage.ChangeChanelTabview(name)
+    end
+
+    function IsSelectBlackListMenu()
+        return ChatChannelPage.IsSelectBlackListMenu()
+    end
+
+    function IsSelectPrivateMenu()
+        return ChatChannelPage.IsSelectPrivateMenu()
+    end
+
+    function DS_PrivateChat_Items(index)
+        if index == nil then
+            return #ChatChannelPage.privateUsers
+        else
+            return ChatChannelPage.privateUsers[index]
+        end
+    end
+
+    function ClickItem(name,mcmlNode)
+        local item_index = mcmlNode:GetAttribute("param1")
+        if item_index then
+            ChatChannelPage.ClickItem(item_index)
+        end
+    end
+
+    function OnPrivateSearch()
+        ChatChannelPage.OnPrivateSearch()
+    end
+
+    function GetPrivateChatName()
+        return ChatChannelPage.GetPrivateChatName() or ""
+    end
+
+    function GetIcon(data)
+        return ChatChannelPage.GetIcon(data) or ""
+    end
+
+    function GetName(data)
+        return ChatChannelPage.GetName(data) or ""
+    end
+
+    function GetLimitName(name)
+        if not name or name == "" then
+            return ""
+        end
+        local leftStr, rightStr = _guihelper.TrimUtf8TextByWidth(name,70,"System;12;norm")
+        if leftStr and rightStr and leftStr ~= "" and rightStr ~= "" then
+            return leftStr.. "..."
+        end
+        return name
+    end
+
+    function IsItemSelect(index)
+        return ChatChannelPage.selectedPrivateUserIndex == tonumber(index)
+    end
+
+    function IsShowPrivateChatContent()
+        return ChatChannelPage.IsShowPrivateChatContent()
+    end
+
+    function GetChanelRoom()
+        local roomName = ChatChannelPage.GetRoomByChannel()
+        if not roomName or roomName == "" then
+            return ""
+        end
+        local leftStr, rightStr = _guihelper.TrimUtf8TextByWidth(roomName,300,"System;14;norm")
+        if leftStr and rightStr and leftStr ~= "" and rightStr ~= "" then
+            return leftStr.. "..."
+        end
+        return roomName
+    end
+
+    function IsShowMemberList()
+        return ChatChannelPage.IsShowMemberList()
+    end
+
+    function OnChangeMemberListStatus()
+        ChatChannelPage.OnChangeMemberListStatus()
+    end
+
+    function Ds_MemberList_Items(index)
+        if index == nil then
+            return #ChatChannelPage.members
+        else
+            return ChatChannelPage.members[index]
+        end
+    end
+
+    function IsMyself(data)
+        return ChatChannelPage.IsMyself(data)
+    end
+
+    function GetMemberNum()
+        return ChatChannelPage.members and #ChatChannelPage.members or 0
+    end
+
+    function OnAddFriend(name,mcmlNode)
+        local data = mcmlNode:GetAttribute("param1")
+        if data then
+            ChatChannelPage.AddFriend(data)
+        end
+    end
+
+    function OnAddBlackList(name,mcmlNode)
+        local data = mcmlNode:GetAttribute("param1")
+        if data then
+            ChatChannelPage.AddBlackList(data)
+        end
+    end
+
+    function OnDeleteFriend(name,mcmlNode)
+        local data = mcmlNode:GetAttribute("param1")
+        if data then
+            ChatChannelPage.DeleteFriend(data)
+        end
+    end
+
+    function OnStartPrivateChat(name,mcmlNode)
+        local data = mcmlNode:GetAttribute("param1")
+        if data then
+            ChatChannelPage.StartPrivateChat(data)
+        end
+    end
+
+    function OnBlackListSearch()
+        ChatChannelPage.OnBlackListSearch()
+    end
+
+    function Ds_BlackList_Items(index)
+        if index == nil then
+            return #ChatChannelPage.blackList
+        else
+            return ChatChannelPage.blackList[index]
+        end
+    end
+
+    function OnRemoveBlackList(name,mcmlNode)
+        local data = mcmlNode:GetAttribute("param1")
+        if data then
+            ChatChannelPage.RemoveBlackList(data)
+        end
+    end
+
+    function OnClickSmiley()
+        local NewSmileyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/NewSmileyPage.lua");
+        NewSmileyPage.ShowPage(true)
+    end
+
+    function OnGroupChatKeyUp()
+        ChatChannelPage.OnPrivateChatKeyUp()
+    end
+
+    function OnClickSendChat()
+        ChatChannelPage.OnClickSendChat()
+    end
+
+    function OnPrivateChatKeyUp()
+        ChatChannelPage.OnPrivateChatKeyUp()
+    end
+
+    function OnPrivateSearchChange(name,mcmlNode)
+        ChatChannelPage.OnPrivateSearchChange(name,mcmlNode)
+    end
+    
+    function OnBlackListSearchChange(name,mcmlNode)
+        ChatChannelPage.OnBlackListSearchChange(name,mcmlNode)
+    end
+
+    function OnPrivateChatChange(name,mcmlNode)
+        ChatChannelPage.OnPrivateChatChange(name,mcmlNode)
+    end
+
+    function OnGroupChatTextChange(name,mcmlNode)
+        ChatChannelPage.OnGroupChatTextChange(name,mcmlNode)
+    end
+
+    function GetChatContentHeight()
+        return ChatChannelPage.GetChatContentHeight()
+    end
+]]>
+</script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#0000006F;">
+    <pe:container   zorder="2" alignment="_ml" width="1100" height="0" style="position: relative; margin-top: 0px; background-color:#26262600;">
+        <div  style="float: left; margin-left: 0px; width: 148px; height: 1440px; background-color:#262626">
+            <div style="position: relative; width: 142px; height: 720px;">
+                <pe:repeat DataSource="<%=GetMenuData()%>" >
+                    <pe:repeatitem style="float:left;min-width:122px; ">
+                        <pe:if condition='<%=GetSelectChanelIndex() == Eval("index") %>' >
+                            <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>'  icon="<%=Eval('icon1')%>" icon_width="22" icon_height="22" icon_off_x="-40" icon_off_y="0" onclick="OnChangeTabview" style="text-align: left; font-weight:bold;margin-top: 12px; text-offset-x:39; text-offset-y:1; margin-left: 12px;color:#ffffff;font-size:14px;min-width:122px;height:40px; background-color: #404040; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)" />
+                        </pe:if>
+                        <pe:if condition='<%=GetSelectChanelIndex() ~= Eval("index") %>' >
+                            <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>'  icon="<%=Eval('icon')%>"  icon_width="22" icon_height="22" icon_off_x="-40" icon_off_y="0" onclick="OnChangeTabview" style="text-align: left; font-weight:bold;margin-top: 12px; text-offset-x:39; text-offset-y:1; margin-left: 12px;color:#A8A7B0;font-size:14px;min-width:122px;height:40px; background:url()" />
+                        </pe:if>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </div>
+            <div style="position: relative; width: 1px; height: 1300px; margin-left: 146px; background-color: #313131ff"></div>
+        </div>
+        <pe:if condition='<%=IsSelectBlackListMenu() %>' > <!-- 黑名单列表 -->
+            <div height="100%" style="float: left; width: 232px;  margin-left: 0px; background-color:#262626">
+                <div style='margin-left: 15px; width: 200px; height: 36px; margin-top: 10px; background-color: #1a1a1a;'>
+                    <input type="button" tooltip='<%= L"搜索" %>' onclick="OnBlackListSearch" style=" margin-top: 12px; margin-left: 10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/community_32bits.png#506 238 16 16)" />
+                    <input type='text' name='blacklist_search_content' EmptyText='<%= L"输入要查找的好友" %>' onchange="OnBlackListSearchChange" EmptyTextColor='#FF7B7A8A' textcolor='#7B7A8AFF'
+                            style='float: left; margin-top: 6px; margin-left: 6px; width: 160px; height: 26px; font-size: 12px; base-font-size: 12px; text-valign: center; background:;'/>
+                </div>
+                <div height="92%" style="margin-top:0px; margin-left: 0px; width:250px;">
+                    <pe:gridview DataSource='<%=Ds_BlackList_Items%>' RememberScrollPos="true" name="item_private_chat_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" >
+                        <Columns>
+                            <div style="width: 250px; height: 36px; color:#ffffff ;">
+                                <div style="position: relative; margin-left:4px;margin-top:2px;">
+                                    <img zorder="0" src='<%=GetIcon(XPath("this"))%>' width="32" height="32"/>
+                                </div>
+                                <div style="position: relative; margin-top:6px; margin-left: 48px; color:#ffffff">
+                                    <%= GetLimitName(GetName(XPath("this"))) %>
+                                </div>
+                                <input type="button" tooltip="<%=L'移除'%>" name='<%=Eval("index")%>' param1='<%=XPath("this")%>' onclick="OnRemoveBlackList" style="margin-top: 2px; margin-left: 180px; color: #ffffff; width: 24px; height: 24px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#178 8 24 24);" />
+                            </div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <div style="color:#ffffff; margin-top: 100px; text-align: center; "><%= L"暂无数据" %></div>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+            </div>
+            <input type="button" onclick="OnClose" style="float: left; margin-left: 0px; margin-top: 334px; width: 22px; height: 72px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#2 2 22 72);"/>
+        </pe:if>
+        <pe:if condition='<%=not IsSelectBlackListMenu() %>' >
+            <div height="100%" style="float: left; width: 770px;  margin-left: 0px; ">
+                <pe:if condition='<%=IsSelectPrivateMenu()%>'> <!-- 私聊 -->
+                    <div height="100%" style="float: left;  margin-left: 0px; background-color:#262626">
+                        <!-- 私聊列表 -->
+                        <div height="100%" style="float: left; width: 232px;  margin-left: 0px; "> 
+                            <div style='margin-left: 11px; width: 210px; height: 36px; margin-top: 10px; background-color: #1a1a1a;'>
+                                <input type="button" tooltip='<%= L"搜索" %>' onclick="OnPrivateSearch" style=" margin-top: 12px; margin-left: 10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/community_32bits.png#506 238 16 16)" />
+                                <input type='text' name='private_search_content' EmptyText='<%= L"输入要查找的好友" %>' onchange="OnPrivateSearchChange" EmptyTextColor='#FF7B7A8A' textcolor='#7B7A8AFF'
+                                        style='float: left; margin-top: 6px; margin-left: 6px; width: 160px; height: 26px; font-size: 12px; base-font-size: 12px; text-valign: center; background:;'/>
+                            </div>
+                            <div style="width:220px;height:600px;">
+                                <pe:gridview DataSource='<%=DS_PrivateChat_Items%>' style="margin:0px; margin-left: 0px; width:220px;height:600px; " RememberScrollPos="true" name="item_private_chat_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "50" >
+                                    <Columns>
+                                            <div style="width:210px;height:50px;color:#ffffff">
+                                                <input type="button" uiname="<%='private_chat_'..Eval('index')%>" Normal_BG="" onclick="ClickItem" param1='<%=Eval("index") %>' MouseOver_BG='' alwaysmouseover="true" style="position:relative;margin-top:0px;width:210px;height:48px;background:;" />
+                                                <div style="position:relative;margin-left:10px;margin-top:5px;width:210px;height:48px;">
+                                                    <div style="float: left;margin-left:0px;margin-top:4px;">
+                                                        <img zorder="0" src='<%=GetIcon(XPath("this"))%>' width="32" height="32"/>
+                                                    </div>
+                                                    <div style="float: left;margin-left: 8px;margin-top: 4;">
+                                                        <div style="margin-top:6px;width:150px;color:#ffffff">
+                                                            <%=GetName(XPath("this")) %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <pe:if condition='<%=IsItemSelect(Eval("index"))%>'>
+                                                    <div style="position: relative;width:210px;height:48px;margin-left: 0px;padding:0px;background-color: #1A1A1A; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                                    </div>
+                                                </pe:if>
+                                            </div>
+                                    </Columns>
+                                    <EmptyDataTemplate>
+                                        <div style="color:#ffffff; margin-top: 100px; text-align: center; "><%= L"暂无数据" %></div>
+                                    </EmptyDataTemplate>
+                                </pe:gridview>
+                            </div>
+                        </div>
+                        <div style="float: left; width: 1px; height: 1300px; margin-left: 1px; background-color: #313131ff"></div>
+                        <!-- 私聊内容 -->
+                        <pe:if condition='<%=IsShowPrivateChatContent()%>'>
+
+                            <div height="100%" style="float: left; width: 462px; margin-left: 0px; ">
+                                <div style="width: 464px; height: 56px;">
+                                    <div style="position: relative; font-size: 14px; base-font-size: 14px; color: #D3D3D3; margin-top: 1px; margin-left: 16px;"><%=GetPrivateChatName()%></div>
+                                </div>
+                                <div style="<%='margin-top:0px; padding-bottom: 60px; width:460px; background-color: #1a1a1a; height:'..GetChatContentHeight()..'px;'%>">
+                                    <pe:container height="95%"  uiname="private_chat_content" alignment="_lt" style="margin-top:12px;width:460px; background: url();">
+                                    </pe:container>
+                                </div>
+                                <div style="width: 464px; height: 56px;">
+                                    <div style="position: relative;margin-top: 8px;margin-left: 12px;height: 40px;width: 342px; background-color: #1a1a1a66; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#118 162 32 32:14 14 14 14);">
+                                        <div style="position: relative; margin-left:10px;margin-top:0px; width:272px; height:40px; background: url();">
+                                            <input type="text" name="private_chat_words"  onkeyup="OnPrivateChatKeyUp" onchange="OnPrivateChatChange" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" 
+                                            style="position:relative;margin-top:7px; margin-left:0px; width: 300px; height:26px;background:;" class="bordertext" />
+                                            <div style="margin-left: 300px; margin-top: -26px;">
+                                                <input type="button"
+                                                    tooltip="表情"
+                                                    style="font-size: 12px;
+                                                            margin-left: 1px;
+                                                            margin-top: 1px;
+                                                            width: 20px;
+                                                            height:20px;background:url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#216 96 20 20);" 
+                                                    onclick="OnClickSmiley()"
+                                                    name="smiley_btn"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; margin-left: 320px; margin-top: 8px;"> 
+                                        <input type="button" align="right" style="position: relative;
+                                                    margin-right: 16px;
+                                                    width: 80px;
+                                                    margin-top: 0px;
+                                                    height: 40px;
+                                                    color: #ffffff;
+                                                    background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#42 238 16 16:6 6 6 6);"
+                                            name="send_private_chat"
+                                            value='<%= L"发送" %>'
+                                            onclick="OnClickSendChat"/>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </pe:if>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not IsSelectPrivateMenu()%>'> <!-- 组队聊天 和 地图聊天 -->
+                    <div height="100%" style="float: left; margin-left: 0px; background-color:#262626">
+                        <!-- 聊天内容 -->
+                        <div height="100%" style="float: left; width: 460px;  margin-left: 0px; ">
+                            <div style="width: 460px; height: 56px; margin-top: 4px;">
+                                <div style="position: relative; font-size: 14px; base-font-size: 14px; color: #D3D3D3; margin-top: 14px; margin-left: 16px;"><%=L"房间名称："..GetChanelRoom()%></div>
+                                <div onclick="OnChangeMemberListStatus" style="position: relative; margin-top: 16px; margin-left: 424px; width: 24px; height: 24px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#158 126 24 24);"></div>
+                            </div>
+                            <div style="<%='margin-top:0px; padding-bottom: 60px; width:460px; background-color: #1a1a1a; height:'..GetChatContentHeight()..'px;'%>">
+                                <pe:container  height="95%"  uiname="group_chat_content" alignment="_lt" style="margin-top:12px;width:460px; background: url();">
+                                </pe:container>
+                            </div>
+                            <div style="width: 460px; height: 56px;">
+                                <div style="position: relative;margin-top: 8px;margin-left: 12px;height: 40px;width: 342px; background-color: #1a1a1a66; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#118 162 32 32:14 14 14 14);">
+                                    <div style="position: relative; margin-left:0px;margin-top:0px; width:272px; height:40px; background: url();">
+                                        <input type="text" name="group_chat_words"  onkeyup="OnGroupChatKeyUp" onchange="OnGroupChatTextChange" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" 
+                                        style="position:relative;margin-top:7px; margin-left:12px; width: 300px; height:26px;background:;" class="bordertext" />
+                                        <div style="margin-left: 310px; margin-top: -26px;">
+                                            <input type="button" tooltip="表情"
+                                                style="font-size: 12px;
+                                                        margin-left: 1px;
+                                                        margin-top: 1px;
+                                                        width: 20px;
+                                                        height:20px;background:url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#216 96 20 20);" 
+                                                onclick="OnClickSmiley()"
+                                                name="smiley_btn"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="position: relative; margin-left: 320px; margin-top: 8px;">
+                                    <input type="button" align="right" style="position: relative;
+                                                margin-right: 12px;
+                                                width: 80px;
+                                                height: 40px;
+                                                color: #ffffff;
+                                                background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#42 238 16 16:6 6 6 6);"
+                                        name="send_group_chat"
+                                        value="<%=L'发送'%>"
+                                        onclick="OnClickSendChat"/>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div style="float: left; width: 1px; height: 1300px; margin-left: 0px; background-color: #313131ff"></div>
+                        <!-- 成员列表 -->
+                         <pe:if condition="<%=IsShowMemberList()%>">
+                             <div style="float: left; width: 280px; height: 720px; margin-left: 0px;  "> 
+                                <div style="position: relative; font-size: 14px; base-font-size: 14px; color: #D3D3D3; margin-top: 18px; margin-left: 16px;"><%=L"当前房间人数："..GetMemberNum()%></div>
+                                <div style="width: 270px; height: 660px; margin-left: 3px; margin-top: 54px; ">
+                                    <pe:gridview DataSource='<%=Ds_MemberList_Items%>' style="margin-top:0px; margin-left: 0px; width:270px;height:660px;" RememberScrollPos="true" name="item_private_chat_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" >
+                                        <Columns>
+                                            <div style="width: 250px; height: 36px; color:#ffffff ; ">
+                                                <div style="position: relative; margin-left:4px;margin-top:2px;">
+                                                    <img zorder="0" src='<%=GetIcon(XPath("this"))%>' width="32" height="32"/>
+                                                </div>
+                                                <div style="position: relative; margin-top:8px; margin-left: 48px; color:#ffffff">
+                                                    <%= GetLimitName(GetName(XPath("this"))) %>
+                                                </div>
+                                                <div style="margin-left: 128px; margin-top: 3px;">
+                                                    <input type="button" tooltip="<%=L'私聊'%>" param1='<%=XPath("this")%>'  onclick="OnStartPrivateChat"  style="width: 24px; height: 24px; margin-top: 2px; margin-left: 6px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#140 44 24 24);"/>
+                                                    <input type="button" tooltip="<%=L'拉黑好友'%>" param1='<%=XPath("this")%>'  onclick="OnAddBlackList"  style="width: 24px; height: 24px; margin-top: 2px; margin-left: 6px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#84 44 24 24);"/>
+                                                    <input type="button" tooltip="<%=L'删除好友'%>" param1='<%=XPath("this")%>'  onclick="OnDeleteFriend"  style="width: 24px; height: 24px; margin-top: 2px; margin-left: 6px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#150 72 24 24);"/>
+                                                    <input type="button" tooltip="<%=L'添加好友'%>" param1='<%=XPath("this")%>'  onclick="OnAddFriend"  style="width: 24px; height: 24px; margin-top: 2px; margin-left: 6px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#28 46 24 24);"/>
+                                                </div>
+                                            </div>
+                                        </Columns>
+                                        <EmptyDataTemplate>
+                                            <div style="color:#ffffff; margin-top: 100px; text-align: center; "><%= L"暂无数据" %></div>
+                                        </EmptyDataTemplate>
+                                    </pe:gridview>
+                                </div>
+                            </div>
+                         </pe:if>
+                    </div>
+                </pe:if>
+                <input type="button" onclick="OnClose" style="float: left; margin-left: 0px; margin-top: 334px; width: 22px; height: 72px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#2 2 22 72);"/>
+            </div>
+        </pe:if>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

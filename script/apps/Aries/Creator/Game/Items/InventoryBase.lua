@@ -85,12 +85,20 @@ end
 
 -- clear all inventory to empty.
 -- @param from_slot_id: start from a given slot. if nil, it will search from beginning. 
-function InventoryBase:Clear(from_slot_id, to_slot_id)
+function InventoryBase:Clear(from_slot_id, to_slot_id,filter)
 	local slots = self.slots;
 	local count = 0;
 	for i=(from_slot_id or 1), (to_slot_id or self.max_pick_item_count or self:GetSlotCount()) do
 		local item = slots[i];
-		if(item and item.count>0) then
+		local fit = true
+		if(item and filter ~= nil and filter ~= "")then
+			local tooltip = item:GetTooltip()
+			local matchResult = string.find(tooltip, filter)
+			if(matchResult == nil or matchResult == "")then
+				fit = false
+			end
+		end
+		if(item and item.count>0 and fit) then
 			slots[i] = nil;
 			count = count + 1;
 		end			
@@ -348,7 +356,7 @@ end
 -- @param count: if nil, it will remove all items in the given slot. 
 function InventoryBase:RemoveItem(slot_index, count)
 	local cur_item_stack = self.slots[slot_index];
-	if (cur_item_stack) then
+	if (cur_item_stack and not cur_item_stack.is_pinned) then
         local item_stack;
 		if(not count) then
 			count = cur_item_stack.count;
@@ -377,6 +385,9 @@ end
 -- @return original item stack at the given position. 
 function InventoryBase:ReplaceItem(slot_index, item_stack)
 	local cur_item_stack = self.slots[slot_index];
+	if(cur_item_stack and cur_item_stack.is_pinned) then
+		return
+	end
 	self:OnUnloadInEntity(cur_item_stack)
 
 	self.slots[slot_index] = item_stack;

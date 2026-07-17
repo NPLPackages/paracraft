@@ -46,6 +46,10 @@ function world_info_class:SetTeleportBackPosition(x,y,z)
 		x, y, z = Player.GetPlayer():GetPosition();
 	end
 	if(x) then
+		if(x == 0) then
+			-- in paracraft world,  Player.GetPlayer() is invalid, because when this function is called, the world is already unloaded.
+			x,y,z = nil, nil, nil;
+		end
 		self.LastWorldPosX = x;
 		self.LastWorldPosY = y;
 		self.LastWorldPosZ = z;

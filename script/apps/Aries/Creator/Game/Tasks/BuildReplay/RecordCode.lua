@@ -25,8 +25,8 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 local RecordCode = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"),commonlib.gettable("MyCompany.Aries.Game.Tasks.RecordCode"))
-local block_speed = 3
-local code_speed = 30
+local block_speed = 1
+local code_speed = 20
 function RecordCode:OnInit()
     self.record_data = {}
     self.current_entity = nil

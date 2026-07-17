@@ -183,6 +183,7 @@ function BlockMaterialTask:ShowPage()
 		url="script/apps/Aries/Creator/Game/Tasks/BlockMaterial/BlockMaterialTask.html",
 		alignment="_ctb", left=0, top= -55, width = 350, height = 64, parent = parent,
 	});
+	window:EnableSelfPaint(true);
 end
 
 function BlockMaterialTask.GetMaterialId()

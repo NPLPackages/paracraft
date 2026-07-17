@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+local MiniGameUserBag = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameUserBag.lua");
+MiniGameUserBag.OnInit();
+
+-- 数据源函数
+function DS_Collection_Items(index)
+    if index == nil then
+        return #MiniGameUserBag.pageItems
+    else
+        return MiniGameUserBag.pageItems[index]
+    end
+end
+
+-- 点击物品事件
+function OnClickItem(index)
+    MiniGameUserBag.OnClickItem(index)
+end
+
+-- 获取分类按钮数据
+function DS_Category_Buttons()
+    local categories = MiniGameUserBag.GetCategories()
+    return categories
+end
+
+
+-- 切换分类事件
+function OnSwitchCategory(name)
+    MiniGameUserBag.SwitchCategory(name)
+end
+
+function IsVipUser()
+    return MiniGameUserBag.IsVipUser()
+end
+
+-- 开通会员事件
+function OnOpenVip()
+    MiniGameUserBag.OpenVipDialog()
+end
+
+-- 关闭页面
+function OnClose()
+    MiniGameUserBag.ClosePage()
+end
+
+function CheckCategorySelected(name)
+    return MiniGameUserBag.CheckCategorySelected(name)
+end
+
+function GetCurrentCategory()
+    return MiniGameUserBag.GetCurrentCategory()
+end
+
+function OnClickSmileyIcon(index)
+    MiniGameUserBag.OnClickSmileyIcon(index)
+end
+
+function OnClickThrowItem(index)
+    MiniGameUserBag.OnClickThrowItem(index)
+end
+
+function OnClickFoodItem(index)
+    MiniGameUserBag.OnClickFoodItem(index)
+end
+
+function GetItemDeadline(index)
+    return MiniGameUserBag.GetItemDeadline(index)
+end
+
+function OnOpenStore()
+    MiniGameUserBag.ClosePage()
+    MiniGameMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameMainPage.lua")
+    MiniGameMainPage.OnClickSkin()
+end
+function OnClickUserItem(index)
+    MiniGameUserBag.OnClickUserItem(index)
+end
+
+function dummy()
+end
+]]></script>
+<pe:container uiname= "user_bag_ui"  onclick="dummy" style=" width: 420px; height: 545px; background: url(Texture/Aries/Creator/keepwork/minigame/bag/bg_16x16_32bits.png#0 0 16 16:6 6 6 6);">
+    <input type="button" name="CloseBtn" onclick="OnClose()" align="right" style="position:relative; margin-right: 20px; margin-top: 5px;width:56px;height:56px;background:url(Texture/player/close.png)" />
+    <!-- 标题栏 -->
+    <div style="position: relative; margin-left: 20px; margin-top: 15px; width: 420px; height: 40px;">
+        <div style="float: left; margin-top: 5px; width: 103px; height:43px; background: url(Texture/Aries/Creator/keepwork/minigame/bag/title_103x43_32bits.png#0 0 103 43);"></div>
+        <input type="button" onclick="OnOpenStore()" value='<%=L"去商城看看"%>' class="linkbutton_yellow" style="float: left; margin-left: 20px; margin-top: 0px; height: 40px; font-size: 16px;" />
+    </div>
+    
+    <!-- 分类按钮 -->
+    <div style="position: relative; margin-left: 336px; margin-top: 70px; width: 78px; height: 470px;">
+        <pe:repeat DataSource="<%=DS_Category_Buttons()%>">
+            <pe:repeatitem>
+                <div style="width: 72px; height: 72px; margin-top: 10px;">
+                    <pe:if condition='<%=CheckCategorySelected(Eval("index"))%>'>
+                        <div style="position: relative; width: 72px; height: 72px; background: url(Texture/Aries/Creator/keepwork/minigame/bag/btn1_64x64_32bits.png)" ></div>
+                    </pe:if>
+                    <pe:if condition='<%=not CheckCategorySelected(Eval("index"))%>'>
+                        <input type="button" name='<%=Eval("index")%>' onclick='OnSwitchCategory' style="position: relative; width: 72px; height: 72px; background: url(Texture/Aries/Creator/keepwork/minigame/bag/btn_64x64_32bits.png)" />
+                    </pe:if>
+                    <div zorder="1" style="<%='position: relative; margin-left: 4px; margin-top: 4px; width: 64px; height: 64px; background:'..Eval('icon')..';'%>"></div>
+                </div>
+            </pe:repeatitem>
+        </pe:repeat>
+        
+    </div>
+    
+    <!-- 物品网格 -->
+    <div style="position: relative; margin-left: 15px; margin-top: 80px; width: 350px; height: 450px;">
+        <pe:gridview
+                CellPadding="8" 
+                VerticalScrollBarStep="36" 
+                VerticalScrollBarOffsetX="-1560" 
+                AllowPaging="false" 
+                ItemsPerLine="3" 
+                DefaultNodeHeight="104" 
+                RememberScrollPos="true" 
+                RememberLastPage="true" 
+                name="gvPageGridView" 
+                style="margin-left:0px;" 
+                DataSource='<%=DS_Collection_Items%>'>
+            <Columns>
+                <div style="float:left;width:96px;height:104px;">
+                    <pe:if condition="<%=GetCurrentCategory() == 'userItems'%>">
+                        <input type="button" uiname="<%='userbag_item_'..Eval('name')%>" name="<%=Eval('index')%>" onclick="OnClickUserItem" zorder="-1" style="position: relative; margin-left: 0px; margin-top: 0px; width: 96px; height: 104px; background: url(Texture/Aries/Creator/keepwork/minigame/bag/box_97x104_32bits.png#0 0 97 104);" />
+                        <div style="width:96px;height:104px;">
+                             <div style="<%='position: relative; margin-left: 16px; margin-top: 8px; width: 64px; height: 64px; background:'..Eval('icon')..';'%>"></div>
+                            <div style="position: relative; text-align: center; font-size: 14px; base-font-size: 14px; margin-top: 80px; font-weight: bold;"><%=Eval("displayname")%></div>
+                        </div>
+                    </pe:if>
+                    <pe:if condition="<%=GetCurrentCategory() == 'food'%>">
+                        <div name="<%=Eval('index')%>" onclick="OnClickFoodItem" zorder="-1" style="position: relative; margin-left: 0px; margin-top: 0px; width: 96px; height: 104px; background: url(Texture/Aries/Creator/keepwork/minigame/bag/box_97x104_32bits.png#0 0 97 104);"></div>
+                        <div style="width:96px;height:104px;">
+                            <pe:if condition='<%=Eval("category") == "food"%>'>
+                                <div style="<%='position: relative; margin-left: 16px; margin-top: 8px; width: 64px; height: 64px; background:url(https://qiniu-public.keepwork.com/paracraft-cdn-resource/'..Eval('icon')..');'%>"></div>
+                                <div style="position: relative; text-align: center; font-size: 14px; base-font-size: 14px; margin-top: 40px; font-weight: bold;"><%=Eval("displayname")%></div>
+                                <div style="position: relative; text-align: center; font-size: 14px; base-font-size: 12px; margin-top: 80px;"><%="剩余"..Eval("count").."个"%></div>
+                            </pe:if>
+                            <pe:if condition='<%=Eval("category") == "candy"%>'>
+                                <div style="<%='position: relative; margin-left: 16px; margin-top: 8px; width: 64px; height: 64px; background:'..Eval('icon')..';'%>"></div>
+                                <div style="position: relative; text-align: center; font-size: 14px; base-font-size: 12px; margin-top: 8px;"><%=GetItemDeadline(Eval("index"))%></div>
+                                <div style="position: relative; text-align: center; font-size: 14px; base-font-size: 14px; margin-top: 40px; font-weight: bold;"><%=Eval("name")%></div>
+                                <div style="position: relative; text-align: center; font-size: 14px; base-font-size: 12px; margin-top: 80px;"><%="剩余"..Eval("count").."个"%></div>
+                                <pe:if condition='<%=Eval("vipOnly")%>'>
+                                    <div style="position: relative; margin-left: 80px; margin-top: -6px; width: 24px; height: 26px; background: url(Texture/Aries/Creator/keepwork/Mall/VIP_37x41_32bits.png#0 0 37 41);"></div>
+                                </pe:if>
+                            </pe:if>
+                        </div>
+                    </pe:if>
+                    <pe:if condition="<%=GetCurrentCategory() == 'expressions'%>">
+                        <a width="96" height="104" style="padding:0px;background:Texture/Aries/Dock/Action_MouseOver_32bits.png:7 7 7 7;" onclick="OnClickSmileyIcon" param1='<%=Eval("index")%>'>
+                            <div style="margin:1px;padding-left:2px;width:96px;height:104px;" class="block">
+                                <img width="80" height="80" src='<%=Eval("icon")%>' style="position: relative; margin-left: 4px; margin-top: 8px;"/>
+                            </div>
+                        </a>
+                    </pe:if>
+                    <pe:if condition="<%=GetCurrentCategory() == 'throwItems'%>">
+                        <div name="<%=Eval('index')%>" onclick="OnClickThrowItem" zorder="-1" style="position: relative; margin-left: 0px; margin-top: 0px; width: 96px; height: 104px; background: url(Texture/Aries/Creator/keepwork/minigame/bag/box_97x104_32bits.png#0 0 97 104);"></div>
+                        <div style="width:96px;height:104px;">
+                            <div style="<%='position: relative; margin-left: 14px; margin-top: 8px; width: 64px; height: 64px; background:'..Eval('icon')..';'%>"></div>
+                            <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: 80px; color: #FFFFFF;"><%=Eval("displayname")%></div>
+                        </div>
+                    </pe:if>
+                    <pe:if condition="<%=GetCurrentCategory() == 'costumes' or GetCurrentCategory() == 'actions'%>">
+                        <div name="<%=Eval('index')%>" onclick="OnClickItem" zorder="-1" style="<%='position: relative; margin-left: 0px; margin-top: 0px; width: 96px; height: 104px; background:'..Eval('bg')..';'%>"></div>
+                        <div style="width:96px;height:104px;">
+                            <div style="<%='position: relative; margin-left: 14px; margin-top: 8px; width: 64px; height: 64px; background:'..Eval('icon')..';'%>"></div>
+                            <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: 80px; color: #FFFFFF;"><%=Eval("name")%></div>
+                        </div>
+                    </pe:if>
+                </div>
+            </Columns>
+            <EmptyDataTemplate>
+                <div style='font-weight: bold;'>                            
+                    <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: -10px; color: #A8A7B0;" ><%=L"当前分类暂无数据"%></div>
+                </div>
+            </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

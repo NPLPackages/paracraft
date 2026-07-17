@@ -66,7 +66,7 @@ end
 
 --学生身份，显示进入课堂提示
 function ClassSimpleTip.ShowIntoClassRoomGuide(tip,callback,noClose)
-    if System.options.channelId_431 then
+    if System.options.isEducatePlatform then
         return
     end
     ClassSimpleTip.enterClassRoom_callback = callback

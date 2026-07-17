@@ -1,0 +1,130 @@
+<pe:mcml>
+    <div style='width: 262px; height: 222px;'>
+        <div style='width: 262px; height: 222px; background: url(Texture/Aries/Creator/paracraft/Educate/Project/zuopingdi_261x222_32bits.png#0 0 261 222);'>
+            <!-- <pe:if condition='<%= not be_selected() %>'>
+                <input width='100%'type='button'style='position: relative;height:270px;background:url()'name='<%=Eval("index")%>'onclick='switch_world' />
+            </pe:if> -->
+            <!-- 私有 -->
+            <pe:if condition='<%= Eval("project") and tonumber(Eval("project")["visibility"]) == 1 %>'>
+                <pe:container style='position: relative;margin-left: 9px; margin-top: 8px; width: 56px;height: 56px;background:;' zorder='1'>
+                    <div style='position: relative;width: 56px;height: 56px;background: url(Texture/Aries/Creator/paracraft/Educate/Project/siyou_56x56_32bits.png#0 0 56 56);'></div>
+                </pe:container>
+            </pe:if>
+            <!-- 删除 -->
+            <pe:container style='position: relative;margin-left: 214px; margin-top: 22px; width: 23px;height: 23px;background:;' zorder='1'>
+                <input type="button" name='<%=Eval("index")%>' onclick="delete_world" style='width: 23px;height: 23px;background: url(Texture/Aries/Creator/paracraft/Educate/Project/shanchu_23x23_32bits.png#0 0 23 23);' />
+            </pe:container>
+           
+            <!-- 显示preview -->
+            <div align='center'style='width: 220px; height: 110px;margin-top: 18px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#72 20 16 16:2 2 2 2)'>
+                <pe:container style='position: relative;width: 220px; height: 110px;background:url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9);' zorder='1' name='<%=Eval("index")%>' onclick='click_preview()'></pe:container>
+                <div  style='<%= " width: 220px; height: 110px;background: url(" .. get_world_preview() .. ")" %>'></div>
+            </div>
+            <!-- 显示项目名称和项目id -->
+            <div style='margin-left: 22px; height: 32px;'>
+                <pe:container uiname="modifyControl" ClickThrough='true' visible="<%=is_modifying() and be_selected() %>" style="position: relative; background: url();">
+                    <div class='share_world_name'>
+                        <div class='list_search_bar'
+                                style='float: left;
+                                    margin-left: 0px;
+                                    width: 180px;
+                                    height: 30px;'>
+                            <input type='text'
+                                    onchange='update_temp_modify_worldname'
+                                    class='list_search_textfield theme1_white_textfield'
+                                    SkipAutoBadWordFilter="true"
+                                    style='width: 145px;
+                                            height: 30px;'
+                                    value='<%= get_tagname() %>'
+                                    spacing='4' />
+                            <div class='list_search_button'
+                                    style='height: 30px;
+                                        width: 40px;
+                                        font-size: 12px;
+                                        base-font-size: 12px;
+                                        margin-top: -32px;'>
+                                <input type='button'
+                                        name="<%=Eval('index')%>"
+                                        class='list_search_button_click theme1_gray2_button'
+                                        style='height: 25px;'
+                                        DefaultButton='true'
+                                        value='<%=L"保存"%>'
+                                        onclick='covert_status' />
+                            </div>
+                        </div>
+                    </div>
+                </pe:container>
+                <pe:container uiname="normalControl" ClickThrough='true' visible="<%=not is_modifying() or not be_selected()%>" style="position: relative; background: url();">
+                    <div class='share_world_name'>
+                        <%= get_world_text() %>
+                        <pe:if condition='<%= Eval("hasPid") %>'>
+                            <div style='float: left;margin-left: 2px;'tooltip='<%= L"项目ID：" .. Eval("kpProjectId") %>'>
+                                <span style='color: #b2b2b2;'>#<%= Eval('kpProjectId') or '' %></span>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= is_show_modify_button() %>'>
+                            <div onclick='covert_status'
+                                    name="<%=Eval('index')%>"
+                                    tooltip='<%=Eval("text")%>'
+                                    style='float: left;
+                                        margin-top: 6px;
+                                        margin-left: 1px;
+                                        background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#340 311 14 15);
+                                        width: 10px;
+                                        height: 12px;
+                                        z-index: 10' >
+                            </div>
+                        </pe:if>
+                    </div>
+                </pe:container>
+            </div>
+            <!--  -->
+            <div style='margin-left: 22px;'>
+                <div >
+                    <!-- 更新时间 -->
+                    <div style='float: left;height: 20px; width: 50px; font-size: 12px;base-font-size: 12px;color: #b2b2b2;'>
+                        <%= get_world_date() %>
+                    </div>
+                    <!-- 容量 -->
+                    <div style='float: left; height: 20px;width: 50px; font-size: 12px;base-font-size: 12px;color: #b2b2b2;'>
+                        <%= get_world_size() %>
+                    </div>
+                </div>
+                <pe:if condition="<%= not IsOfflineMode() %>">
+                    <div style='font-size: 12px;base-font-size: 12px;color: #b2b2b2;margin-top: 6px;'>
+                        <div style='float:left;'tooltip='<%= L"观看：" .. get_project_views() %>'>
+                            <img src='Texture/Aries/Creator/paracraft/Educate/Project/liulan_15x10_32bits.png#0 0 15 10' style='width: 15px;height: 10px;margin-top: 4px;' />
+                            <div style='float:left;margin-left: 2px;'><%= get_project_views() %></div>
+                        </div>
+                        <div style='float: left;margin-left: 8px;'tooltip='<%= L"点赞：" .. get_project_thumbs() %>'>
+                            <img src='Texture/Aries/Creator/paracraft/Educate/Project/dianzan_10x10_32bits.png#0 0 10 10'style='margin-top:3px; width: 10px; height: 10px;' />
+                            <div style='float:left;margin-left: 2px;'><%= get_project_thumbs() %></div>
+                        </div>
+                        <div style='float:left;margin-left: 8px;'tooltip='<%= L"收藏：" .. get_project_collect() %>'>
+                            <img src='Texture/Aries/Creator/paracraft/Educate/Project/soucang_10x10_32bits.png#0 0 10 10' style='width: 10px;height: 10px;margin-top: 3px;' />
+                            <div style='float: left;margin-left: 2px;'><%= get_project_collect() %></div>
+                        </div>
+                    </div>
+                </pe:if>
+                
+                <div style='margin-top: -40px; margin-left: 150px;'>
+                    <pe:if condition="<%= not IsOfflineMode() %>">
+                        <pe:if condition='<%= Eval("project") and tonumber(Eval("project")["visibility"]) ~= 1 and has_project_id() %>'>
+                            <input type='button'name='<%= Eval("index") %>'onclick='share' style='position: relative; width: 20px;height: 20px;background: url(Texture/Aries/Creator/paracraft/Educate/Project/fenxiang_20x20_32bits.png#0 0 20 20);' />
+                        </pe:if>
+                        <input type='button' name='<%=Eval("index")%>' onclick='enter' tooltip='<%=L"进入"%>' class='share_button'uiname='<%="CreateEmbed.enter" .. Eval("index")%>' style='position: relative; margin-left:36px; width: 23px;height: 20px;background: url(Texture/Aries/Creator/paracraft/Educate/Project/jinru_23x20_32bits.png#0 0 23 20);'/>
+                    </pe:if>
+                    <pe:if condition="<%= IsOfflineMode() %>">
+                        <div style="margin-top: 26px;">
+                            <input type='button' name='<%= Eval("index") %>' onclick='open_folder' tooltip='<%=L"打开世界文件夹"%>' style='position: relative;margin-top: 2px; width: 20px;height: 20px;background: url(Texture/Aries/Creator/paracraft/Educate/Project/icon_document_20x20_32bits.png#0 0 20 20);' />
+                            <input type='button' name='<%=Eval("index")%>' onclick='enter' tooltip='<%=L"进入"%>' class='share_button'uiname='<%="CreateEmbed.enter" .. Eval("index")%>' style='position: relative; margin-left:36px; width: 23px;height: 20px;background: url(Texture/Aries/Creator/paracraft/Educate/Project/jinru_23x20_32bits.png#0 0 23 20);'/>
+                        </div>
+                    </pe:if>
+                </div>
+            </div>
+        </div>
+        <pe:if condition='<%= is_load_more_items(Eval("index")) %>'>
+            <pe:custom oncreate='<%= lazy_load %>'></pe:custom>
+        </pe:if>
+    </div>
+</pe:mcml>

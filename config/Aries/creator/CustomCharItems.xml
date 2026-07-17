@@ -8,9 +8,10 @@ id段         位置  参数                  贴图编号            模型编�
 84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍
 85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤
 86000 86999  背部  attachment id="15"
-87000 97999  手持  attachment id="1"
+87000 87999  手持  attachment id="1"
 88000 88999  嘴巴                        4嘴巴      
 89000 89999  坐骑  暂不开放
+90000 90999  宠物  暂不开放
 
 geoset list
 "hair" = 0, 头发
@@ -42,111 +43,132 @@ model id
     <item id="80001" model="actor;"><geoset category="3" id="1"></geoset></item>      
 
     <!--      81000 81999  眼睛  geoset category="2"   3眼睛 4嘴巴        -->
-    <item id="81001" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_02_blackman.png"></texture></item>
-    <item id="81002" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_ai.png"></texture></item>
-    <item id="81003" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_01_01.png"></texture></item>
-    <item id="81004" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_02_01.png"></texture></item>
-    <item id="81005" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_011.png"></texture></item>
-    <item id="81006" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_14.png"></texture></item>
-    <item id="81007" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AA.png"></texture></item>
-    <item id="81008" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AB.png"></texture></item>
-    <item id="81009" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AC.png"></texture></item>
-    <item id="81010" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AD.png"></texture></item>
-    <item id="81011" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AE.png"></texture></item>
-    <item id="81012" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AF.png"></texture></item>
-    <item id="81013" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AG.png"></texture></item>
-    <item id="81014" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_B_01.png"></texture></item>
-    <item id="81015" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_C_01.png"></texture></item>
-    <item id="81016" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_D_01.png"></texture></item>
-    <item id="81017" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_F_01.png"></texture></item>
-    <item id="81018" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png"></texture></item>
-    <item id="81019" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_fps10_a002.png"></texture></item>
-    <item id="81020" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_fps10_a003.png"></texture></item>
-    <item id="81021" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_G_01.png"></texture></item>
-    <item id="81022" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_H_01.png"></texture></item>
-    <item id="81023" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_I_01.png"></texture></item>
-    <item id="81024" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_J_01.png"></texture></item>
-    <item id="81025" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_K_01.png"></texture></item>
-    <item id="81026" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_L_01.png"></texture></item>
-    <item id="81027" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_M_01.png"></texture></item>
-    <item id="81028" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_N_01.png"></texture></item>
-    <item id="81029" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_O_01.png"></texture></item>
-    <item id="81030" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_P_01.png"></texture></item>
-    <item id="81031" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_Q_01.png"></texture></item>
-    <item id="81032" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_R_01.png"></texture></item>
-    <item id="81033" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_R_03.png"></texture></item>
-    <item id="81034" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_S_01.png"></texture></item>
-    <item id="81035" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_T_01.png"></texture></item>
-    <item id="81036" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_02_01.png"></texture></item>
-    <item id="81037" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_B_01.png"></texture></item>
-    <item id="81038" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_B_02.png"></texture></item>
-    <item id="81039" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_B_03.png"></texture></item>
-    <item id="81040" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_C_01.png"></texture></item>
-    <item id="81041" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_C_02.png"></texture></item>
-    <item id="81042" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_C_03.png"></texture></item>
-    <item id="81043" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_0.png"></texture></item>
-    <item id="81044" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_01.png"></texture></item>
-    <item id="81045" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_02.png"></texture></item>
-    <item id="81046" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_03.png"></texture></item>
-    <item id="81047" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_E_01.png"></texture></item>
-    <item id="81048" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_F_01.png"></texture></item>
-    <item id="81049" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_fps10_a001.png"></texture></item>
-    <item id="81050" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_fps10_a002.png"></texture></item>
-    <item id="81051" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_fps10_a003.png"></texture></item>
-    <item id="81052" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_G_01.png"></texture></item>
-    <item id="81053" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_H_01.png"></texture></item>
-    <item id="81054" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_I_01.png"></texture></item>
-    <item id="81055" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_J_01.png"></texture></item>
-    <item id="81056" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_K_01.png"></texture></item>
-    <item id="81057" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_L_01.png"></texture></item>
-    <item id="81058" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_M_01.png"></texture></item>
-    <item id="81059" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_ai.png"></texture></item>
-    <item id="81060" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_le.png"></texture></item>
-    <item id="81061" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_nu.png"></texture></item>
-    <item id="81062" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_xi.png"></texture></item>
-    <item id="81063" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_ai.png"></texture></item>
-    <item id="81064" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_le.png"></texture></item>
-    <item id="81065" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_nu.png"></texture></item>
-    <item id="81066" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_xi.png"></texture></item>
-    <item id="81067" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_le.png"></texture></item>
-    <item id="81068" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_nu.png"></texture></item>
-    <item id="81069" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_pangjuan.png"></texture></item>
-    <item id="81070" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin.png"></texture></item>
-    <item id="81071" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin_ai.png"></texture></item>
-    <item id="81072" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin_nu.png"></texture></item>
-    <item id="81073" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin_si.png"></texture></item>
-    <item id="81074" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_xi.png"></texture></item>
-    <item id="81075" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc.png"></texture></item>
-    <item id="81076" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc2.png"></texture></item>
-    <item id="81077" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc3.png"></texture></item>
-    <item id="81078" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye1.png"></texture></item>
+    <item id="81001" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_02_blackman.png"></texture></item>
+    <item id="81002" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_ai.png"></texture></item>
+    <item id="81003" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_01_01.png"></texture></item>
+    <item id="81004" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_02_01.png"></texture></item>
+    <item id="81005" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_011.png"></texture></item>
+    <item id="81006" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_14.png"></texture></item>
+    <item id="81007" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AA.png"></texture></item>
+    <item id="81008" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AB.png"></texture></item>
+    <item id="81009" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AC.png"></texture></item>
+    <item id="81010" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AD.png"></texture></item>
+    <item id="81011" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AE.png"></texture></item>
+    <item id="81012" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AF.png"></texture></item>
+    <item id="81013" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_AG.png"></texture></item>
+    <item id="81014" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_B_01.png"></texture></item>
+    <item id="81015" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_C_01.png"></texture></item>
+    <item id="81016" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_D_01.png"></texture></item>
+    <item id="81017" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_F_01.png"></texture></item>
+    <item id="81018" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png"></texture></item>
+    <item id="81019" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_fps10_a002.png"></texture></item>
+    <item id="81020" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_fps10_a003.png"></texture></item>
+    <item id="81021" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_G_01.png"></texture></item>
+    <item id="81022" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_H_01.png"></texture></item>
+    <item id="81023" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_I_01.png"></texture></item>
+    <item id="81024" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_J_01.png"></texture></item>
+    <item id="81025" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_K_01.png"></texture></item>
+    <item id="81026" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_L_01.png"></texture></item>
+    <item id="81027" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_M_01.png"></texture></item>
+    <item id="81028" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_N_01.png"></texture></item>
+    <item id="81029" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_O_01.png"></texture></item>
+    <item id="81030" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_P_01.png"></texture></item>
+    <item id="81031" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_Q_01.png"></texture></item>
+    <item id="81032" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_R_01.png"></texture></item>
+    <item id="81033" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_R_03.png"></texture></item>
+    <item id="81034" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_S_01.png"></texture></item>
+    <item id="81035" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_T_01.png"></texture></item>
+    <item id="81036" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_02_01.png"></texture></item>
+    <item id="81037" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_B_01.png"></texture></item>
+    <item id="81038" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_B_02.png"></texture></item>
+    <item id="81039" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_B_03.png"></texture></item>
+    <item id="81040" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_C_01.png"></texture></item>
+    <item id="81041" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_C_02.png"></texture></item>
+    <item id="81042" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_C_03.png"></texture></item>
+    <item id="81043" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_0.png"></texture></item>
+    <item id="81044" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_01.png"></texture></item>
+    <item id="81045" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_02.png"></texture></item>
+    <item id="81046" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_D_03.png"></texture></item>
+    <item id="81047" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_E_01.png"></texture></item>
+    <item id="81048" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_F_01.png"></texture></item>
+    <item id="81049" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_fps10_a001.png"></texture></item>
+    <item id="81050" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_fps10_a002.png"></texture></item>
+    <item id="81051" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_fps10_a003.png"></texture></item>
+    <item id="81052" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_G_01.png"></texture></item>
+    <item id="81053" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_H_01.png"></texture></item>
+    <item id="81054" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_I_01.png"></texture></item>
+    <item id="81055" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_J_01.png"></texture></item>
+    <item id="81056" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_K_01.png"></texture></item>
+    <item id="81057" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_L_01.png"></texture></item>
+    <item id="81058" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_M_01.png"></texture></item>
+    <item id="81059" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_ai.png"></texture></item>
+    <item id="81060" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_le.png"></texture></item>
+    <item id="81061" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_nu.png"></texture></item>
+    <item id="81062" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_hong_xi.png"></texture></item>
+    <item id="81063" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_ai.png"></texture></item>
+    <item id="81064" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_le.png"></texture></item>
+    <item id="81065" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_nu.png"></texture></item>
+    <item id="81066" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_lan_xi.png"></texture></item>
+    <item id="81067" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_le.png"></texture></item>
+    <item id="81068" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_nu.png"></texture></item>
+    <item id="81069" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_pangjuan.png"></texture></item>
+    <item id="81070" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin.png"></texture></item>
+    <item id="81071" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin_ai.png"></texture></item>
+    <item id="81072" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin_nu.png"></texture></item>
+    <item id="81073" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_sunbin_si.png"></texture></item>
+    <item id="81074" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_xi.png"></texture></item>
+    <item id="81075" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc.png"></texture></item>
+    <item id="81076" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc2.png"></texture></item>
+    <item id="81077" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc3.png"></texture></item>
+    <item id="81078" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye1.png"></texture></item>
    
-    <item id="81086" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_le.png"></texture></item>
-    <item id="81087" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_nu.png"></texture></item>
-    <item id="81088" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_xi.png"></texture></item>
-    <item id="81089" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_zhengchang.png"></texture></item>
-    <item id="81090" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_fanpai_le.png"></texture></item>
-    <item id="81091" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_fanpai_nu.png"></texture></item>
-    <item id="81092" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_fanpai_xi.png"></texture></item>
-    <item id="81093" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_ai.png"></texture></item>
-    <item id="81094" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_le.png"></texture></item>
-    <item id="81095" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_nu.png"></texture></item>
-    <item id="81096" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_xi.png"></texture></item>
-    <item id="81097" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_zhengchang.png"></texture></item>
-    <item id="81098" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/yunhuhu.png"></texture></item>
-    <item id="81079" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/e1.png"></texture></item>
-    <item id="81080" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/mojing.png"></texture></item>
-    <item id="81081" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_001.png"></texture></item>
-    <item id="81082" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_01.png"></texture></item>
-    <item id="81083" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_02.png"></texture></item>
-    <item id="81084" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_fps14_emoji001.png"></texture></item>
-    <item id="81085" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_G_012.png"></texture></item>
-    <item id="81099" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_A_01.png"></texture></item>
-    <item id="81100" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_A_02.png"></texture></item>
-    <item id="81101" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_yellow.png"></texture></item>
+    <item id="81086" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_le.png"></texture></item>
+    <item id="81087" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_nu.png"></texture></item>
+    <item id="81088" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_xi.png"></texture></item>
+    <item id="81089" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_zhengchang.png"></texture></item>
+    <item id="81090" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_fanpai_le.png"></texture></item>
+    <item id="81091" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_fanpai_nu.png"></texture></item>
+    <item id="81092" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_fanpai_xi.png"></texture></item>
+    <item id="81093" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_ai.png"></texture></item>
+    <item id="81094" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_le.png"></texture></item>
+    <item id="81095" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_nu.png"></texture></item>
+    <item id="81096" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_xi.png"></texture></item>
+    <item id="81097" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_zhengchang.png"></texture></item>
+    <item id="81098" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/yunhuhu.png"></texture></item>
+    <item id="81079" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/e1.png"></texture></item>
+    <item id="81080" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/mojing.png"></texture></item>
+    <item id="81081" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_001.png"></texture></item>
+    <item id="81082" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_01.png"></texture></item>
+    <item id="81083" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_02.png"></texture></item>
+    <item id="81084" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_fps14_emoji001.png"></texture></item>
+    <item id="81085" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_G_012.png"></texture></item>
+    <item id="81099" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_A_01.png"></texture></item>
+    <item id="81100" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_A_02.png"></texture></item>
+    <item id="81101" model="actor;actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_yellow.png"></texture></item>
     
+    <!--      2023.6.6 新增新帕帕眼睛皮肤   -->
+    <item id="81102" model="actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_papa_01.png"></texture></item>
+    <item id="81103" model="actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_papa_02.png"></texture></item>
+    <item id="81104" model="actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_papa_03.png"></texture></item>
+    <item id="81105" model="actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_papa_04.png"></texture></item>
+    <item id="81106" model="actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_papa_05.png"></texture></item>
+    <item id="81107" model="actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_papa_06.png"></texture></item>
+    <item id="81108" model="actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_papa_07.png"></texture></item>
+    <item id="81109" model="actor_papa;actor_xuepapa;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_papa_fps10_a018.png"></texture></item>
+
+    <!--  20230830添加老奶奶和老爷爷眼睛 -->
+    <item id="81110" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/grandma_32bits.png"></texture></item>
+    <item id="81111" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/grandpa_32bits.png"></texture></item>
      
+    <!-- 20231016新增新卡卡的眼睛皮肤 -->
+    <item id="81112" model="actor_kaka;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_kaka_01.png"></texture></item>
+    <item id="81113" model="actor_kaka;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_kaka_02.png"></texture></item>
+    <item id="81114" model="actor_kaka;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_kaka_03.png"></texture></item>
+    <item id="81115" model="actor_kaka;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_kaka_04.png"></texture></item>
+
     <!--      82000 82999  头饰  geoset category="0"   1头发              1短发 2丸子头 3呆毛短发 4长刘海短发 5赛亚人 6长刘海中分 7长散发 8单马尾 9呆毛双马尾 10呆毛长直    -->
+    <item id="92001" model="actor_papa;"><geoset category="0" id="1"></geoset><texture id="1" filename="Texture/bloks/CustomGeoset/hair/pa-head00.png"></texture></item>
+    <item id="92002" model="actor_xuepapa;"><geoset category="0" id="1"></geoset><texture id="1" filename="Texture/bloks/CustomGeoset/hair/pa-head01.png"></texture></item>
     <item id="82001" model="actor;"><geoset category="0" id="1"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/1_Avatar_boy_hair_00.png"></texture></item>
     <item id="82002" model="actor;"><geoset category="0" id="1"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/1_Avatar_boy_hair_01.png"></texture></item>
     <item id="82003" model="actor;"><geoset category="0" id="1"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/1_Avatar_boy_hair_02.png"></texture></item>
@@ -322,11 +344,6 @@ model id
     <item id="82172" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
     <item id="82173" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
     <item id="82174" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
-    
-
-
-
-
 
     <!--      83000 83999  帽子  geoset category="0" attachment id="11"    -->
     <item id="83001" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/v3/Item/ObjectComponents/Head/2145_Elf_BlackHead_Girl01.anim.x"></attachment></item>
@@ -561,6 +578,17 @@ model id
     <!--20220324活动头饰-->
     <item id="83211" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83211_danmawei.anim.x"></attachment></item>
     <item id="83212" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83212_shuangmawei.anim.x"></attachment></item>
+    <!-- 20230830添加 -->
+    <item id="83213" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83213_shuangmawei.anim.x"></attachment></item>
+    <item id="83214" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83214_shuangmawei.anim.x"></attachment></item>
+    <item id="83215" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83215_shuangmawei.anim.x"></attachment></item>
+    <item id="83216" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83216_shuangmawei.anim.x"></attachment></item>
+    <item id="83217" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83217_shuangmawei.anim.x"></attachment></item>
+    <item id="83218" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83218_shuangmawei.anim.x"></attachment></item>
+    <item id="83219" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83219_shuangmawei.anim.x"></attachment></item>
+    <item id="83220" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83220_shuangmawei.anim.x"></attachment></item>
+    <item id="83221" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83221_shuangmawei.anim.x"></attachment></item>
+    <item id="83222" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83222_shuangmawei.anim.x"></attachment></item>
 
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>
@@ -709,7 +737,20 @@ model id
     <!--20220623新增-->
     <item id="84121" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84121_xiaohuangshirt01.png"></texture></item>
     <item id="84122" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84122_xiaohuangshirt02.png"></texture></item>
+    <!--20230703新加-->
+    <item id="84123" model="actor_papa;actor_xuepapa;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84123_papa_shirt001.png"></texture></item>
+    <item id="84124" model="actor_papa;actor_xuepapa;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/pa-shirt00.png"></texture></item>
 
+    <!-- 20230907新加 -->
+    <item id="84125" model="actor_papa;actor_xuepapa;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/pa-shirt01.png"></texture></item>
+    <item id="84126" model="actor_papa;actor_xuepapa;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/pa-shirt02.png"></texture></item>
+    <item id="84127" model="actor_papa;actor_xuepapa;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/pa-shirt03.png"></texture></item>
+
+    <!-- 20231016新增 -->
+    <item id="84128" model="actor_kaka;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/kaka-shirt00.png"></texture></item>
+    <item id="84129" model="actor_kaka;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/kaka-shirt01.png"></texture></item>
+    <item id="84130" model="actor_kaka;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/kaka-shirt02.png"></texture></item>
+    
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
     <item id="85002" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_.png"></texture></item>
@@ -1116,50 +1157,157 @@ model id
     <item id="87186" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/red.x"></attachment></item>
     <item id="87187" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/yellow.x"></attachment></item>
     <!--20210527新增-->
-<item id="87188" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87188_alloy_silver_shield.anim.x"></attachment></item>
-<item id="87189" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87189_alloy_green_shield.anim.x"></attachment></item>
-<item id="87190" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87190_alloy_red_shield.anim.x"></attachment></item>
-    <!--20210701新增-->
-<item id="87191" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87191_keyboard.anim.x"></attachment></item>
-    <!--20210729新增-->
-<item id="87192" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87192_purple_magicstick.anim.x"></attachment></item>
+    <item id="87188" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87188_alloy_silver_shield.anim.x"></attachment></item>
+    <item id="87189" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87189_alloy_green_shield.anim.x"></attachment></item>
+    <item id="87190" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87190_alloy_red_shield.anim.x"></attachment></item>
+        <!--20210701新增-->
+    <item id="87191" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87191_keyboard.anim.x"></attachment></item>
+        <!--20210729新增-->
+    <item id="87192" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87192_purple_magicstick.anim.x"></attachment></item>
 
     <!--    88000 88999  嘴巴                        4嘴巴          -->
-    <item id="88001" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_08_01.png"></texture></item>
-    <item id="88002" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_fps10_a001.png"></texture></item>
-    <item id="88003" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_fps10_a003.png"></texture></item>
-    <item id="88004" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_01_01.png"></texture></item>
-    <item id="88005" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_02_01.png"></texture></item>
-    <item id="88006" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_03_01.png"></texture></item>
-    <item id="88007" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a002.png"></texture></item>
-    <item id="88008" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a003.png"></texture></item>
-    <item id="88009" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a004.png"></texture></item>
-    <item id="88013" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_mask.png"></texture></item>
-    <item id="88016" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_03.png"></texture></item>
-    <item id="88017" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_04.png"></texture></item>
-    <item id="88018" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_05.png"></texture></item>
-    <item id="88019" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_06.png"></texture></item>
-    <item id="88020" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_01_01.png"></texture></item>
-    <item id="88021" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_02_01.png"></texture></item>
-    <item id="88022" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_03_01.png"></texture></item>
-    <item id="88023" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_04_01.png"></texture></item>
-    <item id="88024" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_05_01.png"></texture></item>
-    <item id="88025" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_06_01.png"></texture></item>
-    <item id="88026" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_07_01.png"></texture></item>
-    <!--无法适配
-    <item id="88027" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_01_02.png"></texture></item>
-    <item id="88028" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_01_03.png"></texture></item>
-    -->
+    <item id="88001" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_08_01.png"></texture></item>
+    <item id="88002" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_fps10_a001.png"></texture></item>
+    <item id="88003" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_fps10_a003.png"></texture></item>
+    <item id="88004" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_01_01.png"></texture></item>
+    <item id="88005" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_02_01.png"></texture></item>
+    <item id="88006" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_03_01.png"></texture></item>
+    <item id="88007" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a002.png"></texture></item>
+    <item id="88008" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a003.png"></texture></item>
+    <item id="88009" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a004.png"></texture></item>
+    <item id="88013" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_mask.png"></texture></item>
+    <item id="88016" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_03.png"></texture></item>
+    <item id="88017" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_04.png"></texture></item>
+    <item id="88018" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_05.png"></texture></item>
+    <item id="88019" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_06.png"></texture></item>
+    <item id="88020" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_01_01.png"></texture></item>
+    <item id="88021" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_02_01.png"></texture></item>
+    <item id="88022" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_03_01.png"></texture></item>
+    <item id="88023" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_04_01.png"></texture></item>
+    <item id="88024" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_05_01.png"></texture></item>
+    <item id="88025" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_06_01.png"></texture></item>
+    <item id="88026" model="actor;actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_07_01.png"></texture></item>
+    
+    <!--      2023.6.6 新增新帕帕嘴巴皮肤   -->
+    <item id="88030" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa_000.png"></texture></item>
+    <item id="88031" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa_001.png"></texture></item>
+    <item id="88032" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa_002.png"></texture></item>
+    <item id="88033" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa_003.png"></texture></item>
+    <item id="88034" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa_004.png"></texture></item>
+    <item id="88035" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa_005.png"></texture></item>
+    <item id="88036" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa_006.png"></texture></item>
+    <item id="88037" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa_007.png"></texture></item>
+    <item id="88038" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa00_fps10_a001.png"></texture></item>
+    <item id="88039" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa00_fps10_a002.png"></texture></item>
+    <item id="88040" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa00_fps10_a003.png"></texture></item>
+    <item id="88041" model="actor_papa;actor_xuepapa;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_papa00_fps10_a004.png"></texture></item>
+
+    <!-- 2023.10.16 新增卡卡的嘴巴 -->
+    <item id="88042" model="actor_kaka;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_kaka_01.png"></texture></item>
+    <item id="88043" model="actor_kaka;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_kaka_02.png"></texture></item>
+    <item id="88044" model="actor_kaka;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_kaka00_fps10_a004.png"></texture></item>
     <item id="88029" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_07_01.png"></texture></item>
     
     <!--    89000 89999  坐骑      -->
-    <item id="89001" model="actor;">
-      <!-- id=20是固定的 -->
-      <attachment id="20" filename="character/CC/ObjectComponents/Ride/89001_tank.anim.x"></attachment>
-    </item>
+    <item id="89001" model="actor;"><attachment id="20" filename="character/v5/02animals/XueDiChe/XueDiChe.x" ></attachment></item>
+    <item id="89002" model="actor;"><attachment id="20" filename="character/v6/02animals/FireBird_Yellow/FireBird_Yellow.x"></attachment></item>
+    <item id="89005" model="actor;"><attachment id="20" filename="character/v5/02animals/MagicAwingCarpet/MagicAwingCarpet.x"></attachment></item>
+    <item id="89006" model="actor;"><attachment id="20" filename="character/v6/02animals/FireBird_Rarity/FireBird_Rarity.x"></attachment></item>
+    <item id="89009" model="actor;"><attachment id="20" filename="character/v5/02animals/HorsePhoenix/HorsePhoenix.x"></attachment></item>
+    <item id="89010" model="actor;"><attachment id="20" filename="character/v6/02animals/HuLangMoTuo/HuLangMoTuo.x"></attachment></item>
+    <!-- 紫色龙 -->
+    <item id="89003" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMinor/SkinColor01.dds"></attachment></item>
+    <item id="89004" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMajor/Female/SkinColor01.dds"></attachment></item>
+    <!-- 绿色龙 -->
+    <item id="89007" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMinor/SkinColor03.dds"></attachment></item>
+    <item id="89008" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMajor/Female/SkinColor03.dds"></attachment></item>
+    <!-- 橙色龙 -->
+    <item id="89011" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMinor/SkinColor04.dds"></attachment></item>
+    <item id="89012" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMajor/Female/SkinColor04.dds"></attachment></item>
+    <!-- 特殊抱抱龙暗黑 -->
+    <item id="89013" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMinor/SkinColor05.dds"></attachment></item>
+    <item id="89014" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMajor/Female/SkinColor05.dds"></attachment></item>
+    <!-- 特殊抱抱龙血红 -->
+    <item id="89015" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMinor/SkinColor06.dds"></attachment></item>
+    <item id="89016" model="actor;"><attachment id="20" filename="character/v3/PurpleDragonMajor/Female/SkinColor06.dds"></attachment></item>
 
+    <item id="89017" model="actor;"><attachment id="20" filename="character/v5/08functional/BlueBoat/BlueBoat.x"></attachment></item>
+    <item id="89018" model="actor;"><attachment id="20" filename="character/v5/02animals/NanGuaChe/NanGuaChe.x"></attachment></item>
+    <item id="89019" model="actor;"><attachment id="20" filename="character/v5/02animals/ShuangRenFeiTing/ShuangRenFeiTing.x"></attachment></item>
+    <item id="89020" model="actor;"><attachment id="20" filename="character/v5/02animals/MagicBesom/MagicBesom.x"></attachment></item>
+    <item id="89021" model="actor;"><attachment id="20" filename="character/v5/02animals/Elephant/Elephant.x"></attachment></item>
+    <item id="89022" model="actor;"><attachment id="20" filename="character/v5/02animals/GoldenDragon/GoldenDragon_02.x"></attachment></item>
+    <item id="89023" model="actor;"><attachment id="20" filename="character/v5/02animals/HorseSilverWolf/HorseSilverWolf.x"></attachment></item>
+    <item id="89024" model="actor;"><attachment id="20" filename="character/v5/02animals/GrilRabbit/GrilRabbit.x"></attachment></item>
+    <item id="89025" model="actor;"><attachment id="20" filename="character/v5/02animals/Pegasus/Pegasus.x"></attachment></item>
+    <item id="89026" model="actor;"><attachment id="20" filename="character/v5/02animals/Smilodon/Smilodon.x"></attachment></item>
+    <item id="89027" model="actor;"><attachment id="20" filename="character/v5/02animals/Tortoise/Tortoise01.x"></attachment></item>
+    <item id="89028" model="actor;"><attachment id="20" filename="character/v5/02animals/Tortoise/Tortoise04.x"></attachment></item>
+    <item id="89029" model="actor;"><attachment id="20" filename="character/v6/10mobs/06CloudIsland/BalanceShenJu01/BalanceShenJu01.x"></attachment></item>
+    <item id="89030" model="actor;"><attachment id="20" filename="character/v6/02animals/YinYangLingHu/YinYangLingHu.x"></attachment></item>
+    <item id="89031" model="actor;"><attachment id="20" filename="character/v6/02animals/YinYangJinHu/YinYangJinHu.x"></attachment></item>
+    <item id="89032" model="actor;"><attachment id="20" filename="character/v6/02animals/YinYangHongHu/YinYangHongHu.x"></attachment></item>
+    <item id="89033" model="actor;"><attachment id="20" filename="character/v6/02animals/Yangtuo/Yangtuo.x"></attachment></item>
+    <item id="89034" model="actor;"><attachment id="20" filename="character/v6/02animals/WindEagle_Yellow/WindEagle_Yellow.x"></attachment></item>
+    <item id="89035" model="actor;"><attachment id="20" filename="character/v6/02animals/WindEagle_White/WindEagle_White.x"></attachment></item>
+    <item id="89036" model="actor;"><attachment id="20" filename="character/v6/02animals/ShengDanMiLu/ShengDanMiLu.x"></attachment></item>
+    <item id="89037" model="actor;"><attachment id="20" filename="character/v6/02animals/Pegasus_white/Pegasus_white.x"></attachment></item>
+    <item id="89038" model="actor;"><attachment id="20" filename="character/v6/02animals/Pegasus_Brown/Pegasus_Brown.x"></attachment></item>
+
+    <!-- 宠物 -->
+    <item id="90001" model="actor;" name="purple_dragon01" displayname="紫色龙蛋" scale="0.5"><attachment id="22" filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_04_an.x"></attachment></item>
+    <item id="90002" model="actor;" name="purple_dragon02" displayname="紫色龙1阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonEgg/SkinColor01.dds"></attachment></item>
+    <item id="90003" model="actor;" name="purple_dragon03" displayname="紫色龙2阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMinor/SkinColor01.dds"></attachment></item>
+    <item id="90004" model="actor;" name="purple_dragon04" displayname="紫色龙3阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMajor/Female/SkinColor01.dds"></attachment></item>
+    <item id="90005" model="actor;" name="green_dragon01" displayname="绿色龙蛋" scale="0.5"><attachment id="22" filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_01_an.x"></attachment></item>
+    <item id="90006" model="actor;" name="green_dragon02" displayname="绿色龙1阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonEgg/SkinColor03.dds"></attachment></item>
+    <item id="90007" model="actor;" name="green_dragon03" displayname="绿色龙2阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMinor/SkinColor03.dds"></attachment></item>
+    <item id="90008" model="actor;" name="green_dragon04" displayname="绿色龙3阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMajor/Female/SkinColor03.dds"></attachment></item>
+    <item id="90009" model="actor;" name="orange_dragon01" displayname="橙色龙蛋" scale="0.5"><attachment id="22" filename="model/06props/v5/03quest/FunnyEgg/FunnyEgg_02_an.x"></attachment></item>
+    <item id="90010" model="actor;" name="orange_dragon02" displayname="橙色龙1阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonEgg/SkinColor04.dds"></attachment></item>
+    <item id="90011" model="actor;" name="orange_dragon03" displayname="橙色龙2阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMinor/SkinColor04.dds"></attachment></item>
+    <item id="90012" model="actor;" name="orange_dragon04" displayname="橙色龙3阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMajor/Female/SkinColor04.dds"></attachment></item>
+    <item id="90013" model="actor;" name="black_dragon03" displayname="暗黑龙2阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMinor/SkinColor05.dds"></attachment></item>
+    <item id="90014" model="actor;" name="black_dragon04" displayname="暗黑龙3阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMajor/Female/SkinColor05.dds"></attachment></item>
+    <item id="90015" model="actor;" name="red_dragon03" displayname="血红龙2阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMinor/SkinColor06.dds"></attachment></item>
+    <item id="90016" model="actor;" name="red_dragon04" displayname="血红龙3阶" scale="1"><attachment id="22" filename="character/v3/PurpleDragonMajor/Female/SkinColor06.dds"></attachment></item>
+    <item id="90017" model="actor;" name="pig" displayname="小猪" scale="1"><attachment id="22" filename="character/v5/02animals/ZodiacAnimals/Pig/Pig.x"></attachment></item>
+    <item id="90018" model="actor;" name="yali" displayname="鸭梨" scale="1"><attachment id="22" filename="character/v5/10mobs/HaqiTown/Alexander/Alexander.x"></attachment></item>
+    <item id="90019" model="actor;" name="shiyishou" displayname="食蚁兽" scale="1"><attachment id="22" filename="character/v5/10mobs/HaqiTown/IcePangolin_Fuben/IcePangolin_Fuben.x"></attachment></item>
+    <item id="90020" model="actor;" name="xiaoyanzi" displayname="小燕子" scale="1"><attachment id="22" filename="character/v5/02animals/Swallow/Swallow_mouther.x"></attachment></item>
+    <item id="90021" model="actor;" name="cock" displayname="公鸡" scale="1"><attachment id="22" filename="character/v5/02animals/ZodiacAnimals/Cock/Cock.x"></attachment></item>
+    <item id="90022" model="actor;" name="gou" displayname="大黄狗" scale="1"><attachment id="22" filename="character/v5/02animals/ZodiacAnimals/Dog/Dog.x"></attachment></item>
+    <item id="90023" model="actor;" name="rabit" displayname="小兔子" scale="1"><attachment id="22" filename="character/v5/02animals/ZodiacAnimals/Rabbit/Rabbit.x"></attachment></item>
+
+    <!-- 称号 -->
+    <item id="91000" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor1_101x30.png"></texture></item>
+    <item id="91001" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor2_103x28.png"></texture></item>
+    <item id="91002" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor3_108x37.png"></texture></item>
+    <item id="91003" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor4_110x29.png"></texture></item>
+    <item id="91004" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor5_111x32.png"></texture></item>
+    <item id="91005" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor6_112x29.png"></texture></item>
+    <item id="91006" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor7_113x34.png"></texture></item>
+    <item id="91007" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor8_115x33.png"></texture></item>
+    <item id="91008" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor9_116x25.png"></texture></item>
+    <item id="91009" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor10_118x25.png"></texture></item>
+    <item id="91010" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor11_118x29.png"></texture></item>
+    <item id="91011" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor12_120x25.png"></texture></item>
+    <item id="91012" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor13_120x39.png"></texture></item>
+    <item id="91013" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor14_125x31.png"></texture></item>
+    <item id="91014" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor15_126x33.png"></texture></item>
+    <item id="91015" model="actor;"><texture id="10" filename="Texture/Aries/Creator/keepwork/minigame/honor/honor16_107x34.png"></texture></item>
   </items>
   <models type="actor">
     <model filename="character/CC/02human/CustomGeoset/actor.x"></model>
   </models>
+  <models type="actor_papa">
+    <model filename="character/CC/02human/CustomGeoset/actor_papa.x"></model>
+  </models>
+  <models type="actor_xuepapa">
+    <model filename="character/CC/02human/CustomGeoset/actor_xuepapa.x"></model>
+  </models>
+  <models type="actor_kaka">
+    <model filename="character/CC/02human/CustomGeoset/actor_kaka.x"></model>
+  </models>
+  
 </CustomCharItems>

@@ -36,6 +36,8 @@ function mcml_controls.register_all()
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_usertag.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_window.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/mb_window.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_calendar.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_qrcode.lua");
 
 	-- lessons ppt
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/lessons_ppt/step.lua");
@@ -58,6 +60,9 @@ function mcml_controls.register_all()
 	Map3DSystem.mcml_controls.RegisterUserControl("kp:usertag", MyCompany.Aries.Game.mcml.kp_usertag);
 	Map3DSystem.mcml_controls.RegisterUserControl("kp:window", MyCompany.Aries.Game.mcml.kp_window);
 	Map3DSystem.mcml_controls.RegisterUserControl("mb:window", MyCompany.Aries.Game.mcml.mb_window);
+	Map3DSystem.mcml_controls.RegisterUserControl("kp:calendar", MyCompany.Aries.Game.mcml.kp_calendar);
+	Map3DSystem.mcml_controls.RegisterUserControl("kp:qrcode", MyCompany.Aries.Game.mcml.kp_qrcode);
+
     local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
     Map3DSystem.mcml_controls.RegisterUserControl("pe:nplbrowser", pe_nplbrowser);
 	Map3DSystem.mcml_controls.RegisterUserControl("step", MyCompany.Aries.Game.mcml.lessons_ppt.step);

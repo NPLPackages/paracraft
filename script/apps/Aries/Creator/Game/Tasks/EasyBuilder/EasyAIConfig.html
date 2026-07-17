@@ -1,0 +1,119 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/EasyAIConfig.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>EasyAIConfig</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="false">
+<![CDATA[
+EasyAIConfig = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyAIConfig");
+EasyAIConfig.InitPage(Page);
+
+function GetConfig()
+    return EasyAIConfig.GetConfig();
+end
+
+function GetQuickRepliesText()
+    return EasyAIConfig.GetQuickRepliesText();
+end
+
+]]>
+</script>
+<style>
+    .closebtn {
+        position: relative;
+        margin-right: -19px;
+        margin-top: -18px;
+        width: 56px;
+        height: 56px;
+        background: url(Texture/player/close.png);
+    }
+    .configcontainer {
+        background: url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);
+        padding: 20px;
+        color: #ffffff;
+    }
+    .configtitle {
+        font-size: 18px;
+        color: #ffcc00;
+        margin-bottom: 5px;
+    }
+    .button {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        font-size: 16px;
+        min-width: 70px;
+        spacing:10px;
+        height: 45px;
+        color: #000000;
+        margin-left: 5px;
+    }
+    .highlightbutton {
+        background: url(Texture/Aquarius/Button_Highlight_Large.png:15 15 15 15);
+    }
+    .textarea {
+        background: url(Texture/Aries/Common/ThemeKid/monsterhandbook/fram_bg_32bits.png:6 6 8 8);
+    }
+</style>
+
+<pe:container class="configcontainer" style="width:500px;">
+    <div style="position:relative">
+        <input type="button" name="CloseBtn" onclick="EasyAIConfig.CloseWindow" align="right" class="closebtn" />
+    </div>
+    
+    <div class="configtitle">AI 角色配置</div>
+    
+    <div style="margin-top:15px;color:#ffffff;font-size:16px;">
+        <div style="margin-bottom:10px;">
+            <div style="float:left;width:100px;">名字:</div>
+            <input type="text" name="name" value='<%=GetConfig().character.name%>' style="width:350px;height:30px;color:#ffffff;padding:5px;font-size:16px;" />
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="float:left;width:100px;">初始对话:</div>
+            <input type="text" name="initial_message" value='<%=GetConfig().initial.message%>' style="width:350px;height:30px;color:#ffffff;padding:5px;font-size:16px;" />
+        </div>
+        <div>系统提示词:</div>
+        <div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%">
+            <input uiname="system_prompt"
+                   name="system_prompt"
+                   rows="5"
+                   ShowLineNumber="true"
+                   enable_ime="false"
+                   UseSystemControl="true"
+                   MoveViewWhenAttachWithIME="true"
+                   value='<%=GetConfig().system_prompt%>'
+                   EmptyText='<%=L"点击这里输入..."%>'
+                   CaretColor="#000000"
+                   style="margin-bottom: 1px;
+                          margin-top: 1px;
+                          margin-left: 3px;
+                          margin-right: 5px;
+                          textcolor: #000000;" />
+        </div>
+        <div>快捷回复 (每行一个):</div>
+        <div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%">
+            <input uiname="quick_replies"
+                   name="quick_replies"
+                   rows="3"
+                   ShowLineNumber="true"
+                   enable_ime="false"
+                   UseSystemControl="true"
+                   MoveViewWhenAttachWithIME="true"
+                   value='<%=GetQuickRepliesText()%>'
+                   EmptyText='<%=L"点击这里输入..."%>'
+                   CaretColor="#000000"
+                   style="margin-bottom: 1px;
+                          margin-top: 1px;
+                          margin-left: 3px;
+                          margin-right: 5px;
+                          textcolor: #000000;" />
+        </div>
+        <div style="margin-top:20px;text-align:center;margin-bottom:10px">
+            <input type="button" value="保存配置" align="right" style="margin-right:5px" onclick="EasyAIConfig.OnClickSave" class="button highlightbutton" />
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

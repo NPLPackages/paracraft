@@ -1,0 +1,91 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ClientUpdate/UpdateResultDialog.html?latestVersion&curVersion=" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+    ChangeVersion = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdate/ChangeVersion.lua")
+    ChangeVersion.OnInit()
+
+    function OnClose()
+        Page:CloseWindow();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.version_page.click_close", {useNoId=true},nil,true);
+    end
+
+    function OnClickOpen()
+    end
+
+    function use_mini_version()
+        ChangeVersion.OnClickOldVersion()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.version_page.click_mini_version", {useNoId=true},nil,true);
+    end
+
+    function use_latest_version()
+        ChangeVersion.OnClickChangeNewVersion()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.version_page.click_latest_version", {useNoId=true},nil,true);
+    end
+
+    function GetNotice()
+        return ChangeVersion.htmlData
+    end
+    --n 776 102 32 32
+    --y 776 66 32 32
+]]></script>
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #141414cc;">
+    <pe:container alignment="_ct" width="700" height="500" style="margin-left:-350px;margin-top:-250px;background-color: #2e2e2e; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+        <div style="width: 700px;height: 500px;">
+            <div style="width: 700px;height: 54px;margin-top: 0px; background: url()">
+                <div style="float: left;margin-left: 20px;margin-top: 6px;color: #ffffff;font-size: 20px;base-font-size: 20px;font-weight: bold;"><%=L"版本管理"%></div>
+                <div onclick="OnClose()" style="float: left;margin-left: 670px;margin-top: -20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+            </div>
+            <div style="position: relative; width: 700px; height: 1px; margin-left: 0px; margin-top: -2px; background-color: #FFFFFF22"></div>
+            <div style="width: 654px;height: 260px; margin-top: 18px; margin-left: 18px; color: #ffffff;">
+                <pe:if condition="<%=Mod.WorldShare.Utils.IsEnglish()%>">
+                    <div style="font-size: 16px;base-font-size: 16px; font-weight: bold; width: 654px; height: 75px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 67 32 32:14 14 14 14);">
+                        <div style="position: relative; margin-left: 14px; margin-top: 28px;"><%=L"当前版本：" .. ChangeVersion.current_version %></div>
+                        <input type="button" value='<%=L"当前版本"%>' enabled="false"  style="position: relative; margin-left: 514px; margin-top: 20px; width: 120px; height: 36px; color: #ffffff; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                        <div zorder="1" style="position: relative; margin-left: 514px; margin-top: 20px; width: 120px; height: 36px; color: #ffffff; background-color: #262626aa; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"></div>
+                    </div>
+                    <div style="font-size: 16px;base-font-size: 16px; font-weight: bold; margin-top: 15px; width: 654px; height: 75px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                        <div style="position: relative; margin-left: 14px; margin-top: 28px;"><%=L"稳定版本（推荐）：" .. ChangeVersion.mini_version %></div>
+                        <input type="button" value='<%=L"切换版本"%>' onclick="use_mini_version"  style="position: relative; margin-left: 514px; margin-top: 20px; width: 120px; height: 36px; color: #ffffff; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                    </div>
+                    <div style="font-size: 16px;base-font-size: 16px; font-weight: bold; margin-top: 15px; width: 654px; height: 75px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                        <div style="position: relative; margin-left: 14px; margin-top: 28px;"><%=L"最新预览版本：".. ChangeVersion.latest_version%></div>
+                        <input type="button" value='<%=L"切换版本"%>' onclick="use_latest_version"  style="position: relative; margin-left: 514px; margin-top: 20px; width: 120px; height: 36px; color: #ffffff; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                    </div>   
+                    
+                </pe:if>
+                <pe:if condition="<%=not Mod.WorldShare.Utils.IsEnglish()%>">
+                    <div style="font-size: 16px;base-font-size: 16px; font-weight: bold; width: 654px; height: 75px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 67 32 32:14 14 14 14);">
+                        <div style="position: relative; margin-left: 14px; margin-top: 28px;"><%=L"当前版本：" .. ChangeVersion.current_version %></div>
+                        <input type="button" value='<%=L"当前版本"%>' enabled="false"  style="position: relative; margin-left: 544px; margin-top: 20px; width: 90px; height: 36px; color: #ffffff; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                        <div zorder="1" style="position: relative; margin-left: 544px; margin-top: 20px; width: 90px; height: 36px; color: #ffffff; background-color: #262626aa; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"></div>
+                    </div>
+                    <div style="font-size: 16px;base-font-size: 16px; font-weight: bold; margin-top: 15px; width: 654px; height: 75px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                        <div style="position: relative; margin-left: 14px; margin-top: 28px;"><%=L"稳定版本（推荐）：" .. ChangeVersion.mini_version %></div>
+                        <input type="button" value='<%=L"切换版本"%>' onclick="use_mini_version"  style="position: relative; margin-left: 544px; margin-top: 20px; width: 90px; height: 36px; color: #ffffff; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                    </div>
+                    <div style="font-size: 16px;base-font-size: 16px; font-weight: bold; margin-top: 15px; width: 654px; height: 75px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                        <div style="position: relative; margin-left: 14px; margin-top: 28px;"><%=L"最新预览版本：".. ChangeVersion.latest_version%></div>
+                        <input type="button" value='<%=L"切换版本"%>' onclick="use_latest_version"  style="position: relative; margin-left: 544px; margin-top: 20px; width: 90px; height: 36px; color: #ffffff; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                    </div>   
+                    
+                </pe:if>
+                <div style="margin-top: 16px; width: 654px; height: 150px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 104 32 32:14 14 14 14);">
+                    <pe:treeview style='height:142px; margin-top: 8px;  background:;'
+                                VerticalScrollBarOffsetX='4'
+                                VerticalScrollBarStep=“20”>
+                        <div style="width: 520px; color: #D9D9D9;">
+                            <%= GetNotice() %>
+                        </div>
+                    </pe:treeview>
+                </div>             
+            </div>
+        </div>
+    </pe:container>
+</pe:container>     
+    
+</pe:mcml>
+</body>
+</html>

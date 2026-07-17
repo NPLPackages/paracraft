@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+    <head>
+        <title>2023.6.10</title>
+    </head>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl" refresh="false">
+                <![CDATA[
+                local CompetitionUtils =  NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Competition/CompetitionUtils.lua")
+                local CompetitionMain = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Competition/CompetitionMain.lua")
+                CompetitionMain.OnInit()
+                function ClosePage()
+                    CompetitionMain.ClosePage()
+                end
+
+                function GetCompeteData()
+                    return CompetitionMain.compete_data
+                end
+
+                function GetCompeteDateStr(index)
+                    local competeDt = CompetitionMain.compete_data[index]
+                    if competeDt then
+                        return CompetitionUtils.GetTimeFormat(competeDt.startTime,competeDt.endTime)
+                    end
+                end
+
+                function CheckCanEnter(index)
+                    local competeDt = CompetitionMain.compete_data[index]
+                    if competeDt then
+                        local _,startTime,endTime = CompetitionUtils.GetTimeFormat(competeDt.startTime,competeDt.endTime)
+                        local curTime = CompetitionUtils.GetServerTime()
+                        return curTime <= endTime and curTime >= startTime
+                    end
+                    return false
+                end
+
+                function LimitName(name)
+                    return commonlib.GetLimitLabel(name, 17)
+                end
+
+                function OnClickEnter(name)
+                    CompetitionMain.OnClickSubmit(tonumber(name))
+                end
+
+                function IsEmptyCompete()
+                    return not CompetitionMain.compete_data or #CompetitionMain.compete_data == 0
+                end
+
+                function OnClickExtra(name)
+                    CompetitionMain.OnClickExtra(tonumber(name))
+                end
+
+                function GetTimeFormat(timeStr)
+                    return CompetitionUtils.GetTimeFormatWithSpacing(timeStr) or ""
+                end
+
+
+
+                function GetButtonHtml(status)
+                    if status == 1 then
+                        return [[<div style="position: relative; margin-top: 16px; margin-left: -2px; width: 332px; height: 44px; background: url(Texture/Aries/Creator/paracraft/Educate/Compete/anniu4_420x60_32bits.png#0 0 420 60);" ></div>]]
+                    elseif status == 2 then
+                        return [[<input type="button" name="<%=Eval('index')%>" onclick="OnClickCompete" style="position: relative; margin-top: 16px; margin-left: -2px; width: 332px; height: 44px; background: url(Texture/Aries/Creator/paracraft/Educate/Compete/anniu_420x60_32bits.png#0 0 420 60);" />]]
+                    elseif status == 3 then
+                        return [[<div style="position: relative; margin-top: 16px; margin-left: -2px; width: 332px; height: 44px; background: url(Texture/Aries/Creator/paracraft/Educate/Compete/anniu2_420x60_32bits.png#0 0 420 60);" ></div>]]
+                    elseif status == 4 then
+                        return [[<div style="position: relative; margin-top: 16px; margin-left: -2px; width: 332px; height: 44px; background: url(Texture/Aries/Creator/paracraft/Educate/Compete/anniu3_420x60_32bits.png#0 0 420 60);" ></div>]]
+                    end
+                    return [[<div style="position: relative; margin-top: 16px; margin-left: -2px; width: 332px; height: 44px; background: url(Texture/Aries/Creator/paracraft/Educate/Compete/anniu4_420x60_32bits.png#0 0 420 60);" ></div>]]
+                end
+
+                function OnClickCompete(name)
+                    local index = tonumber(name)
+                    if index then
+                        CompetitionMain.OnClickSubmit(tonumber(name))
+                    end
+                end
+
+                function GetTimeDisText(startTime)
+                    if startTime then
+                        local time = commonlib.timehelp.GetTimeStampByDateTime(startTime)
+                        local current = CompetitionUtils.GetServerTime()
+                        local time_stamp = time - current 
+                        time_stamp = time_stamp >= 0 and time_stamp or 0
+                        local day = math.ceil(time_stamp / 86400)
+                        return "距离开赛还有"..day.."天"
+                    end
+                    return ""
+                end
+            ]]></script>
+            <div style="width:1140px; height: 560px; background-color:#090A0D00; padding-top: 20px; padding-bottom: 20px;">
+                <pe:if condition="<%=not IsEmptyCompete()%>">
+                    <pe:treeview name='user_race' style='background:url();'  VerticalScrollBarOffsetX='-300' VerticalScrollBarStep="100">
+                        <div style="width: 1140px; ">
+                            <pe:repeat DataSource="<%=GetCompeteData()%>">
+                                <pe:repeatitem style="float:left;">
+                                    <pe:if condition="<%= Eval('isMain') == true %>">
+                                        <div style="float:left;width: 1100px; height: 330x; background-color: #00ff0000;">
+                                            <img src="<%=Eval('icon')%>" style="position: relative; width: 520px; height: 270px; margin-top: 30px;"/>
+                                            <div style="position: relative; font-size: 24px; margin-left: 540px; margin-top: 20px; base-font-size: 24px; font-weight: bold;"><%=Eval("name")%></div>
+                                            <div style="width: 540px; height: 230px; margin-left: 540px; margin-top: 80px;">
+                                                <div style="margin-top: 10px;"><%="主办单位："..Eval("sponsor")%></div>
+                                                <div style="margin-top: 30px;">
+                                                    <%=Eval("intro")%>
+                                                    <pe:if condition="<%= Eval('isShowExtra') == true %>">
+                                                        <input type="button" name="<%=Eval('index')%>" onclick="OnClickExtra" value='<%=L"  查看更多"%>' style="color: #3D7EFF; background:url()"></input>
+                                                    </pe:if>
+                                                </div>
+                                                <div style="margin-top: 10px;"><%="赛事时间："..GetCompeteDateStr(Eval("index"))%></div>
+                                            </div>
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition="<%= Eval('isMain') == false %>">
+                                        <div style="float:left;width: 380px; height: 200px; margin-top: -10px; margin-left: -10px; ">
+                                            <div tooltip='<%=Eval("name")%>' style="position: relative; font-size: 20px; margin-left: 26px; margin-top: 20px; base-font-size: 20px; font-weight: bold;"><%=LimitName(Eval("name"))%></div>
+                                            <div style="position: relative; width: 380px; height: 100px; margin-left: 26px; margin-top: 67px; ">
+
+                                                <!-- 开考时间 -->
+                                                <div style="float: left; width: 150px; height: 50px; ">
+                                                    <div style="float: left; width: 18px; height: 18px; background: url(Texture/Aries/Creator/paracraft/Educate/Compete/date_18x18_32bits.png#0 0 18 18);"></div>
+                                                    <div style="float: left; margin-left: 6px; margin-top: -2px;"><%=L"开考时间"%></div>
+                                                    <div style="margin-left: 0px; margin-top: 6px;"><%=GetTimeFormat(Eval("startTime"))%></div>
+                                                    
+                                                </div>
+                                                <!--  结束时间 -->
+                                                <div style="float: left; margin-left: 44px; width: 150px; height: 50px; ">
+                                                    <div style="float: left; width: 18px; height: 18px; background: url(Texture/Aries/Creator/paracraft/Educate/Compete/date_18x18_32bits.png#0 0 18 18);"></div>
+                                                    <div style="float: left; margin-left: 6px; margin-top: -2px;"><%=L"结束时间"%></div>
+                                                    <div style="margin-left: 0px; margin-top: 6px;"><%=GetTimeFormat(Eval("endTime"))%></div>
+                                                    
+                                                </div>
+                                                <%=GetButtonHtml(Eval("status"))%>
+                                                <pe:if condition='<%=Eval("status") == 1%>'>
+                                                    <input type="button" value='<%=GetTimeDisText(Eval("startTime"))%>' zorder="2" style="margin-top: 16px; color: #ffffff; font-size: 6px; base-font-size: 6px; text-offset-y:-3; margin-left: -6px; width: 108px; height: 30px; background: url(Texture/Aries/Creator/paracraft/Educate/Compete/date_96x22_32bits.png#0 0 96 22);" />
+                                                </pe:if>
+                                            </div>
+                                            <div zorder="-1" style="position: relative;  width: 380px; height: 200px; background: url(Texture/Aries/Creator/paracraft/Educate/Project/zuopingdi_72x72_32bits.png#0 0 72 72:30 30 30 30);"></div>
+                                            
+                                        </div>
+                                    </pe:if>
+                                    
+                                </pe:repeatitem>
+                            </pe:repeat>
+                        </div>
+                    </pe:treeview>
+                </pe:if>
+                
+                <pe:if condition="<%=IsEmptyCompete()%>">
+                    <div align='center'
+                        style='width: 258px;
+                                height: 244px;
+                                margin-top: 130px;
+                                background: url(Texture/Aries/Creator/paracraft/Educate/Project/kongbai_258x244_32bits.png#0 0 258 244)'>
+                        <div style="text-align: center; font-size: 14px; base-font-size: 14px; font-weight: bold; margin-top: 170px; color: #3D7EFF;" ><%=L"暂无比赛信息"%></div>
+                    </div>
+                </pe:if>
+                
+
+            </div>
+        </pe:mcml>
+    </body>
+</html>

@@ -341,7 +341,11 @@ end
 function ItemStack:GetIcon()
 	local item = self:GetItem();
 	if(item) then
-		return item:GetIcon():gsub("#", ";");	
+		local icon = self:GetDataField("customIcon");
+		if(icon and icon:match("^https?://")) then
+			return icon;
+		end
+		return item:GetIcon():gsub("#", ";");
 	end
 end
 
@@ -349,7 +353,7 @@ end
 function ItemStack:GetBlock()
 	local item = self:GetItem();
 	if(item) then
-		return item:GetBlock();	
+		return item:GetBlock();
 	end
 end
 
@@ -406,6 +410,10 @@ end
 function ItemStack:GetTooltip()
 	local item = self:GetItem();
 	if(item) then
+		local tooltip = self:GetDataField("customTooltip");
+		if(tooltip) then
+			return tooltip;
+		end
 		local tip = self:GetDataField("tooltip")
 		if(tip == nil or tip == "") then
 			tip = item:GetTooltipFromItemStack(self);
@@ -419,7 +427,7 @@ function ItemStack:GetDisplayName()
 	if(item) then
 		local tip = self:GetDataField("tooltip")
 		if(tip == nil or tip == "") then
-			tip = item:GetDisplayName();
+			tip = item:GetDisplayName(self);
 		end
 		return tip;
 	else

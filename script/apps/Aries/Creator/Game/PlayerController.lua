@@ -138,6 +138,16 @@ function PlayerController:LoadFromCurrentWorld()
 
 	self:CheckSetMode();
 	GameLogic.events:AddEventListener("game_mode_change", self.OnGameModeChanged, self, "Player");
+	GameLogic:Connect("WorldUnloaded", self, self.OnWorldUnloaded, "PlayerController");
+end
+
+function PlayerController:OnWorldUnloaded()
+	if(self.lastTool) then
+		if(self.lastTool.OnDeSelect) then
+			self.lastTool:OnDeSelect();
+		end
+		self.lastTool = nil;
+	end
 end
 
 function PlayerController:SaveToCurrentWorld()
@@ -253,7 +263,7 @@ end
 -- called when player is loaded and GUI scene context is initialized. 
 function PlayerController:InitMainPlayerHandTool()
 	local player = EntityManager.GetPlayer();
-	if(player.inventory and not player.is_hand_tool_initialized) then
+	if(player and player.inventory and not player.is_hand_tool_initialized) then
 		player.is_hand_tool_initialized = true;
 		player.inventory:OnInventoryChanged(player.inventory:GetHandToolIndex());
 	end
@@ -315,6 +325,22 @@ function PlayerController:SetBlockInRightHand(blockid_or_item_stack, bIsReplace)
 		end
 		return player:SetBlockInRightHand(blockid_or_item_stack, bIsReplace);		
 	end
+end
+
+function PlayerController:SetRightHandTool(tool)
+	if self.lastTool ~= tool then
+		if self.lastTool and self.lastTool.OnDeSelect then
+			self.lastTool:OnDeSelect();
+		end
+		self.lastTool = tool;
+		if tool and tool.OnSelect then
+			tool:OnSelect();
+		end
+	end
+end
+
+function PlayerController:GetRightHandTool()
+	return self.lastTool;
 end
 
 -- throw entity to the x,y,z location. 
@@ -394,6 +420,7 @@ end
 
 function PlayerController:SaveLocalData(name, value, bIsGlobal, bDeferSave)
 	LocalStorageUtil.Save_userdata(name, value, bIsGlobal, bDeferSave)
+	GameLogic.FlushDiskIO() --网页版需要手动flush一下
 end
 
 -- load local user data for a given world
@@ -446,9 +473,15 @@ end
 -- set the player that is being controlled. 
 function PlayerController:SetMainPlayer(entityPlayer)
 	entityPlayer:SetFocus();
-	local last_player = EntityManager.SetMainPlayer(entityPlayer);
+	local last_player = EntityManager.GetPlayer();
 	
 	if(last_player) then
+		-- swap inventory from last player to the new one.
+		local inventory = last_player:GetInventory();
+		if(inventory) then
+			local oldInventory = entityPlayer:SetInventory(inventory);
+			last_player:SetInventory(oldInventory);
+		end
 		if(last_player:isa(EntityManager.EntityPlayerMP)) then
 			-- we do not delete old ones for debugging networking using loopback interface 
 			-- using the same process. 
@@ -457,6 +490,9 @@ function PlayerController:SetMainPlayer(entityPlayer)
 			last_player:Destroy();
 		end
 	end
+	-- swap main player
+	EntityManager.SetMainPlayer(entityPlayer);
+	self:InitMainPlayerHandTool();
 end
 
 -- return true if processed. 

@@ -1,0 +1,64 @@
+<!-- script/apps/Aries/Creator/Game/Areas/ChatSystem/UserInfoCtrl.html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="NewSmileyPage.lua"><![CDATA[
+local UserInfoCtrl = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/UserInfoCtrl.lua");
+UserInfoCtrl.OnInit();
+
+function IsHaveModel()
+    return  UserInfoCtrl.userData.modelUrl and UserInfoCtrl.userData.modelUrl ~= ""
+end
+
+function GetLimitUserName()
+    local nickname = UserInfoCtrl.userData.nickname
+    local username = (nickname and nickname~="") and nickname or UserInfoCtrl.userData.username
+    username,_rightStr = commonlib.GetLimitLabelByTextWidth(username,78,"System;14;norm",true)
+    if _rightStr and _rightStr ~= "" then
+        return username..".."
+    end
+    return username
+end
+
+function OnClickUser()
+    UserInfoCtrl.chatId = nil
+    UserInfoCtrl.chatType = nil
+    UserInfoCtrl.ShowUserOperate()
+end
+
+function GetUserId()
+    return UserInfoCtrl.userData.userId
+end
+
+function GetPortrait()
+    return UserInfoCtrl.userData.portrait
+end
+]]></script>
+
+<div width="100%" height="100%" style="">
+   <div height="100%"  style="width: 140px; margin-left: 6px;">
+        <div style="float: left; width: 144px; height: 44px; margin-top: 20px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#2 78 144 44);">
+            <div onclick="OnClickUser" style="position: relative; width: 140px; height: 40px; background: url();"></div>
+            <div style="float: left; width: 40px; height: 40px;">
+                <pe:if condition="<%=IsHaveModel()%>">
+                    <pe:mc_player name='<%="user_ctrl_player"%>' miniscenegraphname='<%="user_ctrl_player_miniscene"%>' style="margin-left:-6px;margin-top:-19px;width:60px;height:60px;" IsInteractive="false" NoFrameMove="true" DefaultCameraObjectDist="3.2" LookAtHeight="1.57" DefaultLiftupAngle="0.1" fisrtFrameMove="false"/>
+                </pe:if>
+                <pe:if condition="<%=not IsHaveModel()%>">
+                    <img src="<%=GetPortrait()%>" style="width: 40px; height: 40px;" />
+                </pe:if>
+            </div>
+            <div style="color: #ffffff; float: left; margin-left: 8px; margin-top: 5px; width: 95px; height: 40px;">
+                <div style="font-size: 12px;  base-font-size: 12px; font-weight: bold; shadow-quality:4;shadow-color:#000000;text-shadow:true;"><%=GetLimitUserName()%></div>
+                <div style="margin-top: 0px; font-size: 10px;  base-font-size: 10px;  shadow-quality:4;shadow-color:#aa000000;text-shadow:true;"><%="ID: " .. GetUserId()%></div>
+            </div>
+        </div>
+   </div>
+</div>
+</pe:mcml> 
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="WorldSharePage.lua" ><![CDATA[
+    local WorldSharePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareWorld/WorldSharePage.lua") 
+    WorldSharePage.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetQrcode()
+        return WorldSharePage.GetShareLink()
+    end
+
+    function OnClickCopy()
+        WorldSharePage.OnClickCopyLink()
+    end
+
+
+]]></script>
+    <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000000;">
+        <pe:container alignment="_ct" width="640" height="420" style="margin-left:-320px;margin-top:-210px;background: ;">
+            <div style="position: relative; width: 640px; height: 420px;">
+                <div zorder="-1" style="position: relative; width: 640px; height: 48px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/wtitle_32x32_32bits.png:14 14 14 14);">
+                    <div style="position: relative; font-size: 16px; base-font-size: 16px; font-weight: bold; color: #ffffff; margin-left: 16px; margin-top: 10px;"><%=L"作品分享"%></div>
+                    <input type="button" value="" onclick="ClosePage()" style="position: relative; margin-left: 604px; margin-top: 12px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/guanbi_44x44_32bits.png#0 0 44 44);" />
+                </div>
+                <div zorder="-2" style="position: relative; width: 640px; height: 420px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/wbg_32x32_32bits.png:14 14 14 14);"></div>
+            </div>
+
+            <div align="center" style="margin-top: 54px; width: 500px; height: 300px; background: url();">
+                <div style="margin-left: 18px; margin-top: 18px; width: 464px; height: 196px; ">
+                    <div style="text-align: center; color: #ffffff;font-size: 18px; base-font-size: 18px;"><%=L"使用手机微信或者QQ扫码分享作品"%></div>
+                    <div style="margin-top: 14px; margin-left: 160px; width: 140px; height: 140px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                        <div style="margin-left: 5px; margin-top: 5px; width: 130px; height: 130px; background-color: #ffffff;">
+                            <kp:qrcode value="<%=GetQrcode()%>" style="margin-left: 2px; margin-top: 2px; width: 126px; height: 126px; color: #000000;"></kp:qrcode>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div align="center" style=" margin-top: 0px; width: 104px; height: 40px;">
+                    <div style="float: left; width: 14px; height: 14px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#627 103 28 28);"></div>
+                    <div style="float: left; margin-top: -4px; margin-left: 8px; color: #ffffff;font-size: 12px; base-font-size: 12px;"><%=L"快来扫一扫吧"%></div>
+                </div>
+                <div style=" margin-left: 140px; margin-top: 16px;">
+                    <input type='button' value='<%=L"复制分享链接"%>' onclick='OnClickCopy' style='float: left;  font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff; width: 220px; height: 44px; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);'/>
+                </div>
+            </div>
+        </pe:container>
+    </pe:container> 
+</pe:mcml>
+</body>
+</html>

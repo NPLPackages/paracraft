@@ -16,7 +16,11 @@ end
 
 function OnClickLink()
     GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.contact_teacher.contact_customer");
-    ParaGlobal.ShellExecute('open', L'https://wpa1.qq.com/TxyKupLK?_type=wpa&qidian=true', '', '', 1)
+    if System.os.GetPlatform() == 'android' then
+        GameLogic.RunCommand('/open -e https://work.weixin.qq.com/kfid/kfcf794bf130083e719')
+    else
+        ParaGlobal.ShellExecute('open', 'https://work.weixin.qq.com/kfid/kfcf794bf130083e719', '', '', 1)
+    end
 end
 
 function GetSchoolDesc()

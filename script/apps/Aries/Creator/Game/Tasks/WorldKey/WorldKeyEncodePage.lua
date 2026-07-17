@@ -120,11 +120,11 @@ function WorldKeyEncodePage.EncodeKey()
         return
     end
 
-    if not GameLogic.IsVip() then
-        local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-        VipToolNew.Show("worldkey_encode")
-        return
-    end
+    -- if not GameLogic.IsVip() then
+    --     local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+    --     VipToolNew.Show("worldkey_encode")
+    --     return
+    -- end
 
     local buy_link_text = page:GetValue("buy_link_text");
     if not buy_link_text or buy_link_text == "" then
@@ -198,6 +198,7 @@ function WorldKeyEncodePage.EncodeKey()
     -- world_encodekey_data.txt_file_path = txt_file_path
     
     local projectId = WorldKeyEncodePage.projectId
+    local KeepworkServiceProject = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceProject.lua')
     KeepworkServiceProject:UpdateProject(projectId, params, function(data, err)
         if err == 200 then
             local data = {}

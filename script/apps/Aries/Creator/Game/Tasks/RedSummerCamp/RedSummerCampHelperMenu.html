@@ -9,7 +9,7 @@
     end
     _x = tonumber(Page:GetRequestParam("x"));
     _y = tonumber(Page:GetRequestParam("y"));
-
+    isTest = tonumber(Page:GetRequestParam("isTest"));
     _width = 162
     _listOfHelpNode = {
     }
@@ -48,6 +48,15 @@
         },
     })
 
+    if isTest and isTest == 1 then
+        table.insert(_listOfHelpNode,{
+            {
+                text = "测试",
+                cmdName = "help.test"
+            },
+        })
+    end
+
     function getItemText(index)
         return _listOfHelpNode[index] and _listOfHelpNode[index].text
     end
@@ -62,6 +71,13 @@
                    not Mod.WorldShare.Store:Get('user/isVerified') and
                    (not System.options.isChannel_430) then
                     _guihelper.MessageBox(L'请先完善您的资料')
+                    return
+                end
+
+                if info.cmdName == "help.test" then
+                    local VersionSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/VersionSetting.lua')
+                    VersionSetting.ShowPage()
+                    ClosePage();
                     return
                 end
 

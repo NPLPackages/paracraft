@@ -10,6 +10,8 @@ NPL.load("(gl)script/kids/3DMapSystem_Data.lua");
 NOTE: all data presentation in Map3DSystem table and subtable
 	  any lua file want to use the Map3DSystem table can load this file
 ]]
+
+NPL.PostLoad(function()
 NPL.load("(gl)script/kids/3DMapSystemData/TableDef.lua");
 NPL.load("(gl)script/kids/3DMapSystemData/options.lua");
 NPL.load("(gl)script/kids/3DMapSystemData/world_db.lua");
@@ -23,7 +25,9 @@ NPL.load("(gl)script/kids/3DMapSystemUI/event_handlers.lua");
 NPL.load("(gl)script/kids/3DMapSystemUI/Msg_Def.lua"); -- message defination
 --NPL.load("(gl)script/kids/3DMapSystemData/ItemManager.lua");
 NPL.load("(gl)script/kids/3DMapSystemItem/ItemManager.lua");
+end)
 
+Map3DSystem = Map3DSystem or {};
 -- TODO: put folder to seperate zip file for easy of update patching. 
 -- there are some preload, hence the following file must be executed even before the scripting interface is ready.
 --ParaAsset.OpenArchive ("character.zip", true);

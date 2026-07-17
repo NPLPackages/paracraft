@@ -597,6 +597,7 @@ function Entity:OpenEditor(editor_name, entity)
 			EditLightTask.GetInstance():SelectLight(self);
 		end
 		GameLogic.SetModified();
+		return true;
 	end
 end
 

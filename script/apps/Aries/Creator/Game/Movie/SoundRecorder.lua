@@ -8,7 +8,7 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/SoundRecorder.lua");
 local SoundRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.SoundRecorder");
 SoundRecorder.ShowPage(function(filename)
-	-- filename is recording/rec[yyyy-M-d]_[HH-mm-ss].ogg
+	
 end);
 -------------------------------------------------------
 ]]
@@ -27,43 +27,64 @@ function SoundRecorder.OnInit()
 	page = document:GetPageCtrl();
 end
 
+-- @param maxDuration: default to nil, we will continue recording until user clicks the stop button. Otherwise we will start immediately and stop after maxDuration seconds.
+function SoundRecorder.CaptureSound(filename, OnClose, maxDuration, isSilent)
+	SoundRecorder.ShowPage(OnClose, filename, "immediate", maxDuration, isSilent)
+end
+
 -- @param OnClose: function(result, values) end 
+-- @param outputFilename: if nil, default to "temp/capture.ogg", it can also be wav file. 
+-- @param mode: default to nil, or "immediate", if "immediate" we will return immediately after recording.
+-- @param maxDuration: default to nil, we will continue recording until user clicks the stop button. Otherwise we will stop after maxDuration seconds.
 -- result is "ok" is user clicks the OK button. 
-function SoundRecorder.ShowPage(OnClose)
+function SoundRecorder.ShowPage(OnClose, outputFilename, mode, maxDuration, isSilent)
+	if (System.os.GetPlatform() == "android") then
+		if(RequestAndroidPermission and RequestAndroidPermission.RequestRecordAudioPermission) then
+			RequestAndroidPermission.RequestRecordAudioPermission();
+		end
+	end
+
 	SoundRecorder.result = nil;
 	SoundRecorder.status = nil;
+	SoundRecorder.OnCloseCallback = OnClose;
+	SoundRecorder.mode = mode;
+	SoundRecorder.outputFilename = outputFilename or tmpCapturedFile;
+	SoundRecorder.maxDuration = maxDuration;
 	SoundRecorder.mytimer = SoundRecorder.mytimer or commonlib.Timer:new({callbackFunc = function(timer)
 		SoundRecorder.OnTimer(timer);
 	end})
+	if(not isSilent) then
+		local params = {
+			url = "script/apps/Aries/Creator/Game/Movie/SoundRecorder.html", 
+			name = "SoundRecorder.ShowPage", 
+			isShowTitleBar = false,
+			DestroyOnClose = true,
+			bToggleShowHide=false, 
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			allowDrag = mode ~= "immediate",
+			click_through = false, 
+			enable_esc_key = true,
+			bShow = true,
+			isTopLevel = mode ~= "immediate",
+			zorder = mode == "immediate" and 1000 or nil,
+			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+			directPosition = true,
+				align = "_ct",
+				x = -200,
+				y = -170,
+				width = 400,
+				height = 320,
+		};
+		System.App.Commands.Call("File.MCMLWindowFrame", params);
 
-	local params = {
-		url = "script/apps/Aries/Creator/Game/Movie/SoundRecorder.html", 
-		name = "SoundRecorder.ShowPage", 
-		isShowTitleBar = false,
-		DestroyOnClose = true,
-		bToggleShowHide=false, 
-		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = true,
-		click_through = false, 
-		enable_esc_key = true,
-		bShow = true,
-		isTopLevel = true,
-		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-		directPosition = true,
-			align = "_ct",
-			x = -200,
-			y = -170,
-			width = 400,
-			height = 320,
-	};
-	System.App.Commands.Call("File.MCMLWindowFrame", params);
-
-	params._page.OnClose = function()
-		if(OnClose) then
-			OnClose(SoundRecorder.result);
+		params._page.OnClose = function()
+			AudioEngine.StopRecording()
+			page = nil;
 		end
-		AudioEngine.StopRecording()
-		page = nil;
+	end
+
+	if(SoundRecorder.maxDuration and SoundRecorder.mode == "immediate") then
+		SoundRecorder.OnRecord()
 	end
 end
 
@@ -99,9 +120,25 @@ function SoundRecorder.OnSave()
 end
 
 function SoundRecorder.OnTimer(timer)
-	if(page and SoundRecorder.status == "recording") then
-		local text = string.format(L"录制中: %.2f秒", (commonlib.TimerManager.GetCurrentTime() - SoundRecorder.startRecordTime) / 1000);
-		page:SetUIValue("text", text);
+	if(SoundRecorder.status == "recording") then
+		local totalSeconds =  (commonlib.TimerManager.GetCurrentTime() - SoundRecorder.startRecordTime) / 1000
+		if (page) then
+			local text;
+			if(SoundRecorder.maxDuration) then
+				text = string.format(L"录制中: %.2f秒/%d秒", totalSeconds, SoundRecorder.maxDuration);
+			else
+				text = string.format(L"录制中: %.2f秒", totalSeconds);
+			end
+			if(SoundRecorder.mode ~= 'immediate') then
+				page:SetUIValue("text", text);
+			else
+				page:SetUIValue("textImmediate", text);
+			end
+		end
+
+		if(SoundRecorder.maxDuration and totalSeconds > SoundRecorder.maxDuration) then
+			SoundRecorder.OnStopRecord()
+		end
 	else
 		timer:Change();
 	end
@@ -116,16 +153,29 @@ function SoundRecorder.OnRecord()
 end
 
 function SoundRecorder.OnStopRecord()
+	if(SoundRecorder.status == "recorded") then
+		AudioEngine.StopRecording()
+		return
+	end
 	SoundRecorder.status = "recorded"
 	SoundRecorder.recordedDuration = commonlib.TimerManager.GetCurrentTime() - SoundRecorder.startRecordTime;
 	SoundRecorder.RefreshPage()
 	SoundRecorder.mytimer:Change();
 
 	AudioEngine.StopRecording()
-	SoundRecorder.tempFilename = AudioEngine.SaveRecording(tmpCapturedFile, SoundRecorder.recordSoundQuality);
+	SoundRecorder.tempFilename = AudioEngine.SaveRecording(SoundRecorder.outputFilename, SoundRecorder.recordSoundQuality);
 	if(not SoundRecorder.tempFilename) then
-		SoundRecorder.OnReRecord()
-		_guihelper.MessageBox(L"无法录制声音，请确定你已经连接了麦克风")
+		-- SoundRecorder.OnReRecord()
+		-- _guihelper.MessageBox(L"无法录制声音，请确定你已经连接了麦克风")
+		LOG.std(nil, "warn", "SoundRecorder", "failed to record sound. you may not have proper recording device")
+	end
+	if(SoundRecorder.mode == "immediate") then
+		SoundRecorder.result = SoundRecorder.tempFilename;
+		SoundRecorder.OnClose()
+	end
+	if(SoundRecorder.OnCloseCallback) then
+		SoundRecorder.OnCloseCallback(SoundRecorder.result);
+		SoundRecorder.OnCloseCallback = nil;
 	end
 end
 

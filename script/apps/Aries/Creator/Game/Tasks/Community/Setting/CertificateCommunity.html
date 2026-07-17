@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="Certificate.lua" ><![CDATA[
+    -- helper
+    local Validated = NPL.load('(gl)Mod/WorldShare/helper/Validated.lua')
+
+    -- UI
+    local RegisterModal = NPL.load('(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua')
+
+    -- service
+    local KeepworkServiceSession = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceSession.lua')
+
+    -- api
+    local KeepworkUsersApi = NPL.load('(gl)Mod/WorldShare/api/Keepwork/KeepworkUsersApi.lua')
+
+    -- libs
+    local VipCodeExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchange.lua") 
+
+    local RedSummerCampMainPage = NPL.load('(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainPage.lua')
+    local Desktop = commonlib.gettable('MyCompany.Aries.Creator.Game.Desktop')
+
+    local page = document:GetPageCtrl()
+
+    local mode = page:GetRequestParam('mode')
+
+    canClose = true
+
+    if mode == 'summer' then
+        canClose = false
+    end
+
+    hasBeenSent = false
+
+    function close()
+        Mod.WorldShare.Store:Unsubscribe('user/ParentPhoneVerification')
+
+        if page.certificateCallback and type(page.certificateCallback) == 'function' then
+            page.certificateCallback()
+        end
+
+        page:CloseWindow()
+    end
+
+    function show_bind_error_msg()
+        _guihelper.MessageBox([[
+            <pe:container width='620px;'
+                        height='195px'
+                        style='position: relative;
+                                overflow: hidden;
+                                background: url();
+                                margin-left: -30px;
+                                margin-top: -26px;'>
+                <pe:container
+                    alignment='_lt'
+                    scale='0.45'
+                    style='position: relative;
+                        margin-left: 10px;
+                        margin-top: -100px;
+                        width: 1280px;
+                        height: 720px;
+                        background: url();'>
+                    <!--背景水印-->
+                    <div style='position: relative;
+                                margin-left: 24px;
+                                margin-top: 104px;
+                                width: 512px;
+                                height:256px;
+                                background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);' />
+                    <div style='position: relative;
+                                margin-left: 557px;
+                                margin-top: 26px;
+                                width: 512px;
+                                height: 256px;
+                                background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);' />
+                    <div style='position: relative;
+                                margin-left: 103px;
+                                margin-top: 282px;
+                                width: 512px;
+                                height: 256px;
+                                background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);' />
+                    <div style='position: relative;
+                                margin-left: 879px;
+                                margin-top: 311px;
+                                width: 512px;
+                                height: 256px;
+                                background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);' />
+                    <div style='position: relative;
+                                margin-left: 438px;
+                                margin-top: 477px;
+                                width: 512px;
+                                height: 256px;
+                                background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);' />
+                </pe:container>
+                <div align='center'
+                    style='width: 400px;
+                            text-align: center;
+                            margin-top: 25px;
+                            font-size: 18px;
+                            base-font-size: 18px;
+                            background: url();'>
+                    <div><%= L'已经为您完成实名认证。' %></div>
+                    <div><%= L'由于该手机已绑定其他账号，绑定未成功。' %></div>
+                    <div><%= L'稍后请在个人信息中进行操作。' %></div>
+                </div>
+            </pe:container>
+        ]])
+    end
+
+    local timer
+
+    function send()
+        if hasBeenSent then
+            return 
+        end
+
+        local phoneNumber = ''
+
+        if canClose then
+            phoneNumber = page:GetValue('phonenumber')
+        else
+            phoneNumber = page:GetValue('phone_number_summer')
+        end
+
+        local isBind = true--page:GetValue('is_bind_account')
+
+        if not Validated:Phone(phoneNumber) then
+            GameLogic.AddBBS(nil, L'手机格式错误', 3000, '255 0 0')
+            return
+        end
+
+        hasBeenSent = true
+
+        local times = 60
+
+        timer = commonlib.Timer:new({
+            callbackFunc = function(timer)
+                if canClose then
+                    page:SetValue('send_button_1', format('%s(%ds)', L'重新发送', times))
+
+                    if times == 0 then
+                        hasBeenSent = false
+                        page:SetValue('send_button_1', L'发送短信')
+                        timer:Change(nil, nil)
+                    end
+                else
+                    page:SetValue('send_button_2', format('%s(%ds)', L'重新发送', times))
+
+                    if times == 0 then
+                        hasBeenSent = false
+                        page:SetValue('send_button_2', L'发送短信')
+                        timer:Change(nil, nil)
+                    end
+                end
+
+                times = times - 1
+            end
+        })
+
+        KeepworkServiceSession:ParentCellphoneCaptcha(
+            phoneNumber,
+            isBind,
+            function(bIsSucceeded, code, msg)
+                if not bIsSucceeded then
+                    _guihelper.MessageBox(format('%s(%s)', msg, code))
+
+                    hasBeenSent = false
+                    page:SetValue('send_button_2', L'发送短信')
+                    timer:Change(nil, nil)
+                end
+            end
+        )
+
+        timer:Change(1000, 1000)
+    end
+
+    function exit_app()
+        Mod.WorldShare.MsgBox:Show(L'正在退出，请稍后...')
+
+        KeepworkServiceSession:Logout(nil, function()
+            Desktop.ForceExit()
+        end)
+    end
+
+    function use_code()
+        VipCodeExchange.ShowView()
+    end
+
+    Mod.WorldShare.Store:Subscribe('user/ParentPhoneVerification', function(payload)
+        if timer then
+            timer:Change(nil, nil)
+        end
+
+        Mod.WorldShare.Store:Unsubscribe('user/ParentPhoneVerification')
+        Mod.WorldShare.Store:Set('user/isVerified', true)
+        KeepworkServiceSession:CheckVerify()
+
+        RedSummerCampMainPage.RefreshPage()
+        --显示生日设置界面
+        local UserBirthDate = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/Setting/UserBirthDate.lua")
+        UserBirthDate.Show()
+        close()
+        --刷新个人信息界面
+        local CommunityTitleInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityTitleInfo.lua")
+        CommunityTitleInfo.CertificateResult(payload)
+        
+        if payload and
+            type(payload) == 'table' and
+            payload.bindResult == false and
+            payload.isBind == true then
+            show_bind_error_msg()
+        end
+    end)
+
+    function close_certificate()
+        -- 实名认证不允许跳过，禁止关闭
+        GameLogic.AddBBS(nil, L'请完成实名认证后再继续操作', 3000, '255 165 0')
+        return
+    end
+]]></script>
+    <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000000;">
+        <pe:container alignment="_ct" width="540" height="310" style="margin-left:-270px;margin-top:-155px;background: ;">
+            <div style="position: relative; width: 540px; height: 310;">
+                <div zorder="-1" style="position: relative; width: 540px; height: 48px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/wtitle_32x32_32bits.png:14 14 14 14);">
+                    <div style="position: relative; font-size: 16px; base-font-size: 16px; font-weight: bold; color: #ffffff; margin-left: 16px; margin-top: 10px;"><%=L"实名认证"%></div>
+                    <input type="button" value="" onclick="close_certificate()" style="position: relative; margin-left: 504px; margin-top: 12px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/guanbi_44x44_32bits.png#0 0 44 44);" />
+                </div>
+                <div zorder="-2" style="position: relative; width: 540px; height: 310; background: url(Texture/Aries/Creator/keepwork/Mobile/server/wbg_32x32_32bits.png:14 14 14 14);"></div>
+            </div>
+
+            <div align="center" style="margin-top: 54px; width: 500px; height: 300px; background: url();">
+                <div align='center'
+                        style='width: 476px;
+                            height: 40px;
+                            padding-top: 8px;
+                            text-align: center;
+                            color: #FF5733;
+                            background: url(Texture/Aries/Creator/keepwork/community_32bits.png#883 145 32 32:14 14 14 14);'>
+                    <%= L'输入手机号发送认证短信，并点击短信中的链接，即可完成实名认证。' %>
+                </div>
+                <div align='center'
+                        style='width: 476px;
+                            font-size: 14px;
+                            base-font-size: 14px;
+                            height: 40px;
+                            margin-top: 8px;
+                            color: #D3D3D3;
+                            margin-left: 48px;'>
+                    <%= L'完成实名认证后，你创造的世界才能被别人看到。' %>
+                </div>
+
+                <div style='font-size: 14px;
+                            base-font-size: 14px;
+                            margin-left: 60px;
+                            margin-top: 5px;'>
+                    <div style="float: left; color: #D3D3D3;"><%= L'手机号：' %></div>
+
+                    <div style="float: left; width: 320px;height: 40px;margin-left: 0px; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#859 104 32 32:14 14 14 14);">
+                        <input type='text' EmptyText='<%= L"请输入手机号" %>' textcolor="#ffffff" style='float: left; margin-left: 12px; margin-top: 6px; width: 310px;height: 30px; background: url();' name='phonenumber' />
+                    </div>
+                </div>
+                <div align='center'
+                        style='margin-top: 32px;
+                            width: 198px'>
+                    <input type='button'
+                            name='send_button_1'
+                            style='width: 198px;
+                                    height: 40px;
+                                    color: #ffffff;
+                                    background-color: #404BF5; 
+                                    background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);'
+                            value='<%= L"发送短信" %>'
+                        onclick='send()' />
+                </div>
+            </div>
+        </pe:container>
+    </pe:container> 
+</pe:mcml>
+</body>
+</html>

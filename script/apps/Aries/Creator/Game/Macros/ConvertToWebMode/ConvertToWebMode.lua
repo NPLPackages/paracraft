@@ -124,7 +124,7 @@ function ConvertToWebMode:BeginCapture(callback)
                                 VideoRecorder.pluginNeedRestart = true
                             end
 
-                            ConvertToWebMode.BeginCapture(callbackFunc)
+                            ConvertToWebMode:BeginCapture(callbackFunc)
                         else
                             _guihelper.MessageBox(L"安装失败了");
                         end

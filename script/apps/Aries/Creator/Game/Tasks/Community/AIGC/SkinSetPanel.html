@@ -1,0 +1,208 @@
+<!-- SkinSetPanel.html - 皮肤套装面板 -->
+<pe:mcml>
+<script refresh="false" type="text/npl" src="SkinSetPanel.lua"><![CDATA[
+    local page = document:GetPageCtrl()
+    local frameName = page:GetRequestParam('frameName')
+    SkinSetPanel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/AIGC/SkinSetPanel.lua")
+    SkinSetPanel.OnInit(frameName)
+    function DS_Items(index)
+        if index == nil then
+            -- echo(SkinSetPanel.Current_SkinItem_DS,true)
+            return #SkinSetPanel.Current_SkinItem_DS
+        else
+            return SkinSetPanel.Current_SkinItem_DS[index]
+        end
+    end
+
+    local colors = {
+        [25] = "#8685C9",
+        [50] = "#34C827",
+        [100] = "#4890F6",
+        [200] = "#8B4DF6",
+        [400] = "#F68248",
+        [800] = "#FF5555",
+    }
+
+    function GetBackMcml(price)
+        local price = tonumber(price) or 0
+        local color = colors[price]
+        if not color then
+            if price > 800 then
+                color ="#FFD700"
+            else
+                color ="#89CCDF"
+            end
+        end
+        local mcmlStr = [[<pe:container ClickThrough="true" visible="true" zorder="-3"  style='position: relative; width: 100px; height: 120x;background-color: %s; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#44 528 32 32:15 15 15 15);'></pe:container>]]
+        return string.format(mcmlStr, color)
+    end
+
+    function GetCategoryStyle(tex)
+        return string.format("margin-left:14px;margin-top:10px;width:28px;height:14px;background:url(Texture/Aries/Creator/keepwork/Avatar/%s.png#0 0 28 14);", tex);
+    end
+
+    function GetBigIconStyle(tex)
+        return string.format("margin-left:12px;margin-top:12px;width:64px;height:64px;background:url(%s);", tex or "");
+    end
+
+    function GetSmallIconStyle1(tex)
+        return string.format("float:left;margin:5px;width:40px;height:40px;background:url(%s);", tex or "");
+    end
+
+    function GetSmallIconStyle2(tex)
+        return string.format("float:left;margin:5px;width:40px;height:40px;background:url(%s);", tex or "");
+    end
+
+    function CheckSkinUsed(skinId)
+        return SkinSetPanel.CheckSkinUsed(skinId)
+    end
+
+    function IsShowPurchaseSkinBtn(itemtype)
+        local btnType = itemtype or "2"
+        btnType = tonumber(btnType)
+        if btnType == 0 then
+            return false
+        end
+        return true
+    end
+
+    function GetCurrentQuality()
+        return SkinSetPanel.GetCurrentQuality()
+    end
+
+    function onSearch()
+        SkinSetPanel.OnSearchSkin()
+    end
+
+    function onSearchInputKeyup(name,mcmlNode)
+        if(virtual_key == Event_Mapping.EM_KEY_RETURN or virtual_key == Event_Mapping.EM_KEY_NUMPADENTER) then
+            onSearch()
+        end
+    end
+
+    function CheckSkinSelected(skinId)
+        local isSelected = SkinSetPanel.CheckSkinSelected(skinId)
+        return isSelected
+    end
+
+    function OnClickShowHased()
+        SkinSetPanel.OnClickShowHased()
+    end
+]]></script>
+<div align="right" style="position: relative; width: 410px; height: 610px;">
+    <div align="right" zorder="-2" style="position: relative; margin-right: 2px; width: 60px; height: 560px; background-color: #3000C26D; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#44 528 32 32:15 15 15 15);">
+        <pe:repeat DataSource="<%=SkinSetPanel.skin_category_ds%>">
+            <pe:repeatitem>
+                <pe:if condition='<%=SkinSetPanel.skin_category_index == Eval("index") %>'>
+                    <div zorder="-1" onclick="SkinSetPanel.OnChangeSkinCategory" style="float:left;margin-top:8px; margin-left: 8px; width: 44px; height: 44px;  color: #d3d3d3; font-size: 14px; base-font-size: 14px; font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#60 392 48 48);">
+                        <div style="<%='position: relative; width: 28px; height: 28px; margin-left: 7px; margin-top: 7px; background:url('..Eval('icon1')..')'%>" ></div>
+                        <div style="margin-left: 48px; margin-top: 8px; width: 4px; height: 28px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#1010 4 8 56);"></div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=SkinSetPanel.skin_category_index ~= Eval("index") %>'>
+                    <div zorder="-1" name='<%=Eval("index")%>' onclick="SkinSetPanel.OnChangeSkinCategory" style="float:left;margin-top:8px; margin-left: 8px; width: 44px; height: 44px; color: #7B7A8A; font-size: 14px; base-font-size: 14px; font-weight: bold;background:url();">
+                        <div name='<%=Eval("index")%>' onclick="SkinSetPanel.OnChangeSkinCategory" style="<%='width: 28px; height: 28px; margin-left: 7px; margin-top: 7px; background:url('..Eval('icon2')..')'%>" ></div>
+                    </div>
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+    <div align="right" style="position: relative; margin-right: 80px; margin-top: 30px; width: 330px; height: 540px;">
+        <div style="width: 380px; height: 540px; margin-left: -8px;">
+            <pe:gridview CellPadding="12" 
+                    VerticalScrollBarStep="36" 
+                    VerticalScrollBarOffsetX="1560" 
+                    AllowPaging="false" 
+                    ItemsPerLine="3" 
+                    DefaultNodeHeight="120" 
+                    RememberScrollPos="true" 
+                    RememberLastPage="true" 
+                    name="gvSkinIframeGridView" 
+                    DataSource='<%=DS_Items%>'>
+                <Columns>
+                    <div style="float:left;width:100px;height:120px; ">
+                        <div style="position: relative; width:100px;height:120x;background:url();">
+                            <div style="margin-left:7px;margin-top:7px;width:100px;height:96px;">
+                                <div style='<%=GetBigIconStyle(Eval("icon"))%>'></div>
+                            </div>
+                        </div>
+                        <div style="position: relative; margin-top:96px;width:100px; color: #ffffff; text-shadow:true;shadow-quality:8;shadow-color:#80565677; font-size: 14px; base-font-size: 14px; font-weight: bold; text-align:center;">
+                            <%=commonlib.GetLimitLabel(Eval("name"),7)%>
+                        </div>
+                        
+                        <pe:if condition="<%= CheckSkinUsed(Eval('id'))%>">
+                            <pe:container ClickThrough="true" visible="true" zorder="-1" style='position: relative; width: 100px; height: 120x; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#602 270 52 53:22 22 22 22);'>
+                            </pe:container>
+                        </pe:if>
+                        <input type="button" tooltip='<%=Eval("name")%>' param1='<%= XPath("this") %>' onclick="SkinSetPanel.UpdateCustomGeosets" zorder="-2"  style='position: relative; width: 100px; height: 120x;background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#676 180 200 240);' />
+                        <%= GetBackMcml(Eval("price")) %>
+                        <pe:if condition="<%=Eval('has') == 0 and Eval('type') ~= '0' %>"> <!-- 非免费皮肤 -->
+                            <div zorder="2" style="position: relative; margin-left: 6px; margin-top: 6px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/ggs/user/suosi_28X31_32bits.png#0 0 28 31);"></div>
+                        </pe:if>
+                        <pe:if condition="<%=CheckSkinSelected(Eval('id'))%>">
+                            <pe:if condition="<%=Eval('has') == 1 %>">
+                                <div style="position: relative; margin-left: 66px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/keepwork/minigame/user/has_32x32_32bits.png#0 0 32 32);"></div>
+                            </pe:if>
+                            <pe:if condition="<%=Eval('has') == 0 and IsShowPurchaseSkinBtn(Eval('type'))%>">
+                                <input type="button" param1='<%= XPath("this") %>' onclick="SkinSetPanel.PurchaseItem"  style='position: relative; margin-top: 78px; margin-left: -1px; width: 100px; height: 43x;background: url(Texture/Aries/Creator/keepwork/minigame/user/buy_101x43_32bits.png#0 0 101 43);' />
+                            </pe:if>
+                            <pe:if condition="<%=Eval('has') == 0 and Eval('type') == '0' %>"> <!-- 免费皮肤 -->
+                                <div style="position: relative; margin-left: 66px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/keepwork/minigame/user/free_32x32_32bits.png#0 0 32 32);"></div>
+                            </pe:if>
+                        </pe:if>
+                    </div>
+                </Columns>
+                <EmptyDataTemplate>
+                    <div style='font-weight: bold;'>
+                        <div align='center'style='width: 160px;height: 128px; margin-top: 160px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#2 2 160 128)'>
+                        </div>
+                        <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: -10px; color: #A8A7B0;" ><%=L"当前分类暂无数据"%></div>
+                    </div>
+                </EmptyDataTemplate>
+            </pe:gridview>
+
+        </div>
+    </div>
+    <div align="right" style="position: relative; margin-top: 2px; margin-right: 55px; width: 100px; height: 30px;">
+        <div style="position: relative; width: 74px; height: 24px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#84 528 32 24:14 11 14 11);"></div>
+        <div style="position: relative; width: 74px; height: 24px; margin-top: 2px; font-size:14px;color:#ffffff; text-align: center; base-font-size:14px;"><%=SkinSetPanel.GetBeanNum()%></div>
+        <div zorder="1" style="position: relative; margin-top: -4px; margin-left: -12px; width: 30px; height: 30px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#328 423 30 30);"></div>
+    </div>
+
+    <div style="position: relative; width: 220px; height: 30px; background-color: #00000000;">
+        <!-- <div style="float: left; width: 100px; height: 28px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#361 548 100 28);">
+            <div onclick='onSearch' style="float: left; margin-left: 11px; margin-top: 8px;  width: 11px; height: 11px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#451 607 13 13);"></div>
+            <input type='text'
+                name='skin_search'
+                EmptyText='<%= L"搜索" %>'
+                value=''
+                onkeyup='onSearchInputKeyup'
+                EmptyTextColor='#FF1D2129' 
+                textcolor='#1D2129FF'
+                style=' margin-left: 3px;
+                        margin-top: 0px;
+                        width: 65px;
+                        height: 26px;
+                        font-size: 12px;
+                        base-font-size: 12px;
+                        text-valign: center;
+                        background: url()'/>
+        </div> -->
+        <div style="float: left; width: 120px; height: 28px;">
+            <input type="checkbox" name = "checkShow" 
+                checked='<%=SkinSetPanel.isOnlyShowHave%>' 
+                onclick="OnClickShowHased" 
+                UncheckedBG="Texture/Aries/Creator/keepwork/rank/btn_qiehuan3_32X32_32bits.png#0 0 32 32:14 14 14 14" 
+                CheckedBG="Texture/Aries/Creator/keepwork/rank/btn_qiehuan1_32X32_32bits.png#0 0 32 32:14 14 14 14"
+                style="position: relative; margin-top: -2px; width:120px;height:32px;" 
+            />
+            <div zorder="1" style="position: relative; text-align: center; margin-top: -28px; color: #494747;" >显示已获得</div>
+        </div>
+        <div onclick="SkinSetPanel.ShowSkinQuality" zorder="-2" style="float: left; margin-left: 12px; width: 64px; height: 28px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#284 548 64 28);">
+            <pe:container ClickThrough="true" zorder="-1" visible="false" uiname="SkinSetPanel.skin_quality_container" style="position: relative; width: 64px; height: 28px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#474 548 64 28);"></pe:container>
+            <div style="float: left; margin-left: 11px; margin-top: 8px;  width: 11px; height: 11px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#423 607 13 13);"></div>
+            <pe:label name="label_quality" value="<%=GetCurrentQuality()%>" style="margin-left: 3px; margin-top: 4px; font-size: 12px;base-font-size: 12px; color: #1D2129;"/>
+        </div>
+    </div>
+</div>
+</pe:mcml>

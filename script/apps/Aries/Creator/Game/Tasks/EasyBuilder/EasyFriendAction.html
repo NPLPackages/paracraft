@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyFriendAction.lua" refresh="true">
+<![CDATA[
+EasyFriendAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyFriendAction");
+EasyFriendAction.InitPage(Page);
+
+function GetLevelText(level)
+    local currentLevel = EasyFriendAction.GetCurrentFriendLevel()
+    if level - currentLevel == 1 then
+        return string.format("🔒当前进度1/%d", level) 
+    else
+        return L"🔒未解锁"
+    end
+end
+
+function GetTitle()
+    local displayName = EasyFriendAction.targetEntity and EasyFriendAction.targetEntity:GetDisplayName() or "好友互动"
+    local levelName = EasyFriendAction.GetCurrentFriendLevelName() or ""
+    return string.format("%s (%s)", displayName, levelName)
+end
+]]>
+</script>
+<style>
+    .closebtn {
+        position: relative;
+        margin-right: -19px;
+        margin-top: -18px;
+        width: 56px;
+        height: 56px;
+        background: url(Texture/player/close.png);
+    }
+    .actionbtn {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        font-size: 14px;
+        min-width: 80px;
+        height: 45px;
+        spacing:10px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        color: #000000;
+    }
+    .levelheader {
+        padding:6px;margin-top:0px;margin-bottom:10px;
+    }
+    .levelname {float:left;font-size:14px;font-weight:bold;color:#ffd700;}
+    .levellock {float:left;font-size:14px;color:#ff6666;margin-left:5px}
+</style>
+
+<pe:container onclick="" style="padding:20px;background:url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);color:#ffffff;width:380px;height:560px;">
+    <div style="position:relative">
+        <input type="button" name="CloseBtn" onclick="EasyFriendAction.OnClickClose" align="right" class="closebtn" />
+    </div>
+    <!-- Friend Actions List -->
+    <div style="padding-top:3px;padding-bottom:3px;">
+        <div style="height:40px;">
+            <div style="float:left;margin-top:5px;font-size:16px;color:#5af05a"><%=GetTitle()%></div>
+            <div style="float:left;margin-left:5px;margin-top:8px;font-size:12px;color:#aaaaaa;">
+                <%="所有动作: " .. EasyFriendAction.GetAllActionCount()%>
+            </div>
+        </div>
+        <pe:treeview ShowIcon="false" uiname="EasyFriendAction.tvwActions" name="tvwActions" 
+            VerticalScrollBarStep="30"
+            DataSource='<%=EasyFriendAction.GetAllLevelActions()%>' 
+            DefaultNodeHeight="50"
+            style="background:url()">
+            <pe:repeat DataSource='<%=EasyFriendAction.GetAllLevelActions()%>'>
+                <pe:repeatitem style="float:left;">
+                    <pe:if condition='<%=Eval("data_type") == "level_header"%>'>
+                        <div style="width:320px;">
+                            <div class="levelheader">
+                                <pe:if condition='<%=Eval("level") <= EasyFriendAction.GetCurrentFriendLevel()%>'>
+                                    <div class="levelname" style="color:#5af05a;">
+                                        <%=Eval("levelName")%>
+                                    </div>
+                                </pe:if>
+                                <pe:if condition='<%=Eval("level") > EasyFriendAction.GetCurrentFriendLevel()%>'>
+                                    <div class="levelname">
+                                        <%=Eval("levelName")%>
+                                    </div>
+                                    <div class="levellock">
+                                        <%=GetLevelText(Eval("level"))%>
+                                    </div>
+                                </pe:if>
+                            </div>
+                        </div>
+                    </pe:if>
+                    <pe:if condition='<%=Eval("data_type") == "action"%>'>
+                        <input type="button" 
+                            name='<%=Eval("index")%>' 
+                            value='<%=Eval("actionName")%>' 
+                            tooltip='<%=Eval("description")%>'
+                            class="actionbtn" 
+                            onclick="EasyFriendAction.OnClickAction" />
+                    </pe:if>
+                </pe:repeatitem>
+            </pe:repeat>
+        </pe:treeview>
+    </div>
+</pe:container>
+</pe:mcml>
+</html>

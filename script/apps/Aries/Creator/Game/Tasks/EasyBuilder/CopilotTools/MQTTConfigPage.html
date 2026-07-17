@@ -1,0 +1,107 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/MQTTConfigPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>MQTT Configuration</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="false">
+<![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/MQTTTools.lua");
+local MQTTTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.MQTTTools")
+local page = document:GetPageCtrl();
+
+function OnInit()
+    local config = MQTTTools.GetInstance():LoadConfig();
+    page:SetValue("host", config.host or "mqtt.keepwork.com");
+    page:SetValue("port", config.port or 18883);
+    page:SetValue("username", config.username or "");
+    page:SetValue("password", config.password or "");
+    page:SetValue("clientId", config.clientId or "");
+    
+    UpdateStatus();
+end
+
+function UpdateStatus()
+    local status = MQTTTools.GetInstance().status;
+    page:SetValue("status_text", "Status: " .. status);
+end
+
+function OnSave()
+    local config = {
+        host = page:GetValue("host"),
+        port = tonumber(page:GetValue("port")),
+        username = page:GetValue("username"),
+        password = page:GetValue("password"),
+        clientId = page:GetValue("clientId"),
+        topics = {}, -- preserve existing logic if needed
+    };
+    local autoconnect = page:GetValue("autoconnect");
+    if autoconnect then
+        MQTTTools.GetInstance():Connect(config, function(success, err)
+            if success then
+                _guihelper.MessageBox("Connected successfully!");
+            else
+                _guihelper.MessageBox("Connection failed: " .. (err or "Unknown error"));
+            end
+            UpdateStatus();
+        end);
+    else
+        MQTTTools.GetInstance():SaveConfig(config);
+        _guihelper.MessageBox("Configuration saved.");
+    end
+    
+    page:CloseWindow();
+end
+
+function OnClose()
+    page:CloseWindow();
+end
+
+OnInit();
+]]>
+</script>
+<div style="width:400px;height:350px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8);">
+    <div style="height:30px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8);">
+        <div style="float:left;margin-left:10px;margin-top:5px;font-weight:bold;color:#cccccc">MQTT Configuration</div>
+        <input type="button" onclick="OnClose" style="float:right;margin-right:5px;margin-top:5px;width:20px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#351 279 20 20);" />
+    </div>
+    <div style="margin:10px;">
+        <div style="margin-bottom:10px;">
+            <div style="float:left;width:80px;">Host:</div>
+            <input type="text" name="host" style="width:200px;height:25px;" />
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="float:left;width:80px;">Port:</div>
+            <input type="text" name="port" style="width:100px;height:25px;" />
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="float:left;width:80px;">Client ID:</div>
+            <input type="text" name="clientId" style="width:200px;height:25px;" />
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="float:left;width:80px;">Username:</div>
+            <input type="text" name="username" style="width:200px;height:25px;" />
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="float:left;width:80px;">Password:</div>
+            <input type="text" name="password" password="true" style="width:200px;height:25px;" />
+        </div>
+        <div style="margin-bottom:10px;">
+            <input type="checkbox" name="autoconnect" style="margin-top:2px;" checked="checked" /><div style="float:left;margin-left:5px;" for="autoconnect">Auto Connect</div>
+        </div>
+        
+        <div style="margin-top:20px;">
+            <label name="status_text" style="color:#ff0000;font-weight:bold;">Status: Disconnected</label>
+        </div>
+        
+        <div style="margin-top:20px;text-align:center;">
+            <input type="button" value="Save & Connect" onclick="OnSave" style="width:120px;height:30px;" class="mc_light_grey_button_with_fillet" />
+            <input type="button" value="Cancel" onclick="OnClose" style="margin-left:20px;width:80px;height:30px;" class="mc_light_grey_button_with_fillet" />
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

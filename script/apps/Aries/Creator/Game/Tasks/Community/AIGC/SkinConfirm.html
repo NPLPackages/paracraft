@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    SkinConfirm = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/AIGC/SkinConfirm.lua")
+    SkinConfirm.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetBigIconStyle(text)
+        return string.format("margin-left:12px;margin-top:12px;width:64px;height:64px;background:url(%s);", text or "");
+    end
+
+    function ShowVip()
+        local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+        VipPage.ShowPage("ChangeAvatarSkin", "尽享精彩形象");
+    end 
+
+    function GetBuyText()
+        return SkinConfirm.GetBuyText()
+    end
+
+    function OnclickPreview()
+        SkinConfirm.OnClickPreview()
+    end
+
+    function OnClickNext()
+        SkinConfirm.OnClickNext()
+    end
+
+    function GetSkinData()
+        return SkinConfirm.skinData
+    end
+
+    function GetSkinWidth()
+        local num = #SkinConfirm.skinData
+        return 110 * num + 10
+    end
+
+    local colors = {
+        [25] = "#8685C9",
+        [50] = "#34C827",
+        [100] = "#4890F6",
+        [200] = "#8B4DF6",
+        [400] = "#F68248",
+        [800] = "#FF5555",
+    }
+    
+    function GetBackMcml(price)
+        local price = tonumber(price) or 0
+        local color = colors[price] or "#FFFFFF"
+        local mcmlStr = [[<pe:container ClickThrough="true" visible="true" zorder="-3"  style='position: relative; width: 100px; height: 120x;background-color: %s; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#44 528 32 32:15 15 15 15);'></pe:container>]]
+        return string.format(mcmlStr, color)
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#00000088"  > 
+    <div zorder="-3" align="center" valign="center" style=" width: 430px; height: 350px; background: url(Texture/Aries/Creator/keepwork/Community/confirmbg_858x696_32bits.png#0 0 858 696);">
+        <div style="width: 430px; height: 46px;">
+            <div style="position: relative; text-align: center; font-size: 18px; base-font-size: 18px; color: #FFFFFF; margin-top: 13px; font-weight: bold; text-shadow:true;shadow-quality:8;shadow-color:#1fffffff;"><%=L"获取高级外观"%></div>
+            <input onclick="ClosePage" align="right" type="button" style="position: relative; margin-right: 16px; margin-top: 16px; width: 18px; height: 18px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#4 394 34 36);"/>
+        </div>
+        <div style="height: 30px; margin-left: 90px; margin-top: 20px;">
+            <%=GetBuyText()%>
+        </div>
+        <div style="width: 430px; height: 120px; margin-top: 16px;">
+            <input type="button" onclick="OnclickPreview" uiname="SkinConfirm.previewAvatar" value=""  style="position: relative; width: 30px; height: 25px; margin-left: 10px;  margin-top: 50px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#215 445 28 26);" />
+            <pe:container ClickThrough="true" SelfPaint="true" style="position: relative; width: 330px; height: 120px; margin-left: 50px; background: url();">
+                <pe:container uiname="item_bg" width="<%=GetSkinWidth()%>" style="height: 120px; background: url();">
+                    <div style="margin-left: -5px;">
+                        <pe:repeat DataSource="<%=GetSkinData()%>" >
+                            <pe:repeatitem style="float:left;width:100px; ">
+                                <div style="float:left; margin-left: 10px; width:100px;height:120px; ">
+                                    <div style="position: relative; width:100px;height:120x;background:url();">
+                                        <div style="margin-left:9px;margin-top:8px;width:100px;height:96px;">
+                                            <div style='<%=GetBigIconStyle(Eval("icon"))%>'></div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; margin-top:96px;width:100px; color: #ffffff; font-size: 14px; base-font-size: 14px; font-weight: bold; text-align:center;">
+                                        <%=commonlib.GetLimitLabel(Eval("name"),7)%>
+                                    </div>
+                                    <div style="position: relative; margin-left: 6px; margin-top: 6px;">
+                                        <div zorder="1" style="float: left; width: 14px; height: 14px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#328 423 30 30);"></div>
+                                        <div style="float: left; margin-left: 6px; margin-top: -4px; font-size:14px;color:#ffffff; base-font-size:14px; text-shadow:true;shadow-quality:8;shadow-color:#80666666"><%=Eval("price")%></div>
+                                    </div>
+                                    <pe:container ClickThrough="true" visible="true" zorder="-2"  style='position: relative; width: 100px; height: 120x;background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#676 180 200 240);'></pe:container>
+                                    <%= GetBackMcml(Eval("price")) %>
+                                </div>
+                            </pe:repeatitem>
+                        </pe:repeat>
+                    </div>
+                </pe:container>
+            </pe:container>
+            <input type="button" onclick="OnClickNext" uiname="SkinConfirm.nextAvatar" value=""  style="position: relative; margin-left: 390px; margin-top: 50px; width: 30px; height: 25px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#281 445 28 26 );" />
+        </div>
+
+        <div style="text-align: center; color: #86909C; font-size: 10px; base-font-size: 10px; margin-top: 24px;">
+            说明：每次换装都会消耗一定的知识币
+        </div>
+        <div zorder="-1" onclick="ClosePage" style="float: left; margin-left: 100px; height: 36px; margin-top: 10px; width: 108px; font-size: 14px; base-font-size: 14px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#682 92 224 80);">
+            <div style="float: left; margin-top: 7px; margin-left: 39px;"><%=L'取消'%></div>
+        </div>
+        <div zorder="-1" onclick="SkinConfirm.OnClickFirm()" style="float: left; margin-top: 10px; margin-left: 12px; height: 36px; width: 108px; font-size: 14px; base-font-size: 14px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#682 4 224 80);">
+            <div style="float: left; margin-top: 7px; margin-left: 25px;"><%=L'确认支付'%></div>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

@@ -148,14 +148,16 @@ end
 function Actor:BindItemStackToTimeSeries()
 	-- needs to clear all multi variable, otherwise undo function will not work properly. 
 	self.custom_vars = {};
-	local timeseries = self.itemStack:GetDataField("timeseries");
-	if(not timeseries) then
-		timeseries = {};
-		self.itemStack:SetDataField("timeseries", timeseries);
+	if(self.itemStack) then
+		local timeseries = self.itemStack:GetDataField("timeseries");
+		if(not timeseries) then
+			timeseries = {};
+			self.itemStack:SetDataField("timeseries", timeseries);
+		end
+		self.TimeSeries:LoadFromTable(timeseries);
+		self:dataSourceChanged();
+		self:SetModified();
 	end
-	self.TimeSeries:LoadFromTable(timeseries);
-	self:dataSourceChanged();
-	self:SetModified();
 end
 
 function Actor:GetBoundRadius()
@@ -403,6 +405,7 @@ function Actor:SelectMe()
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
 			local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=obj})
 			task:Run();	
+			return true
 		end
 	end
 end
@@ -438,6 +441,7 @@ function Actor:SetRecording(isRecording)
 			if(isRecording) then
 				--self:RemoveKeysInTimeRange(self:GetTime(), self:GetCurrentRecordingEndTime());
 				self:ClearRecordToTime();
+				self.startRecordTime = self:GetTime();
 			end
 			
 			local movieClip = self:GetMovieClip();
@@ -691,16 +695,38 @@ function Actor:RestartRecording()
 	self:Resume();
 end
 
+-- skip non-static 
+function Actor:IsRecordableKey(keyname)
+	return keyname~="isAgent" and keyname~="name";
+end
+
 -- clear all record to a given time. if curTime is nil, it will use the current time. 
 function Actor:ClearRecordToTime(curTime)
 	-- trim all keys to current time
 	local curTime = curTime or self:GetTime();
 	if(curTime) then
 		if(curTime <= 0) then
-			self.TimeSeries:TrimEnd(curTime-1)
-		else
-			self.TimeSeries:TrimEnd(curTime);
+			curTime = curTime-1
 		end	
+		
+		for k,v in pairs(self.TimeSeries:GetData()) do
+			if(type(v) == "table" and v.TrimEnd) then
+				if(self:IsRecordableKey(k)) then
+					v:TrimEnd(curTime);
+				end
+			end	
+		end
+		-- bones animations are not cleared
+		if(false and self.TimeSeries:GetChildren()) then
+			for k,v in pairs(self.TimeSeries:GetChildren()) do
+				if(type(v) == "table" and v.TrimEnd) then
+					if(self:IsRecordableKey(k)) then
+						v:TrimEnd(curTime);
+					end
+				end	
+			end
+		end
+	
 		self:SetModified();
 	end
 end

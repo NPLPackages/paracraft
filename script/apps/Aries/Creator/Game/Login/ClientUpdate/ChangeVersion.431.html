@@ -1,0 +1,64 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ClientUpdate/UpdateResultDialog.html?latestVersion&curVersion=" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+    ChangeVersion = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdate/ChangeVersion.lua")
+    ChangeVersion.OnInit()
+
+    function OnClose()
+        Page:CloseWindow();
+    end
+
+    function OnClickOpen()
+    end
+
+    function use_mini_version()
+        ChangeVersion.OnClickOldVersion()
+    end
+
+    function use_latest_version()
+        ChangeVersion.OnClickChangeNewVersion()
+    end
+
+    function GetNotice()
+        return ChangeVersion.htmlData
+    end
+]]></script>
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #040A1CCC;">
+    <pe:container alignment="_ct" width="600" height="420" style="margin-left:-300px;margin-top:-200px;background: ;">
+        <div style="width: 600px;height: 420px;">
+            <div style="width: 600px;height: 40px;margin-top: 0px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdin_54x60_32bits.png#0 0 54 60:20 20 20 20;">
+                <div style="float: left;margin-left: 20px;margin-top: 6px;color: #ffffff;font-size: 20px;base-font-size: 20px;font-weight: bold;"><%=L"软件版本"%></div>
+                <div onclick="OnClose()" style="float: left;margin-left: 570px;margin-top: -20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+            </div>
+            <div style="width: 600px;height: 380px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdi_54x60_32bits.png#0 0 54 54:25 25 25 25;">
+                <div style="margin-left: 30px; font-size: 16px;base-font-size: 16px; font-weight: bold; margin-top: 15px;">
+                    <div><%=L"当前版本：" .. ChangeVersion.current_version %></div>
+                </div>
+                <div style="margin-left: 30px; font-size: 16px;base-font-size: 16px; font-weight: bold; margin-top: 15px;">
+                    <div style="float: left;"><%=L"稳定版本（推荐）：" .. ChangeVersion.mini_version %></div>
+                    <input type="button" value='<%=L"切换到该版本"%>' onclick="use_mini_version"  style="float: left; margin-left: 70px; color: #404BF5; width: 120px; height: 30px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu_40x30_32bits.png#0 0 40 30:18 14 18 14);"/>
+                </div>
+                <div style="margin-left: 30px; font-size: 16px;base-font-size: 16px; font-weight: bold; margin-top: 15px;">
+                    <div style="float: left;"><%=L"最新预览版本：".. ChangeVersion.latest_version%></div>
+                    <input type="button" value='<%=L"切换到该版本"%>' onclick="use_latest_version"  style="float: left; margin-left: 105px; color: #404BF5; width: 120px; height: 30px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu_40x30_32bits.png#0 0 40 30:18 14 18 14);"/>
+                </div>   
+                <div style="margin-left: 18px; margin-top: 22px; width: 564px; height: 202px; background: url(Texture/Aries/Creator/paracraft/login/Update/input_64x64_32bits.png#0 0 64 64:30 30 30 30);">
+                    <pe:treeview style='margin-top: 10px; height:180px;  background:;'
+                                VerticalScrollBarOffsetX='4'
+                                VerticalScrollBarStep=“20”>
+                        <div style="width: 520px; color: #14233D;">
+                            <%= GetNotice() %>
+                        </div>
+                    </pe:treeview>
+                </div>             
+            </div>
+        </div>
+    </pe:container>
+</pe:container>     
+    
+</pe:mcml>
+</body>
+</html>

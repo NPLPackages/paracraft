@@ -1,0 +1,880 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Advanced CCS modification page for Aries p</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="EditCCSTask.lua">
+EditCCSTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCCSTask");
+EditCCSTask.OnInit();
+    
+function DS_Func_Hairs(index)
+    return EditCCSTask.DS_Func_Hairs(index)
+end
+
+function DS_Func_BaseSkins(index)
+    return EditCCSTask.DS_Func_BaseSkins(index)
+end
+
+function DS_Func_CartoonFace(index_Func)
+    return EditCCSTask.GetDS_Func_CartoonFace(index_Func)
+end
+
+function Custom_ComposedFace(params)
+    EditCCSTask.Custom_ComposedFace(params)
+end
+
+function ClickCartoonFaceComponent(value)
+    EditCCSTask.ClickCartoonFaceComponent(value)
+end
+
+function DS_Func_CharacterSlot(index_Func)
+    return EditCCSTask.GetDS_Func_CharacterSlot(index_Func)
+end
+
+function DS_Items(index)
+    if(index == nil) then
+        return 1;
+    elseif(index == 1) then
+        return {};
+    end
+end
+
+function OnClose()
+    Page:CloseWindow();
+end
+</script>
+<aries:window style="width:400px;height:600px" title='<%=L"换装"%>' mode="thin" onclose="OnClose">
+<pe:tabs name="AdvTools" style="margin:8px">
+    <pe:tab-item name="CartoonFace" text="脸和肤色" selected="true" style="padding:4px">
+        <div style="" class="default">
+        <div>肤色：</div>
+        <pe:gridview DataSource="<%=DS_Func_BaseSkins%>" name="BaseSkins" style="height:64px" 
+             VerticalScrollBarStep="64" CellPadding="0"  DefaultNodeHeight = "50" 
+             ItemsPerLine="7" AllowPaging="false">
+             <Columns>
+                 <a style="margin:0px;"
+                     onclick="EditCCSTask.TestSkin" param1='<%=Eval("color")%>'>
+                     <img style="width:48px;height:48px;" src='<%=Eval("img")%>'/>
+                 </a>
+             </Columns>
+        </pe:gridview>
+        <div>眼睛：</div>
+        <div style="background-color:#f7dfca">
+            <pe:gridview DataSource="<%=DS_Func_CartoonFace(6)%>" name="Mark" style="width:350px;height:142px;"
+                         VerticalScrollBarStep="71" CellPadding="0" DefaultNodeHeight="70"
+                         ItemsPerLine="4" AllowPaging="false">
+                <Columns>
+                    <a style="width:70px;height:70px;margin:0px;" tooltip='<%=Eval("tooltip")%>'
+                       onclick="EditCCSTask.TestFace" param1='<%=Eval("style")%>'>
+                        <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>' />
+                    </a>
+                </Columns>
+            </pe:gridview>
+        </div>
+        <pe:custom oncreate="Custom_ComposedFace" style="margin-top:10px;width:256px;height:256px;"/>
+        </div>
+    </pe:tab-item>
+
+    <pe:tab-item name="Aries Character Slots" text="手持" style="padding:4px">
+        <pe:gridview AllowPaging="False" pagesize="1" ItemsPerLine="1" style="height:500px;" VerticalScrollBarStep="20" name="gvCCSHandhelds" DataSource='<%=DS_Items%>' DefaultNodeHeight="500">
+            <Columns>
+            <form>
+                <div style="">
+                    <input type="button" value="左手空空" style="width:64px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="0"/>
+                    <input type="button" value="右手空空" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="0"/>
+                    <br/>
+                    <div style="height:20px;"/>
+<input type="button" value="男火新手" tooltip="31028_FirstFireRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31028"/>
+<input type="button" value="男冰新手" tooltip="31029_FirstIceRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31029"/>
+<input type="button" value="男风新手" tooltip="31030_FirstStormRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31030"/>
+<input type="button" value="男生新手" tooltip="31031_FirstLifeRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31031"/>
+<input type="button" value="男死新手" tooltip="31032_FirstDeathRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31032"/>
+<input type="button" value="男地新手" tooltip="31696_FirstMythRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31696"/>
+<br/>
+<input type="button" value="男火Lv1" tooltip="31003_1_FireGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31003"/>
+<input type="button" value="男冰Lv1" tooltip="31004_2_IceGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31004"/>
+<input type="button" value="男风Lv1" tooltip="31005_3_StormGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31005"/>
+<input type="button" value="男生Lv1" tooltip="31006_4_LifeGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31006"/>
+<input type="button" value="男死Lv1" tooltip="31007_5_DeathGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31007"/>
+<input type="button" value="男地Lv1" tooltip="31368_MythGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31368"/>
+<br/>
+<input type="button" value="男火Lv10" tooltip="31018_16_FireGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31018"/>
+<input type="button" value="男冰Lv10" tooltip="31019_17_IceGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31019"/>
+<input type="button" value="男风Lv10" tooltip="31020_18_StormGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31020"/>
+<input type="button" value="男生Lv10" tooltip="31021_19_LifeGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31021"/>
+<input type="button" value="男死Lv10" tooltip="31022_20_DeathGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31022"/>
+<input type="button" value="男地Lv10" tooltip="31699_MythGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31699"/>
+<br/>
+<input type="button" value="男火Lv20" tooltip="31033_31_FireGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31033"/>
+<input type="button" value="男冰Lv20" tooltip="31034_32_IceGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31034"/>
+<input type="button" value="男风Lv20" tooltip="31035_33_StormGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31035"/>
+<input type="button" value="男生Lv20" tooltip="31036_34_LifeGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31036"/>
+<input type="button" value="男死Lv20" tooltip="31037_35_DeathGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31037"/>
+<input type="button" value="男地Lv20" tooltip="31701_MythGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31701"/>
+<br/>
+<input type="button" value="男火Lv30" tooltip="31048_46_FireGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31048"/>
+<input type="button" value="男冰Lv30" tooltip="31049_47_IceGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31049"/>
+<input type="button" value="男风Lv30" tooltip="31050_48_StormGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31050"/>
+<input type="button" value="男生Lv30" tooltip="31051_49_LifeGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31051"/>
+<input type="button" value="男死Lv30" tooltip="31052_50_DeathGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31052"/>
+<input type="button" value="男地Lv30" tooltip="31703_MythGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31703"/>
+<br/>
+<input type="button" value="男火Lv40" tooltip="31063_61_FireGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31063"/>
+<input type="button" value="男冰Lv40" tooltip="31064_62_IceGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31064"/>
+<input type="button" value="男风Lv40" tooltip="31065_63_StormGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31065"/>
+<input type="button" value="男生Lv40" tooltip="31066_64_LifeGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31066"/>
+<input type="button" value="男死Lv40" tooltip="31067_65_DeathGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31067"/>
+<input type="button" value="男地Lv40" tooltip="31705_MythGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31705"/>
+<br/>
+<input type="button" value="男火Lv48" tooltip="31078_76_FireGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31078"/>
+<input type="button" value="男冰Lv48" tooltip="31079_77_IceGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31079"/>
+<input type="button" value="男风Lv48" tooltip="31080_78_StormGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31080"/>
+<input type="button" value="男生Lv48" tooltip="31081_79_LifeGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31081"/>
+<input type="button" value="男死Lv48" tooltip="31082_80_DeathGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31082"/>
+<input type="button" value="男地Lv48" tooltip="31767_MythGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31767"/>
+<br/>
+<input type="button" value="男火Lv55" tooltip="31914_FireGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31914"/>
+<input type="button" value="男冰Lv55" tooltip="31915_IceGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31915"/>
+<input type="button" value="男风Lv55" tooltip="31916_StormGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31916"/>
+<input type="button" value="男生Lv55" tooltip="31917_LifeGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31917"/>
+<input type="button" value="男死Lv55" tooltip="31918_DeathGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31918"/>
+<input type="button" value="男地Lv55" tooltip="32110_MythGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="32110"/>
+<br/>
+<input type="button" value="女火新手" tooltip="31028_FirstFireRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31028"/>
+<input type="button" value="女冰新手" tooltip="31029_FirstIceRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31029"/>
+<input type="button" value="女风新手" tooltip="31030_FirstStormRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31030"/>
+<input type="button" value="女生新手" tooltip="31031_FirstLifeRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31031"/>
+<input type="button" value="女死新手" tooltip="31032_FirstDeathRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31032"/>
+<input type="button" value="女地新手" tooltip="31696_FirstMythRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31696"/>
+<br/>
+<input type="button" value="女火Lv1" tooltip="41003_1_FireGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31003"/>
+<input type="button" value="女冰Lv1" tooltip="41004_2_IceGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31004"/>
+<input type="button" value="女风Lv1" tooltip="41005_3_StormGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31005"/>
+<input type="button" value="女生Lv1" tooltip="41006_4_LifeGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31006"/>
+<input type="button" value="女死Lv1" tooltip="41007_5_DeathGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31007"/>
+<input type="button" value="女地Lv1" tooltip="41368_MythGreenRightHandLv1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31368"/>
+<br/>
+<input type="button" value="女火Lv10" tooltip="31018_16_FireGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31018"/>
+<input type="button" value="女冰Lv10" tooltip="31019_17_IceGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31019"/>
+<input type="button" value="女风Lv10" tooltip="31020_18_StormGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31020"/>
+<input type="button" value="女生Lv10" tooltip="31021_19_LifeGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31021"/>
+<input type="button" value="女死Lv10" tooltip="31022_20_DeathGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31022"/>
+<input type="button" value="女地Lv10" tooltip="31699_MythGreenRightHandLv10" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31699"/>
+<br/>
+<input type="button" value="女火Lv20" tooltip="31033_31_FireGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31033"/>
+<input type="button" value="女冰Lv20" tooltip="31034_32_IceGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31034"/>
+<input type="button" value="女风Lv20" tooltip="31035_33_StormGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31035"/>
+<input type="button" value="女生Lv20" tooltip="31036_34_LifeGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31036"/>
+<input type="button" value="女死Lv20" tooltip="31037_35_DeathGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31037"/>
+<input type="button" value="女地Lv20" tooltip="31701_MythGreenRightHandLv20" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31701"/>
+<br/>
+<input type="button" value="女火Lv30" tooltip="31048_46_FireGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31048"/>
+<input type="button" value="女冰Lv30" tooltip="31049_47_IceGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31049"/>
+<input type="button" value="女风Lv30" tooltip="31050_48_StormGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31050"/>
+<input type="button" value="女生Lv30" tooltip="31051_49_LifeGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31051"/>
+<input type="button" value="女死Lv30" tooltip="31052_50_DeathGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31052"/>
+<input type="button" value="女地Lv30" tooltip="31703_MythGreenRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31703"/>
+<br/>
+<input type="button" value="女火Lv40" tooltip="31063_61_FireGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31063"/>
+<input type="button" value="女冰Lv40" tooltip="31064_62_IceGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31064"/>
+<input type="button" value="女风Lv40" tooltip="31065_63_StormGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31065"/>
+<input type="button" value="女生Lv40" tooltip="31066_64_LifeGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31066"/>
+<input type="button" value="女死Lv40" tooltip="31067_65_DeathGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31067"/>
+<input type="button" value="女地Lv40" tooltip="31705_MythGreenRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31705"/>
+<br/>
+<input type="button" value="女火Lv48" tooltip="31078_76_FireGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31078"/>
+<input type="button" value="女冰Lv48" tooltip="31079_77_IceGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31079"/>
+<input type="button" value="女风Lv48" tooltip="31080_78_StormGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31080"/>
+<input type="button" value="女生Lv48" tooltip="31081_79_LifeGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31081"/>
+<input type="button" value="女死Lv48" tooltip="31082_80_DeathGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31082"/>
+<input type="button" value="女地Lv48" tooltip="31767_MythGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31767"/>
+<br/>
+<input type="button" value="女火Lv55" tooltip="31914_FireGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31914"/>
+<input type="button" value="女冰Lv55" tooltip="31915_IceGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31915"/>
+<input type="button" value="女风Lv55" tooltip="31916_StormGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31916"/>
+<input type="button" value="女生Lv55" tooltip="31917_LifeGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31917"/>
+<input type="button" value="女死Lv55" tooltip="31918_DeathGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31918"/>
+<input type="button" value="女地Lv55" tooltip="31918_DeathGreenRightHandLv55" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31918"/>
+<br/>
+<input type="button" value="副手Lv40" tooltip="31594_1_AllGreenLeftHandLv40" style="width:55px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="31594"/>
+<input type="button" value="副手Lv45" tooltip="31752_AllGreenLeftHandLv45" style="width:55px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="31752"/>
+<input type="button" value="先驱法杖" tooltip="31009_VeteranRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31009"/>
+<input type="button" value="奥能Lv1" tooltip="31770_AreaRighthand_VIPLV1" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31770"/>
+<input type="button" value="奥能Lv2" tooltip="31771_AreaRighthand_VIPLV2" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31771"/>
+<input type="button" value="奥能Lv3" tooltip="31772_AreaRighthand_VIPLV3" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31772"/>
+<br/>
+<input type="button" value="棒棒糖" tooltip="35024_MagicHandHeld" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35024"/>
+<input type="button" value="放大镜" tooltip="35025_MagicHandHeld" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35025"/>
+<input type="button" value="蓝色风车" tooltip="35026_MagicHandHeld" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35026"/>
+<input type="button" value="粉红风车" tooltip="35027_MagicHandHeld" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35027"/>
+<input type="button" value="黄色风车" tooltip="35028_MagicHandHeld" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35028"/>
+<input type="button" value="英雄权杖" tooltip="35115_MagicHandForGoldBeen" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35115"/>
+<br/>
+<input type="button" value="荣誉Lv30" tooltip="31805_FireRightHandLv30" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31805"/>
+<input type="button" value="荣誉Lv40" tooltip="31810_FireRightHandLv40" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31810"/>
+<input type="button" value="荣誉Lv48" tooltip="31842_FireGreenRightHandLv45" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31842"/>
+<input type="button" value="副荣誉40" tooltip="31816_AllPurpleLeftHandLv40" style="width:55px;" onclick="EditCCSTask.ClickLeftHandUpdate" gsid="31816"/>
+<input type="button" value="副荣誉48" tooltip="31841_AllGreenLeftHandLv45" style="width:55px;" 
+onclick="EditCCSTask.ClickLeftHandUpdate" gsid="31841"/>
+<input type="button" value="龙魂魔典" tooltip="31925_AllGreenLeftHandLv55" style="width:55px;" 
+onclick="EditCCSTask.ClickLeftHandUpdate" gsid="31925"/>
+<br/>
+<input type="button" value="男春装" tooltip="35037_MagicHandHeld_Boy" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35037"/>
+<input type="button" value="男夏装" tooltip="35038_MagicHandHeld_Boy" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35038"/>
+<input type="button" value="男秋装" tooltip="35039_MagicHandHeld_Boy" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35039"/>
+<input type="button" value="男冬装" tooltip="35040_MagicHandHeld_Boy" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35040"/>
+<input type="button" value="男熊猫" tooltip="35160_PandaRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35160"/>
+<input type="button" value="男婚纱" tooltip="35158_MerryWand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35158"/>
+<br/>
+<input type="button" value="女春装" tooltip="35041_MagicHandHeld_Girl" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35041"/>
+<input type="button" value="女夏装" tooltip="35042_MagicHandHeld_Girl" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35042"/>
+<input type="button" value="女秋装" tooltip="35043_MagicHandHeld_Girl" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35043"/>
+<input type="button" value="女冬装" tooltip="35044_MagicHandHeld_Girl" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35044"/>
+<input type="button" value="女熊猫" tooltip="45160_PandaRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="45160"/>
+<input type="button" value="女婚纱" tooltip="35159_MerryFlower" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35159"/>
+<br/>
+<input type="button" value="男圣诞1" tooltip="35066_ChristmasRedWand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35066"/>
+<input type="button" value="男圣诞2" tooltip="35067_ChristmasGreenWand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35067"/>
+<input type="button" value="男圣诞3" tooltip="35068_ChristmasWhiteWand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35068"/>
+<input type="button" value="女圣诞1" tooltip="35069_ChristmasRedCandy" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35069"/>
+<input type="button" value="女圣诞2" tooltip="35070_ChristmasGreenCandy" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35070"/>
+<input type="button" value="女圣诞3" tooltip="35071_ChristmasWhiteCandy" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35071"/>
+<br/>
+<input type="button" value="男春节1" tooltip="35140_NewYearBrownWand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35140"/>
+<input type="button" value="男春节2" tooltip="35141_NewYearWhiteWand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35141"/>
+<input type="button" value="男春节3" tooltip="35142_NewYearBlackWand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35142"/>
+<input type="button" value="女春节1" tooltip="35143_NewYearBrownFan" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35143"/>
+<input type="button" value="女春节2" tooltip="35144_NewYearWhiteFan" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35144"/>
+<input type="button" value="女春节3" tooltip="35145_NewYearBlackFan" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35145"/>
+<br/>
+<input type="button" value="男白熊" tooltip="35214_WhiteBearXFish" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35214"/>
+<input type="button" value="女白熊" tooltip="35215_WhiteBearFish" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35215"/>
+<input type="button" value="男法老" tooltip="35224_PharaohWand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35224"/>
+<input type="button" value="女法老" tooltip="35224_PharaohWand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35224"/>
+<input type="button" value="月石之语" tooltip="31763_BalanceRightHand_DPS" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31763"/>
+<input type="button" value="黑曜法杖" tooltip="31912_BalanceRightHand_Devil" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="31912"/>
+<br/>
+<input type="button" value="王者权杖" tooltip="35248_KingRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35248"/>
+<input type="button" value="贤者权杖" tooltip="35249_OracleRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35249"/>
+<input type="button" value="吸血鬼杖" tooltip="35258_VampireRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35258"/>
+<input type="button" value="八卦扇" tooltip="35268_ShamanRightHand" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35268"/>
+<input type="button" value="逍遥扇" tooltip="35269_ShamanFan" style="width:55px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="35269"/>
+             
+                </div>
+            </form>
+            </Columns>
+        </pe:gridview>
+    </pe:tab-item>
+
+
+    <pe:tab-item name="NewCharacterAndClothes" text="衣服" style="padding:4px">
+    <pe:gridview AllowPaging="False" pagesize="1" ItemsPerLine="1" style="height:500px;" VerticalScrollBarStep="20" name="gvCCSItems" DataSource='<%=DS_Items%>' DefaultNodeHeight="500">
+        <Columns>
+<input type="button" value="衣服空空" style="width:64px;" onclick="EditCCSTask.ClickNoClothes" gsid="0"/>
+<br/>
+<input type="button" value="男创角" tooltip="31001_InitialEquipmentSuit" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31001" slot="28"/>
+<input type="button" value="女创角" tooltip="41001_InitialEquipmentSuit" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41001" slot="28"/>
+<br/>
+<input type="button" value="男火Lv1" tooltip="31273_1_FireGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31273" slot="28"/>
+<input type="button" value="男冰Lv1" tooltip="31274_2_IceGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31274" slot="28"/>
+<input type="button" value="男风Lv1" tooltip="31275_3_StormGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31275" slot="28"/>
+<input type="button" value="男生Lv1" tooltip="31276_4_LifeGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31276" slot="28"/>
+<input type="button" value="男死Lv1" tooltip="31277_5_DeathGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31277" slot="28"/>
+<input type="button" value="男地Lv1" tooltip="31370_MythGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31370" slot="28"/>
+<br/>
+<input type="button" value="男火Lv10" tooltip="31288_16_FireGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31288" slot="28"/>
+<input type="button" value="男冰Lv10" tooltip="31289_17_IceGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31289" slot="28"/>
+<input type="button" value="男风Lv10" tooltip="31290_18_StormGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31290" slot="28"/>
+<input type="button" value="男生Lv10" tooltip="31291_19_LifeGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31291" slot="28"/>
+<input type="button" value="男死Lv10" tooltip="31292_20_DeathGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31292" slot="28"/>
+<input type="button" value="男地Lv10" tooltip="31717_MythGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31717" slot="28"/>
+<br/>
+<input type="button" value="男火Lv20" tooltip="31303_31_FireGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31303" slot="28"/>
+<input type="button" value="男冰Lv20" tooltip="31304_32_IceGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31304" slot="28"/>
+<input type="button" value="男风Lv20" tooltip="31305_33_StormGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31305" slot="28"/>
+<input type="button" value="男生Lv20" tooltip="31306_34_LifeGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31306" slot="28"/>
+<input type="button" value="男死Lv20" tooltip="31307_35_DeathGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31307" slot="28"/>
+<input type="button" value="男地Lv20" tooltip="31719_MythGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31719" slot="28"/>
+<br/>
+<input type="button" value="男火Lv30" tooltip="31318_46_FireGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31318" slot="28"/>
+<input type="button" value="男冰Lv30" tooltip="31319_47_IceGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31319" slot="28"/>
+<input type="button" value="男风Lv30" tooltip="31320_48_StormGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31320" slot="28"/>
+<input type="button" value="男生Lv30" tooltip="31321_49_LifeGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31321" slot="28"/>
+<input type="button" value="男死Lv30" tooltip="31322_50_DeathGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31322" slot="28"/>
+<input type="button" value="男地Lv30" tooltip="31721_MythGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31721" slot="28"/>
+<br/>
+<input type="button" value="男火Lv40" tooltip="31333_61_FireGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31333" slot="28"/>
+<input type="button" value="男冰Lv40" tooltip="31334_62_IceGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31334" slot="28"/>
+<input type="button" value="男风Lv40" tooltip="31335_63_StormGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31335" slot="28"/>
+<input type="button" value="男生Lv40" tooltip="31336_64_LifeGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31336" slot="28"/>
+<input type="button" value="男死Lv40" tooltip="31337_65_DeathGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31337" slot="28"/>
+<input type="button" value="男地Lv40" tooltip="31723_MythGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31723" slot="28"/>
+<br/>
+<input type="button" value="男火Lv48" tooltip="31778_FireGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31778" slot="28"/>
+<input type="button" value="男冰Lv48" tooltip="31779_IceGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31779" slot="28"/>
+<input type="button" value="男风Lv48" tooltip="31780_StromGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31780" slot="28"/>
+<input type="button" value="男生Lv48" tooltip="31781_LifeGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31781" slot="28"/>
+<input type="button" value="男死Lv48" tooltip="31782_DeathGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31782" slot="28"/>
+<input type="button" value="男地Lv48" tooltip="31801_MythGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31801" slot="28"/>
+<br/>
+<input type="button" value="男火Lv55" tooltip="31935_FireGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31935" slot="28"/>
+<input type="button" value="男冰Lv55" tooltip="31936_IceGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31936" slot="28"/>
+<input type="button" value="男风Lv55" tooltip="31937_StromGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31937" slot="28"/>
+<input type="button" value="男生Lv55" tooltip="31938_LifeGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31938" slot="28"/>
+<input type="button" value="男死Lv55" tooltip="31939_DeathGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31939" slot="28"/>
+<input type="button" value="男地Lv55" tooltip="32113_MythGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="32113" slot="28"/>
+<br/>
+<input type="button" value="女火Lv1" tooltip="41273_1_FireGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41273" slot="28"/>
+<input type="button" value="女冰Lv1" tooltip="41274_2_IceGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41274" slot="28"/>
+<input type="button" value="女风Lv1" tooltip="41275_3_StormGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41275" slot="28"/>
+<input type="button" value="女生Lv1" tooltip="41276_4_LifeGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41276" slot="28"/>
+<input type="button" value="女死Lv1" tooltip="41277_5_DeathGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41277" slot="28"/>
+<input type="button" value="女地Lv1" tooltip="41370_MythGreenSuitLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41370" slot="28"/>
+<br/>
+<input type="button" value="女火Lv10" tooltip="41288_16_FireGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41288" slot="28"/>
+<input type="button" value="女冰Lv10" tooltip="41289_17_IceGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41289" slot="28"/>
+<input type="button" value="女风Lv10" tooltip="41290_18_StormGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41290" slot="28"/>
+<input type="button" value="女生Lv10" tooltip="41291_19_LifeGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41291" slot="28"/>
+<input type="button" value="女死Lv10" tooltip="41292_20_DeathGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41292" slot="28"/>
+<input type="button" value="女地Lv10" tooltip="41717_MythGreenSuitLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41717" slot="28"/>
+<br/>
+<input type="button" value="女火Lv20" tooltip="41303_31_FireGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41303" slot="28"/>
+<input type="button" value="女冰Lv20" tooltip="41304_32_IceGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41304" slot="28"/>
+<input type="button" value="女风Lv20" tooltip="41305_33_StormGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41305" slot="28"/>
+<input type="button" value="女生Lv20" tooltip="41306_34_LifeGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41306" slot="28"/>
+<input type="button" value="女死Lv20" tooltip="41307_35_DeathGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41307" slot="28"/>
+<input type="button" value="女地Lv20" tooltip="41719_MythGreenSuitLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41719" slot="28"/>
+<br/>
+<input type="button" value="女火Lv30" tooltip="41318_46_FireGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41318" slot="28"/>
+<input type="button" value="女冰Lv30" tooltip="41319_47_IceGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41319" slot="28"/>
+<input type="button" value="女风Lv30" tooltip="41320_48_StormGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41320" slot="28"/>
+<input type="button" value="女生Lv30" tooltip="41321_49_LifeGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41321" slot="28"/>
+<input type="button" value="女死Lv30" tooltip="41322_50_DeathGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41322" slot="28"/>
+<input type="button" value="女地Lv30" tooltip="41721_MythGreenSuitLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41721" slot="28"/>
+<br/>
+<input type="button" value="女火Lv40" tooltip="41333_61_FireGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41333" slot="28"/>
+<input type="button" value="女冰Lv40" tooltip="41334_62_IceGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41334" slot="28"/>
+<input type="button" value="女风Lv40" tooltip="41335_63_StormGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41335" slot="28"/>
+<input type="button" value="女生Lv40" tooltip="41336_64_LifeGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41336" slot="28"/>
+<input type="button" value="女死Lv40" tooltip="41337_65_DeathGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41337" slot="28"/>
+<input type="button" value="女地Lv40" tooltip="41723_MythGreenSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41723" slot="28"/>
+<br/>
+<input type="button" value="女火Lv48" tooltip="41778_FireGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41778" slot="28"/>
+<input type="button" value="女冰Lv48" tooltip="41779_IceGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41779" slot="28"/>
+<input type="button" value="女风Lv48" tooltip="41780_StromGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41780" slot="28"/>
+<input type="button" value="女生Lv48" tooltip="41781_LifeGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41781" slot="28"/>
+<input type="button" value="女死Lv48" tooltip="41782_DeathGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41782" slot="28"/>
+<input type="button" value="女地Lv48" tooltip="41801_MythGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41801" slot="28"/>
+<br/>
+<input type="button" value="女火Lv55" tooltip="41935_FireGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41935" slot="28"/>
+<input type="button" value="女冰Lv55" tooltip="41936_IceGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41936" slot="28"/>
+<input type="button" value="女风Lv55" tooltip="41937_StromGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41937" slot="28"/>
+<input type="button" value="女生Lv55" tooltip="41938_LifeGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41938" slot="28"/>
+<input type="button" value="女死Lv55" tooltip="41939_DeathGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41939" slot="28"/>
+<input type="button" value="女地Lv55" tooltip="41939_DeathGreenSuit_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41939" slot="28"/>
+<br/>
+<input type="button" value="男春装" tooltip="35001_MagicColorfulShirt_Spring_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35001" slot="28"/>
+<input type="button" value="男夏装" tooltip="35009_MagicColorfulShirt_Summer_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35009" slot="28"/>
+<input type="button" value="男秋装" tooltip="35017_MagicColorfulShirt_Fall_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35017" slot="28"/>
+<input type="button" value="男冬装" tooltip="35030_MagicColorfulShirt_Winter_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35030" slot="28"/>
+<input type="button" value="男荣誉Lv40" tooltip="31813_FireSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31813" slot="28"/>
+<input type="button" value="男荣誉Lv48" tooltip="31845_FireGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31845" slot="28"/>
+<br/>
+<input type="button" value="女春装" tooltip="35005_MagicColorfulShirt_Spring_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35005" slot="28"/>
+<input type="button" value="女夏装" tooltip="35013_MagicColorfulShirt_Summer_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35013" slot="28"/>
+<input type="button" value="女秋装" tooltip="35021_MagicColorfulShirt_Fall_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35021" slot="28"/>
+<input type="button" value="女冬装" tooltip="35034_MagicColorfulShirt_Winter_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35034" slot="28"/>
+<input type="button" value="女荣誉Lv40" tooltip="41813_FireSuitLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41813" slot="28"/>
+<input type="button" value="女荣誉Lv48" tooltip="41845_FireGreenSuit_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41845" slot="28"/>
+<br/>
+<input type="button" value="男圣诞1" tooltip="35048_ChristmasRedSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35048" slot="28"/>
+<input type="button" value="男圣诞2" tooltip="35049_ChristmasGreenSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35049" slot="28"/>
+<input type="button" value="男圣诞3" tooltip="35050_ChristmasWhiteSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35050" slot="28"/>
+<input type="button" value="女圣诞1" tooltip="35051_ChristmasRedSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35051" slot="28"/>
+<input type="button" value="女圣诞2" tooltip="35052_ChristmasGreenSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35052" slot="28"/>
+<input type="button" value="女圣诞3" tooltip="35053_ChristmasWhiteSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35053" slot="28"/>
+<br/>
+<input type="button" value="男春节1" tooltip="35116_NewYearBrownSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35116" slot="28"/>
+<input type="button" value="男春节2" tooltip="35120_NewYearWhiteSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35120" slot="28"/>
+<input type="button" value="男春节3" tooltip="35124_NewYearBlackSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35124" slot="28"/>
+<input type="button" value="女春节1" tooltip="35128_NewYearBrownSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35128" slot="28"/>
+<input type="button" value="女春节2" tooltip="35132_NewYearWhiteSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35132" slot="28"/>
+<input type="button" value="女春节3" tooltip="35136_NewYearBlackSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35136" slot="28"/>
+<br/>
+<input type="button" value="男熊猫" tooltip="35146_PandaSuit" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35146" slot="28"/>
+<input type="button" value="女熊猫" tooltip="45146_PandaSuit" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="45146" slot="28"/>
+<input type="button" value="男婚纱" tooltip="35150_MerrySuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35150" slot="28"/>
+<input type="button" value="女婚纱" tooltip="35153_MerrySuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35153" slot="28"/>
+<input type="button" value="男吸血鬼" tooltip="35250_VampireSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35250" slot="28"/>
+<input type="button" value="女吸血鬼" tooltip="35253_VampireSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35253" slot="28"/>
+<br/>
+<input type="button" value="男白熊" tooltip="35206_WhiteBearSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35206" slot="28"/>
+<input type="button" value="女白熊" tooltip="35209_WhiteBearSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35209" slot="28"/>
+<input type="button" value="男法老" tooltip="35216_PharaohSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35216" slot="28"/>
+<input type="button" value="女法老" tooltip="35219_PharaohSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35219" slot="28"/>
+<input type="button" value="男阴阳师" tooltip="35260_ShamanSuit_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35260" slot="28"/>
+<input type="button" value="女阴阳师" tooltip="35263_ShamanSuit_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35263" slot="28"/>
+
+        </Columns>
+    </pe:gridview>
+    </pe:tab-item>
+
+    <pe:tab-item name="NewCharacterAndShoes" text="鞋子" style="padding:4px">
+    <pe:gridview AllowPaging="False" pagesize="1" ItemsPerLine="1" style="height:500px;" VerticalScrollBarStep="20" name="gvCCSItems" DataSource='<%=DS_Items%>' DefaultNodeHeight="500">
+        <Columns>
+<input type="button" value="衣服空空" style="width:64px;" onclick="EditCCSTask.ClickNoClothes" gsid="0"/>
+<br/>
+
+<input type="button" value="男创角" tooltip="31002_InitialEquipmentBoot" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31002" slot="19"/>
+<input type="button" value="女创角" tooltip="41002_InitialEquipmentBoot" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41002" slot="19"/>
+<br/>
+<input type="button" value="男火Lv1" tooltip="31363_1_FireGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31363" slot="19"/>
+<input type="button" value="男冰Lv1" tooltip="31364_2_IceGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31364" slot="19"/>
+<input type="button" value="男风Lv1" tooltip="31365_3_StormGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31365" slot="19"/>
+<input type="button" value="男生Lv1" tooltip="31366_4_LifeGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31366" slot="19"/>
+<input type="button" value="男死Lv1" tooltip="31367_5_DeathGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31367" slot="19"/>
+<input type="button" value="男地Lv1" tooltip="31371_MythGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31371" slot="19"/>
+<br/>
+<input type="button" value="男火Lv10" tooltip="31378_16_FireGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31378" slot="19"/>
+<input type="button" value="男冰Lv10" tooltip="31379_17_IceGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31379" slot="19"/>
+<input type="button" value="男风Lv10" tooltip="31380_18_StormGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31380" slot="19"/>
+<input type="button" value="男生Lv10" tooltip="31381_19_LifeGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31381" slot="19"/>
+<input type="button" value="男死Lv10" tooltip="31382_20_DeathGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31382" slot="19"/>
+<input type="button" value="男地Lv10" tooltip="31726_MythGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31726" slot="19"/>
+<br/>
+<input type="button" value="男火Lv20" tooltip="31393_31_FireGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31393" slot="19"/>
+<input type="button" value="男冰Lv20" tooltip="31394_32_IceGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31394" slot="19"/>
+<input type="button" value="男风Lv20" tooltip="31395_33_StormGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31395" slot="19"/>
+<input type="button" value="男生Lv20" tooltip="31396_34_LifeGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31396" slot="19"/>
+<input type="button" value="男死Lv20" tooltip="31397_35_DeathGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31397" slot="19"/>
+<input type="button" value="男地Lv20" tooltip="31728_MythGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31728" slot="19"/>
+<br/>
+<input type="button" value="男火Lv30" tooltip="31408_46_FireGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31408" slot="19"/>
+<input type="button" value="男冰Lv30" tooltip="31409_47_IceGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31409" slot="19"/>
+<input type="button" value="男风Lv30" tooltip="31410_48_StormGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31410" slot="19"/>
+<input type="button" value="男生Lv30" tooltip="31411_49_LifeGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31411" slot="19"/>
+<input type="button" value="男死Lv30" tooltip="31412_50_DeathGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31412" slot="19"/>
+<input type="button" value="男地Lv30" tooltip="31730_MythGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31730" slot="19"/>
+<br/>
+<input type="button" value="男火Lv40" tooltip="31423_61_FireGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31423" slot="19"/>
+<input type="button" value="男冰Lv40" tooltip="31424_62_IceGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31424" slot="19"/>
+<input type="button" value="男风Lv40" tooltip="31425_63_StormGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31425" slot="19"/>
+<input type="button" value="男生Lv40" tooltip="31426_64_LifeGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31426" slot="19"/>
+<input type="button" value="男死Lv40" tooltip="31427_65_DeathGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31427" slot="19"/>
+<input type="button" value="男地Lv40" tooltip="31732_MythGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31732" slot="19"/>
+<br/>
+<input type="button" value="男火Lv48" tooltip="31788_FireGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31788" slot="19"/>
+<input type="button" value="男冰Lv48" tooltip="31789_IceGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31789" slot="19"/>
+<input type="button" value="男风Lv48" tooltip="31790_StromGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31790" slot="19"/>
+<input type="button" value="男生Lv48" tooltip="31791_LifeGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31791" slot="19"/>
+<input type="button" value="男死Lv48" tooltip="31792_DeathGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31792" slot="19"/>
+<input type="button" value="男地Lv48" tooltip="31803_MythGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31803" slot="19"/>
+<br/>
+<input type="button" value="男火Lv55" tooltip="31945_FireGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31945" slot="19"/>
+<input type="button" value="男冰Lv55" tooltip="31946_IceGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31946" slot="19"/>
+<input type="button" value="男风Lv55" tooltip="31947_StromGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31947" slot="19"/>
+<input type="button" value="男生Lv55" tooltip="31948_LifeGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31948" slot="19"/>
+<input type="button" value="男死Lv55" tooltip="31949_DeathGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31949" slot="19"/>
+<input type="button" value="男地Lv55" tooltip="31949_DeathGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31949" slot="19"/>
+<br/>
+<input type="button" value="女火Lv1" tooltip="41363_1_FireGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41363" slot="19"/>
+<input type="button" value="女冰Lv1" tooltip="41364_2_IceGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41364" slot="19"/>
+<input type="button" value="女风Lv1" tooltip="41365_3_StormGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41365" slot="19"/>
+<input type="button" value="女生Lv1" tooltip="41366_4_LifeGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41366" slot="19"/>
+<input type="button" value="女死Lv1" tooltip="41367_5_DeathGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41367" slot="19"/>
+<input type="button" value="女地Lv1" tooltip="41371_MythGreenBootLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41371" slot="19"/>
+<br/>
+<input type="button" value="女火Lv10" tooltip="41378_16_FireGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41378" slot="19"/>
+<input type="button" value="女冰Lv10" tooltip="41379_17_IceGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41379" slot="19"/>
+<input type="button" value="女风Lv10" tooltip="41380_18_StormGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41380" slot="19"/>
+<input type="button" value="女生Lv10" tooltip="41381_19_LifeGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41381" slot="19"/>
+<input type="button" value="女死Lv10" tooltip="41382_20_DeathGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41382" slot="19"/>
+<input type="button" value="女地Lv10" tooltip="41726_MythGreenBootLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41726" slot="19"/>
+<br/>
+<input type="button" value="女火Lv20" tooltip="41393_31_FireGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41393" slot="19"/>
+<input type="button" value="女冰Lv20" tooltip="41394_32_IceGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41394" slot="19"/>
+<input type="button" value="女风Lv20" tooltip="41395_33_StormGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41395" slot="19"/>
+<input type="button" value="女生Lv20" tooltip="41396_34_LifeGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41396" slot="19"/>
+<input type="button" value="女死Lv20" tooltip="41397_35_DeathGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41397" slot="19"/>
+<input type="button" value="女地Lv20" tooltip="41728_MythGreenBootLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41728" slot="19"/>
+<br/>
+<input type="button" value="女火Lv30" tooltip="41408_46_FireGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41408" slot="19"/>
+<input type="button" value="女冰Lv30" tooltip="41409_47_IceGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41409" slot="19"/>
+<input type="button" value="女风Lv30" tooltip="41410_48_StormGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41410" slot="19"/>
+<input type="button" value="女生Lv30" tooltip="41411_49_LifeGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41411" slot="19"/>
+<input type="button" value="女死Lv30" tooltip="41412_50_DeathGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41412" slot="19"/>
+<input type="button" value="女地Lv30" tooltip="41730_MythGreenBootLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41730" slot="19"/>
+<br/>
+<input type="button" value="女火Lv40" tooltip="41423_61_FireGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41423" slot="19"/>
+<input type="button" value="女冰Lv40" tooltip="41424_62_IceGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41424" slot="19"/>
+<input type="button" value="女风Lv40" tooltip="41425_63_StormGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41425" slot="19"/>
+<input type="button" value="女生Lv40" tooltip="41426_64_LifeGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41426" slot="19"/>
+<input type="button" value="女死Lv40" tooltip="41427_65_DeathGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41427" slot="19"/>
+<input type="button" value="女地Lv40" tooltip="41732_MythGreenBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41732" slot="19"/>
+<br/>
+<input type="button" value="女火Lv48" tooltip="41788_FireGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41788" slot="19"/>
+<input type="button" value="女冰Lv48" tooltip="41789_IceGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41789" slot="19"/>
+<input type="button" value="女风Lv48" tooltip="41790_StromGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41790" slot="19"/>
+<input type="button" value="女生Lv48" tooltip="41791_LifeGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41791" slot="19"/>
+<input type="button" value="女死Lv48" tooltip="41792_DeathGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41792" slot="19"/>
+<input type="button" value="女地Lv48" tooltip="41803_MythGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41803" slot="19"/>
+<br/>
+<input type="button" value="女火Lv55" tooltip="41945_FireGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41945" slot="19"/>
+<input type="button" value="女冰Lv55" tooltip="41946_IceGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41946" slot="19"/>
+<input type="button" value="女风Lv55" tooltip="41947_StromGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41947" slot="19"/>
+<input type="button" value="女生Lv55" tooltip="41948_LifeGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41948" slot="19"/>
+<input type="button" value="女死Lv55" tooltip="41949_DeathGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41949" slot="19"/>
+<input type="button" value="女地Lv55" tooltip="41949_DeathGreenBoot_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41949" slot="19"/>
+<br/>
+<input type="button" value="男春装" tooltip="35003_MagicColorfulBoot_Spring_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35003" slot="19"/>
+<input type="button" value="男夏装" tooltip="35011_MagicColorfulBoot_Summer_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35011" slot="19"/>
+<input type="button" value="男秋装" tooltip="35019_MagicColorfulBoot_Fall_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35019" slot="19"/>
+<input type="button" value="男冬装" tooltip="35032_MagicColorfulBoot_Winter_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35032" slot="19"/>
+<input type="button" value="男荣誉Lv40" tooltip="31814_FireBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31814" slot="19"/>
+<input type="button" value="男荣誉Lv48" tooltip="31847_FireGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31847" slot="19"/>
+<br/>
+<input type="button" value="女春装" tooltip="35007_MagicColorfulBoot_Spring_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35007" slot="19"/>
+<input type="button" value="女夏装" tooltip="35015_MagicColorfulBoot_Summer_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35015" slot="19"/>
+<input type="button" value="女秋装" tooltip="35023_MagicColorfulBoot_Fall_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35023" slot="19"/>
+<input type="button" value="女冬装" tooltip="35036_MagicColorfulBoot_Winter_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35036" slot="19"/>
+<input type="button" value="女荣誉Lv40" tooltip="41814_FireBootLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41814" slot="19"/>
+<input type="button" value="女荣誉Lv48" tooltip="41847_FireGreenBoot_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41847" slot="19"/>
+<br/>
+<input type="button" value="男圣诞1" tooltip="35072_ChristmasRedBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35072" slot="19"/>
+<input type="button" value="男圣诞2" tooltip="35073_ChristmasGreenBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35073" slot="19"/>
+<input type="button" value="男圣诞3" tooltip="35074_ChristmasWhiteBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35074" slot="19"/>
+<input type="button" value="女圣诞1" tooltip="35075_ChristmasRedBoot_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35075" slot="19"/>
+<input type="button" value="女圣诞2" tooltip="35076_ChristmasGreenBoot_Gril" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35076" slot="19"/>
+<input type="button" value="女圣诞3" tooltip="35077_ChristmasWhiteBoot_Gril" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35077" slot="19"/>
+<br/>
+<input type="button" value="男春节1" tooltip="35119_NewYearBrownBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35119" slot="19"/>
+<input type="button" value="男春节2" tooltip="35123_NewYearWhiteBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35123" slot="19"/>
+<input type="button" value="男春节3" tooltip="35127_NewYearBlackBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35127" slot="19"/>
+<input type="button" value="女春节1" tooltip="35131_NewYearBrownBoot_Gril" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35131" slot="19"/>
+<input type="button" value="女春节2" tooltip="35135_NewYearWhiteBoot_Gril" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35135" slot="19"/>
+<input type="button" value="女春节3" tooltip="35139_NewYearBlackBoot_Gril" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35139" slot="19"/>
+<br/>
+<input type="button" value="男熊猫" tooltip="35149_PandaBoot" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35149" slot="19"/>
+<input type="button" value="女熊猫" tooltip="45149_PandaBoot" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="45149" slot="19"/>
+<input type="button" value="男婚纱" tooltip="35152_MerryBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35152" slot="19"/>
+<input type="button" value="女婚纱" tooltip="35155_MerryBoot_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35155" slot="19"/>
+<input type="button" value="男吸血鬼" tooltip="35252_VampireBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35252" slot="19"/>
+<input type="button" value="女吸血鬼" tooltip="35255_VampireBoot_Grils" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35255" slot="19"/>
+<br/>
+<input type="button" value="男白熊" tooltip="35208_WhiteBearBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35208" slot="19"/>
+<input type="button" value="女白熊" tooltip="35211_WhiteBearBoot_Grils" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35211" slot="19"/>
+<input type="button" value="男法老" tooltip="35218_PharaohBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35218" slot="19"/>
+<input type="button" value="女法老" tooltip="35221_PharaohBoot_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35221" slot="19"/>
+<input type="button" value="男阴阳师" tooltip="35262_ShamanBoot_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35262" slot="19"/>
+<input type="button" value="女阴阳师" tooltip="35265_ShamanBoot_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35265" slot="19"/>
+
+        </Columns>
+    </pe:gridview>
+    </pe:tab-item>
+
+    <pe:tab-item name="NewCharacterAndHat" text="帽子" style="padding:4px">
+        <pe:gridview AllowPaging="False" pagesize="1" ItemsPerLine="1" style="height:500px;" VerticalScrollBarStep="20" name="gvCCSItems" DataSource='<%=DS_Items%>' DefaultNodeHeight="500">
+            <Columns>
+<input type="button" value="帽子空空" style="width:64px;" onclick="EditCCSTask.ClickHatUpdate" gsid="0"/>
+            <br/>
+<input type="button" value="男火Lv1" tooltip="31093_1_FireGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31093" slot="0"/>
+<input type="button" value="男冰Lv1" tooltip="31094_2_IceGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31094" slot="0"/>
+<input type="button" value="男风Lv1" tooltip="31095_3_StormGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31095" slot="0"/>
+<input type="button" value="男生Lv1" tooltip="31096_4_LifeGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31096" slot="0"/>
+<input type="button" value="男死Lv1" tooltip="31097_5_DeathGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31097" slot="0"/>
+<input type="button" value="男地Lv1" tooltip="31369_MythGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31369" slot="0"/>
+            <br/>
+<input type="button" value="男火Lv10" tooltip="31108_16_FireGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31108" slot="0"/>
+<input type="button" value="男冰Lv10" tooltip="31109_17_IceGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31109" slot="0"/>
+<input type="button" value="男风Lv10" tooltip="31110_18_StormGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31110" slot="0"/>
+<input type="button" value="男生Lv10" tooltip="31111_19_LifeGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31111" slot="0"/>
+<input type="button" value="男死Lv10" tooltip="31112_20_DeathGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31112" slot="0"/>
+<input type="button" value="男地Lv10" tooltip="31708_MythGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31708" slot="0"/>
+            <br/>
+<input type="button" value="男火Lv20" tooltip="31123_31_FireGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31123" slot="0"/>
+<input type="button" value="男冰Lv20" tooltip="31124_32_IceGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31124" slot="0"/>
+<input type="button" value="男风Lv20" tooltip="31125_33_StormGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31125" slot="0"/>
+<input type="button" value="男生Lv20" tooltip="31126_34_LifeGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31126" slot="0"/>
+<input type="button" value="男死Lv20" tooltip="31127_35_DeathGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31127" slot="0"/>
+<input type="button" value="男地Lv20" tooltip="31710_MythGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31710" slot="0"/>
+            <br/>
+<input type="button" value="男火Lv30" tooltip="31138_46_FireGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31138" slot="0"/>
+<input type="button" value="男冰Lv30" tooltip="31139_47_IceGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31139" slot="0"/>
+<input type="button" value="男风Lv30" tooltip="31140_48_StormGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31140" slot="0"/>
+<input type="button" value="男生Lv30" tooltip="31141_49_LifeGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31141" slot="0"/>
+<input type="button" value="男死Lv30" tooltip="31142_50_DeathGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31142" slot="0"/>
+<input type="button" value="男地Lv30" tooltip="31712_MythGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31712" slot="0"/>
+            <br/>
+<input type="button" value="男火Lv40" tooltip="31153_61_FireGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31153" slot="0"/>
+<input type="button" value="男冰Lv40" tooltip="31154_62_IceGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31154" slot="0"/>
+<input type="button" value="男风Lv40" tooltip="31155_63_StormGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31155" slot="0"/>
+<input type="button" value="男生Lv40" tooltip="31156_64_LifeGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31156" slot="0"/>
+<input type="button" value="男死Lv40" tooltip="31157_65_DeathGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31157" slot="0"/>
+<input type="button" value="男地Lv40" tooltip="31714_MythGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31714" slot="0"/>
+            <br/>
+<input type="button" value="男火Lv48" tooltip="31773_FireGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31773" slot="0"/>
+<input type="button" value="男冰Lv48" tooltip="31774_IceGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31774" slot="0"/>
+<input type="button" value="男风Lv48" tooltip="31775_StromGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31775" slot="0"/>
+<input type="button" value="男生Lv48" tooltip="31776_LifeGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31776" slot="0"/>
+<input type="button" value="男死Lv48" tooltip="31777_DeathGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31777" slot="0"/>
+<input type="button" value="男地Lv48" tooltip="31800_MythGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31800" slot="0"/>
+            <br/>
+<input type="button" value="男火Lv55" tooltip="31930_FireGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31930" slot="0"/>
+<input type="button" value="男冰Lv55" tooltip="31931_IceGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31931" slot="0"/>
+<input type="button" value="男风Lv55" tooltip="31932_StromGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31932" slot="0"/>
+<input type="button" value="男生Lv55" tooltip="31933_LifeGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31933" slot="0"/>
+<input type="button" value="男死Lv55" tooltip="31934_DeathGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31934" slot="0"/>
+<input type="button" value="男地Lv55" tooltip="31934_DeathGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31934" slot="0"/>
+            <br/>
+<input type="button" value="女火Lv1" tooltip="41093_1_FireGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41093" slot="0"/>
+<input type="button" value="女冰Lv1" tooltip="41094_2_IceGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41094" slot="0"/>
+<input type="button" value="女风Lv1" tooltip="41095_3_StormGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41095" slot="0"/>
+<input type="button" value="女生Lv1" tooltip="41096_4_LifeGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41096" slot="0"/>
+<input type="button" value="女死Lv1" tooltip="41097_5_DeathGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41097" slot="0"/>
+<input type="button" value="女地Lv1" tooltip="41369_MythGreenHatLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41369" slot="0"/>
+            <br/>
+<input type="button" value="女火Lv10" tooltip="41108_16_FireGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41108" slot="0"/>
+<input type="button" value="女冰Lv10" tooltip="41109_17_IceGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41109" slot="0"/>
+<input type="button" value="女风Lv10" tooltip="41110_18_StormGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41110" slot="0"/>
+<input type="button" value="女生Lv10" tooltip="41111_19_LifeGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41111" slot="0"/>
+<input type="button" value="女死Lv10" tooltip="41112_20_DeathGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41112" slot="0"/>
+<input type="button" value="女地Lv10" tooltip="41708_MythGreenHatLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41708" slot="0"/>
+            <br/>
+<input type="button" value="女火Lv20" tooltip="41123_31_FireGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41123" slot="0"/>
+<input type="button" value="女冰Lv20" tooltip="41124_32_IceGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41124" slot="0"/>
+<input type="button" value="女风Lv20" tooltip="41125_33_StormGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41125" slot="0"/>
+<input type="button" value="女生Lv20" tooltip="41126_34_LifeGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41126" slot="0"/>
+<input type="button" value="女死Lv20" tooltip="41127_35_DeathGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41127" slot="0"/>
+<input type="button" value="女地Lv20" tooltip="41710_MythGreenHatLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41710" slot="0"/>
+            <br/>
+<input type="button" value="女火Lv30" tooltip="41138_46_FireGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41138" slot="0"/>
+<input type="button" value="女冰Lv30" tooltip="41139_47_IceGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41139" slot="0"/>
+<input type="button" value="女风Lv30" tooltip="41140_48_StormGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41140" slot="0"/>
+<input type="button" value="女生Lv30" tooltip="41141_49_LifeGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41141" slot="0"/>
+<input type="button" value="女死Lv30" tooltip="41142_50_DeathGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41142" slot="0"/>
+<input type="button" value="女地Lv30" tooltip="41712_MythGreenHatLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41712" slot="0"/>
+            <br/>
+<input type="button" value="女火Lv40" tooltip="41153_61_FireGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41153" slot="0"/>
+<input type="button" value="女冰Lv40" tooltip="41154_62_IceGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41154" slot="0"/>
+<input type="button" value="女风Lv40" tooltip="41155_63_StormGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41155" slot="0"/>
+<input type="button" value="女生Lv40" tooltip="41156_64_LifeGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41156" slot="0"/>
+<input type="button" value="女死Lv40" tooltip="41157_65_DeathGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41157" slot="0"/>
+<input type="button" value="女地Lv40" tooltip="41714_MythGreenHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41714" slot="0"/>
+            <br/>
+<input type="button" value="女火Lv48" tooltip="41773_FireGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41773" slot="0"/>
+<input type="button" value="女冰Lv48" tooltip="41774_IceGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41774" slot="0"/>
+<input type="button" value="女风Lv48" tooltip="41775_StromGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41775" slot="0"/>
+<input type="button" value="女生Lv48" tooltip="41776_LifeGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41776" slot="0"/>
+<input type="button" value="女死Lv48" tooltip="41777_DeathGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41777" slot="0"/>
+<input type="button" value="女地Lv48" tooltip="41800_MythGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41800" slot="0"/>
+            <br/>
+<input type="button" value="女火Lv55" tooltip="41930_FireGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41930" slot="0"/>
+<input type="button" value="女冰Lv55" tooltip="41931_IceGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41931" slot="0"/>
+<input type="button" value="女风Lv55" tooltip="41932_StromGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41932" slot="0"/>
+<input type="button" value="女生Lv55" tooltip="41933_LifeGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41933" slot="0"/>
+<input type="button" value="女死Lv55" tooltip="41934_DeathGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41934" slot="0"/>
+<input type="button" value="女地Lv55" tooltip="41934_DeathGreenHat_LV55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41934" slot="0"/>
+            <br/>
+<input type="button" value="男春装" tooltip="35000_MagicColorfulHat_Spring_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35000" slot="0"/>
+<input type="button" value="男夏装" tooltip="35008_MagicColorfulHat_Summer_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35008" slot="0"/>
+<input type="button" value="男秋装" tooltip="35016_MagicColorfulHat_Fall_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35016" slot="0"/>
+<input type="button" value="男冬装" tooltip="35029_MagicColorfulHat_Winter_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35029" slot="0"/>
+<input type="button" value="男荣誉Lv40" tooltip="31811_FireHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31811" slot="0"/>
+<input type="button" value="男荣誉Lv48" tooltip="31844_FireGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31844" slot="0"/>
+            <br/>
+<input type="button" value="女春装" tooltip="35004_MagicColorfulHat_Spring_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35004" slot="0"/>
+<input type="button" value="女夏装" tooltip="35012_MagicColorfulHat_Summer_T1_Gir" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35012" slot="0"/>
+<input type="button" value="女秋装" tooltip="35020_MagicColorfulHat_Fall_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35020" slot="0"/>
+<input type="button" value="女冬装" tooltip="35033_MagicColorfulHat_Winter_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35033" slot="0"/>
+<input type="button" value="女荣誉Lv40" tooltip="41811_FireHatLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41811" slot="0"/>
+<input type="button" value="女荣誉Lv48" tooltip="41844_FireGreenHat_LV48" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41844" slot="0"/>
+            <br/>
+<input type="button" value="男圣诞1" tooltip="35054_ChristmasRedHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35054" slot="0"/>
+<input type="button" value="男圣诞2" tooltip="35055_ChristmasGreenHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35055" slot="0"/>
+<input type="button" value="男圣诞3" tooltip="35056_ChristmasWhiteHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35056" slot="0"/>
+<input type="button" value="女圣诞1" tooltip="35057_ChristmasRedHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35057" slot="0"/>
+<input type="button" value="女圣诞2" tooltip="35058_ChristmasGreenHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35058" slot="0"/>
+<input type="button" value="女圣诞3" tooltip="35059_ChristmasWhiteHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35059" slot="0"/>
+            <br/>
+<input type="button" value="男春节1" tooltip="35117_NewYearBrownHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35117" slot="0"/>
+<input type="button" value="男春节2" tooltip="35121_NewYearWhiteHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35121" slot="0"/>
+<input type="button" value="男春节3" tooltip="35125_NewYearBlackHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35125" slot="0"/>
+<input type="button" value="女春节1" tooltip="35129_NewYearBrownHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35129" slot="0"/>
+<input type="button" value="女春节2" tooltip="35133_NewYearWhiteHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35133" slot="0"/>
+<input type="button" value="女春节3" tooltip="35137_NewYearBlackHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35137" slot="0"/>
+            <br/>
+<input type="button" value="男熊猫" tooltip="35147_PandaHat" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35147" slot="0"/>
+<input type="button" value="女熊猫" tooltip="45147_PandaHat" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="45147" slot="0"/>
+<input type="button" value="男婚纱" tooltip="35151_MerryHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35151" slot="0"/>
+<input type="button" value="女婚纱" tooltip="35154_MerryHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35154" slot="0"/>
+<input type="button" value="男吸血鬼" tooltip="35251_VampireHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35251" slot="0"/>
+<input type="button" value="女吸血鬼" tooltip="35254_VampireHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35254" slot="0"/>
+            <br/>
+<input type="button" value="男白熊" tooltip="35207_WhiteBearHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35207" slot="0"/>
+<input type="button" value="女白熊" tooltip="35210_WhiteBearHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35210" slot="0"/>
+<input type="button" value="男法老" tooltip="35217_PharaohHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35217" slot="0"/>
+<input type="button" value="女法老" tooltip="35220_PharaohHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35220" slot="0"/>
+<input type="button" value="男阴阳师" tooltip="35261_ShamanHat_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35261" slot="0"/>
+<input type="button" value="女阴阳师" tooltip="35264_ShamanHat_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35264" slot="0"/>
+            <br/>
+<input type="button" value="王者金冠" tooltip="35246_KingHat" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35246" slot="0"/>
+<input type="button" value="贤者金冠" tooltip="35247_OracleHat" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35247" slot="0"/>
+            </Columns>
+        </pe:gridview>
+    </pe:tab-item>
+
+    <pe:tab-item name="NewCharacterAndHat" text="披风" style="padding:4px">
+        <pe:gridview AllowPaging="False" pagesize="1" ItemsPerLine="1" style="height:500px;" VerticalScrollBarStep="20" name="gvCCSItems" DataSource='<%=DS_Items%>' DefaultNodeHeight="500">
+            <Columns>
+<input type="button" value="背包空空" style="width:64px;" onclick="EditCCSTask.ClickBackUpdate" gsid="0"/>
+            <br/>
+<input type="button" value="男火Lv1" tooltip="31298_FireGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31298" slot="21"/>
+<input type="button" value="男冰Lv1" tooltip="31299_IceGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31299" slot="21"/>
+<input type="button" value="男风Lv1" tooltip="31300_StormGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31300" slot="21"/>
+<input type="button" value="男生Lv1" tooltip="31301_LifeGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31301" slot="21"/>
+<input type="button" value="男死Lv1" tooltip="31187_DeathWhiteBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31187" slot="21"/>
+<input type="button" value="男地Lv1" tooltip="31372_MythGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31372" slot="21"/>
+            <br/>
+<input type="button" value="男火Lv10" tooltip="31198_16_FireGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31198" slot="21"/>
+<input type="button" value="男冰Lv10" tooltip="31199_17_IceGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31199" slot="21"/>
+<input type="button" value="男风Lv10" tooltip="31200_18_StormGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31200" slot="21"/>
+<input type="button" value="男生Lv10" tooltip="31201_19_LifeGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31201" slot="21"/>
+<input type="button" value="男死Lv10" tooltip="31202_20_DeathGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31202" slot="21"/>
+<input type="button" value="男地Lv10" tooltip="31735_MythGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31735" slot="21"/>
+            <br/>
+<input type="button" value="男火Lv20" tooltip="31213_31_FireGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31213" slot="21"/>
+<input type="button" value="男冰Lv20" tooltip="31214_32_IceGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31214" slot="21"/>
+<input type="button" value="男风Lv20" tooltip="31215_33_StormGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31215" slot="21"/>
+<input type="button" value="男生Lv20" tooltip="31216_34_LifeGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31216" slot="21"/>
+<input type="button" value="男死Lv20" tooltip="31217_35_DeathGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31217" slot="21"/>
+<input type="button" value="男地Lv20" tooltip="31737_MythGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31737" slot="21"/>
+            <br/>
+<input type="button" value="男火Lv30" tooltip="31228_46_FireGreenBackLv30_" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31228" slot="21"/>
+<input type="button" value="男冰Lv30" tooltip="31229_47_IceGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31229" slot="21"/>
+<input type="button" value="男风Lv30" tooltip="31230_48_StormGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31230" slot="21"/>
+<input type="button" value="男生Lv30" tooltip="31231_49_LifeGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31231" slot="21"/>
+<input type="button" value="男死Lv30" tooltip="31232_50_DeathGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31232" slot="21"/>
+<input type="button" value="男地Lv30" tooltip="31739_MythGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31739" slot="21"/>
+            <br/>
+<input type="button" value="男火Lv40" tooltip="31243_61_FireGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31243" slot="21"/>
+<input type="button" value="男冰Lv40" tooltip="31244_62_IceGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31244" slot="21"/>
+<input type="button" value="男风Lv40" tooltip="31245_63_StormGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31245" slot="21"/>
+<input type="button" value="男生Lv40" tooltip="31246_64_LifeGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31246" slot="21"/>
+<input type="button" value="男死Lv40" tooltip="31247_65_DeathGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31247" slot="21"/>
+<input type="button" value="男地Lv40" tooltip="31741_MythGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31741" slot="21"/>
+            <br/>
+<input type="button" value="男火Lv48" tooltip="31258_76_FireGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31258" slot="21"/>
+<input type="button" value="男冰Lv48" tooltip="31259_77_IceGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31259" slot="21"/>
+<input type="button" value="男风Lv48" tooltip="31260_78_StormGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31260" slot="21"/>
+<input type="button" value="男生Lv48" tooltip="31261_79_LifeGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31261" slot="21"/>
+<input type="button" value="男死Lv48" tooltip="31262_80_DeathGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31262" slot="21"/>
+<input type="button" value="男地Lv48" tooltip="31766_MythGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31766" slot="21"/>
+            <br/>
+<input type="button" value="男火Lv55" tooltip="31919_FireGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31919" slot="26"/>
+<input type="button" value="男冰Lv55" tooltip="31920_IceGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31920" slot="26"/>
+<input type="button" value="男风Lv55" tooltip="31921_StormGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31921" slot="26"/>
+<input type="button" value="男生Lv55" tooltip="31922_LifeGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31922" slot="26"/>
+<input type="button" value="男死Lv55" tooltip="31923_DeathGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31923" slot="26"/>
+<input type="button" value="男地Lv55" tooltip="31923_DeathGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31923" slot="26"/>
+            <br/>
+<input type="button" value="女火Lv1" tooltip="41298_FireGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31298" slot="21"/>
+<input type="button" value="女冰Lv1" tooltip="41299_IceGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31299" slot="21"/>
+<input type="button" value="女风Lv1" tooltip="31300_StormGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31300" slot="21"/>
+<input type="button" value="女生Lv1" tooltip="31301_LifeGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31301" slot="21"/>
+<input type="button" value="女死Lv1" tooltip="41187_DeathWhiteBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31187" slot="21"/>
+<input type="button" value="女地Lv1" tooltip="41372_MythGreenBackLv1" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31372" slot="21"/>
+            <br/>
+<input type="button" value="女火Lv10" tooltip="41198_16_FireGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31198" slot="21"/>
+<input type="button" value="女冰Lv10" tooltip="41199_17_IceGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31199" slot="21"/>
+<input type="button" value="女风Lv10" tooltip="41200_18_StormGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31200" slot="21"/>
+<input type="button" value="女生Lv10" tooltip="41201_19_LifeGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31201" slot="21"/>
+<input type="button" value="女死Lv10" tooltip="41202_20_DeathGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31202" slot="21"/>
+<input type="button" value="女地Lv10" tooltip="41735_MythGreenBackLv10" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31735" slot="21"/>
+            <br/>
+<input type="button" value="女火Lv20" tooltip="41213_31_FireGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31213" slot="21"/>
+<input type="button" value="女冰Lv20" tooltip="41214_32_IceGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31214" slot="21"/>
+<input type="button" value="女风Lv20" tooltip="41215_33_StormGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31215" slot="21"/>
+<input type="button" value="女生Lv20" tooltip="41216_34_LifeGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31216" slot="21"/>
+<input type="button" value="女死Lv20" tooltip="41217_35_DeathGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31217" slot="21"/>
+<input type="button" value="女地Lv20" tooltip="41737_MythGreenBackLv20" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31737" slot="21"/>
+            <br/>
+<input type="button" value="女火Lv30" tooltip="41228_46_FireGreenBackLv30_" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41228" slot="21"/>
+<input type="button" value="女冰Lv30" tooltip="41229_47_IceGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41229" slot="21"/>
+<input type="button" value="女风Lv30" tooltip="41230_48_StormGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41230" slot="21"/>
+<input type="button" value="女生Lv30" tooltip="41231_49_LifeGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41231" slot="21"/>
+<input type="button" value="女死Lv30" tooltip="41232_50_DeathGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41232" slot="21"/>
+<input type="button" value="女地Lv30" tooltip="41739_MythGreenBackLv30" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41739" slot="21"/>
+            <br/>
+<input type="button" value="女火Lv40" tooltip="41243_61_FireGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31243" slot="21"/>
+<input type="button" value="女冰Lv40" tooltip="41244_62_IceGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31244" slot="21"/>
+<input type="button" value="女风Lv40" tooltip="41245_63_StormGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31245" slot="21"/>
+<input type="button" value="女生Lv40" tooltip="41246_64_LifeGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31246" slot="21"/>
+<input type="button" value="女死Lv40" tooltip="41247_65_DeathGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31247" slot="21"/>
+<input type="button" value="女地Lv40" tooltip="41741_MythGreenBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31741" slot="21"/>
+            <br/>
+<input type="button" value="女火Lv48" tooltip="41258_76_FireGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31258" slot="21"/>
+<input type="button" value="女冰Lv48" tooltip="41259_77_IceGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31259" slot="21"/>
+<input type="button" value="女风Lv48" tooltip="41260_78_StormGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31260" slot="21"/>
+<input type="button" value="女生Lv48" tooltip="41261_79_LifeGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31261" slot="21"/>
+<input type="button" value="女死Lv48" tooltip="41262_80_DeathGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31262" slot="21"/>
+<input type="button" value="女地Lv48" tooltip="41766_MythGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31766" slot="21"/>
+            <br/>
+<input type="button" value="女火Lv55" tooltip="41919_FireGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41919" slot="26"/>
+<input type="button" value="女冰Lv55" tooltip="41920_IceGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41920" slot="26"/>
+<input type="button" value="女风Lv55" tooltip="41921_StormGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41921" slot="26"/>
+<input type="button" value="女生Lv55" tooltip="41922_LifeGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41922" slot="26"/>
+<input type="button" value="女死Lv55" tooltip="41923_DeathGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41923" slot="26"/>
+<input type="button" value="女地Lv55" tooltip="41923_DeathGreenBackLv55" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="41923" slot="26"/>
+            <br/>
+<input type="button" value="男春装" tooltip="35002_MagicColorfulBack_Spring_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35002" slot="26"/>
+<input type="button" value="男夏装" tooltip="35010_MagicColorfulBack_Summer_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35010" slot="26"/>
+<input type="button" value="男秋装" tooltip="35018_MagicColorfulBack_Fall_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35018" slot="26"/>
+<input type="button" value="男冬装" tooltip="35031_MagicColorfulBack_Winter_T1_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35031" slot="26"/>
+<input type="button" value="男荣誉Lv40" tooltip="31812_FireBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31812" slot="21"/>
+<input type="button" value="男荣誉Lv48" tooltip="31843_FireGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31843" slot="21"/>
+            <br/>
+<input type="button" value="女春装" tooltip="35006_MagicColorfulBack_Spring_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35006" slot="26"/>
+<input type="button" value="女夏装" tooltip="35014_MagicColorfulBack_Summer_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35014" slot="26"/>
+<input type="button" value="女秋装" tooltip="35022_MagicColorfulBack_Fall_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35022" slot="26"/>
+<input type="button" value="女冬装" tooltip="35035_MagicColorfulBack_Winter_T1_Girl" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35035" slot="26"/>
+<input type="button" value="女荣誉Lv40" tooltip="41812_FireBackLv40" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31812" slot="21"/>
+<input type="button" value="女荣誉Lv48" tooltip="41843_FireGreenBackLv45" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="31843" slot="21"/>
+            <br/>
+<input type="button" value="男圣诞1" tooltip="35060_ChristmasRedBack_Boys" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35060" slot="21"/>
+<input type="button" value="男圣诞2" tooltip="35061_ChristmasGreenBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35061" slot="21"/>
+<input type="button" value="男圣诞3" tooltip="35062_ChristmasWhiteBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35062" slot="21"/>
+<input type="button" value="女圣诞1" tooltip="35063_ChristmasRedBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35063" slot="21"/>
+<input type="button" value="女圣诞2" tooltip="35064_ChristmasGreenBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35064" slot="21"/>
+<input type="button" value="女圣诞3" tooltip="35065_ChristmasWhiteBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35065" slot="21"/>
+            <br/>
+<input type="button" value="男春节1" tooltip="35118_NewYearBrownBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35118" slot="21"/>
+<input type="button" value="男春节2" tooltip="35122_NewYearWhiteBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35122" slot="21"/>
+<input type="button" value="男春节3" tooltip="35126_NewYearBlackBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35126" slot="21"/>
+<input type="button" value="女春节1" tooltip="35130_NewYearBrownBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35130" slot="21"/>
+<input type="button" value="女春节2" tooltip="35134_NewYearWhiteBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35134" slot="21"/>
+<input type="button" value="女春节3" tooltip="35138_NewYearBlackBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35138" slot="21"/>
+            <br/>
+<input type="button" value="男熊猫" tooltip="35148_PandaBack" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35148" slot="26"/>
+<input type="button" value="女熊猫" tooltip="45148_PandaBack" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="45148" slot="26"/>
+<input type="button" value="男婚纱" tooltip="35156_MerryBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35156" slot="26"/>
+<input type="button" value="女婚纱" tooltip="35157_MerryBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35157" slot="26"/>
+<input type="button" value="男吸血鬼" tooltip="35256_VampireBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35256" slot="21"/>
+<input type="button" value="女吸血鬼" tooltip="35257_VampireBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35257" slot="21"/>
+            <br/>
+<input type="button" value="男白熊" tooltip="35212_WhiteBearBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35212" slot="21"/>
+<input type="button" value="女白熊" tooltip="35213_WhiteBearBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35213" slot="21"/>
+<input type="button" value="男法老" tooltip="35222_PharaohBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35222" slot="21"/>
+<input type="button" value="女法老" tooltip="35223_PharaohBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35223" slot="21"/>
+<input type="button" value="男阴阳师" tooltip="35266_ShamanBack_Boy" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35266" slot="21"/>
+<input type="button" value="女阴阳师" tooltip="35267_ShamanBack_Girls" style="width:55px;" onclick="EditCCSTask.ClickAvaterUpdate" gsid="35267" slot="21"/>
+            </Columns>
+        </pe:gridview>
+    </pe:tab-item>
+</pe:tabs>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

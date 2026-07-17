@@ -23,6 +23,14 @@ function OnCreateSubFrameCtrl(params,node)
     _this.background = "";
     params.parent:AddChild(_this);
 end
+
+function IsMoveView()
+    local isMove = true
+    if GameLogic.Macros:IsPlaying() then
+        isMove = false
+    end
+    return isMove
+end
 ]]>
         </script>
         <div width="100%" style='<%=format("height:%d", MovieClipTimeLine.height)%>'>
@@ -43,7 +51,7 @@ end
             </div>
             <div style="background:url(Texture/whitedot.png);background-color:#4E5463">
                 <div style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #db6517; margin-left: 0px; margin-top: 0px; height: %dpx; width: 150px", MovieClipTimeLine.timelineHeight)%>'>
-                    <input type="text" auto_virtual_keyboard="true" uiname="MovieClipTimeLine.starttime" name="starttime" tooltip='<%=L"开始时间(秒)"%>' enable_ime="false" spacing="0" 
+                    <input type="text" uiname="MovieClipTimeLine.starttime" name="starttime" tooltip='<%=L"开始时间(秒)"%>' MoveViewWhenAttachWithIME='<%=IsMoveView()%>' enable_ime="true" spacing="0" 
                     style='<%=format("background:;margin-left:0px;margin-top:10px;height:%dpx;width:150px;text-align:center;textcolor:#ffffff;font-size:18px", MovieClipTimeLine.timelineHeight-20)%>' value="0" onchange="MovieClipTimeLine.OnChangeStartTime" />
                 </div>
                 <div align="right" style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #db6517; margin-left: 0px; margin-top: 0px; height: %dpx; width: 150px", MovieClipTimeLine.timelineHeight)%>'>
@@ -51,7 +59,7 @@ end
                         <pe:container uiname='<%="MovieClipTimeLine_end_time_compare"%>' zorder="0" style='<%=format("position: relative; margin-left: 0px; background-color: #00ff00;height:%dpx;width:150px", MovieClipTimeLine.timelineHeight+2)%>'>
                         </pe:container>
                     </pe:if>
-                    <input type="text" auto_virtual_keyboard="true" uiname="MovieClipTimeLine.endtime" name="endtime" tooltip='<%=L"结束时间(秒)"%>' enable_ime="false" spacing="0" 
+                    <input type="text" uiname="MovieClipTimeLine.endtime" name="endtime" tooltip='<%=L"结束时间(秒)"%>' MoveViewWhenAttachWithIME='<%=IsMoveView()%>' enable_ime="true" spacing="0" 
                     style='<%=format("background:;margin-left:0px;margin-top:10px;height:%dpx;width:150px;text-align:center;textcolor:#ffffff;font-size:18px", MovieClipTimeLine.timelineHeight-20)%>' value='10' onchange="MovieClipTimeLine.OnChangeEndTime" />
                 </div>
                 <pe:custom name="keyframes" width="100%" oncreate="OnCreateKeyFrameCtrl" style='<%=format("margin-left:150px;margin-right:150px;height:%dpx;", MovieClipTimeLine.timelineHeight)%>'></pe:custom>

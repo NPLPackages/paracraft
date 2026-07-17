@@ -178,8 +178,6 @@ function SkinPage.OnOK()
 end
 
 function SkinPage.OnChangeAvatarSkin()
-	local assetFilename = EntityManager.GetPlayer():GetMainAssetPath();
-
 	if(page) then
 		page:CloseWindow();
 	end
@@ -188,6 +186,8 @@ function SkinPage.OnChangeAvatarSkin()
 	if(not entity) then
 		return
 	end
+	local assetFilename = entity:GetMainAssetPath();
+
 	local old_value = entity:GetSkin();
 
 	if(entity.IsCustomModel and entity:IsCustomModel()) then
@@ -195,14 +195,16 @@ function SkinPage.OnChangeAvatarSkin()
 		local EditCCSTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCCSTask");
 		EditCCSTask:ShowPage(entity, function(ccsString)
 			if(ccsString ~= old_value) then
-				GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
-					if(isVip) then
-						EntityManager.GetPlayer():SetSkin(ccsString);
-						OKCallback();
-					else
-						EntityManager.GetPlayer():SetSkin(old_value);
-					end
-				end)
+				EntityManager.GetPlayer():SetSkin(ccsString);
+				OKCallback();
+				-- GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+				-- 	if(isVip) then
+				-- 		EntityManager.GetPlayer():SetSkin(ccsString);
+				-- 		OKCallback();
+				-- 	else
+				-- 		EntityManager.GetPlayer():SetSkin(old_value);
+				-- 	end
+				-- end)
 			end
 		end);
 	elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
@@ -212,12 +214,14 @@ function SkinPage.OnChangeAvatarSkin()
 		local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
 		EditSkinPage.ShowPage(function(result)
 			if(result and result~=old_value) then
-				GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
-					if(isVip) then
-						entity:SetSkin(result);
-						OKCallback();
-					end
-				end)
+				entity:SetSkin(result);
+				OKCallback();
+				-- GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+				-- 	if(isVip) then
+				-- 		entity:SetSkin(result);
+				-- 		OKCallback();
+				-- 	end
+				-- end)
 			end
 		end, old_value, "", assetFilename)
 	end

@@ -47,14 +47,14 @@ function DestroyBlock:Run()
 			local blocks_modified = block_template:Remove(self.blockX,self.blockY,self.blockZ);
 			if(blocks_modified) then
 				-- invoke callback. 
-				local entityPlayer = EntityManager.GetPlayer();
+				local entityPlayer = self.entityPlayer or EntityManager.GetPlayer();
 				block_template:OnUserBreakItem(self.blockX,self.blockY,self.blockZ, entityPlayer, self.last_block_data);
 
 				GameLogic.events:DispatchEvent({type = "DestroyBlockTask" , block_id = block_id, x = self.blockX, y = self.blockY, z = self.blockZ,
 					last_block_id = self.last_block_id, last_block_data = self.last_block_data,
 				});
 
-				if(dropped_itemStack) then
+				if(dropped_itemStack and not self.donot_drop_item) then
 					-- automatically pick the block when deleted. 
 					if(entityPlayer) then
 						entityPlayer:PickItem(dropped_itemStack, self.blockX,self.blockY,self.blockZ);
@@ -62,7 +62,7 @@ function DestroyBlock:Run()
 				end
 
 				-- only allow history operation if no auto generated blocks are created when the block is destroyed. 
-				if(GameLogic.GameMode:CanAddToHistory()) then
+				if(GameLogic.GameMode:CanAddToHistory() or self.add_to_history) then
 					add_to_history = true;
 				end
 			end
@@ -72,7 +72,7 @@ function DestroyBlock:Run()
 		-- TODO: block.RemoveTerrainBlock(self.blockX,self.blockY,self.blockZ); ?
 	end
 	
-	if(add_to_history) then
+	if(add_to_history or self.add_to_history) then
 		UndoManager.PushCommand(self);
 		GameLogic.SetModified();
 	end

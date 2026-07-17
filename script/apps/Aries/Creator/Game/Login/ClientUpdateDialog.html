@@ -30,8 +30,18 @@ curVersion = Page:GetRequestParam("curVersion")
 curGame = Page:GetRequestParam("curGame")
 allowSkip = Page:GetRequestParam("allowSkip")=="true"
 
+function ClearTimer()
+    if ClientUpdateDialog.mytimer then
+        ClientUpdateDialog.mytimer:Change()
+        ClientUpdateDialog.mytimer = nil
+    end
+end
+
 function OnClickUpdate()
-    ClientUpdateDialog.OnClickUpdate()
+    if ClientUpdateDialog.OnClickUpdate and type(ClientUpdateDialog.OnClickUpdate) == "function" then
+        ClientUpdateDialog.OnClickUpdate()
+    end
+    ClearTimer()
 end
 
 function GetBtnText()
@@ -40,6 +50,7 @@ end
 
 function OnClickSkip()
     OnClose()
+    ClearTimer()
 end
 
 ]]></script>

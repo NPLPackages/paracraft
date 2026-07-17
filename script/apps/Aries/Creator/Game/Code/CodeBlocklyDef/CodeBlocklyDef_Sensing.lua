@@ -23,6 +23,7 @@ local cmds = {
 			type = "field_dropdown",
 			options = {
 				{ L"方块", "block" },
+				{ L"墙壁", "wall" },
 				{ L"附近玩家", "@a" },
 				{ L"某个方块id", "62" },
 				{ L"某个角色名", "" },
@@ -219,11 +220,12 @@ cmd("/hide boundingbox")
 	funcName = "registerCollisionEvent",
 	func_description = 'registerCollisionEvent(%s, function(actor)\\n%send)',
 	ToPython = function(self)
+		local block_indent = self:GetIndent();
 		local input = self:getFieldAsString('input')
-		if input == '' then
-			input = 'pass'
+		if input and input:match('^%s*$') then
+			input = input..'pass'
 		end
-		return string.format('def registerCollisionEvent_func(msg):\n    %s\nregisterCollisionEvent("%s", registerCollisionEvent_func)\n', input, self:getFieldAsString('name'));
+		return string.format('def registerCollisionEvent_func(msg):\n%s\n%sregisterCollisionEvent("%s", registerCollisionEvent_func)\n', input, block_indent, self:getFieldAsString('name'));
 	end,
 	ToNPL = function(self)
 		return string.format('registerCollisionEvent("%s", function(actor)\n%send)\n', self:getFieldAsString('name'), self:getFieldAsString('input'));

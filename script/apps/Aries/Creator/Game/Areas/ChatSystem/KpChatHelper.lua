@@ -23,6 +23,19 @@ function KpChatHelper.ShowMenu(str_username_chatid)
         KpChatHelper.OnShowContextMenu(username, chatid);
 	end
 end
+
+function KpChatHelper.ShowPrivateChatMenu(chat_name)
+    local username, chatid = string.match(chat_name,"(.+)_(.+)");
+    local UserInfoCtrl = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/UserInfoCtrl.lua");
+    UserInfoCtrl.ShowUserOperateMenu(username,chatid,"private")
+end
+
+function KpChatHelper.ShowTeamChatMenu(chat_name)
+    local username, chatid = string.match(chat_name,"(.+)_(.+)");
+    local UserInfoCtrl = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/UserInfoCtrl.lua");
+    UserInfoCtrl.ShowUserOperateMenu(username,chatid,"team")
+end
+
 function KpChatHelper.OnShowContextMenu(username, chatid)
 	
 	local ctl = CommonCtrl.GetControl("kp_chat_window_username_ContextMenu");

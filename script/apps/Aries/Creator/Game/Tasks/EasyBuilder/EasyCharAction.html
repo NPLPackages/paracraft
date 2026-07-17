@@ -1,0 +1,212 @@
+<!-- 
+Title: EasyBuilder Character Action UI
+Author(s): LiXizhi
+Date: 2025/11/11
+Desc: Character control dialog UI
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyCharAction.lua" refresh="true">
+<![CDATA[
+EasyCharAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyCharAction");
+EasyCharAction.InitPage(Page);
+function GetDisplayName()
+    local name = EasyCharAction.GetDisplayName();
+    name = name:gsub(".*/", "");
+    name = name:gsub(":%d%d%d%d.*$", "");
+    return name;
+end
+stanima, maxStanima = EasyCharAction:GetStamina()
+function dummy()
+end
+]]>
+</script>
+<style>
+    .closebtn {
+        position: relative;
+        margin-right: -19px;
+        margin-top: -18px;
+        width: 56px;
+        height: 56px;
+        background: url(Texture/player/close.png);
+    }
+    .actionbtn {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        font-size: 14px;
+        min-width: 60px;
+        spacing:10px;
+        height: 45px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        color: #000000;
+    }
+    .taskbtn {
+        font-size: 14px;
+        min-width: 60px;
+        spacing:10px;
+        height: 45px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        color: #000000;
+    }
+    .taskbtn.normal {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+    }
+    .taskbtn.default {
+        background: url(Texture/Aquarius/Button_Highlight_Large.png:15 15 15 15);
+    }
+    .taskitem {
+        background: #333333;
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 4px;
+    }
+    .taskname {
+        font-size: 14px;
+        color: #5af05a;
+        margin-bottom: 3px;
+    }
+    .taskdesc {
+        font-size: 12px;
+        color: #cccccc;
+        margin-bottom: 5px;
+    }
+    .taskstatus {
+        font-size: 11px;
+        color: #ffcc00;
+        margin-bottom: 5px;
+    }
+    .taskicon {
+        background: url(Texture/Aries/Dock/Action.png#0 0 38 38);
+        width: 38px;
+        height: 38px;
+        float: left;
+        margin-right: 10px;
+    }
+    .taskcontrolbtn {
+        width: 46px;
+        height: 46px;
+        margin-right: 5px;
+    }
+    .pausebtn {
+        background: url(Texture/player/pause.png);
+    }
+    .resumebtn {
+        background: url(Texture/player/play.png);
+    }
+    .deletebtn {
+        background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/guanbi_43x43_32bits.png#0 0 43 43);
+    }
+</style>
+<pe:container onclick="dummy" style="padding:20px;background:url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);color:#ffffff;width:320px;min-height:320px;">
+    <div style="position:relative">
+        <input type="button" name="CloseBtn" onclick="EasyCharAction.OnClickClose" align="right" class="closebtn" />
+    </div>
+    <!-- Character Control Title -->
+    <div style="padding-top:3px;padding-bottom:3px;">
+        <div style="min-height:40px;">
+            <div style="float:left;width:220px;margin-top:5px;font-size:16px;color:#5af05a"><%=GetDisplayName()%></div>
+            <pe:if condition='<%=maxStanima and maxStanima > 0%>'>
+                <div style="margin-top:5px;width:120px;height:12px;background-color:#ff0000;">
+                    <div style='<%=string.format("position:relative;width:%dpx;height:12px;background-color:#00ff00;", math.floor((stanima or 0)/(maxStanima or 1)*120))%>'></div>
+                    <div style="position:relative;margin-top:-3px;text-align:center;color:#7c7a7a;font-size:12px;height:12px;">
+                        <%=string.format("%d/%d", stanima or 0, maxStanima or 1)%>
+                    </div>
+                </div>
+            </pe:if>
+        </div>
+        
+        
+        <!-- Action Buttons -->
+        <div style="margin-top:10px;">
+            <input type="button" 
+                name="followMe" 
+                value='<%=L"跟随我"%>' 
+                tooltip='<%=L"让角色跟随你"%>'
+                class="actionbtn" 
+                onclick="EasyCharAction.OnClickFollowMe" />
+            <input type="button" 
+                name="stop" 
+                value='<%=L"停下来"%>' 
+                tooltip='<%=L"停止跟随"%>'
+                class="actionbtn" 
+                onclick="EasyCharAction.OnClickStop" />
+            <pe:if condition='<%=EasyCharAction.CanChangeSkin()%>'>
+                <input type="button" 
+                    name="changeCloth" 
+                    value='<%=L"换装"%>' 
+                    tooltip='<%=L"更换角色装扮"%>'
+                    class="actionbtn" 
+                    onclick="EasyCharAction.OnClickChangeCloth" />
+            </pe:if>
+            <br />
+            <input type="button" 
+                name="chat"
+                uiname = "easy_char_chat"
+                value='<%=L"对话"%>' 
+                tooltip='<%=L"与角色对话"%>'
+                class='<%=(not EasyCharAction.HasRunningTasks() and "taskbtn default" or "actionbtn")%>' 
+                onclick="EasyCharAction.OnClickChat" />
+            <pe:if condition='<%=EasyCharAction.CanEditAIConfig()%>'>
+                <input type="button" 
+                    name="properties" 
+                    value='<%=L"属性"%>' 
+                    tooltip='<%=L"查看角色属性"%>'
+                    class="actionbtn" 
+                    onclick="EasyCharAction.OnClickProperties" />
+            </pe:if>
+            
+        </div>
+        
+        <!-- Copilot Tasks Section -->
+        <pe:if condition='<%= #EasyCharAction.GetCopilotTasks(true) > 0 %>'>
+            <div style="margin-top:10px;">
+                <div style="font-size:16px;color:#bdbebd;margin-bottom:10px;"><%=L"行动列表"%> (<%=#EasyCharAction.GetCopilotTasks()%>)</div>
+                <pe:repeat DataSource='<%=EasyCharAction.GetCopilotTasks()%>'>
+                    <pe:repeatitem class="taskitem" style="width:280px;">
+                        <div class="taskicon" style="margin-bottom:20px;">
+                            <pe:if condition='<%= Eval("isPaused") %>'>
+                                <div style="position:relaltive;font-size: 12px;color:#ffcc00;margin-top: 32px;width:40px;text-align:center"><%=L"暂停中"%></div>
+                            </pe:if>
+                            <pe:if condition='<%= not Eval("isPaused") and Eval("isRunning") %>'>
+                                <div style="position:relaltive;font-size: 12px;color:#5af05a;margin-top: 32px;width:40px;text-align:center"><%=L"进行中"%></div>
+                            </pe:if>
+                            <pe:if condition='<%= not Eval("isPaused") and not Eval("isRunning") %>'>
+                                <div style="position:relaltive;font-size: 12px;color:#888888;margin-top: 32px;width:40px;text-align:center"><%=L"等待"%></div>
+                            </pe:if>
+                        </div>
+                        <div style="float:left;width:200px;">
+                            <div class="taskname"><%=Eval("name")%></div>
+                            <div class="taskdesc">
+                                <pe:if condition='<%= Eval("description") and Eval("description") ~= "" %>'>
+                                    <%=Eval("description")%>
+                                </pe:if>
+                            </div>
+                            <div class="taskbuttons">
+                                <pe:if condition='<%= Eval("index") == 1 and Eval("actionButtons") and #Eval("actionButtons") > 0 %>'>
+                                    <pe:repeat DataSource='<%=Eval("actionButtons")%>'>
+                                        <pe:repeatitem>
+                                            <input type="button"
+                                                name='<%=Eval("name")%>'
+                                                value='<%=Eval("text")%>'
+                                                class='<%=(Eval("default")==true and "taskbtn default" or "taskbtn normal")%>'
+                                                onclick="EasyCharAction.OnClickTaskAction"
+                                                param1='<%=Eval("taskId")%>'
+                                                />
+                                        </pe:repeatitem>
+                                    </pe:repeat>
+                                </pe:if>
+                            </div>
+                        </div>
+                        <div>
+                        </div>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </div>
+        </pe:if>
+    </div>
+</pe:container>
+    
+</pe:mcml>
+</html>

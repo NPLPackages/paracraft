@@ -28,6 +28,10 @@ end
 function sentence_history:PreviousSentence()
 	self.current_index = self.current_index -1;
 	if(self.current_index <= 0) then
+		if System.options.mc then
+			self.current_index = 0;
+			return ""
+		end
 		self.current_index = #(self.history);
 	end
 	return self.history[self.current_index];
@@ -36,6 +40,10 @@ end
 function sentence_history:NextSentence()
 	self.current_index = self.current_index + 1;
 	if(self.current_index > #(self.history)) then
+		if System.options.mc then
+			self.current_index = #(self.history);
+			return ""
+		end
 		self.current_index = 1;
 	end
 	return self.history[self.current_index];

@@ -764,3 +764,75 @@ end)
 		_guihelper.MessageBox(text);
      end,
  };
+
+ Commands["serialport"] = {
+	name="serialport", 
+	quick_ref="/serialport [connect|disconnect|show|hide] ", 
+	desc=[[serial port command
+/serialport connect
+/serialport disconnect
+/serialport show
+/serialport hide
+]], 
+	mode_deny = "",
+	mode_allow = "",
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local option;
+		option, cmd_text = CmdParser.ParseWord(cmd_text);
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/SerialPort/SerialPortConnector.lua");
+		local SerialPortConnector = commonlib.gettable("MyCompany.Aries.Game.Code.SerialPortConnector");
+		
+		if(option == "show" or not option or option == "") then
+			SerialPortConnector.Show()
+		elseif(option == "hide") then	
+			SerialPortConnector.Close()
+		elseif(option == "connect") then	
+			SerialPortConnector.Show()
+			if(not SerialPortConnector.IsConnected()) then
+				SerialPortConnector.Connect()
+			end
+		elseif(option == "disconnect") then	
+			SerialPortConnector.Disconnect()
+		end
+	end,
+};
+
+Commands["bluetooth"] = {
+	name="bluetooth", 
+	quick_ref="/bluetooth [start|send|register] [msg_name] [msg]", 
+	desc=[[
+-- send a 'test' message with 'helloworld' string
+/bluetooth send test helloworld
+-- register a 'test' message with 'test' event handler
+/bluetooth register test
+-- register a 'test' message with TestEventhandler
+/bluetooth register test TestEventhandler
+-- start ble and connect to paracraft_ble(default name), 
+-- however, there is no need to call start if we use the default name
+/bluetooth start
+/bluetooth start paracraft_ble
+]], 
+	mode_deny = "",
+	mode_allow = "",
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local subcmd;
+		subcmd, cmd_text = CmdParser.ParseWord(cmd_text);
+		local name;
+		name, cmd_text = CmdParser.ParseString(cmd_text);
+		if(subcmd == "start") then
+			GameLogic.All.BlueTooth:StartBluetooth(name, tonumber(cmd_text))
+		elseif (subcmd == "stop") then
+			GameLogic.All.BlueTooth:StopBluetooth()
+		elseif(subcmd == "send" and name) then
+			GameLogic.All.BlueTooth:StartBluetooth()
+			GameLogic.All.BlueTooth:SendEvent(name, cmd_text)
+		elseif(subcmd == "register" and name) then
+			GameLogic.All.BlueTooth:StartBluetooth()
+			local textEventName = name or cmd_text;
+			GameLogic.All.BlueTooth:RegisterEvent(name, function(msg)
+				GameLogic.GetCodeGlobal():BroadcastTextEvent(textEventName, msg);
+			end)
+		end
+	end,
+};

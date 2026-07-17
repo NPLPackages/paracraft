@@ -12,12 +12,30 @@
             UserGuide = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserGuide")
             UserGuide.OnInit();
             name = Page:GetRequestParam("name") or "step1"
+
+            function GetMouseTip()
+                local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+                if(IsMobileUIEnabled)then
+                    return L"按住【手机屏幕】，同时移动手指可以改变视角"
+                else
+                    return L"按住【鼠标右键】，同时移动鼠标可以改变视角"
+                end
+            end
+
+            function GetMoveTip()
+                local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+                if(IsMobileUIEnabled)then
+                    return L"拖动左下角圆盘可以控制角色移动"
+                else
+                    return L"使用键盘【W/A/S/D】控制角色移动"
+                end
+            end
             ]]>
         </script>
         <pe:if condition='<%=(name=="step1")%>'>
             <pe:container alignment="_ct" ClickThrough="true" style="font-size:12px;margin-left:-500px;margin-top:-200px;width:600px;height:300px;background:">
                 <div style="float:left">
-                    <div class="helptip" style="position:relative;color:#B9AB73;margin-top:0px;margin-left:0px;padding:4px;padding-left:10px;padding-right:10px;"><%=L"使用键盘【W/A/S/D】控制角色移动"%></div>
+                    <div class="helptip" style="position:relative;color:#B9AB73;margin-top:0px;margin-left:0px;padding:4px;padding-left:10px;padding-right:10px;"><%=GetMoveTip()%></div>
                     <div style="float:left;margin-top:40px;margin-left:20px;font-weight:bold;font-size:16px;text-align:center;color:#000000;">
                         <div name="key_w" style="margin-left:52px;background:url(Texture/Aries/Common/keyboard_32bits.png);width:48px;height:48px;float:left;padding-left:4px;padding-top:10px;">W</div><br />
                         <div name="key_a" style="margin-left:0px;margin-top:4px;background:url(Texture/Aries/Common/keyboard_32bits.png);width:48px;height:48px;float:left;padding-left:4px;padding-top:10px;">A</div>
@@ -30,7 +48,7 @@
         <pe:if condition='<%=(name=="step2")%>'>
             <pe:container alignment="_ct" ClickThrough="true" style="font-size:12px;margin-left:200px;margin-top:0px;width:600px;height:300px;background:">
                 <div class="helptip" style="margin-top:0px;margin-left:0px;color:#B9AB73;padding-left:5px;padding-bottom:3px;padding-right:5px;">
-                    <%=L"按住【鼠标右键】，同时移动鼠标可以改变视角"%>
+                    <%=GetMouseTip()%>
                 </div>
                 <div style="margin-left:60px;margin-top:40px;">
                     <div style="position:relative;margin-left:32px;margin-top:-32px;width:64px;height:32px;background:url(Texture/Aries/Quest/TutorialMouse_LeftRight_32bits.png);background-animation:url(script/UIAnimation/CommonBounce.lua.table#ShakeLR)" />

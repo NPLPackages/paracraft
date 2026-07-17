@@ -38,8 +38,12 @@ local bg_timer;
 -- e.g. ChatEdit.ShowPage(true, "_lb", 0, -147, 450, 30)
 function ChatEdit.ShowPage(bForceRefreshPage, alignment, left, top, width, height)
 	if(bForceRefreshPage or not ChatEdit.page) then
+		local htmlUrl = "script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html";
+		if System.options.isCommunity  then
+			htmlUrl = "script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.community.html"
+		end
 		ChatEdit.page = Map3DSystem.mcml.PageCtrl:new({
-			url="script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html", 
+			url=htmlUrl, 
 			click_through=true});
 	end
 	ChatEdit.page.OnCreate = ChatEdit.OnCreate
@@ -155,6 +159,7 @@ function ChatEdit.SetText(text)
 	        _editbox:Focus();
 			_editbox:SetCaretPosition(-1);
 			ChatEdit.AutoSetInputMethod(text);
+			ChatEdit.ResetCommandHistory(nil,true)
 		end
 	end
 end
@@ -223,6 +228,7 @@ function ChatEdit.Hide()
 		ChatEdit.is_fade_out = true;
 	end
 	ChatEdit.is_shown = false;
+	ChatEdit.CloseSmiley()
 end
 
 -- timer is enabled whenever chat edit window is shown
@@ -333,24 +339,24 @@ local function isWorldForkCommand(str)
 	return false
 end
 
-function ChatEdit.OnClickSend(name)
+function ChatEdit.CloseSmiley()
+	local ChatManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatManager.lua");
+	ChatManager.CloseSmileyPage()
+end
+
+local max_world_length = 256
+
+function ChatEdit.SendText(words)
 	if(not GameLogic.GameMode:CanChat()) then
 		GameLogic.AddBBS(nil, L"当前模式不允许聊天", 5000, "255 0 0");
 		ChatEdit.LostFocus();
 		return
 	end
+	ChatEdit.SendText_Imp(words)
+end
 
-	local words = "";
-	local _editbox = ChatEdit.GetInputControl();
-	if(_editbox) then
-		if(not name or name == "send") then
-			words = _editbox.text;
-		elseif(name == "cancel") then
-			words = "";
-		end
-	end
-
-	if(words == "")then
+function ChatEdit.SendText_Imp(words)
+	if(not words or words == "")then
 		ChatEdit.LostFocus();
 		if(System.options.IsMobilePlatform) then
 			MyCompany.Aries.Creator.Game.Desktop.ShowMobileDesktop(true);
@@ -366,8 +372,9 @@ function ChatEdit.OnClickSend(name)
 		return;
 	end
 
+	local _editbox = ChatEdit.GetInputControl();
 	if(_editbox) then
-		if((#words) > 120) then
+		if((#words) > max_world_length) then
 			_guihelper.MessageBox(L"你输入的文字太多了");
 			return;
 		end
@@ -375,13 +382,15 @@ function ChatEdit.OnClickSend(name)
 		local original_msg = words;
 
 		local bSendMessage = true;
-		if (words:match("^/")) then
+		if (words:match("^/") and not ChatEdit.IsChatCommand(words)) then
 			CommandHelpPage.ClosePage();
 			if(GameLogic.GameMode:CanUseCommand()) then
 				if not isWorldForkCommand(words) then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 					local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+					local command = words
 					words, bSendMessage = CommandManager:RunFromConsole(words);
+					CommandManager:RunCommand("/history -type save "..command)
 					if(type(words) ~= "string") then
 						words = "";
 					end
@@ -447,6 +456,27 @@ function ChatEdit.OnClickSend(name)
 	end
 end
 
+function ChatEdit.OnClickSend(name)
+	ChatEdit.CloseSmiley()
+	if(not GameLogic.GameMode:CanChat()) then
+		GameLogic.AddBBS(nil, L"当前模式不允许聊天", 5000, "255 0 0");
+		ChatEdit.LostFocus();
+		return
+	end
+
+	local words = "";
+	local _editbox = ChatEdit.GetInputControl();
+	if(_editbox) then
+		if(not name or name == "send") then
+			words = _editbox.text;
+		elseif(name == "cancel") then
+			words = "";
+		end
+	end
+	
+	ChatEdit.SendText_Imp(words)
+end
+
 function ChatEdit.FadeIn(animSeconds)
 	if(ChatEdit.is_fade_out) then
 		ChatEdit.is_fade_out = false;
@@ -510,33 +540,100 @@ function ChatEdit.SetFocus()
 	ChatEdit.is_focus_in = true
 	--ChatWindow.RefreshTreeView();
 end
+NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+
+function ChatEdit.ResetCommandHistory(virtual_key , force_reset)
+	if ChatEdit.reset_command_timer then
+		ChatEdit.reset_command_timer:Change()
+	end
+	if virtual_key == Event_Mapping.EM_KEY_SLASH or force_reset then
+		-- Reset command_index immediately so the first UP key press always shows the most recent command,
+		-- even if the timer below gets cancelled by a subsequent key press (e.g. UP).
+		CommandManager:RunCommand("/history -init")
+		ChatEdit.reset_command_timer = commonlib.TimerManager.SetTimeout(function()  
+			local _editbox = ChatEdit.GetInputControl();
+			if(_editbox and _editbox:IsValid() and _editbox.text == "/") then
+				CommandManager:RunCommand("/history -init")
+			end
+		end, 1000,"command_history_reset_timer"); 
+	end
+end
+
+
+function ChatEdit.OnChangeText(name, mcmlNode)
+	if(System.options.IsMobilePlatform) then
+		-- tricky: this fixed a bug on mobile platform where backspace does not work properly
+		local _editbox = ChatEdit.GetInputControl();
+		if(_editbox and _editbox:IsValid()) then
+			local orig = _editbox.text or "";
+			local sentText = orig;
+			local tag = "[#backspace]"
+			
+			while true do
+				local tag_pos = string.find(sentText, tag, 1, true)
+				if not tag_pos then break end
+				-- split by byte positions since tag is ASCII; compute unicode char count of part before tag
+				local before_bytes = string.sub(sentText, 1, tag_pos - 1)
+				local after_bytes = string.sub(sentText, tag_pos + #tag)
+
+				local before_char_count = ParaMisc.GetUnicodeCharNum(before_bytes)
+				local new_before = ""
+				if before_char_count > 0 then
+					-- remove the last unicode char
+					new_before = ParaMisc.UniSubString(before_bytes, 1, before_char_count - 1) or ""
+				end
+
+				sentText = new_before .. (after_bytes or "")
+			end
+
+			-- only assign back if text actually changed
+			if(sentText ~= orig) then
+				_editbox.text = sentText
+			end
+		end
+	end
+end
 
 function ChatEdit.OnKeyUp(name, mcmlNode)
+	ChatEdit.CloseSmiley()
 	local _editbox = ChatEdit.GetInputControl();
 	if(_editbox and _editbox:IsValid()) then
 		local sentText = _editbox.text;
 
-		if(string.len(sentText) > 120) then
-			_editbox.text = string.sub(sentText, 1, 120);
+		if(string.len(sentText) > max_world_length) then
+			_editbox.text = string.sub(sentText, 1, max_world_length);
 			_editbox:SetCaretPosition(-1);
 		end
 		ChatEdit.AutoSetInputMethod(sentText);
-
+		ChatEdit.ResetCommandHistory(virtual_key);
 		local callbacks = {
 			[Event_Mapping.EM_KEY_RETURN] = ChatEdit.OnClickSend,
 			[Event_Mapping.EM_KEY_NUMPADENTER] = ChatEdit.OnClickSend,
 			[Event_Mapping.EM_KEY_UP] = function ()
-				local sentence = sentence_history:PreviousSentence()
-				if(sentence) then
-					_editbox.text = sentence;
+				local history_command = CommandManager:RunCommand("/history -next")
+				if(history_command and history_command ~= "") then
+					_editbox.text = history_command;
 					_editbox:SetCaretPosition(-1);
+				else
+					local sentence = sentence_history:PreviousSentence()
+					if(sentence and sentence ~= "") then
+						_editbox.text = sentence;
+						_editbox:SetCaretPosition(-1);
+					end
 				end
 			end,
 			[Event_Mapping.EM_KEY_DOWN] = function ()
 				local sentence = sentence_history:NextSentence()
-				if(sentence) then
+				if(sentence and sentence ~= "") then
 					_editbox.text = sentence;
 					_editbox:SetCaretPosition(-1);
+				else
+					local history_command = CommandManager:RunCommand("/history -previous")
+					if(history_command and history_command ~= "") then
+						_editbox.text = history_command;
+						_editbox:SetCaretPosition(-1);
+					end
 				end
 			end,
 		}
@@ -661,4 +758,9 @@ function ChatEdit.IsShowIMEBt()
 	end
 
 	return false
+end
+
+function ChatEdit.IsChatCommand(text)
+	local ChatManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatManager.lua");
+	return ChatManager.IsChatCommand(text)
 end

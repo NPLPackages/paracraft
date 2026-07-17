@@ -8,6 +8,7 @@ use the lib:
 local langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CommandsBlockly.lua");
 -------------------------------------------------------
 ]]
+local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
 local CommandsBlockly = NPL.export();
 commonlib.setfield("MyCompany.Aries.Game.Code.CommandsBlockly", CommandsBlockly);
 
@@ -52,7 +53,6 @@ function CommandsBlockly.AppendMissingCommands()
 		local cmd = cmds:GetSlashCommand(name);
 		if(cmd) then
 			local typeName = "cmd_"..name
-			echo(typeName)
 			
 			local item = cmdsMap[typeName]
 			if(not item) then
@@ -128,3 +128,54 @@ function CommandsBlockly.GetAllCmds()
 	return all_cmds;
 end
 
+-- custom compiler here: 
+-- @param codeblock: code block object here
+function CommandsBlockly.CompileCode(code, filename, codeblock)
+    local block_name = codeblock:GetBlockName();
+    
+	code = CommandsBlockly.GetCode(code, filename);
+	local compiler = CodeCompiler:new():SetFilename(filename)
+	compiler:SetAllowFastMode(true);
+	return compiler:Compile(code);
+end
+
+-- @param code: text of code string
+function CommandsBlockly.GetCode(code, filename)
+	local lines = {}
+
+	local isFirstLine = true;
+	for line in code:gmatch("([^\r\n]+)") do
+		local cmd = line:match("^%s*/(.*)");
+		if(cmd) then
+			isFirstLine = false;
+			local name, params = cmd:match("^(%w+)%s+(.*)");
+			if(name == "wait") then
+				-- tricky: /wait 1s => wait(1)
+				lines[#lines+1] = string.format("wait(%s)", params);
+			else
+				lines[#lines+1] = string.format("cmd(%q)", cmd)
+			end
+		elseif(line:match("^%-%-")) then
+			-- skip comment line
+		elseif(isFirstLine and line:match("^Set%w")) then
+			isFirstLine = false;
+			-- this is a macro, we will run macro
+
+			local text = string.format([[
+if(not GameLogic.Macros:HasUnplayedPreparedMode()) then
+	local player = GameLogic.EntityManager.GetPlayer()
+	local cx, cy, cz = player:GetBlockPos();
+	GameLogic.Macros:PrepareDefaultPlayMode(cx, cy, cz)
+end
+GameLogic.Macros:PrepareInitialBuildState()
+GameLogic.Macros:Play(%q);
+while(GameLogic.Macros:IsPlaying()) do
+	wait(0.5)
+end
+]], code)
+			return text;
+		end
+	end
+	code = table.concat(lines, "\n")
+	return code;
+end

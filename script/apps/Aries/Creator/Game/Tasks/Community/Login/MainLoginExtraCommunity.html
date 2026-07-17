@@ -1,0 +1,211 @@
+<html>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl">
+                <![CDATA[
+                    -- bottles
+                    local MainLogin = NPL.load('(gl)Mod/WorldShare/cellar/MainLogin/MainLogin.lua')
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/MainLogin.lua")
+                    local GameMainLogin = commonlib.gettable('MyCompany.Aries.Game.MainLogin')
+                    -- libs
+                    NPL.load('(gl)script/apps/Aries/Creator/Game/Common/Translation.lua')
+                    local Translation = commonlib.gettable('MyCompany.Aries.Game.Common.Translation')
+                    local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop")
+                    local page = document:GetPageCtrl()
+
+                    MainLogin.language_index = 1
+                    local curLanguage = Translation.GetCurrentLanguage()
+                    if curLanguage == "zhCN" then
+                        MainLogin.language_index = 1
+                    end
+                    if curLanguage == "enUS" then
+                        MainLogin.language_index = 2
+                    end
+                    if curLanguage == "zhTW" then
+                        MainLogin.language_index = 3
+                    end
+                    page.OnCreate = function()
+                        local language_menu = page:FindControl('language_menu')
+                        language_menu.visible = IsShowLanguageMenu() 
+                    end
+                    function DS_Languages()
+                        return {
+                            {name="zhCN", text=L"简体中文"},
+                            {name="enUS", text=L"English"},
+                            {name="zhTW", text=L"繁体中文"},
+                        }
+                    end
+
+                    
+
+                    function OnChangeLanguage(name)
+                        local curLanguage = Translation.GetCurrentLanguage()
+                        if not name or not curLanguage or curLanguage == name then
+                            return
+                        end
+                        Mod.WorldShare.Store:Set('user/isSettingLanguage', true)
+                        Translation.SetCustomLanguage(name, true)
+                        --Translation.ChangeLanguage(name, true);
+                        ShowLanguageMenu()
+                        if(curLanguage ~= Translation.GetCurrentLanguage()) then
+                            NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+                            local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+                            ParaWorldLoginDocker.Restart("paracraft")
+                        end
+                    end
+
+                    function ShowLanguageMenu()
+                        MainLogin.is_language_menu_show = not MainLogin.is_language_menu_show
+                        page:Refresh(0)                        
+                    end
+                    
+                    function GetLanguageText()
+                        local curLanguage = Translation.GetCurrentLanguage()
+                        if curLanguage == "zhCN" then
+                            return L"简体中文"
+                        end
+                        if curLanguage == "enUS" then
+                            return L"English"
+                        end
+                        if curLanguage == "zhTW" then
+                            return L"繁体中文"
+                        end
+                    end
+
+                    function IsShowLanguageMenu()
+                        local isShow = MainLogin.is_language_menu_show == true or MainLogin.is_language_menu_show == "true"
+                        return isShow
+                    end
+
+                    function IsSelectLanguage(index)
+                        local index = tonumber(index)
+                        return index and index == MainLogin.language_index
+                    end
+
+                    function IsShowUpdate()
+                        local platform = System.os.GetPlatform();                        
+                        return platform == "win32"
+                    end
+
+                    function OnClickUpdateBtn()
+                        GameMainLogin:ShowUpdatePage(true)
+                    end
+                ]]>
+            </script>
+            <div>
+                <pe:container name="language_menu" visible="<%=IsShowLanguageMenu()%>" style="position: relative; margin-left: 200px; margin-top: 0x; width: 114px;height: 114px; background-color: #353536; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                    <div style="width: 110px; height: 112px; margin-top: 4px;">
+                        <pe:repeat DataSource="<%=DS_Languages()%>">
+                            <pe:repeatitem style="float:left; width: 114px; height: 36px;">
+                                <div style="float: left; width: 114px;height: 36px; ">
+                                    <pe:if condition="<%=IsSelectLanguage(Eval('index')) %>">
+                                        <div style="width: 110px;
+                                            margin-left: 2px;
+                                            height: 36px; 
+                                            background-color: #CCCCCC22; 
+                                            background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                            <input type="button"
+                                                value="<%='   '..Eval('text')%>"  
+                                                name='<%=Eval("name")%>' 
+                                                onclick="OnChangeLanguage"
+                                                style="color: #d3d3d3; 
+                                                    width: 110px;
+                                                    height: 36px; 
+                                                    background: url();"/>
+                                        </div>
+                                        
+                                    </pe:if>
+                                    <pe:if condition="<%=not IsSelectLanguage(Eval('index'))  %>">
+                                        <input type="button" 
+                                            value="<%='   '..Eval('text')%>"
+                                            name='<%=Eval("name")%>' 
+                                            onclick="OnChangeLanguage"
+                                            style="color: #A8A7B0; 
+                                            width: 110px;
+                                            margin-left: 2px;
+                                            height: 36px; 
+                                            background: url();" />
+                                    </pe:if>
+                                </div>
+                            </pe:repeatitem>
+                        </pe:repeat>
+                    </div>
+                </pe:container>
+                <pe:if condition="<%=IsShowUpdate()%>">
+                    <!-- 552 106 20 20 -->
+                    <div style="float: left; 
+                            margin-top: 110px;
+                            margin-left: 30px;
+                            width: 148px; 
+                            height: 36px; ">
+                        <pe:if condition="<%=not Mod.WorldShare.Utils.IsEnglish()%>">
+                            <input type='button'
+                                value="<%=L'版本更新'%>"
+                                icon="Texture/Aries/Creator/keepwork/community_32bits.png#552 106 20 20"
+                                icon_width="20"
+                                icon_height="20"
+                                icon_off_y="2"
+                                icon_off_x="-48"
+                                style='position: relative;
+                                    font-size: 14px;
+                                    base-font-size: 14px;
+                                    font-weight: bold;
+                                    width: 148px;
+                                    height: 36px;
+                                    color: #d3d3d3;
+                                    background: url()'
+                                onclick='OnClickUpdateBtn' />
+                        </pe:if>
+                        <pe:if condition="<%=Mod.WorldShare.Utils.IsEnglish()%>">
+                            <input type='button'
+                                value="<%=L'Update version'%>"
+                                icon="Texture/Aries/Creator/keepwork/community_32bits.png#552 106 20 20"
+                                icon_width="20"
+                                icon_height="20"
+                                icon_off_y="2"
+                                icon_off_x="-54"
+                                style='position: relative;
+                                    font-size: 14px;
+                                    base-font-size: 14px;
+                                    text-offset-x:13;
+                                    width: 148px;
+                                    height: 36px;
+                                    color: #d3d3d3;
+                                    background: url()'
+                                onclick='OnClickUpdateBtn' />
+                        </pe:if>
+                        
+                    </div>
+                    
+                </pe:if>   
+                <pe:if condition="<%=not IsShowUpdate()%>">
+                    <div style="float: left; 
+                            margin-top: 110px;
+                            margin-left: 30px;
+                            width: 148px; 
+                            height: 36px; "></div>
+                </pe:if>
+                <input type='button'
+                    icon="Texture/Aries/Creator/keepwork/community_32bits.png#596 176 20 20"
+                    icon_width="20"
+                    icon_height="20"
+                    icon_off_y="0"
+                    icon_off_x="-54"
+                    value="<%=L'语言/Language'%>"
+                    style='float: left;
+                            font-size: 14px;
+                            base-font-size: 14px;
+                            font-weight: bold;
+                            margin-top: 110px;
+                            margin-left:0px;
+                            width: 148px;
+                            height: 36px;
+                            text-offset-x:13;
+                            text-offset-y:1;
+                            color: #d3d3d3;
+                            background: url()'
+                    onclick='ShowLanguageMenu' />                
+            </div>
+        </pe:mcml>
+    </body>
+</html>

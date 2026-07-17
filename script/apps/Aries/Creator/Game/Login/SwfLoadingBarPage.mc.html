@@ -50,24 +50,35 @@
     ]]>
 </script>
             <pe:if condition='<%= Page:GetRequestParam("showbg")=="true" %>'>
-                <pe:container alignment="_fi"
-                              zorder="-1"
-                              width="100%"
-                              height="100%"
-                              style="position: relative;
-                                     background: url(Texture/whitedot.png);
-                                     background-color: #000000"></pe:container>
-                <pe:container alignment="_ct"
-                              style="position: relative;
-                                     background:;
-                                     margin-left: -256px;
-                                     margin-top: -170px;
-                                     width: 512px;
-                                     height: 256px;">
-                    <pe:if condition='<%= Page:GetRequestParam("showtoplogo") ~= "false" %>'>
-                        <div style="<%=GetBackgroundImageStyle()%>"></div>
-                    </pe:if>
-                </pe:container>
+                <pe:if condition="<%= System.options.isShenzhenAi5%>">
+                    <pe:container alignment="_fi"
+                        zorder="-1"
+                        width="100%"
+                        height="100%"
+                        style="position: relative;
+                                background: url(Texture/Aries/Creator/paracraft/Educate/shenzhenai5_logo_bg_1280x720_32bits.png#0 0 1280 720);"></pe:container>
+                </pe:if>
+                <pe:if condition="<%=not System.options.isShenzhenAi5%>">
+                    <pe:container alignment="_fi"
+                                zorder="-1"
+                                width="100%"
+                                height="100%"
+                                style="position: relative;
+                                        background: url(Texture/whitedot.png);
+                                        background-color: #000000"></pe:container>
+                    <pe:container alignment="_ct"
+                                style="position: relative;
+                                        background:;
+                                        margin-left: -256px;
+                                        margin-top: -170px;
+                                        width: 512px;
+                                        height: 256px;">
+                        <pe:if condition='<%= Page:GetRequestParam("showtoplogo") ~= "false" %>'>
+                            <div style="<%=GetBackgroundImageStyle()%>"></div>
+                        </pe:if>
+                    </pe:container>
+                </pe:if>
+                
             </pe:if>
             <pe:container alignment="_ctb"
                           uiname="apps.aries.creator.game.login.swf_loading_bar.bar"

@@ -7,13 +7,16 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/ObtainItemEffect.lua");
 local ObtainItemEffect = commonlib.gettable("MyCompany.Aries.Game.Effects.ObtainItemEffect");
-ObtainItemEffect:new({background="Texture/whitedot.png", duration=1000, color="#00ff00ff", width=6,height=6, 
-	from_3d={}, to_2d={x=0,y=0}}):Play();
-ObtainItemEffect:new({background="Texture/whitedot.png", color="#ffffffff", width=32,height=32, 
-	from_3d={bx=0,by=0,bz=0}, to_2d={x=0,y=0}}):Play();
-ObtainItemEffect:new({text="hello world", color="#ffffffff", width=128,height=32, 
-	from_3d={bx=0,by=0,bz=0, offset_x=0, offset_y=0}, to_2d={x=0,y=0}
-	fadeIn=100, fadeOut=100}):Play();
+ObtainItemEffect.FlyImageFromEntityToUI(GameLogic.EntityManager.GetPlayer(), "Texture/whitedot.png", {x=0,y=0}, 1000, 32, 32);
+ObtainItemEffect.FlyTextFromEntityToUI(GameLogic.EntityManager.GetPlayer(), "hello world", "QuickSelectBar.btn1", "#00ffff", 16, 2000);
+-- Fly text to entity from UI
+ObtainItemEffect.FlyTextToEntity("Critical Hit!", GameLogic.EntityManager.GetPlayer(), "QuickSelectBar.btn1", "#ff0000", 20, 1000);
+ObtainItemEffect.FlyTextToEntity("Critical Hit!", GameLogic.EntityManager.GetPlayer(), nil, "#ff0000", 20, 1000);
+-- Fly text to entity from another entity
+local npc = GameLogic.EntityManager.GetEntity("myNPC");
+ObtainItemEffect.FlyTextToEntity("Healing +50", GameLogic.EntityManager.GetPlayer(), npc, "#00ff00", 16, 1500);
+-- Fly image to entity from 2D position
+ObtainItemEffect.FlyImageToEntity("Texture/whitedot.png", GameLogic.EntityManager.GetPlayer(), {x=200, y=200}, 2000, 48, 48);
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/mathlib.lua");
@@ -24,6 +27,10 @@ local mathlib = commonlib.gettable("mathlib");
 local ObtainItemEffect = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Effects.ObtainItemEffect"));
 
 function ObtainItemEffect:ctor()
+	self.fontsize = self.fontsize or 14;
+	if(self.fontsize and not self.font) then
+		self.font = string.format("System;%d;bold", self.fontsize);
+	end
 end
 
 function ObtainItemEffect:Convert3Dto2D(from_3d)
@@ -54,6 +61,21 @@ function ObtainItemEffect:Prepare()
 	if(not self.from_2d) then
 		self.from_2d = self:Convert3Dto2D(self.from_3d);
 	end
+
+	if(type(self.to_2d) == "string") then
+		local uiobj = ParaUI.GetUIObject(self.to_2d);
+		if(uiobj and uiobj:IsValid()) then
+			local x, y, width, height = uiobj:GetAbsPosition();
+			local target_w = self.width or 32;
+			local target_h = self.height or target_w;
+			if(self.from_2d) then
+				target_w = self.from_2d.width or target_w;
+				target_h = self.from_2d.height or target_h;
+			end
+			self.to_2d = {x = x + width/2 - target_w/2, y = y + height/2 - target_h/2};
+		end
+	end
+
 	if(not self.to_2d) then
 		self.to_2d = self:Convert3Dto2D(self.to_3d);
 	end
@@ -75,6 +97,9 @@ function ObtainItemEffect:CreateUI()
 		end
 		_this.font = self.font or "System;14;bold";
 		_this.shadow = true;
+		if(not self.background) then
+			_guihelper.SetUIFontFormat(_this, 32+256); -- single line, left align and noclip
+		end
 	end
 	_this.background = self.background or "";
 	_guihelper.SetUIColor(_this, self.color or "#ffffffff");
@@ -124,7 +149,143 @@ function ObtainItemEffect:Play(start_time)
 			end
 			
 		else
+			if self.finishCallback and type(self.finishCallback) == "function" then
+				self.finishCallback();
+				self.finishCallback = nil;
+			end
 			ParaUI.Destroy(id);
 		end	
 	end, nil, 30)
+end
+
+-- convenience: create-and-play
+function ObtainItemEffect.ShowEffect(params)
+	params = params or {};
+	local eff = ObtainItemEffect:new(params);
+	eff:Play();
+	return eff;
+end
+
+-- show text flying from an entity to a 2d position
+function ObtainItemEffect.FlyTextFromEntityToUI(entity, text, to_2d, color, fontsize, duration)
+	if(not entity or type(entity.GetPosition)~="function") then return end
+	local fontsize = fontsize or 14;
+	local x, y, z = entity:GetPosition();
+	y = y + entity:GetHeight();
+	local params = {
+		text = text,
+		color = color,
+		duration = duration,
+		from_3d = {x = x, y = y, z = z},
+		to_2d = to_2d,
+		fontsize = fontsize,
+	};
+	return ObtainItemEffect.ShowEffect(params);
+end
+
+-- show image flying from an entity to a 2d position
+function ObtainItemEffect.FlyImageFromEntityToUI(entity, background, to_2d, duration, width, height)
+	if(not entity or type(entity.GetPosition)~="function") then return end
+	local x, y, z = entity:GetPosition();
+	y = y + entity:GetHeight();
+	local params = {
+		background = background,
+		duration = duration,
+		from_3d = {x = x, y = y, z = z},
+		to_2d = to_2d,
+		width = width,
+		height = height,
+	};
+	return ObtainItemEffect.ShowEffect(params);
+end
+
+-- show text flying to an entity from a source (UI, entity, or offset)
+-- @param from_source: can be a string (UI object name), or a 3d position table {x,y,z} or an entity object or nil. 
+-- if nil, it will try to fly from 100px above the entity.
+function ObtainItemEffect.FlyTextToEntity(text, target_entity, from_source, color, fontsize, duration)
+	if(not target_entity or type(target_entity.GetPosition)~="function") then return end
+	local fontsize = fontsize or 14;
+	local x, y, z = target_entity:GetPosition();
+	y = y + target_entity:GetHeight();
+	local to_3d = {x = x, y = y, z = z};
+	
+	local from_2d, from_3d;
+	
+	if(type(from_source) == "string") then
+		from_2d = from_source;
+	elseif(type(from_source) == "table") then
+		if(type(from_source.GetPosition)=="function") then
+			local fx, fy, fz = from_source:GetPosition();
+			fy = fy + from_source:GetHeight();
+			from_3d = {x = fx, y = fy, z = fz};
+		elseif(from_source.x) then
+			from_2d = from_source;
+		end
+	end
+	
+	if(not from_2d and not from_3d) then
+		local screen_pos = {};
+		ParaScene.GetScreenPosFrom3DPoint(x, y, z, screen_pos);
+		if(screen_pos.x) then
+			from_2d = {x = screen_pos.x, y = screen_pos.y - 100};
+		else
+			from_3d = {x = x, y = y + 1, z = z};
+		end
+	end
+
+	local params = {
+		text = text,
+		color = color,
+		duration = duration,
+		from_2d = from_2d,
+		from_3d = from_3d,
+		to_3d = to_3d,
+		fontsize = fontsize,
+	};
+	return ObtainItemEffect.ShowEffect(params);
+end
+
+-- show image flying to an entity from a source (UI, entity, or offset)
+-- @param from_source: can be a string (UI object name), or a 3d position table {x,y,z} or an entity object or nil. 
+-- if nil, it will try to fly from 100px above the entity.
+function ObtainItemEffect.FlyImageToEntity(background, target_entity, from_source, duration, width, height)
+	if(not target_entity or type(target_entity.GetPosition)~="function") then return end
+	local x, y, z = target_entity:GetPosition();
+	y = y + target_entity:GetHeight();
+	local to_3d = {x = x, y = y, z = z};
+	
+	local from_2d, from_3d;
+	
+	if(type(from_source) == "string") then
+		from_2d = from_source;
+	elseif(type(from_source) == "table") then
+		if(type(from_source.GetPosition)=="function") then
+			local fx, fy, fz = from_source:GetPosition();
+			fy = fy + from_source:GetHeight();
+			from_3d = {x = fx, y = fy, z = fz};
+		elseif(from_source.x) then
+			from_2d = from_source;
+		end
+	end
+	
+	if(not from_2d and not from_3d) then
+		local screen_pos = {};
+		ParaScene.GetScreenPosFrom3DPoint(x, y, z, screen_pos);
+		if(screen_pos.x) then
+			from_2d = {x = screen_pos.x, y = screen_pos.y - 100};
+		else
+			from_3d = {x = x, y = y + 1, z = z};
+		end
+	end
+
+	local params = {
+		background = background,
+		duration = duration,
+		from_2d = from_2d,
+		from_3d = from_3d,
+		to_3d = to_3d,
+		width = width,
+		height = height,
+	};
+	return ObtainItemEffect.ShowEffect(params);
 end

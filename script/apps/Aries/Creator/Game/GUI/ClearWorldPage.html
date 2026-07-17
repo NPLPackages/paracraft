@@ -1,0 +1,69 @@
+<!-- "script/apps/Aries/Creator/Game/GUI/ClearWorldPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ClearWorldPage.lua"><![CDATA[
+ClearWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ClearWorldPage.lua");
+ClearWorldPage.OnInit();
+print("ClearWorldPage.lua loaded",#ClearWorldPage.clearResult);
+function get_file_list(index)
+    if index == nil then
+        return #ClearWorldPage.clearResult
+    else
+        return ClearWorldPage.clearResult[index]
+    end
+end
+
+function GetFileInfo(index)
+    local fileInfo = ClearWorldPage.clearResult[index]
+    if not fileInfo then
+        return ""
+    end
+    local fileSize = math.floor((fileInfo.filesize/1024)*10)/10
+    local infoStr = commonlib.GetLimitLabelByTextWidth(fileInfo.filename,240,"System;12;norm") .. ",大小(".. fileSize .. "kb)"
+    return infoStr
+end
+]]></script>
+<style type="text/mcss">
+    {
+        link_button = {
+            float = "left", color = "#656cf6", ["background-color"] = "#656cf6", background = "Texture/Aries/Common/underline_white_32bits.png:3 3 3 3",
+        },
+    }
+    </style>
+<aries:window style="width:512px;" title='<%=L"清理世界"%>' mode="thin"  onclose="ClearWorldPage.OnClose">
+    <div style="margin:10px;color:#ffffff;">
+        <div style="width: 482px; height: 330px; background: url(Texture/whitedot.png); background-color:#cec8a8" >
+            <pe:gridview RememberScrollPos='true'
+                        AllowOverflowScroll='true'
+                        DataSource='<%= get_file_list %>'
+                        name='clear_file_list'
+                        DefaultNodeHeight='20'
+                        ItemsPerLine='1'
+                        AllowPaging='false'>
+                    <Columns>
+                        <div style="width: 470px; height:20px; ">
+                            <div style="position: relative; color: #505050;"><%=GetFileInfo(Eval("index"))%></div>
+                            <div style="position: relative; margin-left: 400px;">
+                                <div style="float:left;">
+                                    <div class="link_button" name="<%=Eval('index')%>" onclick="ClearWorldPage.OnClickDeleteFile" tooltip='<%=Eval("filename")%>'><%=L"删除"%></div>
+                                </div>
+                                <div style="float:left; margin-left:10px;">
+                                    <div class="link_button" name="<%=Eval('index')%>" onclick="ClearWorldPage.OnClickOpenFile"  tooltip='<%=Eval("filename")%>'><%=L"查看"%></div>
+                                </div>
+                            </div>
+                        </div>
+                    </Columns>
+            </pe:gridview>
+        </div>
+        
+        <div style="margin-top:5px;">
+            <!-- <input type="checkbox" style="margin-top:1px;margin-right:3px;" checked="true" uiname="ClearWorldPage.checkAll" name="checkAll"/><div uiname="ClearWorldPage.checkAll_for" for="checkAll" style="float:left;font-size:10px;color:#808080"><%=L"全部"%></div> -->
+            <input type="button" align="right" uiname="ClearWorldPage.cancel" name="cancel" value='<%=L"取消"%>' onclick="ClearWorldPage.OnClose" style="width:80px;margin-left:20px;" class="mc_light_grey_button_with_fillet" />
+        </div>
+    </div>
+</aries:window>
+</pe:mcml> 
+</body>
+</html>

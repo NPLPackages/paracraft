@@ -1,0 +1,299 @@
+<html>
+
+<body>
+    <pe:mcml>
+        <script type="text/npl">
+        <![CDATA[
+            NPL.load('(gl)script/kids/3DMapSystemUI/ScreenShot/SnapshotPage.lua')
+            NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/Lessons/Creation.lua");
+            local ShareWorld = NPL.load('(gl)Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua');
+
+            local Creation = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Lessons.Creation");
+            local SnapshotPage = commonlib.gettable('MyCompany.Apps.ScreenShot.SnapshotPage');
+            local Desktop = commonlib.gettable('MyCompany.Aries.Creator.Game.Desktop')
+            NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+            local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+            local page = document:GetPageCtrl();
+
+            function snapshot()
+                if SnapshotPage.TakeSnapshot(
+                    Creation:GetImageUrl(),
+                    300,
+                    200,
+                    false
+                ) then
+                    ParaAsset.LoadTexture('', Creation:GetImageUrl(), 1):UnloadAsset()
+                    page:SetUIValue('opus-submit-snapshot', Creation:GetImageUrl());
+                end
+            end
+
+            function get_submit_type()
+                return Creation.submitType;
+            end
+
+            function get_homework_name()
+                if (Creation.curSection and
+                    Creation.curSection.content and
+                    Creation.curSection.content.content and
+                    Creation.curSection.content.content.homeworkName) then
+                    return Creation.curSection.content.content.homeworkName;
+                else
+                    return "";
+                end
+            end
+
+            function get_opus_submit_container_style()
+                if GameLogic.IsReadOnly() then
+                    return "height: 600px;margin-top:-300px";
+                end
+                if (get_submit_type() == 1) then
+                    return "height: 530px;margin-top:-265px";
+                else
+                    return "";
+                end
+            end
+
+            function get_opus_submite_down()
+                if (get_submit_type() == 1) then
+                    return "height: 211px";
+                else
+                    return "";
+                end
+            end
+
+            function submit()
+                local opus_desc = page:GetValue("opus-desc");
+                GameLogic.QuickSave()
+                if (get_submit_type() == 1) then
+                    Creation:SubmitWorld(nil, opus_desc);
+                elseif (get_submit_type() == 2 or get_submit_type() == 3) then
+                    local opus_name = page:GetValue("opus_name");
+                    Creation:SubmitWorld(opus_name, opus_desc);
+                end
+                Desktop.is_exiting = false
+            end
+
+            function submitAndExit()
+                Creation.needExitWorld = true
+                local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+                PapaAPI:ReportLesson()
+                GameLogic.GetFilters():add_filter("SyncWorldFinish", Creation.OnSyncWorldFinish);
+                local opus_desc = page:GetValue("opus-desc");
+                GameLogic.QuickSave()
+                if (get_submit_type() == 1) then
+                    Creation:SubmitWorld(nil, opus_desc);
+                elseif (get_submit_type() == 2 or get_submit_type() == 3) then
+                    local opus_name = page:GetValue("opus_name");
+                    Creation:SubmitWorld(opus_name, opus_desc);
+                end
+                Desktop.is_exiting = false
+            end
+
+            function close()
+                page:CloseWindow();
+                Desktop.is_exiting = false
+            end
+
+            function exitWorld()
+                page:CloseWindow();
+                NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
+                local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+                PapaAPI:NplClickExitWorld()
+                PapaAPI:ReportLesson()
+                local WorldExitDialog = NPL.load('Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
+                WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
+            end
+
+            function onClickBg()
+            end
+
+            function canEditName()
+                local isHomeWorkWorld = WorldCommon.GetWorldTag('isHomeWorkWorld')
+                return not isHomeWorkWorld and not GameLogic.IsReadOnly()
+            end
+
+            function IsHomeWorkWorld()
+                return WorldCommon.GetWorldTag('isHomeWorkWorld')
+            end
+        ]]>
+      </script>
+        <style type="text/mcss">
+            {
+                ["opus-submit-container"] = {
+                    width = 1200,
+                    height = 660,
+                    background = "Texture/Aries/Creator/Game/PapaAdventures/mobile/back1_512x282_32bits.png#0 0 512 282:200 100 200 100",
+                    ["margin-left"] = -600,
+                    ["margin-top"] = -330,
+                },
+                ["opus-submit-title"] = {
+                    width = 1100,
+                    ["font-size"] = 36,
+                    ["base-font-size"] = 36,
+                    ["margin-top"] = 22,
+                    color = "#000000",
+                    ["background-color"] = "",
+                    ["text-align"] = "center",
+                },
+                ["opus-submit-snapshot"] = {
+                    width = 520,
+                    height = 350,
+                    ["background-color"] = "#ffffff00",
+                    ["margin-top"] = 26,
+                    position = 'relative',
+                },
+                ["opus-submit-up"] = {
+                    width = 500,
+                    height = 307,
+                    background = "",
+                    position = 'relative',
+                },
+                ["opus-submit-right"] = {
+                    width = 600,
+                    height = 360,
+                    left = 560,
+                    top = 90,
+                    ['background-color'] = "#ff00ff00",
+                },
+                ["opus-submit-opus-title"] = {
+                    width = 440,
+                    height = 36,
+                    ["line-height"] = "28px",
+                    ["margin-top"] = 0,
+                    ["font-size"] = 28,
+                    ["base-font-size"] = 28,
+                    ["font-weight"] = "bold",
+                    ["color"] = "#38374D"
+                },
+                ["opus-submit-opus-title-textfield"] = {
+                    width = 560,
+                    height = 84,
+                },
+                ["opus-submit-opus-desc"] = {
+                    width = 540,
+                    height = 84,
+                    ["line-height"] = "28px",
+                    ["margin-top"] = 0,
+                    ["font-size"] = 28,
+                    ["base-font-size"] = 28,
+                    ["font-weight"] = "bold",
+                    ["color"] = "#38374D"
+                },
+                ["opus-submit-opus-desc-container"] = {
+                    width = 540,
+                    height = 152,
+                    background = "Texture/Aries/Creator/Game/PapaAdventures/mobile/input_80x36_32bits.png#0 0 80 36:30 10 30 10", 
+                },
+                ["opus-submit-save"] = {
+                    width = 540,
+                    height = 80,
+                    ["text-align"] = "center",
+                    background = "Texture/Aries/Creator/Game/PapaAdventures/mobile/anniu1_540x80_32bits.png#0 0 540 80",
+                    ["font-size"] = 32,
+                    ["base-font-size"] = 30,
+                    ["line-height"] = "80px",
+                    color = "#ffffff", 
+                    ["font-weight"] = "bold",
+                },
+                ["opus-exit-btn"] = {
+                    width = 540,
+                    height = 80,
+                    ["text-align"] = "center",
+                    background = "Texture/Aries/Creator/Game/PapaAdventures/mobile/anniu2_540x80_32bits.png#0 0 540 80",
+                    ["font-size"] = 32,
+                    ["base-font-size"] = 30,
+                    ["line-height"] = "80px",
+                    color = "#ff8a2e",
+                    ["font-weight"] = "bold",
+                },
+                ["close"] = {
+                    width = 64,
+                    height = 64,
+                    background = "Texture/Aries/Creator/paracraft/Tutorial/Esc/close_64x64_32bits.png#0 0 64 64",
+                    position = "relative",
+                    left = 1116,
+                    top = 10,
+                }
+            }
+      </style>
+        <pe:container onclick="onClickBg" ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #dcdcdc00">
+        </pe:container>
+        <pe:container alignment="_ct" ClickThrough="false" class="opus-submit-container" >
+            <div class="opus-submit-up">
+                <pe:if condition="<%= get_submit_type() == 2 or get_submit_type() == 3 or true %>">
+                    <pe:container class="close" onclick="close()" zorder="2" />
+                </pe:if>
+                <div style="width: 440px" align="center">
+                    <pe:if condition="<%= get_submit_type() == 1%>">
+                        <pe:container class="opus-submit-title" zorder="1">
+                            <%= get_homework_name() %>
+                        </pe:container>
+                    </pe:if>
+                    <pe:if condition="<%= get_submit_type() == 2%>">
+                        <pe:container class="opus-submit-title" zorder="1"><%=L"提交作品"%></pe:container>
+                    </pe:if>
+                    <pe:if condition="<%= get_submit_type() == 3%>">
+                        <pe:container class="opus-submit-title" zorder="1"><%=L"退出世界"%></pe:container>
+                    </pe:if>
+                </div>
+                <div class="opus-submit-snapshot" style="margin-left: 40px;">
+                    <input type="button" zorder="3" onclick="snapshot()" style="background: url(Texture/Aries/Creator/Game/PapaAdventures/mobile/snapshot_168x56_32bits.png#0 0 168 56);width: 168px;height: 56px;position: relative;margin-top: 8px;margin-left: 332px;" />
+                    <img name="opus-submit-snapshot" style="width: 510px; height: 350px" />
+                </div>
+            </div>
+            <div class="opus-submit-right">
+                <pe:if condition="<%= get_submit_type() == 2 or get_submit_type() == 3 %>">
+                    <div class="opus-submit-opus-title"  style="margin-left: 40px; margin-top: 10px;"><%=L"世界名称" %></div>
+                    <div class="opus-submit-opus-title-textfield" style="margin-top: 10px;">
+                        <pe:if condition="<%=not canEditName()%>">
+                            <div spacing="10" style="margin-left: 40px; width: 540px; height: 63px;text-valign: center; background: url(Texture/Aries/Creator/Game/PapaAdventures/mobile/input_80x36_32bits.png#0 0 80 36:30 10 30 10);">
+                                <pe:label name = "opus_name_unable" style="font-size: 28px; base-font-size: 28px; margin-left:8px;margin-top:8px;width: 540px; height: 63px;text-valign: center;"></pe:label>
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%=canEditName()%>">
+                            <input type="text" MoveViewWhenAttachWithIME='true' enable_ime="true" name = "opus_name" spacing="10" style="font-size: 28px; base-font-size: 28px; margin-left: 40px; width: 540px; height: 63px;text-valign: center;background: url(Texture/Aries/Creator/Game/PapaAdventures/mobile/input_80x36_32bits.png#0 0 80 36:30 10 30 10);" EmptyText="请输入世界名称" />
+                        </pe:if>
+                    </div>
+                </pe:if>
+                <div class="opus-submit-opus-desc" style="margin-left: 40px; margin-top: 10px;"><%=L"世界描述"%></div>
+                <div class="opus-submit-opus-desc-container" style="margin-left: 40px; margin-top: -36px;">
+                    <pe:if condition="<%=GameLogic.IsReadOnly()%>">
+                        <pe:label name = "opus-desc-unable" style="margin-left:8px;margin-top:8px; font-size: 28px;base-font-size: 28px;width: 520px; height: 140px;text-valign: center;"> </pe:label>
+                    </pe:if>
+                    <pe:if condition="<%=not GameLogic.IsReadOnly()%>">
+                        <input 
+                            MoveViewWhenAttachWithIME='true' 
+                            MoveViewOffset="366"
+                            UseSystemControl="true"
+                            enable_ime="true" 
+                            WordWrap="true" 
+                            name="opus-desc" 
+                            rows="4"  
+                            height="100%" 
+                            CaretColor="#000000" 
+                            style="margin-top: 8px; margin-left: 8px; textcolor:#000000;font-family:Consolas;background:url();" 
+                            lineheight="34" 
+                            fontsize="28"/>               
+                    </pe:if>
+                </div>
+            </div>
+
+            <div style="margin-top: 220px;">
+                <pe:if condition="<%=GameLogic.IsReadOnly()%>">
+                    <input type="button" value='<%=L"直接退出" %>' class="opus-exit-btn" onclick="exitWorld" style="float: left;width:540px; margin-left: 310px; margin-top: -60px;"/>
+                </pe:if>
+                <pe:if condition="<%=not GameLogic.IsReadOnly()%>">
+                    <pe:if condition="<%= get_submit_type() == 1 or get_submit_type() == 2 %>">
+                        <input type="button" value='<%=IsHomeWorkWorld() and L"提交作业" or L"保存世界" %>'  class="opus-submit-save" onclick="submit()" style="float: left;width:540px; margin-left: 310px; margin-top: -60px;"/>
+                    </pe:if>
+                    <pe:if condition="<%= get_submit_type() == 3%>">
+                        <input type="button" value='<%=L"直接退出" %>' class="opus-exit-btn" onclick="exitWorld" style="float: left;width:540px; margin-left: 40px; margin-top: -60px;" />
+                        <input type="button" value='<%=L"保存并退出" %>' class="opus-submit-save" onclick="submitAndExit()" style="width:540px;float: left; margin-left: 40px; margin-top: -60px;" /> 
+                    </pe:if>
+                </pe:if>
+            </div>
+        </pe:container>
+    </pe:mcml>
+</body>
+
+</html>

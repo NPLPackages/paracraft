@@ -1,0 +1,56 @@
+<!-- script/apps/Aries/Creator/Game/Tasks/Community/Setting/PrepareAppPage.html -->
+<html>
+    <head>
+        <title>2014.6.14</title>
+    </head>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl" refresh="false">
+                <![CDATA[
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/PrepareApp/PrepareApp.lua");
+                    local PrepareApp = commonlib.gettable("MyCompany.Aries.Game.PrepareApp");
+                    PrepareApp.OnInit()
+
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
+                    local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
+                    if System.options.channelId_431 then
+                        ClientVersion = L"帕拉卡智慧教育";
+                    elseif System.options.isShenzhenAi5 then
+                        ClientVersion = L"深教AI4"
+                    else
+                        ClientVersion = string.format(L"Paracraft帕拉卡 %s(%s)", options.GetBaseVersion(), options.GetClientVersion());
+                    end
+                ]]>
+            </script>
+            <pe:container style="background-color: #1A1A1A;" alignment="_fi" zorder="-1" width="100%" height="100%" >
+            </pe:container>
+
+            <pe:container alignment="_ct" style="position: relative; background:url();margin-left: -170px;margin-top: 0px;" width="340">
+                <div align="center" style="margin-top:-120px; background: url(Mod/WorldShare/Texture/logo_256x113_32bits.png#0 0 256 113);" width="256" height="113"></div>
+                <div style="color: #D3D3D3; margin-left: 4px;margin-top: 16px; font-size: 16px; base-font-size: 16px; font-weight: bold; text-align:center;height: 22px;">Made with Paracraft</div>
+                <div style="color: #D3D3D3; margin-left: 4px;margin-top: 8px; font-size: 14px; base-font-size: 14px; font-weight: bold; text-align:center;height: 22px;"><%= L"正在检测和加载运行环境，请稍后..." %></div>
+                <div style="margin-top: 20px; background:url(Mod/WorldShare/Texture/progress_bg_320x12_32bits.png#0 0 320 12);" width="320" height="12" >
+                    <pe:container style="position:relative;margin-top: 0px;margin-left: 0x;background:url()" width="320" height="12">
+                        <img uiname="progress_fg" src="Mod/WorldShare/Texture/progress_320x12_32bits.png#0 0 0 12;" width="0" height="12"/>
+                    </pe:container>
+                </div>
+                <div width="320" height="50">
+                    <label name="text_state_tip"  value='<%=L"正在努力加载..."%>' style="margin-left: 4px;margin-top: 2px; height: 30px; text-align:center;color:#A8A7B0;font-weight: bold;"/>
+                </div>
+                
+                
+            </pe:container>
+
+            <pe:container alignment="_mb" width="0" height="85px" style="position: relative; background:url()">
+                <pe:container align="left" style="position: relative; color: #7B7A8A; font-size: 12px; font-weight: bold; margin-left: 20px; background:url()">
+
+                <pe:if condition="<%= not System.options.isEducatePlatform %>">
+                        <div style="margin-top:35px;text-shadow:true"><%= Eval("ClientVersion") %></div>
+                        <div style="margin-top:0px;text-shadow:true"><%= L"(c)Tatfook. powered by NPL and ParaEngine"%></div>
+                    </pe:if>
+                </pe:container>
+            </pe:container>
+        </pe:mcml>
+    </body>
+</html>
+

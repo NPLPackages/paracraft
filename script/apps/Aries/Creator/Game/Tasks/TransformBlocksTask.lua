@@ -92,9 +92,10 @@ function TransformBlocks:Run()
 		local bRemoveSourceEntities = (self.operation == "move" or self.operation == "no_clone");
 		self:DoEntityTransform(self.liveEntities, final_entities, bRemoveSourceEntities)
 	end
-	if(GameLogic.GameMode:CanAddToHistory()) then
+	if(GameLogic.GameMode:CanAddToHistory() or self.add_to_history) then
 		if(#(self.history) > 0) then
 			UndoManager.PushCommand(self);
+			GameLogic.GetFilters():apply_filters("BatchModifyBlocks", self.history)
 		end
 	end
 end

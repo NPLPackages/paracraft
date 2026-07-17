@@ -162,9 +162,9 @@ function DockLayer:ShowDockPage(bShow,align)
         MobileMainPage.ShowButtonsByAlign(align,bShow)
         return
     end
-    if not self:IsShowDockPage() then
-        return 
-    end
+    -- if not self:IsShowDockPage() then
+    --     return 
+    -- end
     if align and align ~= "" then
         self:SetDockItemsVisivleByAlign(align,bShow)
     else
@@ -176,35 +176,49 @@ function DockLayer:OnWorldLoaded()
     commonlib.TimerManager.SetTimeout(function()
         self.m_bShowEsc = true;
         self.m_current_dockkey = self:GetDockCfgKeyByWorldInfo();
-        local dockCfg = _G.DOCK_CONFIG[self.m_current_dockkey];
-
-        if (System.User.isAnonymousWorld) then
-            dockCfg = {
-                {
-                    name = "mini_map",
-                    width = 210,
-                    enabled = true,
-                    height = 248,
-                    type = "special"
-                }
-            };
+        local dockCfg = self:GetDockConfig()
+        if dockCfg then
+            self:ShowDockByCfg(dockCfg);
         end
+    end, 1000);
+end
 
-        if (dockCfg) then
-            local curDockCfg = commonlib.copy(dockCfg);
-
-            if (self.m_current_dockkey == "E_DOCK_TUTORIAR" and
-                GameLogic.IsReadOnly()) then
-                for k,v in pairs (curDockCfg) do
-                    if (v and v.name == "save") then
-                        v.enabled = false;
-                    end
+function DockLayer:GetDockConfig()
+    local dockCfg = _G.DOCK_CONFIG[self.m_current_dockkey];
+    if (System.User.isAnonymousWorld) then
+        dockCfg = {};
+    end
+    if (dockCfg and next(dockCfg) ~= nil) then
+        local curDockCfg = commonlib.copy(dockCfg);
+        if (self.m_current_dockkey == "E_DOCK_TUTORIAR" and
+            GameLogic.IsReadOnly()) then
+            for k,v in pairs (curDockCfg) do
+                if (v and v.name == "save") then
+                    v.enabled = false;
                 end
             end
+        end
+        curDockCfg = self:GetDockConfigByMode(curDockCfg)
+        return curDockCfg;
+    end
+end
 
-            DockLayer:ShowDockByCfg(curDockCfg);
-        end    
-    end, 1000);
+function DockLayer:GetDockConfigByMode(dockConfig)
+    local currentMode =  GameLogic.GetGameMode()
+    local projectIndex = -1
+    for index, value in ipairs(dockConfig) do
+        if value.name == "dianzan" then
+            projectIndex = index
+        end
+    end
+    if projectIndex == -1 
+        or GameLogic.options:HasCopyright() then --申请了版权保护
+        return dockConfig
+    end
+    if currentMode == "edit" then
+        dockConfig[projectIndex] = DockConfig.GetSaveConfig()
+    end
+    return dockConfig
 end
 
 function DockLayer:OnWorldUnloaded()
@@ -219,7 +233,7 @@ function DockLayer.IsPapaCreate()
 end
 
 function DockLayer:ShowDockByCfg(dockCfg)
-    if not dockCfg then
+    if not dockCfg or System.options.isStrictGameMode then
         return
     end
 
@@ -229,12 +243,19 @@ function DockLayer:ShowDockByCfg(dockCfg)
             return
         end
     end
-
-    if self.m_current_dockkey == "E_DOCK_LESSON" and System.options.channelId_431 then
-        dockCfg = commonlib.filter(dockCfg,function (item)
-            return item.name ~= "create_spage"
-        end)
+    if System.options.isEducatePlatform then
+        if self.m_current_dockkey == "E_DOCK_LESSON" then
+            dockCfg = commonlib.filter(dockCfg,function (item)
+                return item.name ~= "create_spage"
+            end)
+        end
+        if self.m_current_dockkey == "E_DOCK_NORMAL" and System.options.isOffline then
+            dockCfg = commonlib.filter(dockCfg,function (item)
+                return item.name == "setting"
+            end)
+        end
     end
+    
     local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
     if IsMobileUIEnabled and self.m_current_dockkey ~= "E_DOCK_TUTORIAR" then
         return
@@ -270,11 +291,6 @@ function DockLayer:ShowDockByCfg(dockCfg)
         end
     end
     self:StartPositionTimer()
-    if self.m_current_dockkey == "E_DOCK_MINI" or self.m_current_dockkey == "E_DOCK_NORMAL" and self.m_tblDockCfg and #self.m_tblDockCfg > 0 then
-        commonlib.TimerManager.SetTimeout(function()
-            DockConfig.SetIconData()
-        end,200)
-    end
 end
 
 function DockLayer:StartPositionTimer()
@@ -308,19 +324,21 @@ function DockLayer:GetDockCfgKeyByWorldInfo()
         return "E_DOCK_DONGAO"
     end
 
+    if DockConfig.IsTutorialUser() then
+        return "E_DOCK_TUTORIAR"
+    end
+
     if DockConfig.IsParaWorld() then
         return "E_DOCK_PARA"
     end
-
+    
     if DockConfig.IsMiniWorld() then
-        if System.options.channelId_431 then
+        if System.options.isEducatePlatform then
             return "E_DOCK_NORMAL"
         end
         return "E_DOCK_MINI"
     end
-    if DockConfig.IsTutorialUser() then
-        return "E_DOCK_TUTORIAR"
-    end
+    
     return "E_DOCK_NORMAL"
 end
 
@@ -501,7 +519,6 @@ function DockLayer:RemoveDock(name)
     if self.m_dockNames and not self.m_dockNames[name] then
         return false
     end
-    print("remove name=============",name)
     local dockItem = self:GetDockByName(name)
     if dockItem then
         dockItem:RemoveSelf()
@@ -722,6 +739,13 @@ function DockLayer:RemoveRedTip(name)
     local dockItem = self:GetDockByName(name)
     if dockItem then
         dockItem:RemoveRedTip()
+    end
+end
+
+function DockLayer:UpdateDockByMode()
+    local dockCfg = self:GetDockConfig()
+    if dockCfg then
+        self:ShowDockByCfg(dockCfg);
     end
 end
 

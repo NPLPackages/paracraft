@@ -826,6 +826,8 @@ function DefaultTheme:Load()
 		},
 	}
 
+	local isTouchMode = System.os.IsTouchMode();
+
 	NPL.load("(gl)script/ide/ContextMenu.lua");
 	CommonCtrl.ContextMenu.DefaultStyle = {
 		borderTop = 4,
@@ -843,8 +845,8 @@ function DefaultTheme:Load()
 		level2itemcolor = "#ffffff",
 		mouseover_textcolor = "#ffffff", 
 				
-		iconsize_x = 24,
-		iconsize_y = 21,
+		iconsize_x = isTouchMode and 36 or 24,
+		iconsize_y = isTouchMode and 30 or 21,
 				
 		menu_bg = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;493 341 16 34:4 4 4 4", 
 		shadow_bg = nil,
@@ -853,11 +855,12 @@ function DefaultTheme:Load()
 		expand_bg = "Texture/Aries/Dock/menu_expand_32bits.png; 0 0 34 34",
 		expand_bg_mouseover = "Texture/Aries/Dock/menu_expand_mouseover_32bits.png; 0 0 34 34",
 
-		menuitemHeight = 24,
+		menuitemHeight = isTouchMode and 36 or 24,
 		separatorHeight = 1,
-		titleHeight = 24,
-				
-		titleFont = "System;12;bold";
+		titleHeight = isTouchMode and 36 or 24,
+	
+		textFont = nil,
+		titleFont = isTouchMode and "System;14;bold" or "System;12;bold";
 	};
 	
 	CommonCtrl.ContextMenu.DefaultStyleThick = {
@@ -954,6 +957,15 @@ function DefaultTheme:Load()
 	self:LoadHeadDisplayStyle();
 	NPL.load("(gl)script/kids/3DMapSystemUI/MiniGames/SwfLoadingBarPage.lua");
 	Map3DSystem.App.MiniGames.SwfLoadingBarPage.url="script/apps/Aries/Creator/Game/Login/SwfLoadingBarPage.mc.html";
+	if System.options.themeColor == "dark" or System.options.themeColor == "" then
+		Map3DSystem.App.MiniGames.SwfLoadingBarPage.url="script/apps/Aries/Creator/Game/Login/SwfLoadingBarPage.dark.mc.html";
+	end
+	if System.options.themeColor == "light" then
+		Map3DSystem.App.MiniGames.SwfLoadingBarPage.url="script/apps/Aries/Creator/Game/Login/SwfLoadingBarPage.light.mc.html";
+	end
+	if System.options.isShenzhenAi5 then
+		Map3DSystem.App.MiniGames.SwfLoadingBarPage.url="script/apps/Aries/Creator/Game/Login/SwfLoadingBarPage.ai5.html";
+	end
 
 	NPL.load("(gl)script/ide/TooltipHelper.lua");
 	local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");

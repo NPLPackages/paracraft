@@ -126,7 +126,7 @@ function TexturePackage:SetParentfolder()
 		local dir = self.packagepath:match("(.*/)");
 		dir = commonlib.Encoding.Utf8ToDefault(dir);
 		local result = commonlib.Files.Find({}, dir, 0, 200, "*.", "*.zip");
-		if(not result[1]) then
+		if(not result or not result[1]) then
 			LOG.std(nil, "info", "TexturePackage", "no folder in dir %s", dir);
 			return;
 		end

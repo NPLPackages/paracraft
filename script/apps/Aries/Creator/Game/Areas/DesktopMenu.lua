@@ -20,7 +20,7 @@ local menu_name_map = {};
 local edit_mode_menu = {};
 local game_mode_menu = {};
 
-local isRename = System.options.channelId_431 or System.options.isPapaAdventure
+local isRename = System.options.isPapaAdventure
 
 function DesktopMenu.LoadMenuItems(bForceReload)
 	if(menu_items and not bForceReload) then
@@ -38,14 +38,23 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"新建...".."  Ctrl+N",name = "file.createworld",onclick=nil},
 				{text = L"打开...".."  Ctrl+O",name = "file.loadworld",onclick=nil},
 				{text = isRename and L"临时保存".."  Ctrl+S" or L"快速保存".."  Ctrl+S",name = "file.saveworld",onclick=nil, cmd="/save"},
+				
 				{text = L"另存为...",name = "file.saveworldas",onclick=nil},
+				{Type = "Separator"},
+				{text = L"导出...", name = "file.export", cmd="/menu file.export", onclick=nil},
+				{text = L"导出p3d文件...",name = "file.exportp3dfile",onclick=nil},
+				{text = L"加载p3d文件...",name = "file.openp3dfile",onclick=nil},
+				{Type = "Separator"},
+				{text = L"生成独立应用程序...",name = "file.makeapp", cmd="/makeapp UImode"},
+				{text = L"生成PPT演示文档...",name = "file.makeppt", cmd="/makeapp ppt"},
 				{Type = "Separator"},
 				{text = isRename and L"保存世界" or L"上传世界",name = "file.uploadworld",onclick=nil},
 				{text = L"本地历史版本...",name = "file.openbackupfolder",onclick=nil},
-				{text = L"生成独立应用程序...",name = "file.makeapp", cmd="/makeapp UImode"},
 				{text = L"备份...",name = "file.worldrevision",onclick=nil},
-				{text = L"打开本地目录",name = "file.openworlddir",onclick=nil},
+				{text = L"打开本地目录".."...",name = "file.openworlddir",onclick=nil},
+				{text = L"用VsCode打开代码...",name = "file.dumpcodeblock", cmd="/dump codeblock",onclick=nil},
 				{Type = "Separator"},
+				{text = L"在线网盘...",name = "file.webdisk",onclick=nil},
 				{text = L"系统设置...".."  ESC", name = "file.settings", cmd="/menu file.settings", },
 				{text = L"退出...",name = "file.exit",onclick=nil},
 			},
@@ -56,6 +65,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"重做".."  Ctrl+Y",name = "edit.redo",onclick=nil},
 				{Type = "Separator"},
 				{text = L"复制".."  Ctrl+C",name = "edit.copy",onclick=nil},
+				{text = L"含引用复制".."  Ctrl+Shift+C",name = "edit.copy",onclick=nil},
 				{text = L"粘贴".."  Ctrl+V",name = "edit.paste",onclick=nil},
 				{text = L"删除".."  Del",name = "edit.delete",onclick=nil},
 				{Type = "Separator"},
@@ -73,7 +83,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 						{text = L"查看全部跳转点...", name = "edit.bookmark.viewall", cmd="/menu edit.bookmark.viewall"},
 					}
 				},
-				--{Type = "Separator"},
+				{Type = "Separator"},
 				{text = L"录制宏命令...", name = "window.macro", cmd="/macro record -i", onclick=nil},
 				{text = L"分享模型...", name = "window.sharemod", onclick=nil},
 			},
@@ -98,15 +108,15 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"人物...",name = "window.role", onclick=nil},
 				{text = L"动作...",name = "window.anim", cmd="/show anim"},
 				--{text = L"角色换装...",name = "window.changeskin", onclick=nil},
-				{text = L"校园中心...",name = "window.schoolcenter",onclick=nil},
+				-- {text = L"校园中心...",name = "window.schoolcenter",onclick=nil},
 				{text = L"材质包管理...",name = "window.texturepack",onclick=nil},
 				{text = L"资源...",name = "window.mall",onclick=nil},
-				{text = L"背包...",name = "window.userbag",onclick=nil},
+				-- {text = L"背包...",name = "window.userbag",onclick=nil},
 				-- {text = L"元件库...",name = "window.onlinestore", cmd="/open store"},
 				{text = L"视频录制...".."  F9",name = "window.videorecoder", cmd="/record"},
 				{text = L"音频录制...",name = "window.soundrecoder", cmd="/recordsound"},
-				{text = L"好友...",name = "window.friend",onclick=nil},
-				{text = L"邮件...",name = "window.email",onclick=nil},
+				-- {text = L"好友...",name = "window.friend",onclick=nil},
+				-- {text = L"邮件...",name = "window.email",onclick=nil},
 				--{text = L"视频分享...",name = "window.videosharing", cmd="/share"},
 				{Type = "Separator"},
 				{text = L"信息".."  F3",name = "window.info",onclick=nil},
@@ -115,6 +125,8 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"NPL控制面板...".."  F11",name = "window.console", cmd="/open npl://console"},
 				-- {text = "NPL Debugger... (Ctrl+Alt+I)",name = "window.debugger", cmd="/open npl://debugger"},
 				{text = L"MOD插件管理...".."  Ctrl+M",name = "window.mod",cmd="/show mod"},
+				{text = L"连接串口...",name = "window.serialport",cmd="/show serialport"},
+				{text = L"MQTT管理器...",name = "window.mqtt", onclick=nil},
 				{Type = "Separator"},
 				{text = L"分享...",name = "share.video_or_panorama", onclick=nil},
 			},
@@ -125,7 +137,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = L"教学视频",name = "help.videotutorials", onclick=nil},
 				{text = L"官方文档".." & "..L"教学视频",name = "help.learn", onclick=nil},
 				{text = L"新手教学...",name = "help.dailycheck", onclick=nil},
-				{text = L"创意空间..."..L"(课程)".."  F7",name = "help.creativespace", onclick=nil},
+				-- {text = L"创意空间..."..L"(课程)".."  F7",name = "help.creativespace", onclick=nil},
 				{Type = "Separator"},
 				-- {text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
 				{text = L"帮助...".."  F1",name = "help.help", onclick=nil},
@@ -136,7 +148,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"提交意见与反馈",name = "help.bug", onclick=nil},
 				--{text = L"NPL Code Wiki...(F11)",name = "help.npl_code_wiki", autoclose=true, onclick=nil},
 				--{text = L"开发文档",name = "help.ParacraftSDK", onclick=nil},
-				{text = L"关于Paracraft...",name = "help.about", onclick=nil},
+				{text = L"关于...",name = "help.about", onclick=nil},
 				-- {text = L"致谢",name = "help.Credits", onclick=nil},
 			},
 		},
@@ -157,16 +169,18 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 	};
 	-- apply filter
 	menu_items = GameLogic.GetFilters():apply_filters("desktop_menu", menu_items);
-	if System.options.isChannel_430 then
+	if System.os.GetPlatform() ~= "win32" then
 		for _, menuItem in ipairs(menu_items) do
-			if(menuItem.children and menuItem.name =="help") then
+			if(menuItem.children and menuItem.name =="file")then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
-					return item.name ~= "help.learn"
+					return item.name ~= "file.dumpcodeblock"
+						and item.name ~= "file.openp3dfile"
+						and item.name ~= "file.exportp3dfile"
 				end)
 			end
 		end
 	end
-	if System.options.channelId_431 then
+	if System.options.isEducatePlatform then
 		for _, menuItem in ipairs(menu_items) do
 			if(menuItem.children and menuItem.name =="help") then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
@@ -176,8 +190,16 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				end)
 			elseif(menuItem.children and menuItem.name =="file")then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
-					return item.name ~= "file.saveworldas" and item.name ~= "file.openbackupfolder" and item.name ~= "file.worldrevision"
+					return item.name ~= "file.openbackupfolder" 
+						and item.name ~= "file.worldrevision"
+						and item.name ~= "file.makeppt"
+						and item.name ~= "file.webdisk"
 				end)
+				if System.options.isOffline then
+					menuItem.children = commonlib.filter(menuItem.children,function (item)
+						return item.name ~= "file.uploadworld"
+					end)
+				end
 			elseif(menuItem.children and menuItem.name =="edit")then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
 					return item.name ~= "window.macro" and item.name ~= "window.sharemod"
@@ -188,15 +210,21 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 						and item.name ~= "window.userbag" and item.name ~= "window.friend" and item.name ~= "window.email" 
 						and item.name ~= "window.console" and item.name ~= "window.mod"
 				end)
+				if System.options.isOffline then
+					menuItem.children = commonlib.filter(menuItem.children,function (item)
+						return item.name ~= "window.mall" and item.name ~= "window.serialport"  and item.name ~= "share.video_or_panorama" 
+					end)
+				end
 			end
 		end
+		menu_items = DesktopMenu.FilterMenuItems(menu_items)
 	end
 
 	if System.options.isPapaAdventure then
 		for _, menuItem in ipairs(menu_items) do
 			if(menuItem.children and menuItem.name =="help") then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
-					return item.name ~= "help.dailycheck" and item.name ~= "help.creativespace" 
+					return item.name ~= "help.dailycheck" and item.name ~= "help.creativespace" and item.name ~= "help.about"
 				end)
 			elseif(menuItem.children and menuItem.name =="file")then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
@@ -210,9 +238,10 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 						return item.name ~= "file.saveworldas" and item.name ~= "file.openbackupfolder" 
 							and item.name ~= "file.worldrevision" and item.name ~= "file.makeapp" 
 							and item.name ~= "file.loadworld" and item.name ~= "file.createworld"
+							and item.name ~= "file.webdisk"
 					end
 					return item.name ~= "file.saveworldas" and item.name ~= "file.openbackupfolder" 
-						and item.name ~= "file.worldrevision" and item.name ~= "file.makeapp"
+						and item.name ~= "file.worldrevision" and item.name ~= "file.makeapp" and item.name ~= "file.webdisk"
 				end)
 			elseif(menuItem.children and menuItem.name =="edit")then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
@@ -240,7 +269,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		if(menuItem.children) then
 			menuItem.ctl = CommonCtrl.ContextMenu:new{
 				name = "ParaCraft.DesktopMenu."..menuItem.name,
-				width = 220,
+				width = Mod.WorldShare.Utils.IsEnglish() and 274 or 220,
 				height = 30,
 				DefaultNodeHeight = 26,
 				-- style = CommonCtrl.ContextMenu.DefaultStyleThick,
@@ -263,6 +292,47 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 	end
 	table.sort(game_mode_menu, menu_sort_function);
 	table.sort(edit_mode_menu, menu_sort_function);
+end
+
+function DesktopMenu.FilterMenuItems(menu_items) --赛事和课程屏蔽部分menu
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld') or {};
+    local channel = WorldCommon.GetWorldTag("channel")
+    local worldChannel = currentEnterWorld.channel or 0
+    if (channel ~= 2 and worldChannel ~= 2 and channel ~= 1 and worldChannel ~= 1) then
+        return menu_items
+    end
+    for _, menuItem in ipairs(menu_items) do
+        if(menuItem.children and menuItem.name =="file")then
+            if channel == 2 or worldChannel == 2 then
+                menuItem.children = commonlib.filter(menuItem.children,function (item)
+                    return item.name ~= "file.createworld" 
+                        and item.name ~= "file.loadworld" 
+                        and item.name ~= "file.exportp3dfile"
+                        and item.name ~= "file.openp3dfile"
+                        and item.name ~= "file.makeapp"
+                        and item.name ~= "file.makeppt"
+                        and item.name ~= "file.openworlddir"
+                        and item.name ~= "file.saveworldas" 
+                end)
+            end
+            if channel == 1 or worldChannel == 1 then
+                menuItem.children = commonlib.filter(menuItem.children,function (item)
+                    return item.name ~= "file.saveworldas" 
+                end)
+            end
+        end
+        if(menuItem.children and menuItem.name =="project")then
+            menuItem.children = commonlib.filter(menuItem.children,function (item)
+                return item.name ~= "project.member"
+            end)
+        end
+    end
+    menu_items = commonlib.filter(menu_items,function (item)
+        return item.name ~= "online"
+    end)
+    return menu_items
 end
 
 function DesktopMenu.IsPapaCreate()
@@ -344,6 +414,28 @@ end
 
 -- click top menu item, normally this will show context menu
 function DesktopMenu.OnClickMenuItem(name)
+	if (System.os.IsEmscripten() and name == "online") then
+		GameLogic.RunCommand("/tip -duration 3000 此功能， web版本暂不支持，请安装客户端。");
+		return ;
+	end
+
+	if System.options.isEducatePlatform and name == "online" then
+		if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+			GameLogic.GetFilters():apply_filters('check_signed_in', '请先登录', function(result)
+				if result == true then
+					commonlib.TimerManager.SetTimeout(function()
+						DesktopMenu.ShowMenuOpptions(name)
+					end, 500)
+				end
+			end)
+			return
+		end
+	end
+
+	DesktopMenu.ShowMenuOpptions(name)
+end
+
+function DesktopMenu.ShowMenuOpptions(name)
 	local menuItem = DesktopMenu.GetMenuItem(name);
 	if(menuItem) then
 		if(menuItem.ctl and menuItem.children) then

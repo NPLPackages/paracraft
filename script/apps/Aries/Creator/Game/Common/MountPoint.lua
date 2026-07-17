@@ -33,6 +33,32 @@ function MountPoint:GetName()
 	return self.name or ""
 end
 
+function MountPoint:IsAnchor()
+	if(self.name and self.name:match("^@")) then
+		return true;
+	end
+end
+
+function MountPoint:SetMatchedAnchor(mp)
+	if(self:IsAnchor()) then
+		if(self.matchedAnchor) then
+			self.matchedAnchor.matchedAnchor = nil;
+		end
+		if(mp and mp:IsAnchor()) then
+			self.matchedAnchor = mp;
+			mp.matchedAnchor = self;
+		else
+			self.matchedAnchor = nil;
+		end
+	end
+end
+
+function MountPoint:GetMatchedAnchor()
+	if(self:IsAnchor()) then
+		return self.matchedAnchor;
+	end
+end
+
 function MountPoint:Clone()
 	return MountPoint:new(commonlib.copy(self));
 end
@@ -124,4 +150,90 @@ end
 
 function MountPoint:GetLastAABB()
 	return self.lastDX, self.lastDY, self.lastDZ
+end
+
+function MountPoint:GetEntity()
+	return self.parentEntity;
+end
+
+function MountPoint:IsTwoAnchorMatched(mp)
+	if(self:IsAnchor() and mp:IsAnchor()) then
+		if(self:GetEntity() == mp:GetEntity()) then
+			return false
+		end
+		local name1 = self:GetName()
+		local name2 = mp:GetName()
+		local function nameToTable(name)
+			local t = {}
+			local n = 0
+			local c = name:match("{(.-)}")
+			if(c) then
+				for k in c:gmatch("%w+") do
+					t[k] = true
+					n = n + 1
+				end
+			end
+			return t, n
+		end
+		local bothHasCategory = false
+		local categoryMap1, n1 = nameToTable(name1)
+		local categoryMap2, n2 = nameToTable(name2)
+		if(n1 > 0 and n2 > 0) then
+			bothHasCategory = true
+		end
+		local checkFacing = true
+		local hasSameCategory = false
+		for c1, _ in pairs(categoryMap1) do
+			if((c1 == "up" and categoryMap2["down"]) or (c1 == "down" and categoryMap2["up"])) then
+				checkFacing = false
+				if(hasSameCategory) then
+					break
+				end
+			elseif(categoryMap2[c1]) then
+                if(c1 == "up" or c1 == "down") then
+                    return false
+                end
+				hasSameCategory = true
+				if(not checkFacing) then
+					break
+				end
+			end
+		end
+		if(bothHasCategory and not hasSameCategory) then
+			return false
+		end
+		if(checkFacing) then
+			local function formatFacing(facing)
+				if(facing >= math.rad(360)) then
+					facing = facing - math.rad(360)
+				elseif(facing < 0) then
+					if(math.abs(facing) < 0.002) then
+						facing = 0
+					else
+						facing = facing + math.rad(360)
+					end
+				end
+				return facing
+			end
+			local facing1 = formatFacing(self:GetFacing() + self:GetEntity():GetFacing())
+			local facing2 = formatFacing(mp:GetFacing() + mp:GetEntity():GetFacing())
+			if(math.abs(math.abs(facing1 - facing2) - math.rad(180)) > 0.002) then
+				return false
+			end
+		end
+		local function startsWith(str, prefix)
+			return str:sub(1, #prefix) == prefix
+		end
+		local startsWithPlus1 = startsWith(name1, "@+")
+		local startsWithPlus2 = startsWith(name2, "@+")
+		if(startsWithPlus1 and startsWithPlus2) then
+			return false
+		end
+		local startsWithMinus1 = startsWith(name1, "@-")
+		local startsWithMinus2 = startsWith(name2, "@-")
+		if(startsWithMinus1 and startsWithMinus2) then
+			return false
+		end
+		return true
+	end
 end

@@ -15,6 +15,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActorItemStack.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/BoxTrigger.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockCodeBase.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
+local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local BoxTrigger = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld.BoxTrigger")
 local CodeActorItemStack = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActorItemStack");
@@ -37,15 +39,18 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 Entity:Property({"languageConfigFile", "", "GetLanguageConfigFile", "SetLanguageConfigFile"})
 Entity:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "SetAllowClientExecution"})
 Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
+Entity:Property({"isDeferLoad", false, "IsDeferLoad", "SetDeferLoad"})
+Entity:Property({"isGliaFile", false, "IsGliaFile", "SetGliaFile"})
 Entity:Property({"isStepMode", false, "IsStepMode", "SetStepMode", auto=true})
 Entity:Property({"hasDiskFileMirror", false, "HasDiskFileMirror", "SetHasDiskFileMirror"})
-Entity:Property({"isOpenSource", false, "IsOpenSource", "SetOpenSource"})
+Entity:Property({"isOpenSource", true, "IsOpenSource", "SetOpenSource"})
 Entity:Property({"isCodeReadOnly",false,"IsCodeReadOnly","SetCodeReadOnly"})
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
 Entity:Signal("inventoryChanged", function(slotIndex) end)
 Entity:Signal("beforeRunThisBlock")
 Entity:Signal("afterRunThisBlock")
+Entity:Signal("displayNameChanged")
 
 -- class name
 Entity.class_name = "EntityCode";
@@ -142,7 +147,10 @@ function Entity:SaveToXMLNode(node, bSort)
 		node.attr.allowClientExecution = true;
 	end
 	if(self:IsAllowFastMode()) then
-		node.attr.allowFastMode= true;
+		node.attr.allowFastMode = true;
+	end
+	if(self:IsDeferLoad()) then
+		node.attr.isDeferLoad = true;
 	end
 	if(self:IsStepMode()) then
 		node.attr.isStepMode = true;
@@ -150,8 +158,8 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self:HasDiskFileMirror()) then
 		node.attr.hasDiskFileMirror= true;
 	end
-	if(self:IsOpenSource()) then
-		node.attr.isOpenSource = true;
+	if(not self:IsOpenSource()) then
+		node.attr.isOpenSource = false;
 	end
 	if(self:IsCodeReadOnly()) then
 		node.attr.isCodeReadOnly = true;
@@ -174,10 +182,11 @@ function Entity:LoadFromXMLNode(node)
 	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true" or node.attr.allowGameModeEdit == true);
 	self.isAllowClientExecution = (node.attr.allowClientExecution == "true" or node.attr.allowClientExecution == true);
 	self.isAllowFastMode = (node.attr.allowFastMode == "true" or node.attr.allowFastMode == true);
+	self.isDeferLoad = (node.attr.isDeferLoad == "true" or node.attr.isDeferLoad == true);
 	self.isStepMode = (node.attr.isStepMode == "true" or node.attr.isStepMode == true);
 	self.hasDiskFileMirror = (node.attr.hasDiskFileMirror == "true" or node.attr.hasDiskFileMirror == true);
-	self.isOpenSource = (node.attr.isOpenSource == "true" or node.attr.isOpenSource == true);
-	self.isCodeReadOnly = (node.attr.isCodeReadOnly == "true" or node.attr.isCodeReadOnly == true)
+	self.isOpenSource = (node.attr.isOpenSource ~= "false" and node.attr.isOpenSource ~= false)
+	self.isCodeReadOnly = (node.attr.isCodeReadOnly == "true" or node.attr.isCodeReadOnly == true);
 	self.languageConfigFile = node.attr.languageConfigFile;
 	self.codeLanguageType = node.attr.codeLanguageType;
 	self.triggerBoxString = node.attr.triggerBoxString;
@@ -261,6 +270,7 @@ function Entity:SetDisplayName(v)
 		if(codeBlock) then
 			codeBlock:SetBlockName(v);
 		end
+		self:displayNameChanged(v)
 	end
 end
 
@@ -415,6 +425,9 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			self:OpenEditor("entity", entity);
 		end
 	end
+	if GameLogic.IsReadOnly() and not self:IsOpenSource() and mouse_button=="left" then
+		GameLogic.AddBBS(nil,L"该方块不允许访问和查看代码。")
+	end
 	return true;
 end
 
@@ -424,10 +437,20 @@ function Entity:OpenEditor(editor_name, entity)
 		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 		CodeBlockWindow.Show(true);
 		CodeBlockWindow.SetCodeEntity(self);
+		GameLogic.SetModified()
 		GameLogic.GetFilters():apply_filters("CodeBlockEditorOpened", CodeBlockWindow, entity,self)	
 	end
+	do 
+		open_editor() 
+		return true;
+	end
+	--[[
 	local function open_editor_wrap()
-		if (System.User.isAnonymousWorld) then
+		if System.options.isOffline then
+			open_editor();
+			return
+		end
+		if (System.User.isAnonymousWorld and not canEdit) then
 			GameLogic.CheckSignedIn(L"请先登录！", function()
 				if (System.User.isAnonymousWorld) then 
 					GameLogic.AddBBS(nil, L"需要会员权限才能访问", 5000, "255 0 0");
@@ -439,13 +462,18 @@ function Entity:OpenEditor(editor_name, entity)
 			open_editor();
 		end
 	end
-
-	if self.languageConfigFile == "" or self.languageConfigFile == "npl_cad" then
-		local check_type = self.languageConfigFile == "npl_cad" and "click_cad_block" or "click_code_block"
-		UserPermission.CheckCanEditBlock(check_type, open_editor_wrap)
+	if System.options.cmdline_world ~= nil and System.options.cmdline_world ~= "" then
+		open_editor()
+		return
 	else
-		open_editor_wrap()
+		if self.languageConfigFile == "" or self.languageConfigFile == "npl_cad" then
+			local check_type = self.languageConfigFile == "npl_cad" and "click_cad_block" or "click_code_block"
+			UserPermission.CheckCanEditBlock(check_type, open_editor_wrap)
+		else
+			open_editor_wrap()
+		end
 	end
+	]]
 end
 
 function Entity:CloseEditor()
@@ -555,7 +583,7 @@ function Entity:Restart(onFinishedCallback)
 
 	local blocks = self:GetAllNearbyCodeEntities()
 	if(blocks) then
-		function restartCodeEntity_(codeEntity)
+		function restartCodeEntity_(codeEntity, delayLoadTime)
 			local codeBlock = codeEntity:GetCodeBlock(true)
 			if(codeBlock) then
 				codeEntity:OnBeforeRunThisBlock()
@@ -564,32 +592,55 @@ function Entity:Restart(onFinishedCallback)
 					if (onFinishedCallback) then
 						onFinishedCallback();
 					end
-				end);
+				end, delayLoadTime);
 			end
 		end
 		local id = self:GetBlockId();
 		local blocks2;
 		local BlockEngine = self:GetBlockEngine();
-	
-		for _, idx in ipairs(blocks) do
+
+		-- non-deferred blocks that are directly connected to a movie entity are restarted first.
+		-- deferred blocks are always loaded after non-deferred blocks, regardless of they are connected to movie block. 
+		local UnDeferredCount = 0;
+		for i, idx in ipairs(blocks) do
 			local x, y, z = BlockEngine:FromSparseIndex(idx);
 			local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
 			if(codeEntity and codeEntity:GetBlockId() == id) then
-				-- blocks that are directly connected to a movie entity are restarted first.
 				if(codeEntity:GetNearByMovieEntity(x, y, z)) then
-					restartCodeEntity_(codeEntity);
+					if(not codeEntity.isDeferLoad) then
+						restartCodeEntity_(codeEntity);
+					else
+						blocks2 = blocks2 or {};
+						local count = #blocks2 + 1
+						blocks2[count] = idx;
+						if(count > 1) then
+							local from = UnDeferredCount + 1;
+							if(from ~= count) then
+								blocks2[from], blocks2[count] = blocks2[count], blocks2[from];
+							end
+						end
+					end
 				else
 					blocks2 = blocks2 or {};
-					blocks2[#blocks2+1] = idx;
+					if(not codeEntity.isDeferLoad) then
+						UnDeferredCount = UnDeferredCount + 1;
+						table.insert(blocks2, UnDeferredCount, idx)
+					else
+						blocks2[#blocks2 + 1] = idx;
+					end
 				end
 			end
 		end
 		if(blocks2) then
-			for _, idx in ipairs(blocks2) do
+			-- mixture of deferred and non-deferred blocks are always loaded together. 
+			-- clusters of deferred blocks are delay loaded. 
+			local delayLoadTime = (UnDeferredCount > 0) and 0 or 100;
+			for i = 1, #blocks2 do
+				local idx = blocks2[i];
 				local x, y, z = BlockEngine:FromSparseIndex(idx);
 				local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
-				if(codeEntity and codeEntity:GetBlockId() == id) then
-					restartCodeEntity_(codeEntity);
+				if(codeEntity) then
+					restartCodeEntity_(codeEntity, delayLoadTime);
 				end
 			end
 		end
@@ -619,23 +670,28 @@ function Entity:Stop()
 	end);
 end
 
-function Entity:AutoCreateMovieEntity()
+-- @param bForceCreate: if true, it will create a movie entity if not found even if the language config.isAutoCreateMovieEntity is false.
+function Entity:AutoCreateMovieEntity(bForceCreate)
 	local movieEntity = self:FindNearByMovieEntity();
 	if(not movieEntity) then
-		local cx, cy, cz = self:GetBlockPos();
-		local BlockEngine = self:GetBlockEngine();
+		local langConfig = self:GetLanguageConfig();
+		if(bForceCreate or not (langConfig and langConfig.isAutoCreateMovieEntity==false)) then
+			local cx, cy, cz = self:GetBlockPos();
+			local BlockEngine = self:GetBlockEngine();
 	
-		for side = 3, 0, -1 do
-			local dx, dy, dz = Direction.GetOffsetBySide(side);
-			local x,y,z = cx+dx, cy+dy, cz+dz;
-			local blockTemplate = BlockEngine:GetBlock(x,y,z);
-			if(not blockTemplate) then
-				BlockEngine:SetBlock(x,y,z, names.MovieClip, 0, 3, nil);
-				local movieEntity = BlockEngine:GetBlockEntity(x,y,z);
-				if(movieEntity) then
-					movieEntity:CreateNPC();
+			for side = 3, 0, -1 do
+				local dx, dy, dz = Direction.GetOffsetBySide(side);
+				local x,y,z = cx+dx, cy+dy, cz+dz;
+				local blockTemplate = BlockEngine:GetBlock(x,y,z);
+				if(not blockTemplate) then
+					BlockEngine:SetBlock(x,y,z, names.MovieClip, 0, 3, nil);
+					local movieEntity = BlockEngine:GetBlockEntity(x,y,z);
+					if(movieEntity) then
+						movieEntity:CreateNPC();
+					end
+					GameLogic.events:DispatchEvent({type = "CreateBlockTask" , block_id = 228, block_data = 0, x = x, y = y, z = z});
+					return true;
 				end
-				return true;
 			end
 		end
 	end
@@ -666,6 +722,10 @@ function Entity:SetLastCommandResult(last_result)
 	end
 end
 
+function Entity:GetLanguageConfig()
+	return LanguageConfigurations:GetConfig(self:GetLanguageConfigFile())
+end
+
 function Entity:GetLanguageConfigFile()
 	return self.languageConfigFile or "";
 end
@@ -677,7 +737,7 @@ function Entity:SetLanguageConfigFile(filename)
 end
 
 -- set code language type
--- @param type: "npl" or "javascript" or "python"
+-- @param type: "npl" or "javascript" or "python" or "clang" or "arduino" or "cpp"
 function Entity:SetCodeLanguageType(type)
     type = type or "npl"
 	if(self:GetCodeLanguageType() ~= type) then
@@ -780,6 +840,32 @@ end
 
 function Entity:IsAllowFastMode()
 	return self.isAllowFastMode;
+end
+
+-- defer loading means the code block will not be loaded until scene is loaded, possibly after other non-deferred code blocks nearby.
+function Entity:SetDeferLoad(bDeferLoading)
+	self.isDeferLoad = bDeferLoading == true;
+end
+
+function Entity:IsDeferLoad()
+	return self.isDeferLoad;
+end
+
+function Entity:IsGliaFile()
+	local sFilename = self:GetDisplayName()
+	if(sFilename and sFilename:find("^%(gl%)")) then
+		return true;
+	end
+end
+
+function Entity:SetGliaFile(value)
+	local sFilename = self:GetDisplayName() or ""
+	if(value and not sFilename:find("^%(gl%)")) then
+		self:SetDisplayName("(gl)"..sFilename);
+	elseif(not value and sFilename:find("^%(gl%)")) then
+		sFilename = sFilename:gsub("^%(gl%)", "")
+		self:SetDisplayName(sFilename);
+	end
 end
 
 function Entity:SetHasDiskFileMirror(bUseDiskFileMirror)
@@ -929,4 +1015,13 @@ function Entity:GetAgentInventoryView()
 		itemStack:SetDataField("name", self:GetFilename())
 	end
 	return self.agentInventoryView;
+end
+
+-- some code block like python, c++, arduino, will generate intermediate NPL code.
+function Entity:SetIntermediateCode(code)
+	self.intermediateCode = code;
+end
+
+function Entity:GetIntermediateCode()
+	return self.intermediateCode;
 end

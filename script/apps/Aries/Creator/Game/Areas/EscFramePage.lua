@@ -81,7 +81,7 @@ function EscFramePage.OnChangeCategory(index, bRefreshPage)
 end
 
 function EscFramePage.ShowPage_Mobile()
-	GameLogic.RunCommand("/menu file.exit");
+	--GameLogic.RunCommand("/menu file.exit");
 end
 
 function EscFramePage.IsVisible()
@@ -89,6 +89,9 @@ function EscFramePage.IsVisible()
 end
 
 function EscFramePage.ShowPage(bShow)
+    if System.options.isStrictGameMode then
+        return
+    end
     GameLogic.GetFilters():apply_filters("OnShowEscFrame", bShow);
     if (System.options.IsMobilePlatform) then
         EscFramePage.ShowPage_Mobile()
@@ -113,7 +116,7 @@ function EscFramePage.ShowPage(bShow)
             local width, height = 390, 350
             EscFramePage.bForceHide = bShow == false;
             local url = "script/apps/Aries/Creator/Game/Areas/EscFramePage.html"
-            if System.options.channelId_431 then
+            if System.options.isEducatePlatform then
                 url = "script/apps/Aries/Creator/Game/Educate/Other/EscFramePage.431.html"
             elseif System.options.isPapaAdventure then
                 url = "script/apps/Aries/Creator/Game/Areas/EscFrameTutorialPage.html"

@@ -5,6 +5,7 @@
 <script refresh="true" type="text/npl" src=".lua" ><![CDATA[
     EducateMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/EducateMainPage.lua")
     EducateMainPage.OnInit()
+    isGotoWorld = false
     function ClosePage()
         EducateMainPage.ClosePage()
     end
@@ -22,18 +23,24 @@
     end
 
     function OnClickGo()
-        local opus_content = Page:GetValue('project_text', '')
+        if not isGotoWorld then
+            local opus_content = Page:GetValue('project_text', '')
 
-        local pid = get_project_id(opus_content)
+            local pid = get_project_id(opus_content)
 
-        if pid then
-            GameLogic.RunCommand("/loadworld " .. pid)
+            if pid then
+                GameLogic.RunCommand("/loadworld " .. pid)
 
-            if pid and tonumber(pid) == "number" then
-                GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.main_worldID_open', {useNoId = true})
+                if pid and tonumber(pid) == "number" then
+                    GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.main_worldID_open', {useNoId = true})
+                end
+            else
+                GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.go_to_url', opus_content)
             end
-        else
-            GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.go_to_url', opus_content)
+            isGotoWorld = true
+            commonlib.TimerManager.SetTimeout(function()
+                isGotoWorld = false
+            end,2000)
         end
     end
 
@@ -42,6 +49,8 @@
             return "script/apps/Aries/Creator/Game/Educate/Project/EducateProject.html"
         elseif EducateMainPage.tab_view_index == 2 then
             return "script/apps/Aries/Creator/Game/Educate/NoviceCourse/NoviceCoursePage.html"
+        elseif EducateMainPage.tab_view_index == 3 then
+            return "script/apps/Aries/Creator/Game/Educate/Competition/CompetitionMain.html"
         end
         return "script/apps/Aries/Creator/Game/Educate/Project/EducateProject.html"
     end
@@ -80,7 +89,40 @@
     end
 
     function GetUserName()
-        return EducateMainPage.GetUserName()
+        return EducateMainPage.GetFilterUserName()
+    end
+
+    function GetNameTooltip()
+        local username = EducateMainPage.GetUserName()
+        if not username then
+            return ""
+        end
+        local fontName = "System;12;bold"
+        local textWidth = _guihelper.GetTextWidth(username,fontName)
+        if textWidth > 82 then
+            return BadWordFilter.FilterString(username)
+        end
+        return ""
+    end
+
+    function ShwoDownTime()
+        return EducateMainPage.shwoDownTime
+    end
+
+    function OnEnterExamWorld()
+        local entranceProjectId = EducateMainPage.entranceProjectId
+        if entranceProjectId and entranceProjectId ~= 0 then
+            GameLogic.RunCommand(string.format("/loadworld -s %s", entranceProjectId))
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.competition.enter",{kpProjectId=entranceProjectId,useNoId=true})
+        end
+    end
+
+    function OnClickCompete()
+        EducateMainPage.OpenCompeleteUrl()
+    end
+
+    function OpenAbount()
+        GameLogic.RunCommand("/menu help.about");
     end
 ]]></script>
 <pe:container alignment="_fi" width="100%" height="100%" style="background-color:#E3EEFD; ">
@@ -88,10 +130,11 @@
     <pe:container alignment="_ctl" zorder="2" style="width: 100px;height: 720px; background:;">
         <div style="width: 123px; height: 720px; background: url(Texture/Aries/Creator/paracraft/Educate/cebianlan_123x720_32bits.png#0 0 123 720);">
             <div style="margin-top: 32px; width: 100xp; height: 40px;">
-                <div style="width: 50px; height: 50px; margin-left: 28px; ">
+                <div style="position: relative; width: 50px; height: 50px; margin-left: 28px; ">
                     <div style="position: relative; width: 48px; height: 48px; background: url(Texture/Aries/Creator/paracraft/Educate/touxiangdi_48x48_32bits.png#0 0 48 48);"></div>
                     <img name="img_protrait" src="<%=GetUserPortrait()%>" style="position: relative; margin: 2px; width: 44px; height: 44px;"/>
                 </div>
+                <!-- <div tooltip="<%=GetNameTooltip()%>" style="position: relative; width: 50px; height: 50px; margin-left: 28px; "></div> -->
             </div>
             
             <label name="txt_user" value="<%=GetUserName()%>" style="color: #ffffff; font-size: 12px; font-weight: bold; margin-top: 14px; width: 100px; height: 20px; text-align: center;"></label>
@@ -110,10 +153,17 @@
                     </pe:repeatitem>
                 </pe:repeat>
             </div>
-            <div style="width: 100px; height: 60px;">
-                <input type="button" name="btn_web" onclick="OpenWebUrl" style=" margin-left:30px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login/wangzhan_40x40_32bits.png#0 0 40 40);"/> 
-                <div for="btn_web" style="text-align: center; color: #ffffff; font-size: 10px;"><%=L"打开网站"%></div>
-            </div>
+            <pe:if condition="<%=System.options.isShenzhenAi5%>">
+                <div style="width: 100px; height: 60px;">
+                </div>
+            </pe:if>
+            <pe:if condition="<%=not System.options.isShenzhenAi5%>">
+                <div style="width: 100px; height: 60px;">
+                    <input type="button" name="btn_web" onclick="OpenWebUrl" style=" margin-left:30px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login/wangzhan_40x40_32bits.png#0 0 40 40);"/> 
+                    <div for="btn_web" style="text-align: center; color: #ffffff; font-size: 10px;"><%=L"打开网站"%></div>
+                </div>
+            </pe:if>
+            
 
             <div style="width: 100px; height: 60px; margin-top: 40px;">
                 <input type="button" onclick="ClosePage" style="width: 40px; height: 40px; margin-left: 30px; background: url(Texture/Aries/Creator/paracraft/Educate/guanbi_40x40_32bits.png#0 0 40 40);" />
@@ -124,7 +174,18 @@
     <!-- Texture/Aries/Creator/paracraft/Educate/beijingdi_50x50_32bits.png#0 0 50 50:24 24 24 24 -->
     <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">   
         <div style="position: relative; height:35px;margin-top:34px;" >
-            <pe:container uiname="search_input_bg" style="margin-top: 0px; margin-left: 820px; width: 300px;height:35px;background:url(Texture/Aries/Creator/paracraft/Educate/Project/shuru_64x35_32bits.png#0 0 64 35:30 16 30 16);">
+            <div style="position: relative;margin-left: 154px;margin-top: -6px; width: 620px;height:52px;background-color: #82b0ff00;">
+                <pe:if condition ="<%=ShwoDownTime()%>">
+                    <pe:label name="race_name_text" style="width: 400px;font-size: 16px; base-font-size: 20px;font-weight: bold;text-offset-y:-2;margin-left:0px;margin-top:0px;height: 26px;background: url();" >
+                    </pe:label>
+                    <div >
+                        <pe:label name="down_time_text" style="width: 200px;font-size: 16px; base-font-size: 20px;font-weight: bold;text-offset-y:-2;margin-left:0px;margin-top:4px;height: 26px;background: url();" >
+                        </pe:label>
+                        <input type="button"  onclick="OnEnterExamWorld" value="进入" style="font-weight:bold;color:#1f1f1f;font-size: 18px;text-offset-y:-2;margin-left:0px;margin-top:0px;width: 80px;height: 32px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/btn2_32X52_32bits.png#0 0 32 52:12 12 12 12);" />    
+                    </div>
+                </pe:if>
+            </div>
+            <pe:container uiname="search_input_bg" style="margin-top: 0px; margin-left: 124px; width: 300px;height:36px;background:url(Texture/Aries/Creator/paracraft/Educate/Project/shuru_64x35_32bits.png#0 0 64 35:30 16 30 16);">
                 <input type="text" EmptyText='<%=L"输入世界ID或服务器地址"%>' onkeyup="OnKeyUp" SkipAutoBadWordFilter="true" name="project_text" CaretColor="#FF000000" textcolor="#000000"
                     style="position: relative; font-size:14px; base-font-size:14px; margin-left:10px;margin-top: 4px; width: 290px; height:30px; background: url();" />
                 <input type="button" onclick="OnClickGo" style="margin-left: 249px; margin-top: -32px; width: 48px; height: 28px; background: url(Texture/Aries/Creator/paracraft/Educate/jinru_47x27_32bits.png#0 0 48 28);  " />
@@ -136,11 +197,17 @@
                     <!-- <pe:label name="course_tip_text" value="0" style=" margin-top: -2px; text-align: center; color: #ffffff; font-size: 8px; "></pe:label> -->
                 </pe:container>
             </pe:container>
+            <pe:container uiname="compete_button_bg" visible="false" style="width: 60px; height: 60px; margin-left: 1160px; margin-top: -60px; background: url();">
+                <input type="button" name="course" onclick="OnClickCompete" style="width: 45px; height: 45px; background: url(Texture/Aries/Creator/paracraft/Educate/icon_web_40x40_32bits.png#0 0 40 40);"/>
+                <div for="course" style="margin-top: 2px; font-size: 10px;"><%=L"赛事网站"%></div>
+            </pe:container>
         </div>    
         <!-- RIGHT -->
-        <div style="position: relative; margin-left:124px;margin-top:90px;width:1132px;height:600px;background:url(Texture/Aries/Creator/paracraft/Educate/beijingdi_50x50_32bits.png#0 0 50 50 :24 24 24 24);">
-            <div style="position: relative; width: 320px; height: 112px; background: url(Texture/Aries/Creator/paracraft/Educate/biaotidiban_320x112_32bits.png#0 0 320 112);"></div>
-            
+        <div style="position: relative; margin-left:124px;margin-top:90px;width:1132px;height:600px;background:url(Texture/Aries/Creator/paracraft/Educate/diban_54x54_32bits.png#0 0 54 54:25 25 25 25);">
+            <div style="position: relative; width: 320px; height: 112px; background: url();"></div>
+            <pe:if condition="<%=System.os.IsTouchMode()%>">
+                <input zorder="10" type="button" value="关于" icon="Texture/Aries/Creator/paracraft/Educate/about_32bits.png" icon_width="16" icon_height="16" icon_off_x="-16" icon_off_y="0" onclick="OpenAbount" style="margin-top: 550px; color: #82b0ff; font-size: 10px; base-font-size: 10px; text-offset-x:10; margin-left: 25px; width: 50px; height: 20px; background: url();"/>
+            </pe:if>
         </div>
         <!-- <div style="position:relative;margin-top:45px;width:240px;height:450px;">
             <iframe name="building_wnd" src='<%=CreatorDesktop.GetTab().url or "" %>'></iframe>

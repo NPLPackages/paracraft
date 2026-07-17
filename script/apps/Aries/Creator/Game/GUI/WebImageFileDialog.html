@@ -1,0 +1,33 @@
+<!-- "script/apps/Aries/Creator/Game/GUI/WebImageFileDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="WebImageFileDialog.lua"><![CDATA[
+    local WebImageFileDialog = NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/WebImageFileDialog.lua");
+    WebImageFileDialog.OnInit()
+
+    function OnClose()
+        WebImageFileDialog.OnClose()
+    end
+
+    function get_url()
+        return WebImageFileDialog.url;
+    end
+
+    function get_title()
+        return WebImageFileDialog.GetTitle()
+    end
+]]></script>
+<kp:window  title='<%=get_title()%>' width="800" height="600"   onclose="OnClose">
+    <div style="width: 800px; height: 560px; margin-top: 39px;">
+        <pe:nplbrowser name="image_nplbrowser_instance"  url="<%= get_url() %>" width="800" height="566" visible="true"/>
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>

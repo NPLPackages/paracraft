@@ -1,0 +1,40 @@
+<pe:mcml>
+<script type="text/npl" src="EasyHomeBuilder.lua"><![CDATA[
+local EasyHomeBuilder = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/EasyHomeBuilder.lua")
+EasyHomeBuilder.OnInit();
+function OnClose()
+    EasyHomeBuilder.Close()
+end
+
+function OnNextHome()
+    EasyHomeBuilder.OnClickNext()
+end
+
+function OnPreHome()
+    EasyHomeBuilder.OnClickPrev()
+end
+
+function GetCurrentHome()
+    return EasyHomeBuilder.GetHomeByIndex(EasyHomeBuilder.selectSlotIndex)
+end
+
+function OnConfirm()
+    EasyHomeBuilder.OnClickBuild()
+end
+]]>
+</script>
+<pe:container alignment="_fi" width="100%" height="100%" zorder="-1" style="position:relative;background:;">
+    <pe:container alignment="_ct" style="position:relative;width: 700px; height: 512px; margin-left: -350px; margin-top: -256px; background: url();">
+        <div style="width: 700px; height: 512px;">
+            <div style="position: relative; margin-left: 200px; padding-left: 20px; padding-right: 20px; height: 60px; background: url(Texture/Taurus/Button_Normal_Large.png#0 0 32 32:14 14 14 14);">
+                <div style="float: left; margin-top: 12px; font-size: 24px; font-weight: bold; color: #000000;"><%=L"家园选址："..GetCurrentHome().displayName%></div>
+            </div>
+            <div style="position: relative; margin-top: 240px; width: 700px; height: 41px;">        
+                <input type="button" onclick="OnPreHome()" style="float: left; margin-left: 10px; width: 64px; height: 64px; background: url(Texture/3DMapSystem/Desktop/RightPanel/PreviousPage64.png#0 0 64 64); " />
+                <input type="button" onclick="OnNextHome()" style="float: left; margin-left: 630px; margin-top: -64px; width: 64px; height: 64px; background: url(Texture/3DMapSystem/Desktop/RightPanel/NextPage64.png#0 0 64 64); " />
+            </div>
+            <input type="button" value="确认选择" onclick="OnConfirm()" style="position: relative; margin-top: 450px; margin-left: 250px; width: 200px; height: 60px; font-size: 24px; font-weight: bold; color: #000000; background: url(Texture/Taurus/Button_Highlight_Large.png#0 0 32 32:14 14 14 14);" />
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>

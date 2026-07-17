@@ -1,0 +1,35 @@
+<!-- "script/apps/Aries/Creator/Game/Educate/Competition/CompeteRepairPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="CompeteRepairPage.lua">
+<![CDATA[
+local CompeteRepairPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Competition/CompeteRepairPage.lua")
+CompeteRepairPage.OnInit();
+
+]]></script>
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #000000cc;">
+    <pe:container alignment="_ct" width="1280" height="720" style="margin-left:-640px;margin-top:-360px;background: ;">
+        <div  style="width: 200px;height: 200px; margin-top: 280px; margin-left: 420px;">
+            <div style='min-width: 100px;
+                        height: 100px;
+                        margin-left: 10px;
+                        margin-top: 10px;
+                        position: relative;
+                        background:url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#500 15 104 109);
+                        background-animation:url(script/UIAnimation/CommonProgress.lua.table#WaitingSpin)'>
+            </div>
+            <div style="width: 500px; font-size: 36px; base-font-size: 36px; color: #FFFFFF; margin-top: 34px; margin-left: 120px;">
+                <%=L"世界正在重新加载中..."%>
+            </div>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml> 
+</body>
+</html>

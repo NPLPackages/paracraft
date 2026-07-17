@@ -1,0 +1,908 @@
+<ccsskin>
+    <category name="hand_equipment" text="手持">
+        <item text="棒棒糖左手" icon="Texture/Aries/Item/1022_LargeLollipop.png" slot="11" gsid="1022"/>
+        <item text="棒棒糖右手" icon="Texture/Aries/Item/1022_LargeLollipop.png" slot="10" gsid="1022"/>
+        <item text="探测器左手" icon="Texture/Aries/Item/1147_Detector.png" slot="11" gsid="1147"/>
+        <item text="探测器右手" icon="Texture/Aries/Item/1147_Detector.png" slot="10" gsid="1147"/>
+        <item text="元宵火把左" icon="Texture/Aries/Item/1156_YuanXiaoTorch.png" slot="11" gsid="1156"/>
+        <item text="元宵火把右" icon="Texture/Aries/Item/1156_YuanXiaoTorch.png" slot="10" gsid="1156"/>
+        <item text="古奇凿子左" icon="Texture/Aries/Item/1157_GucciChisel.png" slot="11" gsid="1157"/>
+        <item text="古奇凿子右" icon="Texture/Aries/Item/1157_GucciChisel.png" slot="10" gsid="1157"/>
+        <item text="蓝色风车左" icon="Texture/Aries/Item/1187_BluePinwheel.png" slot="11" gsid="1187"/>
+        <item text="蓝色风车右" icon="Texture/Aries/Item/1187_BluePinwheel.png" slot="10" gsid="1187"/>
+        <item text="粉色风车左" icon="Texture/Aries/Item/1188_PinkPinwheel.png" slot="11" gsid="1188"/>
+        <item text="粉色风车右" icon="Texture/Aries/Item/1188_PinkPinwheel.png" slot="10" gsid="1188"/>
+        <item text="橙色风车左" icon="Texture/Aries/Item/1189_OrangePinwheel.png" slot="11" gsid="1189"/>
+        <item text="橙色风车右" icon="Texture/Aries/Item/1189_OrangePinwheel.png" slot="10" gsid="1189"/>
+        <item text="手持1" icon="Texture/Aries/Item/1266_CommonNewbieWand.png" slot="11" gsid="1266"/>
+        <item text="手持2" icon="Texture/Aries/Item/1267_FireWand_5.png" slot="11" gsid="1267"/>
+        <item text="手持3" icon="Texture/Aries/Item/1268_IceWand_5.png" slot="11" gsid="1268"/>
+        <item text="手持4" icon="Texture/Aries/Item/1269_StormWand_5.png" slot="11" gsid="1269"/>
+        <item text="手持5" icon="Texture/Aries/Item/1270_LifeWand_5.png" slot="11" gsid="1270"/>
+        <item text="手持6" icon="Texture/Aries/Item/1271_DeathWand_5.png" slot="11" gsid="1271"/>
+        <item text="手持7" icon="Texture/Aries/Item/1272_FireWand_10.png" slot="11" gsid="1272"/>
+        <item text="手持8" icon="Texture/Aries/Item/1273_IceWand_10.png" slot="11" gsid="1273"/>
+        <item text="手持9" icon="Texture/Aries/Item/1274_StormWand_10.png" slot="11" gsid="1274"/>
+        <item text="手持10" icon="Texture/Aries/Item/1275_LifeWand_10.png" slot="11" gsid="1275"/>
+        <item text="手持11" icon="Texture/Aries/Item/1276_DeathWand_10.png" slot="11" gsid="1276"/>
+        <item text="VIP1" icon="Texture/Aries/Item/1290_VIPStaff1.png" slot="11" gsid="1290"/>
+        <item text="VIP2" icon="Texture/Aries/Item/1291_VIPStaff2.png" slot="11" gsid="1291"/>
+        <item text="VIP3" icon="Texture/Aries/Item/1292_VIPStaff3.png" slot="11" gsid="1292"/>
+        <item text="VIP4" icon="Texture/Aries/Item/1293_VIPStaff4.png" slot="11" gsid="1293"/>
+        <item text="VIP5" icon="Texture/Aries/Item/1294_VIPStaff5.png" slot="11" gsid="1294"/>
+        <item text="VIP6" icon="Texture/Aries/Item/1295_VIPStaff6.png" slot="11" gsid="1295"/>
+        <item text="VIP7" icon="Texture/Aries/Item/1296_VIPStaff7.png" slot="11" gsid="1296"/>
+        <item text="VIP8" icon="Texture/Aries/Item/1297_VIPStaff8.png" slot="11" gsid="1297"/>
+        <item text="VIP9" icon="Texture/Aries/Item/1298_VIPStaff9.png" slot="11" gsid="1298"/>
+        <item text="VIP10" icon="Texture/Aries/Item/1299_VIPStaff10.png" slot="11" gsid="1299"/>
+        <item text="VIP11" icon="Texture/Aries/Item/1300_VIPStaff11.png" slot="11" gsid="1300"/>
+        <item text="商手持1" icon="Texture/Aries/Item/1445_ShopFireWand01.png" slot="10" gsid="1445"/>
+        <item text="商手持2" icon="Texture/Aries/Item/1446_ShopIceWand01.png" slot="10" gsid="1446"/>
+        <item text="商手持3" icon="Texture/Aries/Item/1447_ShopStormWand01.png" slot="10" gsid="1447"/>
+        <item text="商手持4" icon="Texture/Aries/Item/1448_ShopLifeWand01.png" slot="10" gsid="1448"/>
+        <item text="商手持5" icon="Texture/Aries/Item/1449_ShopDeathWand01.png" slot="10" gsid="1449"/>
+        <item text="23日1" icon="Texture/Aries/Item/1465_FireWand_15.png" slot="10" gsid="1465"/>
+        <item text="23日2" icon="Texture/Aries/Item/1466_IceWand_15.png" slot="10" gsid="1466"/>
+        <item text="23日3" icon="Texture/Aries/Item/1467_StormWand_15.png" slot="10" gsid="1467"/>
+        <item text="23日4" icon="Texture/Aries/Item/1468_LifeWand_15.png" slot="10" gsid="1468"/>
+        <item text="23日5" icon="Texture/Aries/Item/1469_DeathWand_15.png" slot="10" gsid="1469"/>
+        <item text="1月13商1" icon="Texture/Aries/Item/1512_ShopFireWand02.png" slot="10" gsid="1512"/>
+        <item text="1月13商2" icon="Texture/Aries/Item/1513_ShopIceWand02.png" slot="10" gsid="1513"/>
+        <item text="1月13商3" icon="Texture/Aries/Item/1514_ShopStormWand02.png" slot="10" gsid="1514"/>
+        <item text="1月13商4" icon="Texture/Aries/Item/1515_ShopDeathWand02.png" slot="10" gsid="1515"/>
+        <item text="1月13商5" icon="Texture/Aries/Item/1516_ShopLifeWand02.png" slot="10" gsid="1516"/>
+        <item text="1月13普1" icon="Texture/Aries/Item/1517_FireWand20.png" slot="10" gsid="1517"/>
+        <item text="1月13普2" icon="Texture/Aries/Item/1518_IceWand20.png" slot="10" gsid="1518"/>
+        <item text="1月13普3" icon="Texture/Aries/Item/1519_StormWand20.png" slot="10" gsid="1519"/>
+        <item text="1月13普4" icon="Texture/Aries/Item/1520_DeathWand20.png" slot="10" gsid="1520"/>
+        <item text="1月13普5" icon="Texture/Aries/Item/1521_LifeWand20.png" slot="10" gsid="1521"/>
+        <item text="1月20杖1" icon="Texture/Aries/Item/1607_FireWand25.png" slot="10" gsid="1607"/>
+        <item text="1月20杖2" icon="Texture/Aries/Item/1608_IceWand25.png" slot="10" gsid="1608"/>
+        <item text="1月20杖3" icon="Texture/Aries/Item/1609_StormWand25.png" slot="10" gsid="1609"/>
+        <item text="1月20杖4" icon="Texture/Aries/Item/1610_DeathWand25.png" slot="10" gsid="1610"/>
+        <item text="1月20杖5" icon="Texture/Aries/Item/1611_LifeWand25.png" slot="10" gsid="1611"/>
+        <item text="1月28商1" icon="Texture/Aries/Item/1645_ShopFireWand03.png" slot="10" gsid="1645"/>
+        <item text="1月28商2" icon="Texture/Aries/Item/1646_ShopIceWand03.png" slot="10" gsid="1646"/>
+        <item text="1月28商3" icon="Texture/Aries/Item/1647_ShopStormWand03.png" slot="10" gsid="1647"/>
+        <item text="1月28商4" icon="Texture/Aries/Item/1648_ShopDeathWand03.png" slot="10" gsid="1648"/>
+        <item text="1月28商5" icon="Texture/Aries/Item/1649_ShopLifeWand03.png" slot="10" gsid="1649"/>
+        <item text="玫瑰杖" icon="Texture/Aries/Item/1650_ShopNewYearsRoseWand.png" slot="10" gsid="1650"/>
+        <item text="40火商1" icon="Texture/Aries/Item/1684_ShopFireWand04.png" slot="10" gsid="1684"/>
+        <item text="40冰商2" icon="Texture/Aries/Item/1685_ShopIceWand04.png" slot="10" gsid="1685"/>
+        <item text="40风商3" icon="Texture/Aries/Item/1686_ShopStormWand04.png" slot="10" gsid="1686"/>
+        <item text="40死商4" icon="Texture/Aries/Item/1687_ShopDeathWand04.png" slot="10" gsid="1687"/>
+        <item text="40生商5" icon="Texture/Aries/Item/1688_ShopLifeWand04.png" slot="10" gsid="1688"/>
+        <item text="S1火1" icon="Texture/Aries/Item/1747_ColiseumFireWandS1.png" slot="10" gsid="1747"/>
+        <item text="S1冰2" icon="Texture/Aries/Item/1748_ColiseumIceWandS1.png" slot="10" gsid="1748"/>
+        <item text="S1风3" icon="Texture/Aries/Item/1749_ColiseumStormWandS1.png" slot="10" gsid="1749"/>
+        <item text="S1死4" icon="Texture/Aries/Item/1750_ColiseumDeathWandS1.png" slot="10" gsid="1750"/>
+        <item text="S1生5" icon="Texture/Aries/Item/1751_ColiseumLifeWandS1.png" slot="10" gsid="1751"/>
+        <item text="魔晶法杖左手" icon="Texture/Aries/Item/1788_MagicCrystalWand.png" slot="11" gsid="1788"/>
+        <item text="魔晶法杖右手" icon="Texture/Aries/Item/1788_MagicCrystalWand.png" slot="10" gsid="1788"/>
+        <item text="火初学" icon="Texture/Aries/Item/1807_FirstFireRightHand.png" slot="10" gsid="1807"/>
+        <item text="冰初学" icon="Texture/Aries/Item/1808_FirstIceRightHand.png" slot="10" gsid="1808"/>
+        <item text="风初学" icon="Texture/Aries/Item/1809_FirstStormRightHand.png" slot="10" gsid="1809"/>
+        <item text="生初学" icon="Texture/Aries/Item/1810_FirstLifeRightHand.png" slot="10" gsid="1810"/>
+        <item text="死初学" icon="Texture/Aries/Item/1811_FirstDeathRightHand.png" slot="10" gsid="1811"/>
+        <item text="S2冰1" icon="Texture/Aries/Item/1823_IceRightHandS2.png" slot="10" gsid="1823"/>
+        <item text="S2火2" icon="Texture/Aries/Item/1831_FireRightHandS2.png" slot="10" gsid="1831"/>
+        <item text="S2风3" icon="Texture/Aries/Item/1841_StormRightHandS2.png" slot="10" gsid="1841"/>
+        <item text="S2生4" icon="Texture/Aries/Item/1849_LifeRightHandS2.png" slot="10" gsid="1849"/>
+        <item text="S2死5" icon="Texture/Aries/Item/1858_DeathRightHandS2.png" slot="10" gsid="1858"/>
+        <item text="强S2冰1" icon="Texture/Aries/Item/1860_IceRightHandS2_Power.png" slot="10" gsid="1860"/>
+        <item text="强S2火2" icon="Texture/Aries/Item/1861_FireRightHandS2_Power.png" slot="10" gsid="1861"/>
+        <item text="强S2风3" icon="Texture/Aries/Item/1862_StormRightHandS2_Power.png" slot="10" gsid="1862"/>
+        <item text="强S2生4" icon="Texture/Aries/Item/1863_LifeRightHandS2_Power.png" slot="10" gsid="1863"/>
+        <item text="强S2死5" icon="Texture/Aries/Item/1864_DeathRightHandS2_Power.png" slot="10" gsid="1864"/>
+        <item text="强化魔晶" icon="Texture/Aries/Item/1865_MagicCrystalWand_Power.png" slot="10" gsid="1865"/>
+        <item text="1943" icon="Texture/Aries/Item/1944_RightHand_Legend_LifeLevel50.png" slot="10" gsid="1943"/>
+        <item text="1953" icon="Texture/Aries/Item/1954_RightHand_Legend_IceLevel50.png" slot="10" gsid="1953"/>
+        <item text="1963" icon="Texture/Aries/Item/1964_RightHand_Legend_FireLevel50.png" slot="10" gsid="1963"/>
+        <item text="1973" icon="Texture/Aries/Item/1974_RightHand_Legend_StormLevel50.png" slot="10" gsid="1973"/>
+        <item text="1983" icon="Texture/Aries/Item/1984_RightHand_Legend_DeathLevel50.png" slot="10" gsid="1983"/>
+        <item text="左手2117" icon="Texture/Aries/Item/2117_ChristmasLolipop.png" slot="11" gsid="2117"/>
+        <item text="烈火S4" icon="Texture/Aries/Item/2119_TheStrongest_FireLevel55.png" name="2119_TheStrongest_FireLevel55" slot="10"  gsid="2119"/>
+        <item text="寒冰S4" icon="Texture/Aries/Item/2120_TheStrongest_IceLevel55.png" name="2120_TheStrongest_IceLevel55" slot="10"  gsid="2120"/>
+        <item text="风暴S4" icon="Texture/Aries/Item/2121_TheStrongest_StormLevel55.png" name="2121_TheStrongest_StormLevel55" slot="10"  gsid="2121"/>
+        <item text="生命S4" icon="Texture/Aries/Item/2122_TheStrongest_LifeLevel55.png" name="2122_TheStrongest_LifeLevel55" slot="10"  gsid="2122"/>
+        <item text="死亡S4" icon="Texture/Aries/Item/2123_TheStrongest_DeathLevel55.png" name="2123_TheStrongest_DeathLevel55" slot="10"  gsid="2123"/>
+        <item text="青钢盾1" icon="Texture/Aries/Item/2129_FinedayPig_Shield.png" name="2129_FinedayPig_Shield" slot="11"  gsid="2129"/>
+        <item text="肘子肉1" icon="Texture/Aries/Item/2130_SugarFree_PorkMeat.png" name="2130_SugarFree_PorkMeat" slot="11"  gsid="2130"/>
+        <item text="恶魔锤1" icon="Texture/Aries/Item/2131_AngryDemon_Hammer.png" name="2131_AngryDemon_Hammer" slot="11" gsid="2131"/>
+        <item text="青钢盾2" icon="Texture/Aries/Item/2132_FinedayPig_Shield_Max.png" name="2132_FinedayPig_Shield_Max" slot="11"  gsid="2132"/>
+        <item text="肘子肉2" icon="Texture/Aries/Item/2133_SugarFree_PorkMeat_Max.png" name="2133_SugarFree_PorkMeat_Max" slot="11"  gsid="2133"/>
+        <item text="恶魔锤2" icon="Texture/Aries/Item/2134_AngryDemon_Hammer_Max.png" name="2134_AngryDemon_Hammer_Max" slot="11" gsid="2134"/>
+        <item text="龙息灵盾1" icon="Texture/Aries/Item/2202_TheStrongest_FireLevel55_Left.png" name="2202_TheStrongest_FireLevel55_Left" slot="11"  gsid="2202"/>
+        <item text="冰裂灵盾1" icon="Texture/Aries/Item/2203_TheStrongest_IceLevel55_Left.png" name="2203_TheStrongest_IceLevel55_Left" slot="11"  gsid="2203"/>
+        <item text="雷霆灵盾1" icon="Texture/Aries/Item/2204_TheStrongest_StormLevel55_Left.png" name="2204_TheStrongest_StormLevel55_Left" slot="11"  gsid="2204"/>
+        <item text="神翼灵盾1" icon="Texture/Aries/Item/2205_TheStrongest_LifeLevel55_Left.png" name="2205_TheStrongest_LifeLevel55_Left" slot="11"  gsid="2205"/>
+        <item text="灾厄灵盾1" icon="Texture/Aries/Item/2206_TheStrongest_DeathLevel55_Left.png" name="2206_TheStrongest_DeathLevel55_Left" slot="11"  gsid="2206"/>
+
+        <item text="右烈火S4" icon="Texture/Aries/Item/2304_FireMagicWandS4.png" name="2304_FireMagicWandS4" slot="10"  gsid="2304"/>
+        <item text="右寒冰S4" icon="Texture/Aries/Item/2305_IceMagicWandS4.png" name="2305_IceMagicWandS4" slot="10"  gsid="2305"/>
+        <item text="右风暴S4" icon="Texture/Aries/Item/2306_StormMagicWandS4.png" name="2306_StormMagicWandS4" slot="10"  gsid="2306"/>
+        <item text="右生命S4" icon="Texture/Aries/Item/2307_LifeMagicWandS4.png" name="2307_LifeMagicWandS4" slot="10"  gsid="2307"/>
+        <item text="右死亡S4" icon="Texture/Aries/Item/2308_DeathMagicWandS4.png" name="2308_DeathMagicWandS4" slot="10"  gsid="2308"/>
+
+        <item text="左烈火S4" icon="Texture/Aries/Item/17084_ColouredGlaze.png" name="2309_FireLeftHandS4" slot="11"  gsid="2309"/>
+        <item text="左寒冰S4" icon="Texture/Aries/Item/17084_ColouredGlaze.png" name="2310_IceLeftHandS4" slot="11"  gsid="2310"/>
+        <item text="左风暴S4" icon="Texture/Aries/Item/17084_ColouredGlaze.png" name="2311_StormLeftHandS4" slot="11"  gsid="2311"/>
+        <item text="左生命S4" icon="Texture/Aries/Item/17084_ColouredGlaze.png" name="2312_LifeLeftHandS4" slot="11"  gsid="2312"/>
+        <item text="左死亡S4" icon="Texture/Aries/Item/17084_ColouredGlaze.png" name="2313_DeathLeftHandS4" slot="11"  gsid="2313"/>
+
+        <item text="红色浆果左手" icon="Texture/Aries/Item/21001_RedAcinus.png" slot="11" gsid="21001"/>
+        <item text="红色浆果右手" icon="Texture/Aries/Item/21001_RedAcinus.png" slot="10" gsid="21001"/>
+        <item text="黄色浆果左手" icon="Texture/Aries/Item/21002_YellowAcinus.png" slot="11" gsid="21002"/>
+        <item text="黄色浆果右手" icon="Texture/Aries/Item/21002_YellowAcinus.png" slot="10" gsid="21002"/>
+        <item text="蓝色浆果左手" icon="Texture/Aries/Item/21003_BlueAcinus.png" slot="11" gsid="21003"/>
+        <item text="蓝色浆果右手" icon="Texture/Aries/Item/21003_BlueAcinus.png" slot="10" gsid="21003"/>
+        <item text="绿色浆果左手" icon="Texture/Aries/Item/21004_GreenAcinus.png" slot="11" gsid="21004"/>
+        <item text="绿色浆果右手" icon="Texture/Aries/Item/21004_GreenAcinus.png" slot="10" gsid="21004"/>
+        <item text="喇叭花左手" icon="Texture/Aries/Item/21005_MorningGlory.png" slot="11" gsid="21005"/>
+        <item text="喇叭花右手" icon="Texture/Aries/Item/21005_MorningGlory.png" slot="10" gsid="21005"/>
+        <item text="急救箱左手" icon="Texture/Aries/Item/21006_FirstAidBox.png" slot="11" gsid="21006"/>
+        <item text="急救箱右手" icon="Texture/Aries/Item/21006_FirstAidBox.png" slot="10" gsid="21006"/>
+    </category>
+    <category name="clothes" text="衣服">
+        <item text="森林上装" icon="Texture/Aries/Item/1001_ForestDress.png" slot="16" gsid="1001"/>
+        <item text="白色红条短T恤" icon="Texture/Aries/Item/1005_WhiteRedStripTShirt.png" slot="16" gsid="1005"/>
+        <item text="警察服" icon="Texture/Aries/Item/1008_PoliceUniformShirt.png" slot="16" gsid="1008"/>
+        <item text="黄色冬日外套" icon="Texture/Aries/Item/1023_WinterYellowCoat.png" slot="16" gsid="1023"/>
+        <item text="野人女式皮束胸" icon="Texture/Aries/Item/1027_SavageGirlLeatherWeskit.png" slot="16" gsid="1027"/>
+        <item text="红色比基尼" icon="Texture/Aries/Item/1034_RedBikini.png" slot="16" gsid="1034"/>
+        <item text="蔚蓝色比基尼" icon="Texture/Aries/Item/1037_SteelBlueBikini.png" slot="16" gsid="1037"/>
+        <item text="黄色星星碧绿边比基尼" icon="Texture/Aries/Item/1039_LightYellowStarBikini.png" slot="16" gsid="1039"/>
+        <item text="野人新红上" icon="Texture/Aries/Item/1041_SavageGirlRedLeatherWeskit.png" slot="16" gsid="1041"/>
+        <item text="野人新黄上" icon="Texture/Aries/Item/1042_SavageGirlYellowLeatherWeskit.png" slot="16" gsid="1042"/>
+        <item text="工装上" icon="Texture/Aries/Item/1047_YellowWorkingCoat.png" slot="16" gsid="1047"/>
+        <item text="初始1上" icon="Texture/Aries/Item/1050_RegInit_Shirt1.png" slot="16" gsid="1050"/>
+        <item text="初始2上" icon="Texture/Aries/Item/1053_RegInit_Shirt2.png" slot="16" gsid="1053"/>
+        <item text="初始3上" icon="Texture/Aries/Item/1056_RegInit_Shirt3.png" slot="16" gsid="1056"/>
+        <item text="初始4上" icon="Texture/Aries/Item/1059_RegInit_Shirt4.png" slot="16" gsid="1059"/>
+        <item text="初始5上" icon="Texture/Aries/Item/1062_RegInit_Shirt5.png" slot="16" gsid="1062"/>
+        <item text="初始6上" icon="Texture/Aries/Item/1103_RegInit_Shirt6.png" slot="16" gsid="1103"/>
+        <item text="滑冰上衣" icon="Texture/Aries/Item/1066_Skating_MediumBlueShirt.png" slot="16" gsid="1066"/>
+        <item text="篮球上衣" icon="Texture/Aries/Item/1069_Basketball_RedBullShirt.png" slot="16" gsid="1069"/>
+        <item text="医生上衣" icon="Texture/Aries/Item/1072_Doctor_SkyBlueCoat.png" slot="16" gsid="1072"/>
+        <item text="大使上衣" icon="Texture/Aries/Item/1075_Ambassador_GreenCoat.png" slot="16" gsid="1075"/>
+        <item text="工装紫上衣" icon="Texture/Aries/Item/1080_Working_RedPurpleKhakiStripTShirt.png" slot="16" gsid="1080"/>
+        <item text="紫色棉衣" icon="Texture/Aries/Item/1083_PurpleRedStripeCoat.png" slot="16" gsid="1083"/>
+        <item text="万圣节衣服" icon="Texture/Aries/Item/1086_HalloweenCoat.png" slot="16" gsid="1086"/>
+        <item text="红灰条纹海盗服" icon="Texture/Aries/Item/1088_RedGreyStripePirateCoat.png" slot="16" gsid="1088"/>
+        <item text="圣诞棉服" icon="Texture/Aries/Item/1091_ChristmasWarmCoat.png" slot="16" gsid="1091"/>
+        <item text="圣诞吊带服" icon="Texture/Aries/Item/1092_ChristmasWarmDress.png" slot="16" gsid="1092"/>
+        <item text="麋鹿服" icon="Texture/Aries/Item/1097_ElkCoat.png" slot="16" gsid="1097"/>
+        <item text="白射手衣" icon="Texture/Aries/Item/1107_WhiteSharpshooter_Coat.png" slot="16" gsid="1107"/>
+        <item text="黑射手衣" icon="Texture/Aries/Item/1111_BlackSharpshooter_Coat.png" slot="16" gsid="1111"/>
+        <item text="丹瑟衣" icon="Texture/Aries/Item/1115_Dancer_Coat.png" slot="16" gsid="1115"/>
+        <item text="D达人衣" icon="Texture/Aries/Item/1119_D_DaRen_Coat.png" slot="16" gsid="1119"/>
+        <item text="B达人衣" icon="Texture/Aries/Item/1123_B_DaRen_Coat.png" slot="16" gsid="1123"/>
+        <item text="F达人衣" icon="Texture/Aries/Item/1127_F_DaRen_Coat.png" slot="16" gsid="1127"/>
+        <item text="新年女衣" icon="Texture/Aries/Item/1138_NewYearGirlCoat.png" slot="16" gsid="1138"/>
+        <item text="新年男衣" icon="Texture/Aries/Item/1141_NewYearBoyCoat.png" slot="16" gsid="1141"/>
+        <item text="新年拜年衣" icon="Texture/Aries/Item/1144_NewYearWarmCoat.png" slot="16" gsid="1144"/>
+        <item text="元宵女衣" icon="Texture/Aries/Item/1151_YuanXiaoGirlShirt.png" slot="16" gsid="1151"/>
+        <item text="元宵男衣" icon="Texture/Aries/Item/1154_YuanXiaoBoyShirt.png" slot="16" gsid="1154"/>
+        <item text="棒糖女上" icon="Texture/Aries/Item/1158_LollipopGirlShirt.png" slot="16" gsid="1158"/>
+        <item text="清爽女衣" icon="Texture/Aries/Item/1161_CoolSummerGirlShirt.png" slot="16" gsid="1161"/>
+        <item text="淑女衣" icon="Texture/Aries/Item/1164_FairLadyGirlShirt.png" slot="16" gsid="1164"/>
+        <item text="功夫黑衣" icon="Texture/Aries/Item/1167_KongFuBlackShirt.png" slot="16" gsid="1167"/>
+        <item text="功夫黄衣" icon="Texture/Aries/Item/1170_KongFuYellowShirt.png" slot="16" gsid="1170"/>
+        <item text="西瓜女衣" icon="Texture/Aries/Item/1173_WatermelonGirlShirt.png" slot="16" gsid="1173"/>
+        <item text="西瓜男衣" icon="Texture/Aries/Item/1176_WatermelonBoyShirt.png" slot="16" gsid="1176"/>
+        <item text="棒糖男衣" icon="Texture/Aries/Item/1179_LollipopBoyShirt.png" slot="16" gsid="1179"/>
+        <item text="清爽男衣" icon="Texture/Aries/Item/1182_CoolSummerBoyShirt.png" slot="16" gsid="1182"/>
+        <item text="银色铠甲" icon="Texture/Aries/Item/1190_SilverPlateArmor.png" slot="16" gsid="1190"/>
+        <item text="糖果装衣1" icon="Texture/Aries/Item/1192_CandySuitShirt1.png" slot="16" gsid="1192"/>
+        <item text="糖果装衣2" icon="Texture/Aries/Item/1197_CandySuitShirt2.png" slot="16" gsid="1197"/>
+        <item text="糖果装衣3" icon="Texture/Aries/Item/1202_CandySuitShirt3.png" slot="16" gsid="1202"/>
+        <item text="糖果装衣4" icon="Texture/Aries/Item/1207_CandySuitShirt4.png" slot="16" gsid="1207"/>
+        <item text="夏日红衣" icon="Texture/Aries/Item/1212_ColorfulStripHotShirt.png" slot="16" gsid="1212"/>
+        <item text="可乐装衣" icon="Texture/Aries/Item/1217_ColaSuitShirt.png" slot="16" gsid="1217"/>
+        <item text="报纸装衣" icon="Texture/Aries/Item/1221_NewspaperShirt.png" slot="16" gsid="1221"/>
+        <item text="塑料套装" icon="Texture/Aries/Item/1225_PlasticStripeShirt.png" slot="16" gsid="1225"/>
+        <item text="女仆装衣" icon="Texture/Aries/Item/1227_ServantGirlShirt.png" slot="16" gsid="1227"/>
+        <item text="火衣1" icon="Texture/Aries/Item/1241_FireSuit1.png" slot="16" gsid="1241"/>
+        <item text="冰衣1" icon="Texture/Aries/Item/1242_IceSuit1.png" slot="16" gsid="1242"/>
+        <item text="风衣1" icon="Texture/Aries/Item/1243_StormSuit1.png" slot="16" gsid="1243"/>
+        <item text="死衣1" icon="Texture/Aries/Item/1244_DeathSuit1.png" slot="16" gsid="1244"/>
+        <item text="生衣1" icon="Texture/Aries/Item/1245_LifeSuit1.png" slot="16" gsid="1245"/>
+        <item text="通衣1" icon="Texture/Aries/Item/1246_CommonSuit1.png" slot="16" gsid="1246"/>
+        <item text="通衣2" icon="Texture/Aries/Item/1247_CommonSuit2.png" slot="16" gsid="1247"/>
+        <item text="通衣3" icon="Texture/Aries/Item/1248_CommonSuit3.png" slot="16" gsid="1248"/>
+        <item text="通衣4" icon="Texture/Aries/Item/1249_CommonSuit4.png" slot="16" gsid="1249"/>
+        <item text="通衣5" icon="Texture/Aries/Item/1250_CommonSuit5.png" slot="16" gsid="1250"/>
+        <item text="通衣6" icon="Texture/Aries/Item/1322_CommonSuit6.png" slot="16" gsid="1322"/>
+        <item text="通衣7" icon="Texture/Aries/Item/1356_CommonSuit7.png" slot="16" gsid="1356"/>
+        <item text="通衣8" icon="Texture/Aries/Item/1357_CommonSuit8.png" slot="16" gsid="1357"/>
+        <item text="普通衣1" icon="Texture/Aries/Item/1279_RedCutyShirt.png" slot="16" gsid="1279"/>
+        <item text="普通衣2" icon="Texture/Aries/Item/1282_MagicGentleShirt.png" slot="16" gsid="1282"/>
+        <item text="VIP衣1" icon="Texture/Aries/Item/1285_GloryWarriorSuit.png" slot="16" gsid="1285"/>
+        <item text="VIP衣2" icon="Texture/Aries/Item/1288_MagicProtectionSuit.png" slot="16" gsid="1288"/>
+        <item text="火衣2" icon="Texture/Aries/Item/1312_FireSuit2.png" slot="16" gsid="1312"/>
+        <item text="冰衣2" icon="Texture/Aries/Item/1313_IceSuit2.png" slot="16" gsid="1313"/>
+        <item text="风衣2" icon="Texture/Aries/Item/1314_StormSuit2.png" slot="16" gsid="1314"/>
+        <item text="死衣2" icon="Texture/Aries/Item/1315_DeathSuit2.png" slot="16" gsid="1315"/>
+        <item text="生衣2" icon="Texture/Aries/Item/1316_LifeSuit2.png" slot="16" gsid="1316"/>
+        <item text="火衣3" icon="Texture/Aries/Item/1317_FireSuit3.png" slot="16" gsid="1317"/>
+        <item text="冰衣3" icon="Texture/Aries/Item/1318_IceSuit3.png" slot="16" gsid="1318"/>
+        <item text="风衣3" icon="Texture/Aries/Item/1319_StormSuit3.png" slot="16" gsid="1319"/>
+        <item text="死衣3" icon="Texture/Aries/Item/1320_DeathSuit3.png" slot="16" gsid="1320"/>
+        <item text="生衣3" icon="Texture/Aries/Item/1321_LifeSuit3.png" slot="16" gsid="1321"/>
+        <item text="火衣4" icon="Texture/Aries/Item/1346_FireSuit4.png" slot="16" gsid="1346"/>
+        <item text="冰衣4" icon="Texture/Aries/Item/1347_IceSuit4.png" slot="16" gsid="1347"/>
+        <item text="风衣4" icon="Texture/Aries/Item/1348_StormSuit4.png" slot="16" gsid="1348"/>
+        <item text="死衣4" icon="Texture/Aries/Item/1349_DeathSuit4.png" slot="16" gsid="1349"/>
+        <item text="生衣4" icon="Texture/Aries/Item/1350_LifeSuit4.png" slot="16" gsid="1350"/>
+        <item text="火衣5" icon="Texture/Aries/Item/1351_FireSuit5.png" slot="16" gsid="1351"/>
+        <item text="冰衣5" icon="Texture/Aries/Item/1352_IceSuit5.png" slot="16" gsid="1352"/>
+        <item text="风衣5" icon="Texture/Aries/Item/1353_StormSuit5.png" slot="16" gsid="1353"/>
+        <item text="死衣5" icon="Texture/Aries/Item/1354_DeathSuit5.png" slot="16" gsid="1354"/>
+        <item text="生衣5" icon="Texture/Aries/Item/1355_LifeSuit5.png" slot="16" gsid="1355"/>
+        <item text="火套衣1" icon="Texture/Aries/Item/1385_FireExchangeSuit01.png" slot="16" gsid="1385"/>
+        <item text="冰套衣1" icon="Texture/Aries/Item/1386_IceExchangeSuit01.png" slot="16" gsid="1386"/>
+        <item text="风套衣1" icon="Texture/Aries/Item/1387_StormExchangeSuit01.png" slot="16" gsid="1387"/>
+        <item text="死套衣1" icon="Texture/Aries/Item/1388_DeathExchangeSuit01.png" slot="16" gsid="1388"/>
+        <item text="生套衣1" icon="Texture/Aries/Item/1389_LifeExchangeSuit01.png" slot="16" gsid="1389"/>
+        <item text="火套衣2" icon="Texture/Aries/Item/1390_FireExchangeSuit02.png" slot="16" gsid="1390"/>
+        <item text="冰套衣2" icon="Texture/Aries/Item/1391_IceExchangeSuit02.png" slot="16" gsid="1391"/>
+        <item text="风套衣2" icon="Texture/Aries/Item/1392_StormExchangeSuit02.png" slot="16" gsid="1392"/>
+        <item text="死套衣2" icon="Texture/Aries/Item/1393_DeathExchangeSuit02.png" slot="16" gsid="1393"/>
+        <item text="生套衣2" icon="Texture/Aries/Item/1394_LifeExchangeSuit02.png" slot="16" gsid="1394"/>
+        <item text="火套衣3" icon="Texture/Aries/Item/1395_FireExchangeSuit03.png" slot="16" gsid="1395"/>
+        <item text="冰套衣3" icon="Texture/Aries/Item/1396_IceExchangeSuit03.png" slot="16" gsid="1396"/>
+        <item text="风套衣3" icon="Texture/Aries/Item/1397_StormExchangeSuit03.png" slot="16" gsid="1397"/>
+        <item text="死套衣3" icon="Texture/Aries/Item/1398_DeathExchangeSuit03.png" slot="16" gsid="1398"/>
+        <item text="生套衣3" icon="Texture/Aries/Item/1399_LifeExchangeSuit03.png" slot="16" gsid="1399"/>
+        <item text="商通衣1" icon="Texture/Aries/Item/1453_ShopCommonSuit01.png" slot="16" gsid="1453"/>
+        <item text="商通衣2" icon="Texture/Aries/Item/1454_ShopCommonSuit02.png" slot="16" gsid="1454"/>
+        <item text="商通衣3" icon="Texture/Aries/Item/1455_ShopCommonSuit03.png" slot="16" gsid="1455"/>
+        <item text="学徒衣" icon="Texture/Aries/Item/1471_NewbieSuit.png" slot="16" gsid="1471"/>
+        <item text="男爵衣" icon="Texture/Aries/Item/1474_ClownSuit.png" slot="16" gsid="1474"/>
+        <item text="公主衣" icon="Texture/Aries/Item/1477_PrincessClownSuit.png" slot="16" gsid="1477"/>
+        <item text="闪灵衣" icon="Texture/Aries/Item/1480_ShiningSuit.png" slot="16" gsid="1480"/>
+        <item text="异域衣" icon="Texture/Aries/Item/1484_ForeignLandSuit.png" slot="16" gsid="1484"/>
+        <item text="1月13衣1" icon="Texture/Aries/Item/1492_ShopFireSuitLv12.png" slot="16" gsid="1492"/>
+        <item text="1月13衣2" icon="Texture/Aries/Item/1493_ShopIceSuitLv12.png" slot="16" gsid="1493"/>
+        <item text="1月13衣3" icon="Texture/Aries/Item/1494_ShopStormSuitLv12.png" slot="16" gsid="1494"/>
+        <item text="1月13衣4" icon="Texture/Aries/Item/1495_ShopDeathSuitLv12.png" slot="16" gsid="1495"/>
+        <item text="1月13衣5" icon="Texture/Aries/Item/1496_ShopLifeSuitLv12.png" slot="16" gsid="1496"/>
+        <item text="1月20火衣1" icon="Texture/Aries/Item/1539_EgyptFireSuit1.png" slot="16" gsid="1539"/>
+        <item text="1月20冰衣1" icon="Texture/Aries/Item/1540_EgyptIceSuit1.png" slot="16" gsid="1540"/>
+        <item text="1月20风衣1" icon="Texture/Aries/Item/1541_EgyptStormSuit1.png" slot="16" gsid="1541"/>
+        <item text="1月20死衣1" icon="Texture/Aries/Item/1542_EgyptDeathSuit1.png" slot="16" gsid="1542"/>
+        <item text="1月20生衣1" icon="Texture/Aries/Item/1543_EgyptLifeSuit1.png" slot="16" gsid="1543"/>
+        <item text="1月20火衣2" icon="Texture/Aries/Item/1544_EgyptFireSuit2.png" slot="16" gsid="1544"/>
+        <item text="1月20冰衣2" icon="Texture/Aries/Item/1545_EgyptIceSuit2.png" slot="16" gsid="1545"/>
+        <item text="1月20风衣2" icon="Texture/Aries/Item/1546_EgyptStormSuit2.png" slot="16" gsid="1546"/>
+        <item text="1月20死衣2" icon="Texture/Aries/Item/1547_EgyptDeathSuit2.png" slot="16" gsid="1547"/>
+        <item text="1月20生衣2" icon="Texture/Aries/Item/1548_EgyptLifeSuit2.png" slot="16" gsid="1548"/>
+        <item text="1月20通衣1" icon="Texture/Aries/Item/1549_EgyptCommonSuit1.png" slot="16" gsid="1549"/>
+        <item text="1月20通衣2" icon="Texture/Aries/Item/1550_EgyptCommonSuit2.png" slot="16" gsid="1550"/>
+        <item text="1月20火衣兑" icon="Texture/Aries/Item/1551_EgyptExchangeFireSuit.png" slot="16" gsid="1551"/>
+        <item text="1月20冰衣兑" icon="Texture/Aries/Item/1552_EgyptExchangeIceSuit.png" slot="16" gsid="1552"/>
+        <item text="1月20风衣兑" icon="Texture/Aries/Item/1553_EgyptExchangeStormSuit.png" slot="16" gsid="1553"/>
+        <item text="1月20死衣兑" icon="Texture/Aries/Item/1554_EgyptExchangeDeathSuit.png" slot="16" gsid="1554"/>
+        <item text="1月20生衣兑" icon="Texture/Aries/Item/1555_EgyptExchangeLifeSuit.png" slot="16" gsid="1555"/>
+        <item text="1月28火衣1" icon="Texture/Aries/Item/1621_ShopFireSuitLv22.png" slot="16" gsid="1621"/>
+        <item text="1月28冰衣1" icon="Texture/Aries/Item/1622_ShopIceSuitLv22.png" slot="16" gsid="1622"/>
+        <item text="1月28风衣1" icon="Texture/Aries/Item/1623_ShopStormSuitLv22.png" slot="16" gsid="1623"/>
+        <item text="1月28死衣1" icon="Texture/Aries/Item/1624_ShopDeathSuitLv22.png" slot="16" gsid="1624"/>
+        <item text="1月28生衣1" icon="Texture/Aries/Item/1625_ShopLifeSuitLv22.png" slot="16" gsid="1625"/>
+        <item text="新年女衣" icon="Texture/Aries/Item/1626_ShopNewYearsGalSuit.png" slot="16" gsid="1626"/>
+        <item text="新年兔衣1" icon="Texture/Aries/Item/1627_ShopNewYearsRabbitSuit01.png" slot="16" gsid="1627"/>
+        <item text="新年兔衣2" icon="Texture/Aries/Item/1628_ShopNewYearsRabbitSuit02.png" slot="16" gsid="1628"/>
+        <item text="学生男衣" icon="Texture/Aries/Item/1653_ShopSchoolUniformBoySuit.png" slot="16" gsid="1653"/>
+        <item text="学生女衣" icon="Texture/Aries/Item/1654_ShopSchoolUniformGalSuit.png" slot="16" gsid="1654"/>
+        <item text="商32火衣" icon="Texture/Aries/Item/1664_ShopFireSuitLv32.png" slot="16" gsid="1664"/>
+        <item text="商32冰衣" icon="Texture/Aries/Item/1665_ShopIceSuitLv32.png" slot="16" gsid="1665"/>
+        <item text="商32风衣" icon="Texture/Aries/Item/1666_ShopStormSuitLv32.png" slot="16" gsid="1666"/>
+        <item text="商32死衣" icon="Texture/Aries/Item/1667_ShopDeathSuitLv32.png" slot="16" gsid="1667"/>
+        <item text="商32生衣" icon="Texture/Aries/Item/1668_ShopLifeSuitLv32.png" slot="16" gsid="1668"/>
+
+        <item text="女婚衣" icon="Texture/Aries/Item/1690_ShopWeddingShirtGirl.png" slot="16" gsid="1690"/>
+        <item text="男婚衣" icon="Texture/Aries/Item/1693_ShopWeddingShirtBoy.png" slot="16" gsid="1693"/>
+        <item text="男春衣" icon="Texture/Aries/Item/1707_ShopSpringShirtBoy.png" slot="16" gsid="1707"/>
+        <item text="女春衣" icon="Texture/Aries/Item/1708_ShopSpringShirtGirl.png" slot="16" gsid="1708"/>
+        <item text="S1火衣" icon="Texture/Aries/Item/1721_ColiseumFireShirtS1.png" slot="16" gsid="1721"/>
+        <item text="S1冰衣" icon="Texture/Aries/Item/1722_ColiseumIceShirtS1.png" slot="16" gsid="1722"/>
+        <item text="S1风衣" icon="Texture/Aries/Item/1723_ColiseumStormShirtS1.png" slot="16" gsid="1723"/>
+        <item text="S1死衣" icon="Texture/Aries/Item/1724_ColiseumDeathShirtS1.png" slot="16" gsid="1724"/>
+        <item text="S1生衣" icon="Texture/Aries/Item/1725_ColiseumLifeShirtS1.png" slot="16" gsid="1725"/>
+        <item text="S1死衣" icon="Texture/Aries/Item/1726_Shop201161ShirtBoy.png" slot="16" gsid="1726"/>
+        <item text="S1生衣" icon="Texture/Aries/Item/1727_Shop201161ShirtGirl.png" slot="16" gsid="1727"/>
+        <item text="1790清凉衣" icon="Texture/Aries/Item/1790_ColorfulSweltersCoolSuit.png" slot="16" gsid="1790"/>
+        <item text="1793迷你裙" icon="Texture/Aries/Item/1793_ColorfulMiniShirt.png" slot="16" gsid="1793"/>
+        <item text="S2冰衣" icon="Texture/Aries/Item/1819_IceShirtS2.png" slot="16" gsid="1819"/>
+        <item text="S2火衣" icon="Texture/Aries/Item/1827_FireShirtS2.png" slot="16" gsid="1827"/>
+        <item text="S2风衣" icon="Texture/Aries/Item/1837_StormShirtS2.png" slot="16" gsid="1837"/>
+        <item text="S2生衣" icon="Texture/Aries/Item/1847_LifeShirtS2.png" slot="16" gsid="1847"/>
+        <item text="S2死衣" icon="Texture/Aries/Item/1855_DeathShirtS2.png" slot="16" gsid="1855"/>
+        <item text="女炫1衣" icon="Texture/Aries/Item/2056_DarkLolitaSuit.png" slot="16" gsid="2056"/>
+        <item text="女炫2衣" icon="Texture/Aries/Item/2059_PapawCatSuit.png" slot="16" gsid="2059"/>
+        <item text="女炫3衣" icon="Texture/Aries/Item/2062_QueenRobotSuit.png" slot="16" gsid="2062"/>
+        <item text="男炫1衣" icon="Texture/Aries/Item/2065_ElectricShockSuit.png" slot="16" gsid="2065"/>
+        <item text="男炫2衣" icon="Texture/Aries/Item/2068_ExplorationSuit.png" slot="16" gsid="2068"/>
+        <item text="男炫3衣" icon="Texture/Aries/Item/2071_AdventurerSuit.png" slot="16" gsid="2071"/>
+        <item text="S3火衣" icon="Texture/Aries/Item/2077_FireShirtS3.png" slot="16" gsid="2077"/>
+        <item text="S3冰衣" icon="Texture/Aries/Item/2084_IceShirtS3.png" slot="16" gsid="2084"/>
+        <item text="S3电衣" icon="Texture/Aries/Item/2091_StormShirtS3.png" slot="16" gsid="2091"/>
+        <item text="S3生衣" icon="Texture/Aries/Item/2098_LifeShirtS3.png" slot="16" gsid="2098"/>
+        <item text="S3死衣" icon="Texture/Aries/Item/2105_DeathShirtS3.png" slot="16" gsid="2105"/>
+        <item text="万圣衣" icon="Texture/Aries/Item/2113_HalloweenPumpkinSuit.png" slot="16" gsid="2113"/>
+        <item text="烈火S4衣" icon="Texture/Aries/Item/2236_FireShirtS4.png" tooltip="2236_FireShirtS4" gsid="2236" slot="16"/>
+        <item text="寒冰S4衣" icon="Texture/Aries/Item/2243_IceShirtS4.png" tooltip="2243_IceShirtS4" gsid="2243" slot="16"/>
+        <item text="风暴S4衣" icon="Texture/Aries/Item/2250_StormShirtS4.png" tooltip="2250_StormShirtS4" gsid="2250" slot="16"/>
+        <item text="生命S4衣" icon="Texture/Aries/Item/2257_LifeShirtS4.png" tooltip="2257_LifeShirtS4" gsid="2257" slot="16"/>
+        <item text="死亡S4衣" icon="Texture/Aries/Item/2264_DeathShirtS4.png" tooltip="2264_DeathShirtS4" gsid="2264" slot="16"/> 
+    </category>
+    <category name="pants" text="裤子">
+        <item text="森林下装" icon="Texture/Aries/Item/1002_ForestShort.png" slot="17" gsid="1002"/>
+        <item text="迷彩小短裤" icon="Texture/Aries/Item/1006_RedCamouflageShort.png" slot="17" gsid="1006"/>
+        <item text="警察裤" icon="Texture/Aries/Item/1009_PoliceUniformPant.png" slot="17" gsid="1009"/>
+        <item text="黄色冬日紧身裤" icon="Texture/Aries/Item/1026_WinterYellowTightPant.png" slot="17" gsid="1026"/>
+        <item text="野人男式麻布七分裤" icon="Texture/Aries/Item/1028_SavageBoyFlaxShort.png" slot="17" gsid="1028"/>
+        <item text="野人女式麻布短裙" icon="Texture/Aries/Item/1029_SavageGirlFlaxSkirt.png" slot="17" gsid="1029"/>
+        <item text="红色星星女式沙滩裤" icon="Texture/Aries/Item/1035_GirlRedStarBeachPants.png" slot="17" gsid="1035"/>
+        <item text="红色星星男式沙滩裤" icon="Texture/Aries/Item/1036_BoyRedStarBeachPants.png" slot="17" gsid="1036"/>
+        <item text="蔚蓝色白边短裤" icon="Texture/Aries/Item/1038_SteelBlueShort.png" slot="17" gsid="1038"/>
+        <item text="黄色星星碧绿边短裤" icon="Texture/Aries/Item/1040_LightYellowStarShort.png" slot="17" gsid="1040"/>
+        <item text="野人新红下" icon="Texture/Aries/Item/1043_SavageGirlRedFlaxSkirt.png" slot="17" gsid="1043"/>
+        <item text="野人新黄下" icon="Texture/Aries/Item/1044_SavageGirlYellowFlaxSkirt.png" slot="17" gsid="1044"/>
+        <item text="工装下" icon="Texture/Aries/Item/1048_YellowWorkingPants.png" slot="17" gsid="1048"/>
+        <item text="初始1下" icon="Texture/Aries/Item/1051_RegInit_Pants1.png" slot="17" gsid="1051"/>
+        <item text="初始2下" icon="Texture/Aries/Item/1054_RegInit_Pants2.png" slot="17" gsid="1054"/>
+        <item text="初始3下" icon="Texture/Aries/Item/1057_RegInit_Pants3.png" slot="17" gsid="1057"/>
+        <item text="初始4下" icon="Texture/Aries/Item/1060_RegInit_Pants4.png" slot="17" gsid="1060"/>
+        <item text="初始5下" icon="Texture/Aries/Item/1063_RegInit_Pants5.png" slot="17" gsid="1063"/>
+        <item text="滑冰裤子" icon="Texture/Aries/Item/1067_Skating_MediumBlueSkirt.png" slot="17" gsid="1067"/>
+        <item text="篮球裤子" icon="Texture/Aries/Item/1070_Basketball_RedBullShort.png" slot="17" gsid="1070"/>
+        <item text="医生裤子" icon="Texture/Aries/Item/1073_Doctor_SkyBluePants.png" slot="17" gsid="1073"/>
+        <item text="大使裤子" icon="Texture/Aries/Item/1076_Ambassador_GreenPants.png" slot="17" gsid="1076"/>
+        <item text="工装绿裤子" icon="Texture/Aries/Item/1081_Working_LawnGreenShort.png" slot="17" gsid="1081"/>
+        <item text="玫瑰紧身裤" icon="Texture/Aries/Item/1084_RosyPants.png" slot="17" gsid="1084"/>
+        <item text="红白格纹裤" icon="Texture/Aries/Item/1089_RedWhitePlaidPants.png" slot="17" gsid="1089"/>
+        <item text="绿色横纹裤" icon="Texture/Aries/Item/1093_GreenStripePants.png" slot="17" gsid="1093"/>
+        <item text="粉红横纹裤" icon="Texture/Aries/Item/1094_PinkStripePants.png" slot="17" gsid="1094"/>
+        <item text="麋鹿裤" icon="Texture/Aries/Item/1098_ElkPants.png" slot="17" gsid="1098"/>
+        <item text="万圣节裤子" icon="Texture/Aries/Item/1101_HalloweenPants.png" slot="17" gsid="1101"/>
+        <item text="初始6下" icon="Texture/Aries/Item/1104_RegInit_Pants6.png" slot="17" gsid="1104"/>
+        <item text="白射手裤" icon="Texture/Aries/Item/1108_WhiteSharpshooter_Pants.png" slot="17" gsid="1108"/>
+        <item text="黑射手裤" icon="Texture/Aries/Item/1112_BlackSharpshooter_Pants.png" slot="17" gsid="1112"/>
+        <item text="丹瑟裤" icon="Texture/Aries/Item/1116_Dancer_Pants.png" slot="17" gsid="1116"/>
+        <item text="D达人裤" icon="Texture/Aries/Item/1120_D_DaRen_Pants.png" slot="17" gsid="1120"/>
+        <item text="B达人裤" icon="Texture/Aries/Item/1124_B_DaRen_Pants.png" slot="17" gsid="1124"/>
+        <item text="F达人裤" icon="Texture/Aries/Item/1128_F_DaRen_Pants.png" slot="17" gsid="1128"/>
+        <item text="新年女裤" icon="Texture/Aries/Item/1139_NewYearGirlPant.png" slot="17" gsid="1139"/>
+        <item text="新年男裤" icon="Texture/Aries/Item/1142_NewYearBoyPant.png" slot="17" gsid="1142"/>
+        <item text="新年拜年裤" icon="Texture/Aries/Item/1145_NewYearWarmPant.png" slot="17" gsid="1145"/>
+        <item text="元宵女裤" icon="Texture/Aries/Item/1152_YuanXiaoGirlPants.png" slot="17" gsid="1152"/>
+        <item text="元宵男裤" icon="Texture/Aries/Item/1155_YuanXiaoBoyPants.png" slot="17" gsid="1155"/>
+
+        <item text="棒糖女下" icon="Texture/Aries/Item/1060_RegInit_Pants4.png" slot="17" gsid="1159"/>
+        <item text="清爽女裤" icon="Texture/Aries/Item/1162_CoolSummerGirlPants.png" slot="17" gsid="1162"/>
+        <item text="淑女裤" icon="Texture/Aries/Item/1165_FairLadyGirlPants.png" slot="17" gsid="1165"/>
+        <item text="功夫黑裤" icon="Texture/Aries/Item/1168_KongFuBlackPants.png" slot="17" gsid="1168"/>
+        <item text="功夫黄裤" icon="Texture/Aries/Item/1171_KongFuYellowPants.png" slot="17" gsid="1171"/>
+        <item text="西瓜女裤" icon="Texture/Aries/Item/1174_WatermelonGirlPants.png" slot="17" gsid="1174"/>
+        <item text="西瓜男裤" icon="Texture/Aries/Item/1177_WatermelonBoyPants.png" slot="17" gsid="1177"/>
+        <item text="棒糖男裤" icon="Texture/Aries/Item/1180_LollipopBoyPants.png" slot="17" gsid="1180"/>
+        <item text="清爽男裤" icon="Texture/Aries/Item/1183_CoolSummerBoyPants.png" slot="17" gsid="1183"/>
+        <item text="糖果装裤1" icon="Texture/Aries/Item/1193_CandySuitPant1.png" slot="17" gsid="1193"/>
+        <item text="糖果装裤2" icon="Texture/Aries/Item/1198_CandySuitPant2.png" slot="17" gsid="1198"/>
+        <item text="糖果装裤3" icon="Texture/Aries/Item/1203_CandySuitPant3.png" slot="17" gsid="1203"/>
+        <item text="糖果装裤4" icon="Texture/Aries/Item/1208_CandySuitPant4.png" slot="17" gsid="1208"/>
+        <item text="夏日红裤" icon="Texture/Aries/Item/1213_ColorfulStripHotPant.png" slot="17" gsid="1213"/>
+        <item text="可乐装裤" icon="Texture/Aries/Item/1218_ColaSuitPant.png" slot="17" gsid="1218"/>
+        <item text="报纸装裤" icon="Texture/Aries/Item/1222_NewspaperPant.png" slot="17" gsid="1222"/>
+    </category>
+    <category name="shoes" text="鞋子">
+        <item text="森林鞋" icon="Texture/Aries/Item/1004_ForestBoot.png" gsid="1004" slot="19"/>
+        <item text="红色帆布鞋" icon="Texture/Aries/Item/1007_RedCanvasShoes.png" gsid="1007" slot="19"/>
+        <item text="警察靴" icon="Texture/Aries/Item/1010_PoliceUniformShoes.png" gsid="1010" slot="19"/>
+        <item text="黄色冬日靴子" icon="Texture/Aries/Item/1024_WinterYellowBoot.png" gsid="1024" slot="19"/>
+        <item text="野人男式毛靴" icon="Texture/Aries/Item/1030_SavageBoyFurryBoot.png" gsid="1030" slot="19"/>
+        <item text="野人女式毛靴" icon="Texture/Aries/Item/1031_SavageGirlFurryBoot.png" gsid="1031" slot="19"/>
+        <item text="黑色沙滩拖鞋" icon="Texture/Aries/Item/1033_BlackFlipFlops.png" gsid="1033" slot="19"/>
+        <item text="野人新红脚" icon="Texture/Aries/Item/1045_SavageRedFurryBoot.png" gsid="1045" slot="19"/>
+        <item text="野人新黄脚" icon="Texture/Aries/Item/1046_SavageYellowFurryBoot.png" gsid="1046" slot="19"/>
+        <item text="工装脚" icon="Texture/Aries/Item/1049_YellowWorkingBoots.png" gsid="1049" slot="19"/>
+        <item text="初始1脚" icon="Texture/Aries/Item/1052_RegInit_Boots1.png" gsid="1052" slot="19"/>
+        <item text="初始2脚" icon="Texture/Aries/Item/1055_RegInit_Boots2.png" gsid="1055" slot="19"/>
+        <item text="初始3脚" icon="Texture/Aries/Item/1058_RegInit_Boots3.png" gsid="1058" slot="19"/>
+        <item text="初始4脚" icon="Texture/Aries/Item/1061_RegInit_Boots4.png" gsid="1061" slot="19"/>
+        <item text="初始5脚" icon="Texture/Aries/Item/1064_RegInit_Boots5.png" gsid="1064" slot="19"/>
+        <item text="初始6脚" icon="Texture/Aries/Item/1105_RegInit_Boots6.png" gsid="1105" slot="19"/>
+        <item text="滑冰鞋" icon="Texture/Aries/Item/1068_Skating_SilverWhiteShoes.png" gsid="1068" slot="19"/>
+        <item text="篮球鞋" icon="Texture/Aries/Item/1071_Basketball_RedBullShoes.png" gsid="1071" slot="19"/>
+        <item text="医生鞋" icon="Texture/Aries/Item/1074_Doctor_BlackShoes.png" gsid="1074" slot="19"/>
+        <item text="大使鞋" icon="Texture/Aries/Item/1077_Ambassador_GreenBoots.png" gsid="1077" slot="19"/>
+        <item text="圣诞黑鞋" icon="Texture/Aries/Item/1095_ChristmasBlackBoot.png" gsid="1095" slot="19"/>
+        <item text="麋鹿鞋" icon="Texture/Aries/Item/1099_ElkBoots.png" gsid="1099" slot="19"/>
+        <item text="圣诞红鞋" icon="Texture/Aries/Item/1100_ChristmasRedBoot.png" gsid="1100" slot="19"/>
+        <item text="白射手鞋" icon="Texture/Aries/Item/1109_WhiteSharpshooter_Boots.png" gsid="1109" slot="19"/>
+        <item text="黑射手鞋" icon="Texture/Aries/Item/1113_BlackSharpshooter_Boots.png" gsid="1113" slot="19"/>
+        <item text="丹瑟鞋" icon="Texture/Aries/Item/1117_Dancer_Boots.png" gsid="1117" slot="19"/>
+        <item text="D达人鞋" icon="Texture/Aries/Item/1121_D_DaRen_Boots.png" gsid="1121" slot="19"/>
+        <item text="B达人鞋" icon="Texture/Aries/Item/1125_B_DaRen_Boots.png" gsid="1125" slot="19"/>
+        <item text="F达人鞋" icon="Texture/Aries/Item/1129_F_DaRen_Boots.png" gsid="1129" slot="19"/>
+        <item text="海盗鞋" icon="Texture/Aries/Item/1131_PirateBoots.png" gsid="1131" slot="19"/>
+        <item text="猫头拖鞋" icon="Texture/Aries/Item/1132_BlackWhiteCattySlipper.png" gsid="1132" slot="19"/>
+        <item text="老大拖鞋" icon="Texture/Aries/Item/1133_BigBrotherSlipper.png" gsid="1133" slot="19"/>
+        <item text="紫红鞋" icon="Texture/Aries/Item/1134_PurpleRedBoots.png" gsid="1134" slot="19"/>
+        <item text="新年女鞋" icon="Texture/Aries/Item/1140_NewYearGirlBoots.png" gsid="1140" slot="19"/>
+        <item text="新年男鞋" icon="Texture/Aries/Item/1143_NewYearBoyBoots.png" gsid="1143" slot="19"/>
+        <item text="新年拜年鞋" icon="Texture/Aries/Item/1146_NewYearWarmBoots.png" gsid="1146" slot="19"/>
+        <item text="元宵女鞋" icon="Texture/Aries/Item/1153_YuanXiaoGirlBoots.png" gsid="1153" slot="19"/>
+        <item text="棒糖女鞋" icon="Texture/Aries/Item/1160_LollipopGirlBoots.png" gsid="1160" slot="19"/>
+        <item text="清爽女鞋" icon="Texture/Aries/Item/1163_CoolSummerGirlBoots.png" gsid="1163" slot="19"/>
+        <item text="淑女鞋" icon="Texture/Aries/Item/1166_FairLadyGirlBoots.png" gsid="1166" slot="19"/>
+        <item text="功夫黑鞋" icon="Texture/Aries/Item/1169_KongFuBlackBoots.png" gsid="1169" slot="19"/>
+        <item text="功夫黄鞋" icon="Texture/Aries/Item/1172_KongFuYellowBoots.png" gsid="1172" slot="19"/>
+        <item text="西瓜女鞋" icon="Texture/Aries/Item/1175_WatermelonGirlBoots.png" gsid="1175" slot="19"/>
+        <item text="西瓜男鞋" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" gsid="1178" slot="19"/>
+        <item text="棒糖男鞋" icon="Texture/Aries/Item/1181_LollipopBoyBoots.png" gsid="1181" slot="19"/>
+        <item text="清爽男鞋" icon="Texture/Aries/Item/1184_CoolSummerBoyBoots.png" gsid="1184" slot="19"/>
+        <item text="糖果装鞋1" icon="Texture/Aries/Item/1195_CandySuitBoot1.png" gsid="1195" slot="19"/>
+        <item text="糖果装鞋2" icon="Texture/Aries/Item/1200_CandySuitBoot2.png" gsid="1200" slot="19"/>
+        <item text="糖果装鞋3" icon="Texture/Aries/Item/1205_CandySuitBoot3.png" gsid="1205" slot="19"/>
+        <item text="糖果装鞋4" icon="Texture/Aries/Item/1210_CandySuitBoot4.png" gsid="1210" slot="19"/>
+        <item text="夏日红鞋" icon="Texture/Aries/Item/1215_ColorfulStripHotBoot.png" gsid="1215" slot="19"/>
+        <item text="可乐装鞋" icon="Texture/Aries/Item/1219_ColaSuitBoot.png" gsid="1219" slot="19"/>
+        <item text="报纸装鞋" icon="Texture/Aries/Item/1223_NewspaperBoot.png" gsid="1223" slot="19"/>
+        <item text="女仆装鞋" icon="Texture/Aries/Item/1229_ServantGirlBoot.png" gsid="1229" slot="19"/>
+
+        <item text="火鞋1" icon="Texture/Aries/Item/1251_FireBoot1.png" gsid="1251" slot="19"/>
+        <item text="冰鞋1" icon="Texture/Aries/Item/1252_IceBoot1.png" gsid="1252" slot="19"/>
+        <item text="风鞋1" icon="Texture/Aries/Item/1253_StormBoot1.png" gsid="1253" slot="19"/>
+        <item text="死鞋1" icon="Texture/Aries/Item/1254_DeathBoot1.png" gsid="1254" slot="19"/>
+        <item text="生鞋1" icon="Texture/Aries/Item/1255_LifeBoot1.png" gsid="1255" slot="19"/>
+        <item text="通鞋1" icon="Texture/Aries/Item/1256_CommonBoot1.png" gsid="1256" slot="19"/>
+        <item text="通鞋2" icon="Texture/Aries/Item/1257_CommonBoot2.png" gsid="1257" slot="19"/>
+        <item text="通鞋3" icon="Texture/Aries/Item/1258_CommonBoot3.png" gsid="1258" slot="19"/>
+        <item text="通鞋4" icon="Texture/Aries/Item/1259_CommonBoot4.png" gsid="1259" slot="19"/>
+        <item text="通鞋5" icon="Texture/Aries/Item/1260_CommonBoot5.png" gsid="1260" slot="19"/>
+        <item text="普通鞋1" icon="Texture/Aries/Item/1280_RedCutyBoot.png" gsid="1280" slot="19"/>
+        <item text="普通鞋2" icon="Texture/Aries/Item/1283_MagicGentleBoot.png" gsid="1283" slot="19"/>
+        <item text="VIP鞋1" icon="Texture/Aries/Item/1286_GloryWarriorBoot.png" gsid="1286" slot="19"/>
+        <item text="VIP鞋2" icon="Texture/Aries/Item/1289_MagicProtectionBoot.png" gsid="1289" slot="19"/>
+        <item text="火鞋2" icon="Texture/Aries/Item/1323_FireBoot2.png" gsid="1323" slot="19"/>
+        <item text="冰鞋2" icon="Texture/Aries/Item/1324_IceBoot2.png" gsid="1324" slot="19"/>
+        <item text="风鞋2" icon="Texture/Aries/Item/1325_StormBoot2.png" gsid="1325" slot="19"/>
+        <item text="死鞋2" icon="Texture/Aries/Item/1326_DeathBoot2.png" gsid="1326" slot="19"/>
+        <item text="生鞋2" icon="Texture/Aries/Item/1327_LifeBoot2.png" gsid="1327" slot="19"/>
+        <item text="火鞋3" icon="Texture/Aries/Item/1328_FireBoot3.png" gsid="1328" slot="19"/>
+        <item text="冰鞋3" icon="Texture/Aries/Item/1329_IceBoot3.png" gsid="1329" slot="19"/>
+        <item text="风鞋3" icon="Texture/Aries/Item/1330_StormBoot3.png" gsid="1330" slot="19"/>
+        <item text="死鞋3" icon="Texture/Aries/Item/1331_DeathBoot3.png" gsid="1331" slot="19"/>
+        <item text="生鞋3" icon="Texture/Aries/Item/1332_LifeBoot3.png" gsid="1332" slot="19"/>
+        <item text="通鞋6" icon="Texture/Aries/Item/1333_CommonBoot6.png" gsid="1333" slot="19"/>
+        <item text="火鞋4" icon="Texture/Aries/Item/1358_FireBoot4.png" gsid="1358" slot="19"/>
+        <item text="冰鞋4" icon="Texture/Aries/Item/1359_IceBoot4.png" gsid="1359" slot="19"/>
+        <item text="风鞋4" icon="Texture/Aries/Item/1360_StormBoot4.png" gsid="1360" slot="19"/>
+        <item text="死鞋4" icon="Texture/Aries/Item/1361_DeathBoot4.png" gsid="1361" slot="19"/>
+        <item text="生鞋4" icon="Texture/Aries/Item/1362_LifeBoot4.png" gsid="1362" slot="19"/>
+        <item text="火鞋5" icon="Texture/Aries/Item/1363_FireBoot5.png" gsid="1363" slot="19"/>
+        <item text="冰鞋5" icon="Texture/Aries/Item/1364_IceBoot5.png" gsid="1364" slot="19"/>
+        <item text="风鞋5" icon="Texture/Aries/Item/1365_StormBoot5.png" gsid="1365" slot="19"/>
+        <item text="死鞋5" icon="Texture/Aries/Item/1366_DeathBoot5.png" gsid="1366" slot="19"/>
+        <item text="生鞋5" icon="Texture/Aries/Item/1367_LifeBoot5.png" gsid="1367" slot="19"/>
+        <item text="通鞋7" icon="Texture/Aries/Item/1368_CommonBoot7.png" gsid="1368" slot="19"/>
+        <item text="通鞋8" icon="Texture/Aries/Item/1369_CommonBoot8.png" gsid="1369" slot="19"/>
+        <item text="火套鞋1" icon="Texture/Aries/Item/1400_FireExchangeBoot01.png" gsid="1400" slot="19"/>
+        <item text="冰套鞋1" icon="Texture/Aries/Item/1401_IceExchangeBoot01.png" gsid="1401" slot="19"/>
+        <item text="风套鞋1" icon="Texture/Aries/Item/1402_StormExchangeBoot01.png" gsid="1402" slot="19"/>
+        <item text="死套鞋1" icon="Texture/Aries/Item/1403_DeathExchangeBoot01.png" gsid="1403" slot="19"/>
+        <item text="生套鞋1" icon="Texture/Aries/Item/1404_LifeExchangeBoot01.png" gsid="1404" slot="19"/>
+        <item text="火套鞋2" icon="Texture/Aries/Item/1405_FireExchangeBoot02.png" gsid="1405" slot="19"/>
+        <item text="冰套鞋2" icon="Texture/Aries/Item/1406_IceExchangeBoot02.png" gsid="1406" slot="19"/>
+        <item text="风套鞋2" icon="Texture/Aries/Item/1407_StormExchangeBoot02.png" gsid="1407" slot="19"/>
+        <item text="死套鞋2" icon="Texture/Aries/Item/1408_DeathExchangeBoot02.png" gsid="1408" slot="19"/>
+        <item text="生套鞋2" icon="Texture/Aries/Item/1409_LifeExchangeBoot02.png" gsid="1409" slot="19"/>
+        <item text="火套鞋3" icon="Texture/Aries/Item/1410_FireExchangeBoot03.png" gsid="1410" slot="19"/>
+        <item text="冰套鞋3" icon="Texture/Aries/Item/1411_IceExchangeBoot03.png" gsid="1411" slot="19"/>
+        <item text="风套鞋3" icon="Texture/Aries/Item/1412_StormExchangeBoot03.png" gsid="1412" slot="19"/>
+        <item text="死套鞋3" icon="Texture/Aries/Item/1413_DeathExchangeBoot03.png" gsid="1413" slot="19"/>
+        <item text="生套鞋3" icon="Texture/Aries/Item/1414_LifeExchangeBoot03.png" gsid="1414" slot="19"/>
+        <item text="商通鞋1" icon="Texture/Aries/Item/1456_ShopCommonBoot01.png" gsid="1456" slot="19"/>
+        <item text="商通鞋2" icon="Texture/Aries/Item/1457_ShopCommonBoot02.png" gsid="1457" slot="19"/>
+        <item text="商通鞋3" icon="Texture/Aries/Item/1458_ShopCommonBoot03.png" gsid="1458" slot="19"/>
+        <item text="学徒鞋" icon="Texture/Aries/Item/1472_NewbieBoot.png" gsid="1472" slot="19"/>
+        <item text="男爵鞋" icon="Texture/Aries/Item/1475_ClownBoot.png" gsid="1475" slot="19"/>
+        <item text="公主鞋" icon="Texture/Aries/Item/1478_PrincessClownBoot.png" gsid="1478" slot="19"/>
+        <item text="闪灵鞋" icon="Texture/Aries/Item/1481_ShiningBoot.png" gsid="1481" slot="19"/>
+        <item text="异域鞋" icon="Texture/Aries/Item/1485_ForeignLandBoot.png" gsid="1485" slot="19"/>
+        <item text="1月13鞋1" icon="Texture/Aries/Item/1497_ShopFireBootLv12.png" gsid="1497" slot="19"/>
+        <item text="1月13鞋2" icon="Texture/Aries/Item/1498_ShopIceBootLv12.png" gsid="1498" slot="19"/>
+        <item text="1月13鞋3" icon="Texture/Aries/Item/1499_ShopStormBootLv12.png" gsid="1499" slot="19"/>
+        <item text="1月13鞋4" icon="Texture/Aries/Item/1500_ShopDeathBootLv12.png" gsid="1500" slot="19"/>
+        <item text="1月13鞋5" icon="Texture/Aries/Item/1501_ShopLifeBootLv12.png" gsid="1501" slot="19"/>
+        <item text="1月20火鞋1" icon="Texture/Aries/Item/1556_EgyptFireBoot1.png" gsid="1556" slot="19"/>
+        <item text="1月20冰鞋1" icon="Texture/Aries/Item/1557_EgyptIceBoot1.png" gsid="1557" slot="19"/>
+        <item text="1月20风鞋1" icon="Texture/Aries/Item/1558_EgyptStormBoot1.png" gsid="1558" slot="19"/>
+        <item text="1月20死鞋1" icon="Texture/Aries/Item/1559_EgyptDeathBoot1.png" gsid="1559" slot="19"/>
+        <item text="1月20生鞋1" icon="Texture/Aries/Item/1560_EgyptLifeBoot1.png" gsid="1560" slot="19"/>
+        <item text="1月20火鞋2" icon="Texture/Aries/Item/1561_EgyptFireBoot2.png" gsid="1561" slot="19"/>
+        <item text="1月20冰鞋2" icon="Texture/Aries/Item/1562_EgyptIceBoot2.png" gsid="1562" slot="19"/>
+        <item text="1月20风鞋2" icon="Texture/Aries/Item/1563_EgyptStormBoot2.png" gsid="1563" slot="19"/>
+        <item text="1月20死鞋2" icon="Texture/Aries/Item/1564_EgyptDeathBoot2.png" gsid="1564" slot="19"/>
+        <item text="1月20生鞋2" icon="Texture/Aries/Item/1565_EgyptLifeBoot2.png" gsid="1565" slot="19"/>
+        <item text="1月20通鞋1" icon="Texture/Aries/Item/1566_EgyptCommonBoot1.png" gsid="1566" slot="19"/>
+        <item text="1月20通鞋2" icon="Texture/Aries/Item/1567_EgyptCommonBoot2.png" gsid="1567" slot="19"/>
+        <item text="1月20火鞋兑" icon="Texture/Aries/Item/1568_EgyptExchangeFireBoot.png" gsid="1568" slot="19"/>
+        <item text="1月20冰鞋兑" icon="Texture/Aries/Item/1569_EgyptExchangeIceBoot.png" gsid="1569" slot="19"/>
+        <item text="1月20风鞋兑" icon="Texture/Aries/Item/1570_EgyptExchangeStormBoot.png" gsid="1570" slot="19"/>
+        <item text="1月20死鞋兑" icon="Texture/Aries/Item/1571_EgyptDeathExchangeBoot.png" gsid="1571" slot="19"/>
+        <item text="1月20生鞋兑" icon="Texture/Aries/Item/1572_EgyptExchangeLifeBoot.png" gsid="1572" slot="19"/>
+        <item text="1月28火鞋1" icon="Texture/Aries/Item/1629_ShopFireBootLv22.png" gsid="1629" slot="19"/>
+        <item text="1月28冰鞋1" icon="Texture/Aries/Item/1630_ShopIceBootLv22.png" gsid="1630" slot="19"/>
+        <item text="1月28风鞋1" icon="Texture/Aries/Item/1631_ShopStormBootLv22.png" gsid="1631" slot="19"/>
+        <item text="1月28死鞋1" icon="Texture/Aries/Item/1632_ShopDeathBootLv22.png" gsid="1632" slot="19"/>
+        <item text="1月28生鞋1" icon="Texture/Aries/Item/1633_ShopLifeBootLv22.png" gsid="1633" slot="19"/>
+        <item text="新年女鞋" icon="Texture/Aries/Item/1634_ShopNewYearsGalBoot.png" gsid="1634" slot="19"/>
+        <item text="学生女鞋" icon="Texture/Aries/Item/1655_ShopSchoolUniformGalBoot.png" gsid="1655" slot="19"/>
+        <item text="学生男鞋" icon="Texture/Aries/Item/1658_ShopSchoolUniformBoyBoot.png" gsid="1658" slot="19"/>
+
+        <item text="商32火鞋" icon="Texture/Aries/Item/1669_ShopFireBootLv32.png" gsid="1669" slot="19"/>
+        <item text="商32冰鞋" icon="Texture/Aries/Item/1670_ShopIceBootLv32.png" gsid="1670" slot="19"/>
+        <item text="商32风鞋" icon="Texture/Aries/Item/1671_ShopStormBootLv32.png" gsid="1671" slot="19"/>
+        <item text="商32死鞋" icon="Texture/Aries/Item/1672_ShopDeathBootLv32.png" gsid="1672" slot="19"/>
+        <item text="商32生鞋" icon="Texture/Aries/Item/1673_ShopLifeBootLv32.png" gsid="1673" slot="19"/>
+        <item text="女婚鞋" icon="Texture/Aries/Item/1691_ShopWeddingBootGirl.png" gsid="1691" slot="19"/>
+        <item text="男婚鞋" icon="Texture/Aries/Item/1694_ShopWeddingBootBoy.png" gsid="1694" slot="19"/>
+        <item text="男春鞋" icon="Texture/Aries/Item/1709_ShopSpringBootBoy.png" gsid="1709" slot="19"/>
+        <item text="女春鞋" icon="Texture/Aries/Item/1710_ShopSpringBootGirl.png" gsid="1710" slot="19"/>
+        <item text="S1火鞋" icon="Texture/Aries/Item/1728_ColiseumFireBootS1.png" gsid="1728" slot="19"/>
+        <item text="S1冰鞋" icon="Texture/Aries/Item/1729_ColiseumIceBootS1.png" gsid="1729" slot="19"/>
+        <item text="S1风鞋" icon="Texture/Aries/Item/1730_ColiseumStormBootS1.png" gsid="1730" slot="19"/>
+        <item text="S1死鞋" icon="Texture/Aries/Item/1731_ColiseumDeathBootS1.png" gsid="1731" slot="19"/>
+        <item text="S1生鞋" icon="Texture/Aries/Item/1732_ColiseumLifeBootS1.png" gsid="1732" slot="19"/>
+        <item text="S1死鞋" icon="Texture/Aries/Item/1733_Shop201161BootBoy.png" gsid="1733" slot="19"/>
+        <item text="S1生鞋" icon="Texture/Aries/Item/1734_Shop201161BootGirl.png" gsid="1734" slot="19"/>
+        <item text="1791清凉鞋" icon="Texture/Aries/Item/1791_ColorfulClothesCoolBoot.png" gsid="1791" slot="19"/>
+        <item text="1794迷你鞋" icon="Texture/Aries/Item/1794_ColorfulMiniBoot.png" gsid="1794" slot="19"/>
+        <item text="S2冰鞋" icon="Texture/Aries/Item/1821_IceBootS2.png" gsid="1821" slot="19"/>
+        <item text="S2火鞋" icon="Texture/Aries/Item/1834_FireBootS2.png" gsid="1834" slot="19"/>
+        <item text="S2风鞋" icon="Texture/Aries/Item/1835_StormBootS2.png" gsid="1835" slot="19"/>
+        <item text="S2生鞋" icon="Texture/Aries/Item/1843_LifeBootS2.png" gsid="1843" slot="19"/>
+        <item text="S2死鞋" icon="Texture/Aries/Item/1853_DeathBootS2.png" gsid="1853" slot="19"/>
+        <item text="女炫1鞋" icon="Texture/Aries/Item/2057_DarkLolitaBoot.png" gsid="2057" slot="19"/>
+        <item text="女炫2鞋" icon="Texture/Aries/Item/2060_PapawCatBoot.png" gsid="2060" slot="19"/>
+        <item text="女炫3鞋" icon="Texture/Aries/Item/2063_QueenRobotBoot.png" gsid="2063" slot="19"/>
+        <item text="男炫1鞋" icon="Texture/Aries/Item/2066_ElectricShockBoot.png" gsid="2066" slot="19"/>
+        <item text="男炫2鞋" icon="Texture/Aries/Item/2069_ExplorationBoot.png" gsid="2069" slot="19"/>
+        <item text="男炫3鞋" icon="Texture/Aries/Item/2072_AdventurerBoot.png" gsid="2072" slot="19"/>
+        <item text="S3火鞋" icon="Texture/Aries/Item/2078_FireBootS3.png" gsid="2078" slot="19"/>
+        <item text="S3冰鞋" icon="Texture/Aries/Item/2085_IceBootS3.png" gsid="2085" slot="19"/>
+        <item text="S3电鞋" icon="Texture/Aries/Item/2092_StormBootS3.png" gsid="2092" slot="19"/>
+        <item text="S3生鞋" icon="Texture/Aries/Item/2099_LifeBootS3.png" gsid="2099" slot="19"/>
+        <item text="S3死鞋" icon="Texture/Aries/Item/2106_DeathBootS3.png" gsid="2106" slot="19"/>
+        <item text="万圣鞋" icon="Texture/Aries/Item/2114_HalloweenPumpkinBoot.png" gsid="2114" slot="21"/>
+        <item text="烈火S4鞋" icon="Texture/Aries/Item/2237_FireBootS4.png" tooltip="2237_FireBootS4" gsid="2237" slot="19"/>
+        <item text="寒冰S4鞋" icon="Texture/Aries/Item/2244_IceBootS4.png" tooltip="2244_IceBootS4" gsid="2244" slot="19"/>
+        <item text="风暴S4鞋" icon="Texture/Aries/Item/2251_StormBootS4.png" tooltip="2251_StormBootS4" gsid="2251" slot="19"/>
+        <item text="生命S4鞋" icon="Texture/Aries/Item/2258_LifeBootS4.png" tooltip="2258_LifeBootS4" gsid="2258" slot="19"/>
+        <item text="死亡S4鞋" icon="Texture/Aries/Item/2265_DeathBootS4.png" tooltip="2265_DeathBootS4" gsid="2265" slot="19"/>  
+    </category>
+    <category name="hair" text="头饰">
+        <item text="警察帽" icon="Texture/Aries/Item/1011_PoliceUniformHat.png" slot="0" gsid="1011"/>
+        <item text="黄色冬日棉帽" icon="Texture/Aries/Item/1025_WinterYellowHat.png" slot="0" gsid="1025"/>
+        <item text="大使帽子" icon="Texture/Aries/Item/1078_Ambassador_FeatherHat.png" slot="0" gsid="1078"/>
+        <item text="紫色大脚帽" icon="Texture/Aries/Item/1082_PurpleRedBigFootHat.png" slot="0" gsid="1082"/>
+        <item text="黑白猫帽" icon="Texture/Aries/Item/1085_BlackWhiteCattyHat.png" slot="0" gsid="1085"/>
+        <item text="海盗帽" icon="Texture/Aries/Item/1087_PirateHat.png" slot="0" gsid="1087"/>
+        <item text="圣诞帽" icon="Texture/Aries/Item/1090_ChristmasHat.png" slot="0" gsid="1090"/>
+        <item text="麋鹿帽" icon="Texture/Aries/Item/1096_ElkHat.png" slot="0" gsid="1096"/>
+        <item text="锅盖帽" icon="Texture/Aries/Item/1136_BoilerHat.png" slot="0" gsid="1136"/>
+        <item text="新年金帽" icon="Texture/Aries/Item/1137_NewYearGoldenHat.png" slot="0" gsid="1137"/>
+        <item text="西瓜帽" icon="Texture/Aries/Item/1185_WatermelonYellowHat.png" slot="0" gsid="1185"/>
+        <item text="糖果装帽1" icon="Texture/Aries/Item/1191_CandySuitHat1.png" slot="0" gsid="1191"/>
+        <item text="糖果装帽2" icon="Texture/Aries/Item/1196_CandySuitHat2.png" slot="0" gsid="1196"/>
+        <item text="糖果装帽3" icon="Texture/Aries/Item/1201_CandySuitHat3.png" slot="0" gsid="1201"/>
+        <item text="糖果装帽4" icon="Texture/Aries/Item/1206_CandySuitHat4.png" slot="0" gsid="1206"/>
+        <item text="夏日红帽" icon="Texture/Aries/Item/1211_ColorfulStripHotHat.png" slot="0" gsid="1211"/>
+        <item text="可乐装帽" icon="Texture/Aries/Item/1216_ColaSuitHat.png" slot="0" gsid="1216"/>
+        <item text="报纸装帽" icon="Texture/Aries/Item/1220_NewspaperHat.png" slot="0" gsid="1220"/>
+        <item text="塑料装帽" icon="Texture/Aries/Item/1224_PlasticStripeHat.png" slot="0" gsid="1224"/>
+        <item text="女仆装帽" icon="Texture/Aries/Item/1226_ServantGirlHat.png" slot="0" gsid="1226"/>
+        <item text="火帽1" icon="Texture/Aries/Item/1231_FireHat1.png" slot="0" gsid="1231"/>
+        <item text="冰帽1" icon="Texture/Aries/Item/1232_IceHat1.png" slot="0" gsid="1232"/>
+        <item text="风帽1" icon="Texture/Aries/Item/1233_StormHat1.png" slot="0" gsid="1233"/>
+        <item text="死帽1" icon="Texture/Aries/Item/1234_DeathHat1.png" slot="0" gsid="1234"/>
+        <item text="生帽1" icon="Texture/Aries/Item/1235_LifeHat1.png" slot="0" gsid="1235"/>
+        <item text="通帽1" icon="Texture/Aries/Item/1236_CommonHat1.png" slot="0" gsid="1236"/>
+        <item text="通帽2" icon="Texture/Aries/Item/1237_CommonHat2.png" slot="0" gsid="1237"/>
+        <item text="通帽3" icon="Texture/Aries/Item/1238_CommonHat3.png" slot="0" gsid="1238"/>
+        <item text="通帽4" icon="Texture/Aries/Item/1239_CommonHat4.png" slot="0" gsid="1239"/>
+        <item text="通帽5" icon="Texture/Aries/Item/1240_CommonHat5.png" slot="0" gsid="1240"/>
+        <item text="普通帽1" icon="Texture/Aries/Item/1278_RedCutyHat.png" slot="0" gsid="1278"/>
+        <item text="普通帽2" icon="Texture/Aries/Item/1281_MagicGentleHat.png" slot="0" gsid="1281"/>
+        <item text="VIP帽1" icon="Texture/Aries/Item/1284_GloryWarriorHat.png" slot="0" gsid="1284"/>
+        <item text="VIP帽2" icon="Texture/Aries/Item/1287_MagicProtectionHat.png" slot="0" gsid="1287"/>
+        <item text="火帽2" icon="Texture/Aries/Item/1301_FireHat2.png" slot="0" gsid="1301"/>
+        <item text="冰帽2" icon="Texture/Aries/Item/1302_IceHat2.png" slot="0" gsid="1302"/>
+        <item text="风帽2" icon="Texture/Aries/Item/1303_StormHat2.png" slot="0" gsid="1303"/>
+        <item text="死帽2" icon="Texture/Aries/Item/1304_DeathHat2.png" slot="0" gsid="1304"/>
+        <item text="生帽2" icon="Texture/Aries/Item/1305_LifeHat2.png" slot="0" gsid="1305"/>
+        <item text="火帽3" icon="Texture/Aries/Item/1306_FireHat3.png" slot="0" gsid="1306"/>
+        <item text="冰帽3" icon="Texture/Aries/Item/1307_IceHat3.png" slot="0" gsid="1307"/>
+        <item text="风帽3" icon="Texture/Aries/Item/1308_StormHat3.png" slot="0" gsid="1308"/>
+        <item text="死帽3" icon="Texture/Aries/Item/1309_DeathHat3.png" slot="0" gsid="1309"/>
+        <item text="生帽3" icon="Texture/Aries/Item/1310_LifeHat3.png" slot="0" gsid="1310"/>
+        <item text="通帽6" icon="Texture/Aries/Item/1311_CommonHat6.png" slot="0" gsid="1311"/>
+        <item text="火帽4" icon="Texture/Aries/Item/1334_FireHat4.png" slot="0" gsid="1334"/>
+        <item text="冰帽4" icon="Texture/Aries/Item/1335_IceHat4.png" slot="0" gsid="1335"/>
+        <item text="风帽4" icon="Texture/Aries/Item/1336_StormHat4.png" slot="0" gsid="1336"/>
+        <item text="死帽4" icon="Texture/Aries/Item/1337_DeathHat4.png" slot="0" gsid="1337"/>
+        <item text="生帽4" icon="Texture/Aries/Item/1338_LifeHat4.png" slot="0" gsid="1338"/>
+        <item text="火帽5" icon="Texture/Aries/Item/1339_FireHat5.png" slot="0" gsid="1339"/>
+        <item text="冰帽5" icon="Texture/Aries/Item/1340_IceHat5.png" slot="0" gsid="1340"/>
+        <item text="风帽5" icon="Texture/Aries/Item/1341_StormHat5.png" slot="0" gsid="1341"/>
+        <item text="死帽5" icon="Texture/Aries/Item/1342_DeathHat5.png" slot="0" gsid="1342"/>
+        <item text="生帽5" icon="Texture/Aries/Item/1343_LifeHat5.png" slot="0" gsid="1343"/>
+        <item text="通帽7" icon="Texture/Aries/Item/1344_CommonHat7.png" slot="0" gsid="1344"/>
+        <item text="通帽8" icon="Texture/Aries/Item/1345_CommonHat8.png" slot="0" gsid="1345"/>
+        <item text="火套帽1" icon="Texture/Aries/Item/1370_FireExchangeHat01.png" slot="0" gsid="1370"/>
+        <item text="冰套帽1" icon="Texture/Aries/Item/1371_IceExchangeHat01.png" slot="0" gsid="1371"/>
+        <item text="风套帽1" icon="Texture/Aries/Item/1372_StormExchangeHat01.png" slot="0" gsid="1372"/>
+        <item text="死套帽1" icon="Texture/Aries/Item/1373_DeathExchangeHat01.png" slot="0" gsid="1373"/>
+        <item text="生套帽1" icon="Texture/Aries/Item/1374_LifeExchangeHat01.png" slot="0" gsid="1374"/>
+        <item text="火套帽2" icon="Texture/Aries/Item/1375_FireExchangeHat02.png" slot="0" gsid="1375"/>
+        <item text="冰套帽2" icon="Texture/Aries/Item/1376_IceExchangeHat02.png" slot="0" gsid="1376"/>
+        <item text="风套帽2" icon="Texture/Aries/Item/1377_StormExchangeHat02.png" slot="0" gsid="1377"/>
+        <item text="死套帽2" icon="Texture/Aries/Item/1378_DeathExchangeHat02.png" slot="0" gsid="1378"/>
+        <item text="生套帽2" icon="Texture/Aries/Item/1379_LifeExchangeHat02.png" slot="0" gsid="1379"/>
+        <item text="火套帽3" icon="Texture/Aries/Item/1380_FireExchangeHat03.png" slot="0" gsid="1380"/>
+        <item text="冰套帽3" icon="Texture/Aries/Item/1381_IceExchangeHat03.png" slot="0" gsid="1381"/>
+        <item text="风套帽3" icon="Texture/Aries/Item/1382_StormExchangeHat03.png" slot="0" gsid="1382"/>
+        <item text="死套帽3" icon="Texture/Aries/Item/1383_DeathExchangeHat03.png" slot="0" gsid="1383"/>
+        <item text="生套帽3" icon="Texture/Aries/Item/1384_LifeExchangeHat03.png" slot="0" gsid="1384"/>
+        <item text="商通帽1" icon="Texture/Aries/Item/1450_ShopCommonHat01.png" slot="0" gsid="1450"/>
+        <item text="商通帽2" icon="Texture/Aries/Item/1451_ShopCommonHat02.png" slot="0" gsid="1451"/>
+        <item text="商通帽3" icon="Texture/Aries/Item/1452_ShopCommonHat03.png" slot="0" gsid="1452"/>
+        <item text="学徒帽" icon="Texture/Aries/Item/1470_NewbieHat.png" slot="0" gsid="1470"/>
+        <item text="男爵帽" icon="Texture/Aries/Item/1473_ClownHat.png" slot="0" gsid="1473"/>
+        <item text="公主帽" icon="Texture/Aries/Item/1476_PricessClownHat.png" slot="0" gsid="1476"/>
+        <item text="闪灵帽" icon="Texture/Aries/Item/1479_ShiningHat.png" slot="0" gsid="1479"/>
+        <item text="异域帽" icon="Texture/Aries/Item/1483_ForeignLandsHat.png" slot="0" gsid="1483"/>
+        <item text="1月13帽1" icon="Texture/Aries/Item/1487_ShopFireHatLv12.png" slot="0" gsid="1487"/>
+        <item text="1月13帽2" icon="Texture/Aries/Item/1488_ShopIceHatLv12.png" slot="0" gsid="1488"/>
+        <item text="1月13帽3" icon="Texture/Aries/Item/1489_ShopStormHatLv12.png" slot="0" gsid="1489"/>
+        <item text="1月13帽4" icon="Texture/Aries/Item/1490_ShopDeathHatLv12.png" slot="0" gsid="1490"/>
+        <item text="1月13帽5" icon="Texture/Aries/Item/1491_ShopLifeHatLv12.png" slot="0" gsid="1491"/>
+        <item text="1月20火帽1" icon="Texture/Aries/Item/1522_EgyptFireHat1.png" slot="0" gsid="1522"/>
+        <item text="1月20冰帽1" icon="Texture/Aries/Item/1523_EgyptIceHat1.png" slot="0" gsid="1523"/>
+        <item text="1月20风帽1" icon="Texture/Aries/Item/1524_EgyptStormHat1.png" slot="0" gsid="1524"/>
+        <item text="1月20死帽1" icon="Texture/Aries/Item/1525_EgyptDeathHat1.png" slot="0" gsid="1525"/>
+        <item text="1月20生帽1" icon="Texture/Aries/Item/1526_EgyptLifeHat1.png" slot="0" gsid="1526"/>
+        <item text="1月20火帽2" icon="Texture/Aries/Item/1527_EgyptFireHat2.png" slot="0" gsid="1527"/>
+        <item text="1月20冰帽2" icon="Texture/Aries/Item/1528_EgyptIceHat2.png" slot="0" gsid="1528"/>
+        <item text="1月20风帽2" icon="Texture/Aries/Item/1529_EgyptStormHat2.png" slot="0" gsid="1529"/>
+        <item text="1月20死帽2" icon="Texture/Aries/Item/1530_EgyptDeathHat2.png" slot="0" gsid="1530"/>
+        <item text="1月20生帽2" icon="Texture/Aries/Item/1531_EgyptLifeHat2.png" slot="0" gsid="1531"/>
+        <item text="1月20通帽1" icon="Texture/Aries/Item/1532_EgyptCommonHat1.png" slot="0" gsid="1532"/>
+        <item text="1月20通帽2" icon="Texture/Aries/Item/1533_EgyptCommonHat2.png" slot="0" gsid="1533"/>
+        <item text="1月20火帽兑" icon="Texture/Aries/Item/1534_EgyptExchangeFireHat.png" slot="0" gsid="1534"/>
+        <item text="1月20冰帽兑" icon="Texture/Aries/Item/1535_EgyptExchangeIceHat.png" slot="0" gsid="1535"/>
+        <item text="1月20风帽兑" icon="Texture/Aries/Item/1536_EgyptExchangeStormHat.png" slot="0" gsid="1536"/>
+        <item text="1月20死帽兑" icon="Texture/Aries/Item/1537_EgyptExchangeDeathHat.png" slot="0" gsid="1537"/>
+        <item text="1月20生帽兑" icon="Texture/Aries/Item/1538_EgyptExchangeLifeHat.png" slot="0" gsid="1538"/>
+        <item text="1月28火帽1" icon="Texture/Aries/Item/1612_ShopFireHatLv22.png" slot="0" gsid="1612"/>
+        <item text="1月28冰帽1" icon="Texture/Aries/Item/1613_ShopIceHatLv22.png" slot="0" gsid="1613"/>
+        <item text="1月28风帽1" icon="Texture/Aries/Item/1614_ShopStormHatLv22.png" slot="0" gsid="1614"/>
+        <item text="1月28死帽1" icon="Texture/Aries/Item/1615_ShopDeathHatLv22.png" slot="0" gsid="1615"/>
+        <item text="1月28生帽1" icon="Texture/Aries/Item/1616_ShopLifeHatLv22.png" slot="0" gsid="1616"/>
+        <item text="新年女帽" icon="Texture/Aries/Item/1617_ShopNewYearsGalHat.png" slot="0" gsid="1617"/>
+        <item text="新年兔帽1" icon="Texture/Aries/Item/1618_ShopNewYearsRabbitHat01.png" slot="0" gsid="1618"/>
+        <item text="新年兔帽2" icon="Texture/Aries/Item/1619_ShopNewYearsRabbitHat02.png" slot="0" gsid="1619"/>
+        <item text="玫瑰礼帽" icon="Texture/Aries/Item/1620_ShopNewYearsRoseHat.png" slot="0" gsid="1620"/>
+        <item text="学生男头" icon="Texture/Aries/Item/1651_ShopSchoolUniformBoyHat.png" slot="0" gsid="1651"/>
+        <item text="学生女头" icon="Texture/Aries/Item/1652_ShopSchoolUniformGalHat.png" slot="0" gsid="1652"/>
+        <item text="商32火帽" icon="Texture/Aries/Item/1659_ShopFireHatLv32.png" slot="0" gsid="1659"/>
+        <item text="商32冰帽" icon="Texture/Aries/Item/1660_ShopIceHatLv32.png" slot="0" gsid="1660"/>
+        <item text="商32风帽" icon="Texture/Aries/Item/1661_ShopStormHatLv32.png" slot="0" gsid="1661"/>
+        <item text="商32死帽" icon="Texture/Aries/Item/1662_ShopDeathHatLv32.png" slot="0" gsid="1662"/>
+        <item text="商32生帽" icon="Texture/Aries/Item/1663_ShopLifeHatLv32.png" slot="0" gsid="1663"/>
+        <item text="女婚头" icon="Texture/Aries/Item/1689_ShopWeddingHatGirl.png" slot="0" gsid="1689"/>
+        <item text="男婚头" icon="Texture/Aries/Item/1692_ShopWeddingHatBoy.png" slot="0" gsid="1692"/>
+
+        <item text="男春头" icon="Texture/Aries/Item/1705_ShopSpringHatBoy.png" slot="0" gsid="1705"/>
+        <item text="女春头" icon="Texture/Aries/Item/1706_ShopSpringHatGirl.png" slot="0" gsid="1706"/>
+        <item text="S1火帽" icon="Texture/Aries/Item/1714_ColiseumFireHatS1.png" slot="0" gsid="1714"/>
+        <item text="S1冰帽" icon="Texture/Aries/Item/1715_ColiseumIceHatS1.png" slot="0" gsid="1715"/>
+        <item text="S1风帽" icon="Texture/Aries/Item/1716_ColiseumStormHatS1.png" slot="0" gsid="1716"/>
+        <item text="S1死帽" icon="Texture/Aries/Item/1717_ColiseumDeathHatS1.png" slot="0" gsid="1717"/>
+        <item text="S1生帽" icon="Texture/Aries/Item/1718_ColiseumLifeHatS1.png" slot="0" gsid="1718"/>
+        <item text="S1死帽" icon="Texture/Aries/Item/1719_Shop201161HatBoy.png" slot="0" gsid="1719"/>
+        <item text="S1生帽" icon="Texture/Aries/Item/1720_Shop201161HatGirl.png" slot="0" gsid="1720"/>
+        <item text="1771王冠" icon="Texture/Aries/Item/1771_HeroCrown.png" slot="0" gsid="1771"/>
+        <item text="1772王冠" icon="Texture/Aries/Item/1772_MainCrown.png" slot="0" gsid="1772"/>
+        <item text="1789清凉帽" icon="Texture/Aries/Item/1789_ColorfulSweltersCoolHat.png" slot="0" gsid="1789"/>
+        <item text="1792迷你帽" icon="Texture/Aries/Item/1792_ColorfulMiniHat.png" slot="0" gsid="1792"/>
+        <item text="S2冰帽" icon="Texture/Aries/Item/1822_IceHatS2.png" slot="0" gsid="1822"/>
+        <item text="S2火帽" icon="Texture/Aries/Item/1833_FireHatS2.png" slot="0" gsid="1833"/>
+        <item text="S2风帽" icon="Texture/Aries/Item/1840_StormHatS2.png" slot="0" gsid="1840"/>
+        <item text="S2生帽" icon="Texture/Aries/Item/1848_LifeHatS2.png" slot="0" gsid="1848"/>
+        <item text="S2死帽" icon="Texture/Aries/Item/1856_DeathHatS2.png" slot="0" gsid="1856"/>
+        <item text="女炫1头" icon="Texture/Aries/Item/2055_DarkLolitaHat.png" slot="0" gsid="2055"/>
+        <item text="女炫2头" icon="Texture/Aries/Item/2058_PapawCatHat.png" slot="0" gsid="2058"/>
+        <item text="女炫3头" icon="Texture/Aries/Item/2061_QueenRobotHat.png" slot="0" gsid="2061"/>
+        <item text="男炫1头" icon="Texture/Aries/Item/2064_ElectricShockHat.png" slot="0" gsid="2064"/>
+        <item text="男炫2头" icon="Texture/Aries/Item/2067_ExplorationHat.png" slot="0" gsid="2067"/>
+        <item text="男炫3头" icon="Texture/Aries/Item/2070_AdventurerHat.png" slot="0" gsid="2070"/>
+        <item text="S3火头" icon="Texture/Aries/Item/2075_FireHatS3.png" slot="0" gsid="2075"/>
+        <item text="S3冰头" icon="Texture/Aries/Item/2082_IceHatS3.png" slot="0" gsid="2082"/>
+        <item text="S3电头" icon="Texture/Aries/Item/2089_StormHatS3.png" slot="0" gsid="2089"/>
+        <item text="S3生头" icon="Texture/Aries/Item/2096_LifeHatS3.png" slot="0" gsid="2096"/>
+        <item text="S3死头" icon="Texture/Aries/Item/2103_DeathHatS3.png" slot="0" gsid="2103"/>
+        <item text="万圣头" icon="Texture/Aries/Item/2112_HalloweenPumpkinHead.png" slot="0" gsid="2112"/>
+        <item text="红帽2115" icon="Texture/Aries/Item/2115_ChristmasHatRed.png" slot="0" gsid="2115"/>
+        <item text="绿帽2116" icon="Texture/Aries/Item/2116_ChristmasHatGreen.png" slot="0" gsid="2116"/>
+        <item text="精灵红女" icon="Texture/Aries/Item/2135_Elf_BrownHead_Girl01.png" tooltip="2135_Elf_BrownHead_Girl01" gsid="2135" slot="0"/>
+        <item text="精灵红男" icon="Texture/Aries/Item/2140_Elf_BrownHead_Boy01.png" tooltip="2140_Elf_BrownHead_Boy01" gsid="2140" slot="0"/>
+        <item text="精灵黑女" icon="Texture/Aries/Item/2145_Elf_BlackHead_Girl01.png" tooltip="2145_Elf_BlackHead_Girl01" gsid="2145" slot="0"/>
+        <item text="精灵黑男" icon="Texture/Aries/Item/2150_Elf_BlackHead_Boy01.png" tooltip="2150_Elf_BlackHead_Boy01" gsid="2150" slot="0"/>
+        <item text="精灵白女" icon="Texture/Aries/Item/2155_Elf_WhiteHead_Girl01.png" tooltip="2155_Elf_WhiteHead_Girl01" gsid="2155" slot="0"/>
+        <item text="精灵白男" icon="Texture/Aries/Item/2160_Elf_WhiteHead_Boy01.png" tooltip="2160_Elf_WhiteHead_Boy01" gsid="2160" slot="0"/>
+        <item text="布丁白男" icon="Texture/Aries/Item/2165_Ragnarok_GrayHead_Boy01.png" tooltip="2165_Ragnarok_GrayHead_Boy01" gsid="2165" slot="0"/>
+        <item text="布丁红男" icon="Texture/Aries/Item/2166_Ragnarok_RedHead_Boy02.png" tooltip="2166_Ragnarok_RedHead_Boy02" gsid="2166" slot="0"/>
+        <item text="布丁绿男" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" tooltip="2167_Ragnarok_GreenHead_Boy03" gsid="2167" slot="0"/>
+        <item text="布丁白女" icon="Texture/Aries/Item/2168_Ragnarok_GrayHead_Girl01.png" tooltip="2168_Ragnarok_GrayHead_Girl01" gsid="2168" slot="0"/>
+        <item text="布丁红女" icon="Texture/Aries/Item/2169_Ragnarok_RedHead_Girl02.png" tooltip="2169_Ragnarok_RedHead_Girl02" gsid="2169" slot="0"/>
+        <item text="布丁绿女" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" tooltip="2170_Ragnarok_GreenHead_Girl03" gsid="2170" slot="0"/>
+        <item text="菠菜棕男" icon="Texture/Aries/Item/2171_Spinage_BrownHead_Boy01.png" tooltip="2171_Spinage_BrownHead_Boy01" gsid="2171" slot="0"/>
+        <item text="菠菜红男" icon="Texture/Aries/Item/2172_Spinage_RedHead_Boy02.png" tooltip="2172_Spinage_RedHead_Boy02" gsid="2172" slot="0"/>
+        <item text="菠菜绿男" icon="Texture/Aries/Item/2173_Spinage_BlackHead_Boy03.png" tooltip="2173_Spinage_GreenHead_Boy03" gsid="2173" slot="0"/>
+        <item text="菠菜棕女" icon="Texture/Aries/Item/2174_Spinage_BrownHead_Girl01.png" tooltip="2174_Spinage_BrownHead_Girl01" gsid="2174" slot="0"/>
+        <item text="菠菜红女" icon="Texture/Aries/Item/2175_Spinage_RedHead_Girl02.png" tooltip="2175_Spinage_RedHead_Girl02" gsid="2175" slot="0"/>
+        <item text="菠菜绿女" icon="Texture/Aries/Item/2176_Spinage_BlackHead_Girl03.png" tooltip="2176_Spinage_GreenHead_Girl03" gsid="2176" slot="0"/>
+        <item text="萌卷灰男" icon="Texture/Aries/Item/2177_Errantry_GrayHead_Boy01.png" tooltip="2177_Errantry_GrayHead_Boy01" gsid="2177" slot="0"/>
+        <item text="萌卷绿男" icon="Texture/Aries/Item/2178_Errantry_GreenHead_Boy02.png" tooltip="2178_Errantry_GreenHead_Boy02" gsid="2178" slot="0"/>
+        <item text="萌卷紫男" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" tooltip="2179_Errantry_RedHead_Boy03" gsid="2179" slot="0"/>
+        <item text="萌卷灰女" icon="Texture/Aries/Item/2180_Errantry_GrayHead_Girl01.png" tooltip="2180_Errantry_GrayHead_Girl01" gsid="2180" slot="0"/>
+        <item text="萌卷绿女" icon="Texture/Aries/Item/2181_Errantry_GreenHead_Girl02.png" tooltip="2181_Errantry_GreenHead_Girl02" gsid="2181" slot="0"/>
+        <item text="萌卷紫女" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" tooltip="2182_Errantry_RedHead_Girl03" gsid="2182" slot="0"/>
+        <item text="男火S4帽" icon="Texture/Aries/Item/2234_FireHatS4_Boy.png" tooltip="2234_FireHatS4_Boy" gsid="2234" slot="0"/>
+        <item text="男冰S4帽" icon="Texture/Aries/Item/2241_IceHatS4_Boy.png" tooltip="2241_IceHatS4_Boy" gsid="2241" slot="0"/>
+        <item text="男风S4帽" icon="Texture/Aries/Item/2248_StormHatS4_Boy.png" tooltip="2248_StormHatS4_Boy" gsid="2248" slot="0"/>
+        <item text="男生S4帽" icon="Texture/Aries/Item/2255_LifeHatS4_Boy.png" tooltip="2255_LifeHatS4_Boy" gsid="2255" slot="0"/>
+        <item text="男死S4帽" icon="Texture/Aries/Item/2262_DeathHatS4_Boy.png" tooltip="2262_DeathHatS4_Boy" gsid="2262" slot="0"/>  
+        <item text="女火S4帽" icon="Texture/Aries/Item/2269_FireHatS4_Girl.png" tooltip="2269_FireHatS4_Girl" gsid="2269" slot="0"/>
+        <item text="女冰S4帽" icon="Texture/Aries/Item/2276_IceHatS4_Girl.png" tooltip="2276_IceHatS4_Girl" gsid="2276" slot="0"/>
+        <item text="女风S4帽" icon="Texture/Aries/Item/2283_StormHatS4_Girl.png" tooltip="2283_StormHatS4_Girl" gsid="2283" slot="0"/>
+        <item text="女生S4帽" icon="Texture/Aries/Item/2290_LifeHatS4_Girl.png" tooltip="2290_LifeHatS4_Girl" gsid="2290" slot="0"/>
+        <item text="女死S4帽" icon="Texture/Aries/Item/2297_DeathHatS4_Girl.png" tooltip="2297_DeathHatS4_Girl" gsid="2297" slot="0"/>  
+
+    </category>
+    <category name="back" text="背部">
+        <item text="小翅膀" icon="Texture/Aries/Item/1065_PinkFeatherWing.png"  slot="21" gsid="1065"/>
+        <item text="糖果背包" icon="Texture/Aries/Item/1106_CandyBag.png"  gsid="1106"/>
+        <item text="火套背1" icon="Texture/Aries/Item/1415_FireExchangeBack01.png"  slot="21" gsid="1415"/>
+        <item text="冰套背1" icon="Texture/Aries/Item/1416_IceExchangeBack01.png"  slot="21" gsid="1416"/>
+        <item text="风套背1" icon="Texture/Aries/Item/1417_StormExchangeBack01.png"  slot="21" gsid="1417"/>
+        <item text="死套背1" icon="Texture/Aries/Item/1418_DeathExchangeBack01.png"  slot="21" gsid="1418"/>
+        <item text="生套背1" icon="Texture/Aries/Item/1419_LifeExchangeBack01.png"  slot="21" gsid="1419"/>
+        <item text="火套背2" icon="Texture/Aries/Item/1420_FireExchangeBack02.png"  slot="21" gsid="1420"/>
+        <item text="冰套背2" icon="Texture/Aries/Item/1421_IceExchangeBack02.png"  slot="21" gsid="1421"/>
+        <item text="风套背2" icon="Texture/Aries/Item/1422_StormExchangeBack02.png"  slot="21" gsid="1422"/>
+        <item text="死套背2" icon="Texture/Aries/Item/1423_DeathExchangeBack02.png"  slot="21" gsid="1423"/>
+        <item text="生套背2" icon="Texture/Aries/Item/1424_LifeExchangeBack02.png"  slot="21" gsid="1424"/>
+        <item text="火套背3" icon="Texture/Aries/Item/1425_FireExchangeBack03.png" slot="26" gsid="1425"/>
+        <item text="冰套背3" icon="Texture/Aries/Item/1426_IceExchangeBack03.png" slot="26" gsid="1426"/>
+        <item text="风套背3" icon="Texture/Aries/Item/1427_StormExchangeBack03.png" slot="26" gsid="1427"/>
+        <item text="死套背3" icon="Texture/Aries/Item/1428_DeathExchangeBack03.png" slot="26" gsid="1428"/>
+        <item text="生套背3" icon="Texture/Aries/Item/1429_LifeExchangeBack03.png" slot="26" gsid="1429"/>
+        <item text="商通背1" icon="Texture/Aries/Item/1459_ShopCommonBack01.png"  slot="21" gsid="1459"/>
+        <item text="商通背2" icon="Texture/Aries/Item/1460_ShopCommonBack02.png"  slot="21" gsid="1460"/>
+        <item text="商通背3" icon="Texture/Aries/Item/1461_ShopCommonBack03.png"  slot="21" gsid="1461"/>
+        <item text="闪灵翅" icon="Texture/Aries/Item/1482_ShiningBack.png" slot="26" gsid="1482"/>
+        <item text="异域翅" icon="Texture/Aries/Item/1486_ForeignLandBack.png"  slot="21" gsid="1486"/>
+        <item text="1月13翅1" icon="Texture/Aries/Item/1502_ShopFireBackLv12.png"  slot="21" gsid="1502"/>
+        <item text="1月13翅2" icon="Texture/Aries/Item/1503_ShopIceBackLv12.png"  slot="21" gsid="1503"/>
+        <item text="1月13翅3" icon="Texture/Aries/Item/1504_ShopStormBackLv12.png"  slot="21" gsid="1504"/>
+        <item text="1月13翅4" icon="Texture/Aries/Item/1505_ShopDeathBackLv12.png"  slot="21" gsid="1505"/>
+        <item text="1月13翅5" icon="Texture/Aries/Item/1506_ShopLifeBackLv12.png"  slot="21" gsid="1506"/>
+        <item text="1月20火背1" icon="Texture/Aries/Item/1573_EgyptFireBack1.png"  slot="21" gsid="1573"/>
+        <item text="1月20冰背1" icon="Texture/Aries/Item/1574_EgyptIceBack1.png"  slot="21" gsid="1574"/>
+        <item text="1月20风背1" icon="Texture/Aries/Item/1575_EgyptStormBack1.png"  slot="21" gsid="1575"/>
+        <item text="1月20死背1" icon="Texture/Aries/Item/1576_EgyptDeathBack1.png"  slot="21" gsid="1576"/>
+        <item text="1月20生背1" icon="Texture/Aries/Item/1577_EgyptLifeBack1.png"  slot="21" gsid="1577"/>
+        <item text="1月20火背2" icon="Texture/Aries/Item/1578_EgyptFireBack2.png"  slot="21" gsid="1578"/>
+        <item text="1月20冰背2" icon="Texture/Aries/Item/1579_EgyptIceBack2.png"  slot="21" gsid="1579"/>
+        <item text="1月20风背2" icon="Texture/Aries/Item/1580_EgyptStormBack2.png"  slot="21" gsid="1580"/>
+        <item text="1月20死背2" icon="Texture/Aries/Item/1581_EgyptDeathBack2.png"  slot="21" gsid="1581"/>
+        <item text="1月20生背2" icon="Texture/Aries/Item/1582_EgyptLifeBack2.png"  slot="21" gsid="1582"/>
+        <item text="1月20通背1" icon="Texture/Aries/Item/1583_EgyptCommonBack1.png"  slot="21" gsid="1583"/>
+        <item text="1月20通背2" icon="Texture/Aries/Item/1584_EgyptCommonBack2.png"  slot="21" gsid="1584"/>
+        <item text="1月20火背兑" icon="Texture/Aries/Item/1585_EgyptExchangeFireBack.png"  slot="21" gsid="1585"/>
+        <item text="1月20冰背兑" icon="Texture/Aries/Item/1586_EgyptExchangeIceBack.png"  slot="21" gsid="1586"/>
+        <item text="1月20风背兑" icon="Texture/Aries/Item/1587_EgyptExchangeStormBack.png"  slot="21" gsid="1587"/>
+        <item text="1月20死背兑" icon="Texture/Aries/Item/1588_EgyptExchangeDeathBack.png"  slot="21" gsid="1588"/>
+        <item text="1月20生背兑" icon="Texture/Aries/Item/1589_EgyptExchangeLifeBack.png"  slot="21" gsid="1589"/>
+        <item text="1月28火背1" icon="Texture/Aries/Item/1635_ShopFireBackLv22.png"  slot="21" gsid="1635"/>
+        <item text="1月28冰背1 " icon="Texture/Aries/Item/1636_ShopIceBackLv22.png"  slot="21" gsid="1636"/>
+        <item text="1月28风背1" icon="Texture/Aries/Item/1637_ShopStormBackLv22.png"  slot="21" gsid="1637"/>
+        <item text="1月28死背1" icon="Texture/Aries/Item/1638_ShopDeathBackLv22.png"  slot="21" gsid="1638"/>
+        <item text="1月28生背1" icon="Texture/Aries/Item/1639_ShopLifeBackLv22.png"  slot="21" gsid="1639"/>
+        <item text="学生男背" icon="Texture/Aries/Item/1656_ShopSchoolUniformBoyBack.png" slot="26" gsid="1656"/>
+        <item text="学生女背" icon="Texture/Aries/Item/1657_ShopSchoolUniformGalBack.png" slot="26" gsid="1657"/>
+        <item text="商32火背" icon="Texture/Aries/Item/1674_ShopFireBackLv32.png" slot="26" gsid="1674"/>
+        <item text="商32冰背" icon="Texture/Aries/Item/1675_ShopIceBackLv32.png" slot="26" gsid="1675"/>
+        <item text="商32风背" icon="Texture/Aries/Item/1676_ShopStormBackLv32.png" slot="26" gsid="1676"/>
+        <item text="商32死背" icon="Texture/Aries/Item/1677_ShopDeathBackLv32.png" slot="26" gsid="1677"/>
+        <item text="商32生背" icon="Texture/Aries/Item/1678_ShopLifeBackLv32.png" slot="26" gsid="1678"/>
+        <item text="男春背" icon="Texture/Aries/Item/1711_ShopSpringCombatBackBoy.png" slot="26" gsid="1711"/>
+        <item text="女春背" icon="Texture/Aries/Item/1712_ShopSpringCombatBackGirl.png" slot="26" gsid="1712"/>
+        <item text="暗黑之翼" icon="Texture/Aries/Item/1713_DarklyCombatBack.png" slot="26" gsid="1713"/>
+        <item text="S1火背" icon="Texture/Aries/Item/1735_ColiseumFireBackS1.png" slot="26" gsid="1735"/>
+        <item text="S1冰背" icon="Texture/Aries/Item/1736_ColiseumIceBackS1.png" slot="26" gsid="1736"/>
+        <item text="S1风背" icon="Texture/Aries/Item/1737_ColiseumStormBackS1.png" slot="26" gsid="1737"/>
+        <item text="S1死背" icon="Texture/Aries/Item/1738_ColiseumDeathBackS1.png" slot="26" gsid="1738"/>
+        <item text="S1生背" icon="Texture/Aries/Item/1739_ColiseumLifeBackS1.png" slot="26" gsid="1739"/>
+        <item text="酷夏背包" icon="Texture/Aries/Item/1795_Backpacks.png" slot="26" gsid="1795"/>
+        <item text="泳圈" icon="Texture/Aries/Item/1796_SwimmingLaps.png" slot="26" gsid="1796"/>
+        <item text="大天使之翼" icon="Texture/Aries/Item/1812_AngelWings.png" slot="26" gsid="1812"/>
+        <item text="S2冰背" icon="Texture/Aries/Item/1820_IceBackS2.png" slot="26" gsid="1820"/>
+        <item text="S2火背" icon="Texture/Aries/Item/1832_FireBackS2.png" slot="26" gsid="1832"/>
+        <item text="S2风背" icon="Texture/Aries/Item/1839_StormBackS2.png" slot="26" gsid="1839"/>
+        <item text="S2生背" icon="Texture/Aries/Item/1844_LifeBackS2.png" slot="26" gsid="1844"/>
+        <item text="S2死背" icon="Texture/Aries/Item/1851_DeathBackS2.png" slot="26" gsid="1851"/>
+        <item text="圣诞背包" icon="Texture/Aries/Item/1106_CandyBag.png" slot="26" gsid="1859"/>
+        <item text="S3火背" icon="Texture/Aries/Item/2076_FireBackS3.png" slot="26" gsid="2076"/>
+        <item text="S3冰背" icon="Texture/Aries/Item/2083_IceBackS3.png" slot="26" gsid="2083"/>
+        <item text="S3电背" icon="Texture/Aries/Item/2090_StormBackS3.png" slot="26" gsid="2090"/>
+        <item text="S3生背" icon="Texture/Aries/Item/2097_LifeBackS3.png" slot="26" gsid="2097"/>
+        <item text="S3死背" icon="Texture/Aries/Item/2104_DeathBackS3.png" slot="26" gsid="2104"/>
+        <item text="烈火S4背" icon="Texture/Aries/Item/2235_FireBackS4.png"  tooltip="2235_FireBackS4" gsid="2235" slot="26"/>
+        <item text="寒冰S4背" icon="Texture/Aries/Item/2242_IceBackS4.png"  tooltip="2242_IceBackS4" gsid="2242" slot="26"/>
+        <item text="风暴S4背" icon="Texture/Aries/Item/2249_StormBackS4.png"  tooltip="2249_StormBackS4" gsid="2249" slot="26"/>
+        <item text="生命S4背" icon="Texture/Aries/Item/2256_LifeBackS4.png"  tooltip="2256_LifeBackS4" gsid="2256" slot="26"/>
+        <item text="死亡S4背" icon="Texture/Aries/Item/2263_DeathBackS4.png"  tooltip="2263_DeathBackS4" gsid="2263" slot="26"/>                
+    </category>
+    <category name="effect" text="特殊效果">
+        <item text="效果无" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="12881"/>
+        <item text="S1火衣效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="11721"/>
+        <item text="S1冰衣效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="11722"/>
+        <item text="S1风衣效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="11723"/>
+        <item text="S1死衣效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="11724"/>
+        <item text="S1生衣效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="11725"/>
+        <item text="1726效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="11726"/>
+        <item text="1727效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="11727"/>
+
+        <item text="1903效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="11728"/>
+        <item text="1904效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="11728"/>
+
+        <item text="男戒效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12886"/>
+        <item text="女戒效" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12887"/>
+
+        <item text="强化火1" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12811"/>
+        <item text="强化冰1" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12812"/>
+        <item text="强化电1" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12813"/>
+        <item text="强化生1" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12814"/>
+        <item text="强化死1" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12815"/>
+        <item text="强化火2" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12816"/>
+        <item text="强化冰2" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12817"/>
+        <item text="强化电2" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12818"/>
+        <item text="强化生2" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12819"/>
+        <item text="强化死2" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12820"/>
+        <item text="强化火3" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12821"/>
+        <item text="强化冰3" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12822"/>
+        <item text="强化电3" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12823"/>
+        <item text="强化生3" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12824"/>
+        <item text="强化死3" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12825"/>
+        <item text="强化火4" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12826"/>
+        <item text="强化冰4" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12827"/>
+        <item text="强化电4" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12828"/>
+        <item text="强化生4" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12829"/>
+        <item text="强化死4" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12830"/>
+        <item text="强化火5" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12831"/>
+        <item text="强化冰5" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12832"/>
+        <item text="强化电5" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12833"/>
+        <item text="强化生5" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12834"/>
+        <item text="强化死5" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="29" gsid="12835"/>
+
+        <item text="蝴蝶效果" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="12851"/>
+        <item text="VIP衣1效果" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="12850"/>
+        <item text="VIP衣2效果" icon="Texture/Aries/Item/1178_WatermelonBoyBoots.png" slot="27" gsid="12880"/>
+    </category>
+</ccsskin>

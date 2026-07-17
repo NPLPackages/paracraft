@@ -16,8 +16,10 @@ local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 -- same as /midi [note]
 -- @param beat: 
 function env_imp:playNote(note, beat, base_note, channel)
+	note = tostring(note);
+	note = note:match("^%s*([0-9a-gA-G]+'*)%s*$");
+	if (not note) then return end
 	local command = "";
-
 	if (not base_note) then
 		command = "/midi ";
 	else

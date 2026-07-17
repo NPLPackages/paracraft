@@ -116,6 +116,7 @@ function block_types.PreloadBlockClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockMusicBox.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockCollisionSensor.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockConductor.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockConductorUp.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockDynamic.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockCommandBlock.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockBlockUpdateDetector.lua");
@@ -458,7 +459,10 @@ function block_types.LoadFromFile(filename)
 	local Materials = commonlib.gettable("MyCompany.Aries.Game.Materials");
 	
 	if(xmlRoot) then
-		xmlRoot = GameLogic.GetFilters():apply_filters("block_types", xmlRoot);
+		-- xmlRoot = GameLogic.GetFilters():apply_filters("block_types", xmlRoot);
+		NPL.load("(gl)Mod/NplCad2/ItemCADCodeBlock.lua");
+		NPL.load("(gl)Mod/NplMicroRobot/ItemNplMicroRobotBlock.lua");
+		NPL.load("(gl)Mod/Microbit/ItemMicrobitBlock.lua");
 		
 		for node in commonlib.XPath.eachNode(xmlRoot, "/blocks/block") do
 			local attr = node.attr;

@@ -23,7 +23,7 @@
     end
 ]]></script>
 <!-- Texture/Aries/Creator/keepwork/Mobile/icon/ -->
-<pe:container ClickThrough="true" alignment="_fi" width="100%" height="100%" style="background: url();">
+<pe:container ClickThrough="true" alignment="_fi" style='<%=string.format("margin-left:%d;background:;", System.Windows.Screen:GetSafeAreaLeft())%>' width="100%" height="100%">
     <pe:container ClickThrough="true" uiname="MobileMainPage.operate_lt" alignment="_lt" style="position: relative; width: 260px; height: 400px; background:url();">
         <pe:container uiname="mobile_operate_panel" ClickThrough="true" visible="<%=not GameLogic.IsReadOnly()%>" style="position: relative; margin-left: 25px; margin-top: 16px; width: 174px; height: 352px; background: url(Texture/Aries/Creator/keepwork/Mobile/icon/di_128x60_32bits.png#0 0 128 60:60 24 60 24);">
             <input type="button" onclick="OnClickHelp" style="position: relative; margin-left: 80px; margin-top: 16px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/wenhao_57x57_32bits.png#0 0 57 57);" />
@@ -44,24 +44,36 @@
         </pe:container>
     </pe:container>  
 
-    <pe:container uiname="mobiel_operate_right" alignment="_rt" style="position: relative;width: 330px; height: 330px; background:url();">
-        <div style="position: relative; width: 180px; height: 250px; margin-left: 146px;  margin-top: 23px;">
-            <input type="button" onclick="MobileMainPage.OnClickChangeGameMode" uiname="btn_change_mode" style="float: left; margin-left: 22px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/youximoshi_57x57_32bits.png#0 0 57 57);" />
-            <input type="button" onclick="MobileMainPage.OnClickGameSetting" uiname="btn_game_setting" style="float: left; margin-left: 28px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/shezhi_57x57_32bits.png#0 0 57 57);" />
-            <pe:container uiname="btn_record_game" style="float: left; margin-left: 105px; margin-top: 20px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/luxiang_57x57_32bits.png#0 0 57 57);" >
-            </pe:container>
+    <pe:container ClickThrough="true" uiname="mobile_operate_right" alignment="_rt" style="position: relative;width: 330px; height: 200px; background: url();">
+        <div style="position: relative; width: 230px; height: 250px; margin-left: 90px;  margin-top: 23px;">
+            <pe:if condition="<%=not System.options.isStrictGameMode%>">
+                <input type="button" onclick="MobileMainPage.OnClickUserInfo" uiname="skin" style="float: left; margin-left: 0px; width: 48px; height:48px;background: url(Texture/Aries/Creator/keepwork/dock/skin_45x45_32bits.png#0 0 45 45);" />
+                <input type="button" onclick="MobileMainPage.OnClickChangeGameMode" uiname="btn_change_mode" style="float: left; margin-left: 28px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/youximoshi_57x57_32bits.png#0 0 57 57);" />
+                <input type="button" onclick="MobileMainPage.OnClickGameSetting" uiname="btn_game_setting" style="float: left; margin-left: 28px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/shezhi_57x57_32bits.png#0 0 57 57);" />
+            </pe:if>
+            <pe:if condition="<%=System.options.isStrictGameMode%>">
+                <input type="button" onclick="MobileMainPage.OnClickUserInfo" uiname="skin" style="float: left; margin-left: 84px; width: 48px; height:48px;background: url(Texture/Aries/Creator/keepwork/dock/skin_45x45_32bits.png#0 0 45 45);" />
+                <input type="button" onclick="MobileMainPage.OnClickChangeGameMode" uiname="btn_change_mode" style="float: left; margin-left: 28px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/youximoshi_57x57_32bits.png#0 0 57 57);" />
+            </pe:if>
             <pe:if condition="<%=not GameLogic.IsReadOnly()%>">
-                <input zorder = "-2" type="button" onclick="MobileMainPage.OnClickSaveGame" uiname="btn_save_game" style="float: left; margin-left: 105px;  margin-top: 20px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/baocun_57x57_32bits.png#0 0 56 57);" />
-                <div zorder = "-1" style="margin-left:105px;margin-top:-12px;width:57px;height:27px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/wenzidi_54x27_32bits.png#0 0 54 27)">
+                <input zorder = "-2" type="button" onclick="MobileMainPage.OnClickSaveGame" uiname="btn_save_game" style="float: left; margin-left: 160px;  margin-top: 20px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/baocun_57x57_32bits.png#0 0 56 57);" />
+                <div zorder = "-1" style="margin-left:160px;margin-top:-12px;width:57px;height:27px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/wenzidi_54x27_32bits.png#0 0 54 27)">
                     <div zorder = "1" style="margin-left:9px;margin-top:-2px;min-width:56px;height:55px;font-weight: bold; color: #dde5ee; font-size:20px;">
                         <%=L"保存"%>
                     </div>
                 </div>
             </pe:if>
         </div>
-        <pe:container uiname="mobile_camera_tip" visible="false" style="margin-top: 110px; margin-left: 90px; width: 151px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Mobile/icon/tishidi_60x39_32bits.png#0 0 60 39:26 17 26 17);">
-            <div style="margin-top: 6px;  color: #ffffff; text-align: center; font-size: 18px; base-font-size: 18px; font-weight: bold;"><%=L"长按2s开始录制"%></div>
-        </pe:container>
+    </pe:container>
+
+    <pe:container uiname="mobiel_operate_record" alignment="_rt" style="position: relative; margin-top: 180px; margin-right: 20px; background: url();">
+        <pe:if condition="<%=not System.options.isStrictGameMode%>">
+            <pe:container uiname="btn_record_game" style="float: left; margin-left: 105px; margin-top: 20px; width: 57px; height:57px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/luxiang_57x57_32bits.png#0 0 57 57);" >
+            </pe:container>
+            <pe:container uiname="mobile_camera_tip" visible="false" style="margin-top: -46px; margin-left: -64px; width: 151px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Mobile/icon/tishidi_60x39_32bits.png#0 0 60 39:26 17 26 17);">
+                <div style="margin-top: 6px;  color: #ffffff; text-align: center; font-size: 18px; base-font-size: 18px; font-weight: bold;"><%=L"长按2s开始录制"%></div>
+            </pe:container>
+        </pe:if>
     </pe:container>
 
     <pe:container uiname="mobile_move_node" ClickThrough="true" alignment="_lb" style="width: 400px; height: 400px; background: url()">
@@ -69,10 +81,13 @@
             <pe:container ClickThrough="true" uiname="mobile_move_button" style="position: relative;margin-left: 83px; margin-top: 83px; width: 56px; height:56px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/caozuoqiu_56x56_32bits.png#0 0 56 56);" ></pe:container>
             <pe:container ClickThrough="true" zorder="-1" uiname="mobile_move_button_img_bg"style="position: relative; width: 224px; height: 224px;  background: url(Texture/Aries/Creator/keepwork/Mobile/icon/lunpan_224x224_32bits.png#0 0 224 224);"></pe:container>
         </pe:container>
-        <pe:container uiname="mobile_move_button_touch" style="position: relative;margin-left: 60px; margin-top: 50px; width: 300px; height: 270px; background: url();"></pe:container>
+        <pe:container uiname="mobile_move_button_touch" style="position: relative;margin-left: 92px; margin-top: 65px; width: 230px; height: 230px; background: url();"></pe:container>
     </pe:container>
 
     <pe:container ClickThrough="true" uiname="MobileMainPage.operate_rb" alignment="_rb" style="width: 330px; height: 400px;  background: url();">
+        
+        <input type="button" value='<%=L"动作"%>' onclick="MobileMainPage.OnClickAction" uiname="btn_action" style="display:none;position:relative;color:#ff00ff; font-weight:bold;base-font-size:16px;font-size:22px;margin-top: 0px; margin-left: 90px; width: 80px; height:80px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/caozuoqiu_56x56_32bits.png#0 0 56 56);" />
+
         <pe:container ClickThrough="true" uiname="mobile_fly_back" visible="<%=MobileMainPage.IsFlying()%>" style="position: relative; width: 330px; height: 300px;  background: url();">
             <input type="button" onclick="MobileMainPage.OnClickToggleJump" style="margin-top: 0px; margin-left: 205px; width: 80px; height:80px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/jiaoyin_80x80_32bits.png#0 0 80 80);" />
             <pe:container uiname="btn_fly_up" style="margin-top: 44px;margin-left: 84px; width: 149px; height:81px;background: url(Texture/Aries/Creator/keepwork/Mobile/icon/shang_149x81_32bits.png#0 0 149 81);" ></pe:container>

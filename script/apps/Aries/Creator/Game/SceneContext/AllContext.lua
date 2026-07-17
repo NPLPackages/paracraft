@@ -33,11 +33,13 @@ function AllContext:Init()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/PlayContext.lua");
 	local PlayContext = commonlib.gettable("MyCompany.Aries.Game.SceneContext.PlayContext");
 	context = PlayContext:new():Register("play");
+	self.originPlayContext = context;
 	contexts["play"] = context;
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/EditContext.lua");
 	local EditContext = commonlib.gettable("MyCompany.Aries.Game.SceneContext.EditContext");
 	context = EditContext:new():Register("edit");
+	self.originEditContext = context;
 	contexts["edit"] = context;
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/EditMovieContext.lua");
@@ -89,4 +91,9 @@ function AllContext:SetContext(name, context)
 		contexts[name] = context;
 	end
 	return lastContext;
+end
+
+function AllContext:ResetContext()
+	AllContext:SetContext("edit", self.originEditContext);
+	AllContext:SetContext("play", self.originPlayContext);
 end

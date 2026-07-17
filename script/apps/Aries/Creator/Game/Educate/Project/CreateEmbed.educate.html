@@ -36,33 +36,30 @@
                         return do_modify
                     end
 
-                    function covert_status()
+                    function covert_status(index)
+                        local index = tonumber(index)
+                        if not index or index == 0 then
+                            return
+                        end
+                        Create:OnSwitchWorld(index)
+                        
+                        
                         local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
                         local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
-
                         if currentEnterWorld and
-                           currentEnterWorld.foldername == currentWorld.foldername then
+                            currentEnterWorld.foldername == currentWorld.foldername then
                             GameLogic.AddBBS(nil, L'不能重命名当前编辑的世界', 3000, '255 0 0')
                             return
                         end
-
                         if do_modify then
                             -- 客户端处理铭感词
-                            local temp = MyCompany.Aries.Chat.BadWordFilter.FilterString(temp_modify_worldname);
+                            local temp = MyCompany.Aries.Chat.BadWordFilter.FilterString2(temp_modify_worldname);
                             if temp~=temp_modify_worldname then 
                                 _guihelper.MessageBox(L"该世界名称不可用，请重新设定");
                                 return
                             end
 
-                            local count = 0
-                            for uchar in string.gfind(temp_modify_worldname, '([%z\1-\127\194-\244][\128-\191]*)') do
-                                if #uchar ~= 1 then
-                                    count = count + 2
-                                else
-                                    count = count + 1
-                                end
-                            end
-                            
+                            local count = ParaMisc.GetUnicodeCharNum(temp_modify_worldname);
                             if count > 66 then
                                 _guihelper.MessageBox(format(L'世界名字超过%d个字符, 请重新输入', 66))
                                 return
@@ -70,11 +67,11 @@
 
                             -- update world name
                             if Create:WorldRename(
-                                current_item_index,
+                                index,
                                 temp_modify_worldname,
                                 function()
                                     Create:GetWorldList(Create.statusFilter, function()
-                                        switch_world(current_item_index)
+                                        switch_world(index)
                                     end)
                                 end
                             ) then
@@ -82,14 +79,13 @@
                             else
                                 temp_modify_worldname = ''
                                 do_modify = not do_modify
-                                page:Refresh(0)
+                                page:Refresh(0.1)
                             end
 
                             return
                         end
-
                         do_modify = not do_modify
-                        page:Refresh(0)
+                        page:Refresh(0.1)
                     end
 
                     function be_selected()
@@ -280,7 +276,35 @@
                     end
 
                     function enter(index)
-                        Create:EnterWorld(index)
+                        checkEnter(function()
+                            Create:EnterWorld(index)
+                        end)
+                    end
+
+                    function checkEnter(callback)
+                        if System.options.isOffline then
+                            if callback then
+                                callback()
+                            end
+                            return
+                        end
+                        local EducateProject = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/EducateProject.lua")
+                        EducateProject.CheckOnlineDiskSize(function(surplus)
+                            if surplus == 0 then
+                                _guihelper.MessageBox(L"在线存储空间不足，您将无法保存对该世界的修改", function(res)
+                                    if res and res == _guihelper.DialogResult.OK then
+                                        if callback then
+                                            callback()
+                                        end
+                                    end
+                                end,_guihelper.MessageBoxButtons.OKCancel_CustomLabel,nil, nil, nil, nil, {ok=L"打开世界"})
+                                return 
+                            end
+                            if callback then
+                                callback()
+                            end
+                        end)
+                        
                     end
 
                     function get_world_text()
@@ -290,7 +314,10 @@
 
                         local text = Eval('text')
                         text = MyCompany.Aries.Chat.BadWordFilter.FilterString(text)
-                        text = Mod.WorldShare.Utils.WordsLimit(text, 150, 25)
+                        text = text or ""
+                        if _guihelper.GetTextWidth(text) > 100 then
+                            text = _guihelper.TrimUtf8TextByWidth(text, 100, "System;12;norm").."..."
+                        end
 
                         if Eval('is_zip') == true then
                             text = text .. '.zip'
@@ -666,7 +693,8 @@
                            currentSelectedWorld.kpProjectId and
                            type(currentSelectedWorld.kpProjectId) == 'number' and
                            currentSelectedWorld.kpProjectId ~= 0 then
-                           ShareWorld:ShowWorldCode(currentSelectedWorld.kpProjectId,2)
+                           local WorldSharePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareWorld/WorldSharePage.lua") 
+                           WorldSharePage.ShowView(currentSelectedWorld)
                         end
                     end
 
@@ -733,6 +761,11 @@
 
                             click_preview_item.timer:Change(500, 0)
                         end
+                    end
+
+                    function IsOfflineMode()
+                        local isOffline = System.options.isOffline
+                        return isOffline
                     end
                 ]]>
             </script>

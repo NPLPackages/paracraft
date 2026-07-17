@@ -54,7 +54,10 @@ function DestroyNearbyBlocks:Run()
 				offset_y = 1;
 			end
 		end
-
+		local bCanDelete = GameLogic.EditableWorld:GetBlockCanDestroy(bx,by,bz)
+		if not bCanDelete then
+			return
+		end
 		local destroy_blocks = {};
 		for i = 0, 2 do 
 			for j = 0, 2 do 
@@ -62,21 +65,53 @@ function DestroyNearbyBlocks:Run()
 					local x, y, z = bx+i-1,by+k+offset_y, bz+j-1
 					local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 					if(block_id~=0 and (not self.block_id or self.block_id == block_id)) then
-						-- highlight it
-						ParaTerrain.SelectBlock(x,y,z, true);
-						destroy_blocks[#destroy_blocks+1] = {x,y,z}
+						local bCanDelete = GameLogic.EditableWorld:GetBlockCanDestroy(x,y,z)
+						if bCanDelete then
+							-- highlight it
+							ParaTerrain.SelectBlock(x,y,z, true);
+							destroy_blocks[#destroy_blocks+1] = {x,y,z}
+						end
 					end
 				end
 			end
 		end
 		self.destroy_blocks = destroy_blocks;
+	else
+		local bCanDelete = true
+		for i = 1, #(self.destroy_blocks) do
+			-- x,y,z,block_id, data, serverdata
+			local b = self.destroy_blocks[i];
+			bCanDelete = GameLogic.EditableWorld:GetBlockCanDestroy(b[1],b[2],b[3])
+			if not bCanDelete then
+				break
+			end
+		end
+		if not bCanDelete then
+			GameLogic.AddBBS(nil, L'包含冻结世界前的方块无法删除,请先解冻世界', 5000, '0 255 0')
+			return
+		end
+
+		if(self.liveEntities and #(self.liveEntities) > 0) then
+			for _, entityNode in ipairs(self.liveEntities) do
+				local entity = EntityManager.GetEntity(entityNode.attr.name)
+				if(entity and entity:IsLocked()) then
+					bCanDelete = false
+					break;
+				end
+			end
+		end
+
+		if not bCanDelete then
+			GameLogic.AddBBS(nil, L'包含锁定的角色, 无法删除', 5000, '0 255 0')
+			return
+		end
 	end
 	
 	if((#(self.destroy_blocks) > 0) or (self.liveEntities and #(self.liveEntities) > 0))then
 		self.start_time = commonlib.TimerManager.GetCurrentTime();
 		TaskManager.AddTask(self);
 		GameLogic.SetModified();
-		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",self.destroy_blocks, true)
+		GameLogic.GetFilters():apply_filters("BatchModifyBlocks",self.destroy_blocks, true)
 	end
 end
 
@@ -121,7 +156,7 @@ function DestroyNearbyBlocks:FrameMove()
 
 						if(not is_sound_played) then
 							is_sound_played = true;
-							block_template:play_break_sound();
+							block_template:play_break_sound(block_template:ComputeSoundVolumeByBlockPos(b[1],b[2],b[3]));
 						end
 						
 						if(bx == b[1] and (by-1) == b[2] and bz == b[3]) then
@@ -150,7 +185,7 @@ function DestroyNearbyBlocks:FrameMove()
 				GameLogic.PlayAnimation({animationName = "Break",facingTarget = {x=tx, y=ty, z=tz},});
 			end
 
-			if(GameLogic.GameMode:CanAddToHistory()) then
+			if(GameLogic.GameMode:CanAddToHistory() or self.add_to_history) then
 				UndoManager.PushCommand(self);
 			end
 		end

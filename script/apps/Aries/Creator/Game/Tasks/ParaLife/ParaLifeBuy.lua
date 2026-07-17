@@ -20,7 +20,7 @@ end
 function ParaLifeBuy:GetMachineID(productCode)
     NPL.load("(gl)script/apps/Aries/Desktop/GameMemoryProtector.lua");
     local GameMemoryProtector = commonlib.gettable("MyCompany.Aries.Desktop.GameMemoryProtector")
-    local MachineID = ParaEngine.GetAttributeObject():GetField('MachineID', '')
+    local MachineID = GameLogic.GetMachineID(ParaEngine.GetAttributeObject():GetField('MachineID', ''))
     local md5 = GameMemoryProtector.hash_func_md5(MachineID..productCode)
     return md5
 end

@@ -1,0 +1,75 @@
+<!-- "script/apps/Aries/Creator/Game/KeepWorkMall/ExportTaskNew.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ExportTask.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+Export = commonlib.gettable("MyCompany.Aries.Game.Tasks.Export")
+Export.OnInit();
+function OnClose()
+    Page:CloseWindow();
+end
+
+function onClickSync(value)
+    local isSync = value==true
+    GameLogic.GetFilters():apply_filters("file_sync",isSync)
+end
+
+GameLogic.GetFilters():apply_filters("file_sync",false)
+]]></script>
+<div style="width: 680px; height: 344px; background: url(Texture/Aries/Creator/keepwork/Mall1/img_680x344_32bits.png#0 0 680 344);">
+    <div style="position: relative; margin-left: 22px; margin-top: 18px; color: #38374D; font-size: 22px; base-font-size: 22px; font-weight: bold;"><%=L"保存模型"%></div>
+    <div style="position: relative; width: 330px; height: 32px; margin-left: 340px; margin-top: 18px;">
+        <div style="float:left; color: #38374D; font-size: 16px; base-font-size: 16px;"><%=L"同步保存到模型库"%></div>
+        <div style="float:left;margin-top:3px;margin-left:8px;">
+            <input type="checkbox" name="sync_model" uiname="ExportTask.SyncModel" checked='<%= Export.isSyncModel %>' onclick="onClickSync" style="width:51px;height:31px; margin-top: -7px;" UncheckedBG="Texture/Aries/Creator/keepwork/Mall1/toggle_no_51x31_32bits.png;0 0 51 31" CheckedBG="Texture/Aries/Creator/keepwork/Mall1/toggle_yes_51x31_32bits.png;0 0 51 31"/>
+        </div>
+        <input type="button" onclick="OnClose()" uiname="ExportTask.OnClose" style="float: left; margin-left: 105px; margin-top: -5px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/keepwork/Mall1/btn_close_32x32_32bits.png);"/>
+    </div>
+    <div style="position: relative; margin-left: 6px; margin-top: 50px; width: 680px; height: 180px;">
+        <pe:treeview style="background:;height:256px;" ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="false" DefaultIndentation="0">
+            <pe:repeat DataSource="<%=Export.GetExporterDB()%>">
+                <pe:repeatitem>
+                    <div name='<%=Eval("id")%>' uiname='<%="ExportTask.OnClick_"..Eval("id")%>' onclick="Export.OnSelectExporter" style="float: left; margin-left: 16px; margin-top: 16px; width: 310px; height: 82px; background: url(Texture/Aries/Creator/keepwork/Mall1/img_312x86_32bits.png#0 0 314 86);"> 
+                        <pe:container ClickThrough="true" zorder="1" style="position: relative; margin-left: 2px; margin-top: 2px; width: 306px; height: 29px; background: url(Texture/Aries/Creator/keepwork/Mall1/img_310x32_32bits.png#0 0 310 32);"></pe:container>
+                        <pe:container ClickThrough="true" zorder="2" style="position: relative; background:;margin:3px;color:#000000" enabled="false">
+                            <div style="margin-left: 10px; width: 300px; color: #7B7A8A; font-size: 16px; base-font-size: 16px; font-weight:bold"><%=Eval("title")%></div>
+                            <div style="margin-top: 10px; margin-left: 10px; width: 300px; color: #7B7A8A; font-size: 10px;"><%=Eval("desc") or ""%></div>
+                        </pe:container>
+                    </div>
+                </pe:repeatitem>
+            </pe:repeat>
+        </pe:treeview>
+    </div>
+    <div style="margin-top:274px;">
+        <input type="button" align="right" uiname="ExportTask.Cancel" name="cancel" value='<%=L"取消"%>' onclick="OnClose" style="min-width:310px; height: 50px; margin-right: 24px; background: url(Texture/Aries/Creator/keepwork/Mall1/btn_310x50_32bits.png#0 0 310 50);" />
+    </div>
+</div>
+<!-- <aries:window style="width:512px;" title='<%=L"导出"%>' mode="thin" uiname_onclose="ExportTask.OnClose" onclose="OnClose">
+    <div style="margin:10px;color:#ffffff;font-size:14px;">
+        <div><%=L"请选择你希望导出的文件类型"%></div>
+        <pe:treeview style="background:;height:256px;" ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="false" DefaultIndentation="0">
+            <pe:repeat DataSource="<%=Export.GetExporterDB()%>">
+                <pe:repeatitem>
+                    <div name='<%=Eval("id")%>' uiname='<%="ExportTask.OnClick_"..Eval("id")%>' onclick="Export.OnSelectExporter" style="margin:3px;" width="100%"class="mc_button_grey">
+                        <pe:container zorder="1" style="background:;margin:3px;color:#000000" enabled="false">
+                            <div style="font-weight:bold"><%=Eval("title")%></div>
+                            <div><%=Eval("desc") or ""%></div>
+                        </pe:container>
+                    </div>
+                </pe:repeatitem>
+            </pe:repeat>
+        </pe:treeview>
+        <div style="margin:10px;">
+            <input type="button" align="right" uiname="ExportTask.Cancel" name="cancel" value='<%=L"取消"%>' onclick="OnClose" style="min-width:80px;margin-left:20px;" class="mc_light_grey_button_with_fillet" />
+        </div>
+    </div>
+</aries:window> -->
+</pe:mcml> 
+</body>
+</html>

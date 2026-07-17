@@ -126,6 +126,7 @@ function VideoSharingUpload.OnOK()
 					end);
 				end
 			)
+			collectgarbage("collect");
 		end)
 	end});
 	upload_timer:Change(100, nil);

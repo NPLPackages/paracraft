@@ -13,20 +13,12 @@
             end)
         end
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
 local EntityMovieClip = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip")
-NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
 local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
-NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemStack.lua");
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua")
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager")
-NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local normalserverData = {
 	timeseries = {

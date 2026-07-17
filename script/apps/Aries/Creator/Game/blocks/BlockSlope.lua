@@ -1,6 +1,6 @@
 --[[
 Title: Slope Based Block
-Author(s): devilwalk@taomee
+Author(s): LiXizhi, hyz
 Date: 2016/6/28
 Desc: 
 use the lib:
@@ -11,6 +11,8 @@ local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockSlope")
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/ide/math/bit.lua");
+NPL.load("(gl)script/ide/math/math3d.lua");
+local math3d = commonlib.gettable("mathlib.math3d");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -19,6 +21,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local band = mathlib.bit.band;
+local bor = mathlib.bit.bor;
 
 local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockSlope"));
 
@@ -26,73 +29,6 @@ local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block")
 block_types.RegisterBlockClass("BlockSlope", block);
 
 function block:ctor()
-	local models = {
-		{id_data=0, assetfile="L", facing=0, },
-		{id_data=7, assetfile="L", facing=1.57, },
-		{id_data=1, assetfile="L", facing=3.14, },
-		{id_data=6, assetfile="L", facing=4.71, },
-
-		{id_data=9, assetfile="T", facing=0, },
-		{id_data=12, assetfile="T", facing=4.71, },
-		{id_data=8, assetfile="T", facing=3.14, },
-		{id_data=13, assetfile="T", facing=1.57, },
-
-		{id_data=4, assetfile="/", facing=0, },
-		{id_data=3, assetfile="/", facing=4.71, },
-		{id_data=5, assetfile="/", facing=3.14, },
-		{id_data=2, assetfile="/", facing=1.57, },
-
-		{id_data=14, assetfile="7", facing=0, },
-		{id_data=11, assetfile="7", facing=4.71, },
-		{id_data=15, assetfile="7", facing=3.14, },
-		{id_data=10, assetfile="7", facing=1.57, },
-
-		{id_data=100+0, assetfile="shape_1", facing=0, },
-		{id_data=100+1, assetfile="shape_1", facing=1.57, },
-		{id_data=100+2, assetfile="shape_1", facing=3.14, },
-		{id_data=100+3, assetfile="shape_1", facing=4.71, },
-
-		{id_data=100+4, assetfile="shape_2", facing=0, },
-		{id_data=100+5, assetfile="shape_2", facing=4.71, },
-		{id_data=100+6, assetfile="shape_2", facing=3.14, },
-		{id_data=100+7, assetfile="shape_2", facing=1.57, },
-
-		{id_data=100+8, assetfile="shape_3", facing=0, },
-		{id_data=100+16, assetfile="shape_3", facing=4.71, },
-		{id_data=100+14, assetfile="shape_3", facing=3.14, },
-		{id_data=100+22, assetfile="shape_3", facing=1.57, },
-
-		{id_data=100+9, assetfile="shape_4", facing=0, },
-		{id_data=100+17, assetfile="shape_4", facing=4.71, },
-		{id_data=100+15, assetfile="shape_4", facing=3.14, },
-		{id_data=100+23, assetfile="shape_4", facing=1.57, },
-
-		{id_data=100+10, assetfile="shape_5", facing=0, },
-		{id_data=100+18, assetfile="shape_5", facing=4.71, },
-		{id_data=100+12, assetfile="shape_5", facing=3.14, },
-		{id_data=100+20, assetfile="shape_5", facing=1.57, },
-
-		{id_data=100+11, assetfile="shape_6", facing=0, },
-		{id_data=100+19, assetfile="shape_6", facing=4.71, },
-		{id_data=100+13, assetfile="shape_6", facing=3.14, },
-		{id_data=100+21, assetfile="shape_6", facing=1.57, },
-
-		{id_data=124+0, assetfile="shape_7", facing=0, },
-		{id_data=124+1, assetfile="shape_7", facing=1.57, },
-		{id_data=124+2, assetfile="shape_7", facing=3.14, },
-		{id_data=124+3, assetfile="shape_7", facing=4.71, },
-
-		{id_data=124+4, assetfile="shape_8", facing=0, },
-		{id_data=124+5, assetfile="shape_8", facing=1.57, },
-		{id_data=124+6, assetfile="shape_8", facing=3.14, },
-		{id_data=124+7, assetfile="shape_8", facing=4.71, },
-	}
-	models.id_model_map = {};
-	for i, model in ipairs(models) do
-		models.id_model_map[model.id_data] = model
-	end
-	-- only used by block rotation
-	self.models2 = models;
 end
 
 function block:Init()
@@ -492,7 +428,9 @@ local dir_side_to_data = {
  [3] = {[0] = 0, [1] = 1, [2] = -17, [3] = -17, [4] = -20, [5] = -17},
 };
 
-function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, camx, camy, camz, lookat_x, lookat_y, lookat_z)
+-- this function is only used when shape can not be deduced from corner bits
+function block:GetMetaDataFromEnvOld(blockX, blockY, blockZ, side, side_region, camx, camy, camz, lookat_x, lookat_y, lookat_z)
+	side = side or 0;
 	for i=0,7 do 
 		local idx = 124 + i
 		if isMatch_outCornerModels(idx,blockX, blockY, blockZ) then
@@ -521,8 +459,6 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
 	end
 
 	if not data then
-		NPL.load("(gl)script/ide/math/math3d.lua");
-		local math3d = commonlib.gettable("mathlib.math3d");
 		local dx, dy, dz = math3d.CameraToWorldSpace(0, 0, 1, camx, camy, camz, lookat_x, lookat_y, lookat_z);
 		if math.abs(dx)>=math.abs(dz) and dx>=0 and dy<=0 then
 			data = 0;
@@ -585,6 +521,45 @@ function block:RotateBlockData(blockData, angle, axis)
 	return self:RotateBlockDataUsingModelFacing(blockData, angle, axis) + highColorData;
 end
 
+local mirrorDataMap
+local function GetMirrorMap()
+	if(mirrorDataMap) then
+		return mirrorDataMap;
+	else
+		mirrorDataMap = {
+			["x"] = {
+				[1] = 0, [9] = 12, [8] = 13, [2] = 3, [14] = 11, [15] = 10,
+				[100] = 101, [102] = 103, [104] = 105, [106] = 107, [108] = 113, [109] = 112, [110] = 115, [111] = 114,
+				[116] = 119, [117] = 118, [120] = 123, [121] = 122, [124] = 127, [125] = 126, [128] = 129, [130] = 131,
+				[36] = 38, [25] = 24, [39] = 37, [35] = 33, [27] = 26, [34] = 32,
+			},
+			["y"] = {
+				[7] = 4,[11] = 12,[0] = 3,[8] = 15,[6] = 5,[13] = 10,[1] = 2,[9] = 14,
+				[100] = 105,[101] = 104,[102] = 107,[103] = 106,[108] = 109,[110] = 111,[112] = 113,[114] = 115,[116] = 117,[118] = 119,
+				[120] = 121,[122] = 123, [124] = 131,[125] = 128,[126] = 129,[127] = 130,
+				[34] = 35, [32]=33,[38]=39,[36]=37,
+			},
+			["z"] = {
+				[7] = 6,[9] = 13,[8] = 12,[11] = 15,[14] = 10,[4] = 5,
+				[100] = 103,[101] = 102,[104] = 107,[105] = 105,[108] = 111,[109] = 110,[112] = 115,[113] = 114,
+				[116] = 121,[117] = 120,[118] = 123,[119] = 122,[124] = 125,[126] = 127,[128] = 131,[130] = 129,
+				[33]=39,[26]=25,[32]=38,[37]=35,[24]=27,[36]=34,
+			},
+		}
+		-- add reverse mapping to data pair
+		for axis, dataMap in pairs(mirrorDataMap) do
+			local dataMap1 = {}
+			for k, v in pairs(dataMap) do
+				dataMap1[v] = k;
+			end
+			for k, v in pairs(dataMap1) do
+				dataMap[k] = v;
+			end
+		end
+		return mirrorDataMap;
+	end
+end
+
 -- mirror the block data along the given axis. This is mosted reimplemented in blocks with orientations stored in block data, such as slope, bones, etc. 
 -- @param blockData: current block data
 -- @param axis: "x|y|z", if nil, it should default to "y" axis
@@ -592,151 +567,285 @@ end
 function block:MirrorBlockData(blockData, axis)
 	local highColorData = band(blockData, 0xff00)
 	blockData = band(blockData, 0xff);
-	local arr
-	if(axis == "x") then
-		arr = {
-			[1] = 0,
-			[9] = 12,
-			[8] = 13,
-			[2] = 3,
-			[14] = 11,
-			[15] = 10,
-
-
-			[100] = 101,
-			[102] = 103,
-			[104] = 105,
-			[106] = 107,
-
-			[108] = 113,
-			[109] = 112,
-			[110] = 115,
-			[111] = 114,
-
-			[116] = 119,
-			[117] = 118,
-			[120] = 123,
-			[121] = 122,
-
-			[124] = 127,
-			[125] = 126,
-			[128] = 129,
-			[130] = 131,
-		}
-		
-	elseif(axis == "z") then
-		arr = {
-			[7] = 6,
-			[9] = 13,
-			[8] = 12,
-			[11] = 15,
-			[14] = 10,
-			[4] = 5,
-
-			[100] = 103,
-			[101] = 102,
-			[104] = 107,
-			[105] = 105,
-
-			[108] = 111,
-			[109] = 110,
-			[112] = 115,
-			[113] = 114,
-
-			[116] = 121,
-			[117] = 120,
-			[118] = 123,
-			[119] = 122,
-
-			[124] = 125,
-			[126] = 127,
-			[128] = 131,
-			[130] = 129,
-		}
-	else -- "y"
-		arr = {
-			[7] = 4,
-			[11] = 12,
-			[0] = 3,
-			[8] = 15,
-			[6] = 5,
-			[13] = 10,
-			[1] = 2,
-			[9] = 14,
-
-			[100] = 105,
-			[101] = 104,
-			[102] = 107,
-			[103] = 106,
-
-			[108] = 109,
-			[110] = 111,
-			[112] = 113,
-			[114] = 115,
-
-			[116] = 117,
-			[118] = 119,
-			[120] = 121,
-			[122] = 123,
-
-			[124] = 131,
-			[125] = 128,
-			[126] = 129,
-			[127] = 130,
-		}
-		
-	end
-	for k,v in pairs(arr) do 
-		if k==blockData then
-			blockData = v 
-			break
-		elseif v==blockData then
-			blockData = k
-			break
-		end
-	end
+	blockData = GetMirrorMap()[axis or "y"][blockData] or blockData
 	return blockData + highColorData;
 end
 
-function block:GetModelByBlockData2(blockData)
-	if(self.models2 and blockData and self.models2.id_model_map) then
-		return self.models2.id_model_map[blockData];
+local virtualModels;
+-- virtual model only for model rotation. 
+function block:GetVirtualModels()
+	if(virtualModels) then
+		return virtualModels;
+	end
+	-- model in the same group has same shape but different Y rotation. 
+	virtualModels = {
+		{blockdata=0, groupid="L", facing=0, x_facing=0, x_groupid = "xL2", z_facing=0, z_groupid = "zL1"},
+		{blockdata=7, groupid="L", facing=1.57, x_facing=0, x_groupid = "xL", z_facing=0, z_groupid = "zL"},
+		{blockdata=1, groupid="L", facing=3.14, x_facing=0, x_groupid = "xL1", z_facing=1.57, z_groupid = "zL1", },
+		{blockdata=6, groupid="L", facing=4.71, x_facing=1.57, x_groupid = "xL", z_facing=0, z_groupid = "zL2", },
+
+		{blockdata=9, groupid="T", facing=0, },
+		{blockdata=12, groupid="T", facing=4.71, },
+		{blockdata=8, groupid="T", facing=3.14, },
+		{blockdata=13, groupid="T", facing=1.57, },
+
+		{blockdata=4, groupid="/", facing=0, x_facing=4.71, x_groupid = "xL", z_facing=3.14, z_groupid = "zL", }, {blockdata=28, groupid="/", facing=0, x_facing=4.71, x_groupid = "xL", z_facing=3.14, z_groupid = "zL"},
+		{blockdata=3, groupid="/", facing=4.71, x_facing=3.14, x_groupid = "xL2", z_facing=4.71, z_groupid = "zL1", },
+		{blockdata=5, groupid="/", facing=3.14, x_facing=3.14, x_groupid = "xL", z_facing=3.14, z_groupid = "zL2", }, {blockdata=29, groupid="/", facing=3.14, x_facing=3.14, x_groupid = "xL", z_facing=3.14, z_groupid = "zL2", },
+		{blockdata=2, groupid="/", facing=1.57, x_facing=3.14, x_groupid = "xL1", z_facing=3.14, z_groupid = "zL1", },
+
+		{blockdata=14, groupid="7", facing=0, },
+		{blockdata=11, groupid="7", facing=4.71, },
+		{blockdata=15, groupid="7", facing=3.14, },
+		{blockdata=10, groupid="7", facing=1.57, },
+
+		{blockdata=27, groupid="hori", facing=0, x_facing=1.57, x_groupid = "xL2", z_facing=4.71, z_groupid = "zL2", },
+		{blockdata=26, groupid="hori", facing=4.71, x_facing=1.57, x_groupid = "xL1", z_facing=1.57, z_groupid = "zL2",},
+		{blockdata=25, groupid="hori", facing=3.14, x_facing=4.71, x_groupid = "xL1", z_facing=1.57, z_groupid = "zL", },
+		{blockdata=24, groupid="hori", facing=1.57, x_facing=4.71, x_groupid = "xL2", z_facing=4.71, z_groupid = "zL", },
+
+		{blockdata=38, groupid="corner2", facing=0, },
+		{blockdata=36, groupid="corner2", facing=4.71, },
+		{blockdata=34, groupid="corner2", facing=3.14, },
+		{blockdata=32, groupid="corner2", facing=1.57, },
+
+		{blockdata=35, groupid="corner4", facing=0, },
+		{blockdata=33, groupid="corner4", facing=4.71, },
+		{blockdata=39, groupid="corner4", facing=3.14, },
+		{blockdata=37, groupid="corner4", facing=1.57, },
+
+		{blockdata=38, groupid="corner3", facing=0, },
+		{blockdata=36, groupid="corner3", facing=4.71, },
+		{blockdata=34, groupid="corner3", facing=3.14, },
+		{blockdata=32, groupid="corner3", facing=1.57, },
+
+		{blockdata=100+0, groupid="shape_1", facing=0, x_facing=0, x_groupid = "xL9", z_facing=4.71, z_groupid = "zL7", },
+		{blockdata=100+1, groupid="shape_1", facing=1.57, x_facing=4.71, x_groupid = "xL7", z_facing=0, z_groupid = "zL6", },
+		{blockdata=100+2, groupid="shape_1", facing=3.14, x_facing=0, x_groupid = "xL6", z_facing=1.57, z_groupid = "zL10", },
+		{blockdata=100+3, groupid="shape_1", facing=4.71, x_facing=1.57, x_groupid = "xL10", z_facing=0, z_groupid = "zL9", },
+
+		{blockdata=100+4, groupid="shape_2", facing=0, x_facing=3.14, x_groupid = "xL6", z_facing=1.57, z_groupid = "zL7", },
+		{blockdata=100+5, groupid="shape_2", facing=4.71, x_facing=4.71, x_groupid = "xL10", z_facing=3.14, z_groupid = "zL6", },
+		{blockdata=100+6, groupid="shape_2", facing=3.14, x_facing=3.14, x_groupid = "xL9", z_facing=4.71, z_groupid = "zL10", },
+		{blockdata=100+7, groupid="shape_2", facing=1.57, x_facing=1.57, x_groupid = "xL7", z_facing=3.14, z_groupid = "zL9", },
+
+		{blockdata=100+8, groupid="shape_3", facing=0, x_facing=4.71, x_groupid = "xL5", z_facing=0, z_groupid = "zL7", },
+		{blockdata=100+16, groupid="shape_3", facing=4.71, x_facing=0, x_groupid = "xL10", z_facing=4.71, z_groupid = "zL5", },
+		{blockdata=100+14, groupid="shape_3", facing=1.47, x_facing=1.57, x_groupid = "xL8", z_facing=0, z_groupid = "zL10", },
+		{blockdata=100+22, groupid="shape_3", facing=1.57, x_facing=0, x_groupid = "xL7", z_facing=1.57, z_groupid = "zL8", },
+
+		{blockdata=100+9, groupid="shape_4", facing=0, x_facing=3.14, x_groupid = "xL5", z_facing=1.57, z_groupid = "zL6", },
+		{blockdata=100+17, groupid="shape_4", facing=4.71, x_facing=4.71, x_groupid = "xL9", z_facing=3.14, z_groupid = "zL5", },
+		{blockdata=100+15, groupid="shape_4", facing=3.14, x_facing=3.14, x_groupid = "xL8", z_facing=4.71, z_groupid = "zL9", },
+		{blockdata=100+23, groupid="shape_4", facing=1.57, x_facing=1.57, x_groupid = "xL6", z_facing=3.14, z_groupid = "zL8", },
+
+		{blockdata=100+10, groupid="shape_5", facing=0, x_facing=1.57, x_groupid = "xL5", z_facing=3.14, z_groupid = "zL10", },
+		{blockdata=100+18, groupid="shape_5", facing=4.71, x_facing=3.14, x_groupid = "xL7", z_facing=1.57, z_groupid = "zL5", },
+		{blockdata=100+12, groupid="shape_5", facing=4.71, x_facing=4.71, x_groupid = "xL8", z_facing=3.14, z_groupid = "zL7", },
+		{blockdata=100+20, groupid="shape_5", facing=1.57, x_facing=3.14, x_groupid = "xL10", z_facing=4.71, z_groupid = "zL8", },
+
+		{blockdata=100+11, groupid="shape_6", facing=0, x_facing=0, x_groupid = "xL5", z_facing=1.57, z_groupid = "zL9", },
+		{blockdata=100+19, groupid="shape_6", facing=4.71, x_facing=4.71, x_groupid = "xL6", z_facing=0, z_groupid = "zL5", },
+		{blockdata=100+13, groupid="shape_6", facing=3.14, x_facing=0, x_groupid = "xL8", z_facing=4.71, z_groupid = "zL6", },
+		{blockdata=100+21, groupid="shape_6", facing=1.57, x_facing=1.57, x_groupid = "xL9", z_facing=0, z_groupid = "zL8", },
+
+		{blockdata=124+0, groupid="shape_7", facing=0, x_facing=4.71, x_groupid = "xL3", z_facing=0, z_groupid = "zL3"},
+		{blockdata=124+1, groupid="shape_7", facing=1.57, x_facing=0, x_groupid = "xL3", z_facing=0, z_groupid = "zL4"},
+		{blockdata=124+2, groupid="shape_7", facing=3.14, x_facing=1.57, x_groupid = "xL4", z_facing=4.71, z_groupid = "zL4", },
+		{blockdata=124+3, groupid="shape_7", facing=4.71, x_facing=0, x_groupid = "xL4", z_facing=4.71, z_groupid = "zL3", },
+
+		{blockdata=124+4, groupid="shape_8", facing=0, x_facing=1.57, x_groupid = "xL3", z_facing=1.57, z_groupid = "zL4", },
+		{blockdata=124+5, groupid="shape_8", facing=1.57, x_facing=3.14, x_groupid = "xL4", z_facing=3.14, z_groupid = "zL4", },
+		{blockdata=124+6, groupid="shape_8", facing=3.14, x_facing=4.71, x_groupid = "xL4", z_facing=3.14, z_groupid = "zL3", },
+		{blockdata=124+7, groupid="shape_8", facing=4.71, x_facing=3.14, x_groupid = "xL3", z_facing=1.57, z_groupid = "zL3", },
+	};
+	local id_model_map = {};
+	for i, model in ipairs(virtualModels) do
+		id_model_map[model.blockdata] = model
+	end
+	virtualModels.id_model_map = id_model_map;
+	return virtualModels;
+end
+
+local function GetBlockDataByDeltaAngle(lastModel, vModels, deltaAngle, axisFacingsName, axisGroupName, axisFacingName)
+	local lastFacing = lastModel[axisFacingName];
+	if(lastFacing) then
+		local facing = lastFacing + deltaAngle;
+		if(facing < 0) then
+			facing = facing + 6.28;
+		end
+		facing = (math.floor(facing/1.57+0.5) % 4) * 1.57;
+
+		if(not lastModel[axisFacingsName]) then
+			lastModel[axisFacingsName] = {};
+			for _, model in ipairs(vModels) do
+				if(model[axisGroupName] == lastModel[axisGroupName] and model[axisFacingName]) then
+					lastModel[axisFacingsName][model[axisFacingName]] = model.blockdata;
+				end
+			end
+			if(not lastModel[axisFacingsName][3.14] and lastModel[axisFacingsName][0]) then
+				lastModel[axisFacingsName][3.14] = lastModel[axisFacingsName][0];
+			end
+			if(not lastModel[axisFacingsName][4.71] and lastModel[axisFacingsName][1.57]) then
+				lastModel[axisFacingsName][4.71] = lastModel[axisFacingsName][1.57];
+			end
+		end
+		return lastModel[axisFacingsName][facing];
 	end
 end
 
 -- helper function: can be used by RotateBlockData() to automatically calculate rotated block facing. 
 -- please note, it will cache last search result to accelerate subsequent calls.
 function block:RotateBlockDataUsingModelFacing(blockData, angle, axis)
-	if(not axis or axis == "y") then
-		local lastModel = self:GetModelByBlockData2(blockData)
-		if(lastModel) then
-			local lastFacing = lastModel.facing;
-			if(lastFacing) then
-				facing = lastFacing + angle;
-				if(facing < 0) then
-					facing = facing + 6.28;
-				end
-				facing = (math.floor(facing/1.57+0.5) % 4) * 1.57;
-
-				if(not lastModel.facings) then
-					lastModel.facings = {};
-					for _, model in ipairs(self.models2) do
-						if(model.assetfile == lastModel.assetfile and model.facing and model.transform==lastModel.transform) then
-							lastModel.facings[model.facing] = model.id_data;
-						end
-					end
-					if(not lastModel.facings[3.14] and lastModel.facings[0]) then
-						lastModel.facings[3.14] = lastModel.facings[0];
-					end
-					if(not lastModel.facings[4.71] and lastModel.facings[1.57]) then
-						lastModel.facings[4.71] = lastModel.facings[1.57];
-					end
-				end
-				blockData = lastModel.facings[facing] or blockData;
-			end
+	local vModels = self:GetVirtualModels()
+	local lastModel = blockData and vModels.id_model_map[blockData];
+	if(lastModel) then
+		if(not axis or axis == "y") then
+			blockData = GetBlockDataByDeltaAngle(lastModel, vModels, angle, "facings", "groupid", "facing") or blockData;
+		elseif(axis == "x") then
+			blockData = GetBlockDataByDeltaAngle(lastModel, vModels, angle, "x_facings", "x_groupid", "x_facing") or blockData;
+		elseif(axis == "z") then
+			blockData = GetBlockDataByDeltaAngle(lastModel, vModels, angle, "z_facings", "z_groupid", "z_facing") or blockData;
 		end
-	else
-		-- TODO: other axis
+	end
+	return blockData;
+end
+
+-- 26 blocks in 3*3*3 except the center
+local surroundingBlocks = {
+	{1, 0, 0, 0x0f}, -- +x
+	{-1, 0, 0, 0xf0}, -- -x
+	{0, 1, 0, 0x33}, -- +y
+	{0, -1, 0, 0xcc}, -- -y
+	{0, 0, 1, 0x66}, -- +z
+	{0, 0, -1, 0x99}, -- -z
+
+	{1, 0, 1, 0x6}, -- +x+z
+	{-1, 0, 1, 0x60}, -- -x+z
+	{1, 0, -1, 0x9}, -- +x-z
+	{-1, 0, -1, 0x90}, -- -x-z
+	{1, 1, 1, 0x2}, -- +x+z+y
+	{-1, 1, 1, 0x20}, -- -x+z+y
+	{1, 1, -1, 0x1}, -- +x-z+y
+	{-1, 1, -1, 0x10}, -- -x-z+y
+	{1, -1, 1, 0x4}, -- +x+z-y
+	{-1, -1, 1, 0x40}, -- -x+z-y
+	{1, -1, -1, 0x8}, -- +x-z-y
+	{-1, -1, -1, 0x80}, -- -x-z-y
+
+	{0, 1, 1, 0x22}, -- +y+z
+	{0, 1, -1, 0x11}, -- +y-z
+	{1, 1, 0, 0x3}, -- +y+x
+	{-1, 1, 0, 0x30}, -- +y-x
+	{0, -1, 1, 0x44}, -- -y+z
+	{0, -1, -1, 0x88}, -- -y-z
+	{1, -1, 0, 0xc}, -- -y+x
+	{-1, -1, 0, 0xc0}, -- -y-x
+}
+
+-- return the bitwise fields of the 8 corners. if corner bit is 1 if it belongs to a solid block.
+-- we need to check the surrounding (27-1) blocks to determine the corner bits.
+--    5----1                        0x20  0x2
+--   /|   /|
+--  4----0 |   positive Z         0x10   0x1
+--  | 6--|-2   ^                    0x40  04
+--  |/   |/   /
+--  7----3   --> positive X       0x80   0x8
+function block:GetCornerBit(blockX, blockY, blockZ)
+	local cornerBits = 0;
+	for i = 1, #surroundingBlocks do
+		local b = surroundingBlocks[i]
+		local blockTemplate = BlockEngine:GetBlock(blockX + b[1], blockY + b[2], blockZ + b[3]);
+		if(blockTemplate and blockTemplate.solid) then
+			cornerBits = bor(cornerBits, b[4]);
+		end
+	end
+	return cornerBits
+end
+
+-- corner bits to shape data id
+local cornerBitsToShape = {
+	-- \ vertical shape
+	[bor(0x66, 0xcc)] = 6,
+	[bor(0xf0, 0xcc)] = 1,
+	[bor(0x99, 0xcc)] = 7,
+	[bor(0x0f, 0xcc)] = 0,
+	
+	[bor(0x66, 0x33)] = 5,
+	[bor(0xf0, 0x33)] = 2,
+	[bor(0x99, 0x33)] = 4,
+	[bor(0x0f, 0x33)] = 3,
+	-- ^ horizontal shape
+	[bor(0x66, 0x0f)] = 27,
+	[bor(0x66, 0xf0)] = 26,
+	[bor(0x99, 0xf0)] = 25,
+	[bor(0x99, 0x0f)] = 24,
+	-- 3 face inner corner shape
+	[bor(bor(0x66, 0xf0), 0xcc)] = 32,
+	[bor(bor(0x66, 0x0f), 0xcc)] = 34,
+	[bor(bor(0x99, 0x0f), 0xcc)] = 36,
+	[bor(bor(0x99, 0xf0), 0xcc)] = 38,
+	
+	[bor(bor(0x66, 0xf0), 0x33)] = 33,
+	[bor(bor(0x66, 0x0f), 0x33)] = 35,
+	[bor(bor(0x99, 0x0f), 0x33)] = 37,
+	[bor(bor(0x99, 0xf0), 0x33)] = 39,
+
+	-- triangle shape
+	[216] = 124,
+	[228] = 125,
+	[78] = 126,
+	[141] = 127,
+	[114] = 128,
+	[39] = 129,
+	[27] = 130,
+	[177] = 131,
+    
+	-- small triangle shape
+    [205] = 100,
+	[220] = 101,
+	[236] = 102,
+	[206] = 103,
+	[179] = 104,
+	[59] = 105,
+	[55] = 106,
+	[115] = 107,
+
+	-- snaped triangle shape
+	[248] = 108,
+	[241] = 109,
+	[242] = 110,
+	[244] = 111,
+
+	[31] = 112,
+	[143] = 113,
+	[79] = 114,
+	[47] = 115,
+
+	[157] = 116,
+	[155] = 117,
+	[185] = 118,
+	[217] = 119,
+
+	[103] = 120,
+	[110] = 121,
+	[230] = 122,
+	[118] = 123,
+}
+
+-- static function
+function block:GetBlockDataFromNeighbour(blockX, blockY, blockZ)
+	local cornerBits = self:GetCornerBit(blockX, blockY, blockZ)
+	local blockData = cornerBitsToShape[cornerBits]
+	return blockData;
+end
+
+function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, camx, camy, camz, lookat_x, lookat_y, lookat_z)
+	local blockData = self:GetBlockDataFromNeighbour(blockX, blockY, blockZ)
+	if(not blockData) then
+		blockData = self:GetMetaDataFromEnvOld(blockX, blockY, blockZ, side, side_region, camx, camy, camz, lookat_x, lookat_y, lookat_z)
+		-- the following log is useful for generating cornerBitsToShape map manually
+		-- LOG.std(nil, "info", "block", "no shape found for cornerBits: %d --> data: %d", cornerBits, blockData);
 	end
 	return blockData;
 end

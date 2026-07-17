@@ -781,7 +781,7 @@ function ClassManager.MessageToMcml(chatdata)
 			offset+6, fromName, timestamp, height, width, height, words);
 		end
 	elseif (type == "cmd") then
-		local text = L"";
+		local text = "";
 		if (words == "lock") then
 			text = fromName..L"开启了屏幕锁屏";
 		elseif (words == "unlock") then

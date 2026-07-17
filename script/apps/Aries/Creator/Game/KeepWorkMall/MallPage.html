@@ -1,0 +1,454 @@
+<!-- "script/apps/Aries/Creator/Game/KeepWorkMall/MallPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="MallPage.lua">
+            <![CDATA[
+                local MallUtils = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallUtils.lua");
+                MallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallPage.lua");
+                local page = document:GetPageCtrl()
+                MallPage.OnInit(page);
+
+                function ClosePage()
+                    Page:CloseWindow();
+                    MallPage.CloseView()
+                end
+
+                function IsMenuSelected(index)
+                    return MallPage.menu_select_index == index;
+                end
+
+                function MenuItems(index)
+                    if(index == nil) then    
+                        return #MallPage.menu_data_sources;
+                    else
+                        return MallPage.menu_data_sources[index];
+                    end
+                end
+
+                function OnChangeMenu(name)
+                    MallPage.OnChangeMenu(name)
+                end
+
+                function MenuChildItems(index)
+                    if(index == nil) then    
+                        return #MallPage.GetChildMenuData()
+                    else
+                        return MallPage.GetChildMenuData()[index];
+                    end
+                end
+
+                function IsChildMenuSelected(index)
+                    return MallPage.menu_select_children_index == index;
+                end
+
+                function OnChangeChildMenu(name)
+                    MallPage.OnChangeChildMenu(name)
+                end
+
+                function GetSortData()
+                    return MallPage.sort_data;
+                end
+
+                function IsSortSelected(index)
+                    return MallPage.sort_select_index == index;
+                end
+
+                local sort_button_width = {
+                    normal = {60,80,100},
+                    english = {60,140,140},
+                }
+                function GetSortButtonWidth(index)
+                    local key = Mod.WorldShare.Utils.IsEnglish() and "english" or "normal"
+                    local width = sort_button_width[key][index]
+                    local style = format("width:%dpx ; background: url();", width)
+                    return style
+                end
+
+                function OnChangeSort(name)
+                    MallPage.OnChangeSort(name)
+                end
+
+                function onSearchInputFocusIn()
+                    page:FindControl('search_input_bg_select').visible = true
+                    page:FindControl('clear_btn_container').visible = true
+                end
+
+                function onSearchInputFocusOut()
+                    page:FindControl('search_input_bg_select').visible = false
+                    page:FindControl('clear_btn_container').visible = false
+                end
+
+                function GridsItems(index)
+                    if (index == nil) then
+                        return #MallPage.data_hits;
+                    else
+                        return MallPage.data_hits[index];
+                    end
+                end
+
+                function getIcon(itemData)
+                    return MallUtils.GetIcon(itemData)
+                end
+
+                function CanUseCanvas3dIcon(itemData)
+                    return MallUtils.CanUseCanvas3dIcon(itemData)
+                end
+
+                function IsSpecialModel(itemData)
+                    return MallUtils.IsSpecialModel(itemData)
+                end
+
+                function IsShowUseCount(count)
+                    local count = count or 0
+                    return count >= 0
+                end
+            
+                function GetUseCount(count)
+                    local count = tonumber(count) or 0
+                    return MallUtils.FormatCount(count)
+                end
+
+                function load_more()
+                    MallPage.LoadMore(Eval("index"));
+                end
+
+                function CheckIsCollected(item)
+                    return MallPage:CheckIsCollected(item);
+                end
+
+                function OnClickCollect(name,mcmlNode)
+                    local attr = mcmlNode:GetAttribute("param1")
+                    MallPage.OnClickCollect(attr);
+                end
+
+                function OnclickBuy(name, mcmlNode)
+                    local data = mcmlNode:GetAttribute("param1");
+                    MallPage.OnClickItem(data);
+                end
+
+                function OnSearch()
+                    local search_key = page:GetValue("search_text")
+                    MallPage.OnClickSearch(search_key)
+                end
+
+                function OnSearchKey()
+                    if(virtual_key and virtual_key == Event_Mapping.EM_KEY_RETURN) then
+                        local search_key = page:GetValue("search_text")
+                        MallPage.OnClickSearch(search_key)
+                    end 
+                end
+
+                function OnTextChange()
+                    local search_key = page:GetValue("search_text")
+                    --MallPage.OnClickSearch(search_key)
+                end
+
+                function GetNameText(name)
+                    local nameText = name or ""
+                    local fontName = "System;18;bold"
+                    local width = _guihelper.GetTextWidth(nameText, fontName)
+                    if width > 170 then
+                        return _guihelper.TrimUtf8TextByWidth(nameText,156, fontName).."..."
+                    else
+                        return nameText
+                    end
+                end
+
+                function GetToolTip(name)
+                    local nameText = name or ""
+                    local fontName = "System;18;bold"
+                    local width = _guihelper.GetTextWidth(nameText, fontName)
+                    if width > 170 then
+                        return nameText
+                    end
+                    return ""
+                end
+
+                function GetSearchText()
+                    return MallPage.SearchText
+                end
+
+                function OnClickClearSearch()
+                    page:SetValue("search_text","")
+                    MallPage.OnClickSearch("")
+                end
+
+                function GetModelType(type)
+                    local type = type or ""
+                    if type == "liveModel" then
+                        return string.upper("model")
+                    end
+                    return string.upper(type)
+                end
+            ]]>
+        </script>
+        <div width="100%" style="position: relative; height: 640px; ">
+            <!-- 大分类 -->
+            <div style="position: relative; width: 80px; height: 640px; margin-left: 10px; margin-top: 4px;">
+                <pe:gridview name="menu_gridview"
+                                uiname="MallPage.menu_gridview"
+                                RememberScrollPos="true"
+                                CellPadding="0"
+                                AllowPaging="false"
+                                ItemsPerLine="1"
+                                DefaultNodeHeight="70"
+                                VerticalScrollBarOffsetX="15600"
+                                DataSource='<%= MenuItems %>' >
+                    <Columns>
+                        <pe:if condition='<%= IsMenuSelected(Eval("index")) %>'>
+                            <div style="margin-top: 10px; width: 64px; height: 64px; background: url(Texture/Aries/Creator/keepwork/Mall1/btn1_64x64_32bits.png);">
+                               <div style="position: relative;">
+                                    <img src="<%=Eval('iconActive')%>"  style="margin-left: 16px; margin-top: 9px; width: 32px; height: 32px;"/>
+                                    <div style="margin-top: 1px; text-align: center; font-size: 11px; color: #404BF5;" ><%=Eval("name")%></div>
+                               </div>
+                               <input type="button" name="<%=Eval('index')%>" onclick="OnChangeMenu" style="width: 64px; height: 64px; background: url(); " />
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%=not IsMenuSelected(Eval("index")) %>'>
+                            <div style="margin-top: 10px; width: 64px; height: 64px; background: url(Texture/Aries/Creator/keepwork/Mall1/btn_64x64_32bits.png);">
+                                <div style="position: relative;">
+                                    <img src="<%=Eval('iconUnactive')%>"  style="margin-left: 16px; margin-top: 9px; width: 32px; height: 32px;"/>
+                                    <div style="margin-top: 1px; text-align: center; font-size: 11px; color: #7b7a8a;" ><%=Eval("name")%></div>
+                                </div>
+                                <input type="button" name="<%=Eval('index')%>" onclick="OnChangeMenu" style="width: 64px; height: 64px; background: url(); " />
+                            </div>
+                        </pe:if>
+                    </Columns>
+                </pe:gridview>
+            </div>
+            <!-- 小分类 -->
+            <div width="100%" style="position: relative; margin-left: 68px; height: 660px; background: url(Texture/Aries/Creator/keepwork/Mall1/btn1_64x64_32bits.png#0 0 64 64:30 30 30 30); ">
+                <!-- 列表 -->
+                <div style="position: relative;width: 140px;height: 640px; margin-top: 26px; margin-left: 4px;">
+                    <pe:gridview style=""
+                                name="menu_child_gridview"
+                                uiname="MallPage.menu_child_gridview"
+                                CellPadding="6"
+                                AllowPaging="false"
+                                ItemsPerLine="1"
+                                DefaultNodeHeight="60"
+                                VerticalScrollBarOffsetX="15600"
+                                RememberScrollPos="true"
+                                DataSource='<%= MenuChildItems %>' >
+                        <Columns>
+                            <pe:if condition='<%= IsChildMenuSelected(Eval("index")) %>'>
+                                <input type="button" name="<%=Eval('index')%>" onclick="OnChangeChildMenu" value='<%=Eval("name")%>' style="margin-left: 10px; color: #404BF5; font-size: 16px; base-font-size: 16px; font-weight: bold; width: 102px; height: 48px; background: url(Texture/Aries/Creator/keepwork/Mall1/img_102x48_32bits.png#0 0 102 48);"/>
+                            </pe:if>
+                            
+                            <pe:if condition='<%= not IsChildMenuSelected(Eval("index")) %>'>
+                                <input type="button" name="<%=Eval('index')%>" onclick="OnChangeChildMenu" value='<%=Eval("name")%>' style="margin-left: 10px; color: #7B7A8A; font-size: 14px; base-font-size: 14px; font-weight: bold; width: 102px; height: 48px; background: url(Texture/Aries/Creator/keepwork/Mall1/img_100x46_32bits.png#0 0 102 48);"/>
+                            </pe:if>
+                        </Columns>
+                    </pe:gridview>
+                </div>
+
+                <!-- 排序和搜索 -->
+                <div style="position: relative; margin-left: 95px; margin-top: 19px; width: 1034px; height: 42px;">
+                    <div style="position: relative; width: 500px; height: 42px; ">
+                        <pe:repeat DataSource="<%=GetSortData()%>" >
+                            <pe:repeatitem>
+                                <div style="float: left; margin-left: 43px; height:42px; ">
+                                    <div style="position: relative;">
+                                        <pe:if condition='<%=IsSortSelected(Eval("index")) %>'>
+                                            <div style='float: left; font-size: 20px; base-font-size: 20px; color: #404BF5;'><%=Eval("name")%></div>
+                                            <pe:if condition="<%=MallPage.sort_select_type == 0 %>">
+                                                <div style="float: left; margin-left: 5px; margin-top: 8px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/Mall1/up_10x6_32bits.png#0 0 10 6);"></div>
+                                                <div style="float: left; margin-left: -10px; margin-top: 18px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/Mall1/down1_10x6_32bits.png#0 0 10 6);"></div>
+                                            </pe:if>
+                                            <pe:if condition="<%=MallPage.sort_select_type == 1 %>">
+                                                <div style="float: left; margin-left: 5px; margin-top: 8px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/Mall1/up1_10x6_32bits.png#0 0 10 6);"></div>
+                                                <div style="float: left; margin-left: -10px; margin-top: 18px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/Mall1/down_10x6_32bits.png#0 0 10 6);"></div>
+                                            </pe:if>
+                                            <pe:if condition="<%=MallPage.sort_select_type == -1 %>">
+                                                <div style="float: left; margin-left: 5px; margin-top: 8px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/Mall1/up1_10x6_32bits.png#0 0 10 6);"></div>
+                                                <div style="float: left; margin-left: -10px; margin-top: 18px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/Mall1/down1_10x6_32bits.png#0 0 10 6);"></div>
+                                            </pe:if>
+                                            
+                                        </pe:if>
+                                        <pe:if condition='<%=not IsSortSelected(Eval("index")) %>'>
+                                            <div style='float: left; font-size: 20px; base-font-size: 20px; color: #7B7A8A; '><%=Eval("name")%></div>
+                                            <div style="float: left; margin-left: 5px; margin-top: 8px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/Mall1/up1_10x6_32bits.png#0 0 10 6);"></div>
+                                            <div style="float: left; margin-left: -10px; margin-top: 18px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/Mall1/down1_10x6_32bits.png#0 0 10 6);"></div>
+                                        </pe:if>
+                                    </div> 
+                                    <input type="button" name="<%=Eval('index')%>" onclick="OnChangeSort" height="100%" style="<%=GetSortButtonWidth(Eval('index'))%>" />
+                                </div>
+                            </pe:repeatitem>
+                        </pe:repeat>
+                    </div>
+                    <div style="position: relative; margin-left: 824px;width: 250px;height: 42px;">
+                        <div style="width: 250px;height: 42px;background: url(Texture/Aries/Creator/keepwork/Mall1/search_bg_250x42_32bits.png#0 0 250 42);">
+                            <pe:container name = "search_input_bg_select" visible = "false" style='position:relative;width:251px;height:43px;background: url(Texture/Aries/Creator/keepwork/Mall1/search_select_bg_251x43_32bits.png#0 0 251 43);'>
+                            </pe:container>
+                            <input type="button"
+                                   name="OK"
+                                   uiname="MallPage.OK"
+                                   tooltip="<%= L'搜索' %>"
+                                   onclick="OnSearch"
+                                   style="position: relative;
+                                          margin-left: 20px;
+                                          margin-top: 13px;
+                                          width: 20px;
+                                          height: 20px;
+                                          background: url(Texture/Aries/Creator/keepwork/Mall1/search_20x20_32bits.png#0 0 20 20);" />
+                            <input type="text"
+                                   auto_virtual_keyboard="true"
+                                   EmptyText='<%= L"请输入模型名称或编号" %>'
+                                   onkeyup="OnSearchKey"
+                                   onchange="OnTextChange"
+                                   onfocusin='onSearchInputFocusIn'
+                                   onfocusout ="onSearchInputFocusOut"
+                                   value="<%= GetSearchText() %>"
+                                   SkipAutoBadWordFilter="true"
+                                   name="search_text"
+                                   uiname="MallPage.search_text"
+                                   CaretColor="#FF000000"
+                                   textcolor="#000000"
+                                   style="position: relative;
+                                          font-size: 14px;
+                                          base-font-size: 14px;
+                                          margin-left: 44px;
+                                          margin-top: 10px;
+                                          width: 194px;
+                                          text-offset-y:4;
+                                          height:30px;
+                                          background: url();" />
+                            <pe:container name="clear_btn_container" visible="false" style="position: relative; margin-left: 224px; margin-top: -26px; background: url();">
+                                <input type="button" onclick="OnClickClearSearch" style="width: 14px; height: 14px; background: url(Texture/Aries/Creator/keepwork/Mall1/btn_clear_14x14_32bits.png#0 0 14 14)" />
+                            </pe:container>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 物品列表 -->
+                <div style="position: relative; width: 1090px; height: 560px; margin-left: 132px; margin-top: 70px;">
+                    <pe:gridview style="margin-left: -12px;
+                                        margin-top: -10px;"
+                                    uiname="MallPage.item_gridview"
+                                    name="item_gridview"
+                                    VerticalScrollBarOffsetX="-10086"
+                                    CellPadding="18"
+                                    AllowPaging="false"
+                                    ItemsPerLine="5"
+                                    DefaultNodeHeight="180"
+                                    DataSource="<%= GridsItems %>"
+                                    RememberScrollPos="true"
+                                    onmousewheel='NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallPage.lua").OnMouseWheel()'>
+                        <Columns>
+                            <div style="width: 192px; height: 182px; background: url(Texture/Aries/Creator/keepwork/Mall1/model_bg_190x180_32bits.png#0 0 192 182);">
+                                <div style="position: relative; margin-top: 1px; margin-left: 1px; width: 190px; height: 138px; background: url(Texture/Aries/Creator/keepwork/Mall1/model_bg1_190x138_32bits.png#0 0 190 138);">
+                                    <div style="position: relative; width: 90px; height: 23px; background: url(Texture/Aries/Creator/keepwork/Mall1/model_sign_bg_91x23_32bits.png#0 0 91 23);">
+                                        <div style="color: #75A6FF; margin-left: 8px; margin-top: 1px; font-size: 15px; base-font-size: 15px; font-weight: bold; "><%=GetModelType(Eval("modelType"))%></div>
+                                    </div>
+                                    <pe:if condition="<%=CheckIsCollected(Eval('this'))%>">
+                                        <input zorder="4"  type="button" param1='<%= XPath("this") %>' onclick="OnClickCollect"  style="position: relative; margin-top: 10px; margin-left: 158px; width: 23px; height: 23px; background: url(Texture/Aries/Creator/keepwork/Mall1/star_23x23_32bits.png#0 0 23 23);" />
+                                    </pe:if>
+                                    <pe:if condition="<%=not CheckIsCollected(Eval('this'))%>">
+                                        <input zorder="4"  type="button" param1='<%= XPath("this") %>' onclick="OnClickCollect"  style="position: relative; margin-top: 10px; margin-left: 158px; width: 23px; height: 23px; background: url(Texture/Aries/Creator/keepwork/Mall1/unstar_23x23_32bits.png#0 0 23 23);" />
+                                    </pe:if>
+                                    <pe:if condition="<%=Eval('hasPermission') == false %>">
+                                        <div zorder="2" style="position: relative; width: 190px; height: 138px; background: url(Texture/Aries/Creator/keepwork/Mall1/model_bg_mask_190x138_32bits.png#0 0 190 138);"></div>
+                                    </pe:if>
+                                    <div style="position: relative; margin-top: 10px; margin-left: 30px; width: 130px; height: 130px;">
+                                        <pe:if condition="<%=Eval('hasIcon') and not CanUseCanvas3dIcon(Eval('this'))%>">
+                                            <pe:if condition='<%=Eval("use_little_icon") == true%>'>
+                                                <img zorder="0" src='<%=Eval("icon")%>' width="64" height="64" style="margin-left: 32px; margin-top: 26px;" />
+                                            </pe:if>
+                                            <pe:if condition='<%=Eval("use_little_icon") == false%>'>
+                                                <img zorder="0" src='<%=Eval("icon")%>' width="128" height="64" style="margin-top: 26px;" />
+                                            </pe:if>
+                                        </pe:if>
+                                        <pe:if condition="<%=CanUseCanvas3dIcon(Eval('this'))%>">
+                                            <pe:if condition='<%= IsSpecialModel(Eval("this")) %>'>
+                                                <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index")) %>'
+                                                            xmlInfo='<%= Eval("xmlInfo") %>'
+                                                            DefaultRotY="-0.785"
+                                                            IsInteractive="false"
+                                                            autoRotateSpeed="0"
+                                                            miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 30 + 1) %>'
+                                                            RenderTargetSize="128" 
+                                                            value='<%=getIcon(Eval("this"))%>'
+                                                            style="position: relative;
+                                                                    width: 73px;
+                                                                    height: 73px;
+                                                                    margin-top: 18px;
+                                                                    margin-left: 25px;" />
+                                            </pe:if>
+                                            <pe:if condition='<%= not IsSpecialModel(Eval("this")) %>'>
+                                                <pe:if condition='<%= Eval("isLiveModel") %>'>
+                                                    <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index")) %>'
+                                                                xmlInfo='<%= Eval("xmlInfo") %>'
+                                                                DefaultRotY="1.57"
+                                                                IsInteractive="false"
+                                                                autoRotateSpeed="0"
+                                                                miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 30 + 1) %>'
+                                                                RenderTargetSize="128" 
+                                                                value='<%= getIcon(Eval("this")) %>'
+                                                                style="position: relative;
+                                                                        width: 73px;
+                                                                        height: 73px;
+                                                                        margin-top: 18px;
+                                                                        margin-left: 25px;" />
+                                                </pe:if>
+                                                <pe:if condition='<%= not Eval("isLiveModel") %>'>
+                                                    <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index")) %>'
+                                                                xmlInfo='<%= Eval("xmlInfo") %>'
+                                                                DefaultRotY="-1.57"
+                                                                IsInteractive="false"
+                                                                autoRotateSpeed="0"
+                                                                miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 30 + 1) %>'
+                                                                RenderTargetSize="128" 
+                                                                value='<%= getIcon(Eval("this")) %>'
+                                                                style="position: relative;
+                                                                        width: 73px;
+                                                                        height: 73px;
+                                                                        margin-top: 18px;
+                                                                        margin-left: 25px;" />
+                                                </pe:if>
+                                            </pe:if>
+                                        </pe:if>
+                                    </div>
+
+                                    <pe:if condition="<%=IsShowUseCount(Eval('useCount'))%>">
+                                        <div style="position: relative; margin-left: 6px; margin-top: 114px; width: 58px; height: 18px; background: url(Texture/Aries/Creator/keepwork/Mall1/img_58x18_32bits.png#0 0 58 18);">
+                                            <div style="float: left; margin-left: 2px; margin-top: 5px; width: 14px; height: 8px; background: url(Texture/Aries/Creator/keepwork/Mall1/use_14x8_32bits.png#0 0 14 8);"></div>
+                                            <div style="float: left; color: #38374D; margin-top: 0px; margin-left: 3px; font-size: 10px;"><%=GetUseCount(Eval("useCount"))%></div>
+                                        </div>
+                                    </pe:if>
+                                    <div style="position: relative; color: #7B7A8A; margin-top: 114px; margin-right: 6px; text-align: right; font-size: 12px; font-weight: bolder;"><%="#"..Eval("id")%></div>
+                                    <div tooltip='<%=GetToolTip(Eval("name"))%>' style="position: relative; margin-top: 146px; text-align: center; font-size: 18px; base-font-size: 18px; font-weight: bolder;"><%=GetNameText(Eval("name"))%></div>
+                                    <input type="button"
+                                        zorder='3'
+                                        uiname='<%= "MallPage." .. (Eval("id") or "").. (Eval("name") or "") %>'
+                                        onclick="OnclickBuy()"
+                                        param1='<%= XPath("this") %>'
+                                        style="position: relative;
+                                                margin-left: 0px;
+                                                margin-top: 0px;
+                                                width: 190px;
+                                                height: 180px;
+                                                background: url();" />
+                                </div>
+                                
+                                <pe:custom oncreate='<%= load_more() %>'></pe:custom>
+                            </div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <div style="width: 256px; height: 256px; margin-top: 160px; margin-left: 380px;">
+                                <div style="margin-left: 10px;margin-top: 10px;width: 128px;height: 128px;background: url(Texture/Aries/Creator/keepwork/Mall1/empty_128x128_32bits.png#0 0 128 128);"></div>
+                                <div style="margin-left: 10px;margin-top: -10px;color: #7B7A8A; font-size: 16px; base-font-size: 16px; font-weight: bold"><%=L"未搜索到相关结果"%></div>
+                            </div>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+            </div>
+        </div>
+    </pe:mcml>
+</body>
+</html>

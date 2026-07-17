@@ -123,7 +123,11 @@ function ItemAgent:GetIcon(itemStack)
 				if(not icon) then
 					icon = GameLogic.GetCodeGlobal():BroadcastTextEvent(name..".GetIcon")
 					if(icon) then
-						icon = Files.GetWorldFilePath(icon)
+						if(icon:match("^https?://")) then
+							-- remote icon
+						else
+							icon = Files.GetWorldFilePath(icon)
+						end
 						itemStack.icon_ = icon;
 						return icon
 					end

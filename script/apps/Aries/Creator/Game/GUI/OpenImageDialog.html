@@ -76,29 +76,148 @@ function GetLimitName(name)
     local leftText, rightText = OpenImageDialog.TrimNormUtf8TextByWidth(name, 70, "System;11;norm")
     return leftText.."..."
 end
+
+function showCameraUi(params,node)
+    if System.os.IsTouchMode() then
+        GameLogic.AddBBS(nil,L"暂不支持该功能~")
+        return
+    end
+    if OpenImageDialog.showCamera then
+        OpenImageDialog.BackToFileView()
+        return
+    end
+
+    OpenImageDialog.showCamera = true
+    OpenImageDialog.imageW = 324;
+    OpenImageDialog.imageH = 243
+    local text = Page:GetUIValue("text")
+    Page:Refresh(0)
+    commonlib.TimerManager.SetTimeout(function()
+        GameLogic.RunCommand("/capture video stop -event onCameraClose")
+        OpenImageDialog.openCamera()
+        local filename = OpenImageDialog.start_text and OpenImageDialog.start_text:match("[^/\\]+$") or ""
+        local name,extension =  commonlib.Files.splitText(filename)
+        OpenImageDialog.extension = extension
+        if extension == ".jpg" then
+            filename = name..".png"
+            OpenImageDialog.extension = ".png"
+        end
+        Page:SetUIValue("text",OpenImageDialog.start_text or text) 
+    end,10)
+end
+
+function GetCameraImg()
+    local filename = "temp/camera_size.png"
+    if ParaIO.DoesFileExist(filename) then
+        return filename
+    else
+        return ""
+    end
+end
+
+function ShowSnapshot()
+    return OpenImageDialog.inSnapshot ~= nil
+end
+
+function GetPreviews()
+    return OpenImageDialog.previews or {}
+end
+
+function onClickTextSnapImage()
+    OpenImageDialog.inSnapshot = nil
+    OpenImageDialog.onClickTextSnapImage()
+end
+
+function deleteImage(index)
+    if OpenImageDialog.previews then
+        echo(OpenImageDialog.previews)
+        table.remove(OpenImageDialog.previews,index)
+        echo(OpenImageDialog.previews)
+        local text = Page:GetValue("text")
+        Page:Refresh(0)
+        Page:SetUIValue("text",text)
+    end
+end
+
 ]]></script>
-<kp:window title='<%=L"选择贴图"%>' width="600" height="440"  uiname_onclose="OpenImageDialog.OnClose" onclose="OpenImageDialog.OnClose">
+<kp:window  title='<%=L"选择贴图"%>' width="600" height="440"  uiname_onclose="OpenImageDialog.OnClose" onclose="OpenImageDialog.OnClose">
     <div style="margin-top: 36px; ">
         <div style="margin-left: 10px; width: 600px; height: 260px;">
-            <pe:gridview uiname="OpenImageDialog.gvImg " name="gvFilterFiles" DataSource="<%={}%>"  CellPadding="24" ItemsPerLine="4" AllowPaging="false" DefaultNodeHeight="72" >
-                <Columns>
-                    <div  style="width: 110px; height: 91px; ">  
-                       <%=GetIconStyle(Eval("attr"))%>
-                       <%=GetLimitName(commonlib.Encoding.DefaultToUtf8(GetName(Eval("attr"))),11)%> 
+            <pe:if condition="<%=OpenImageDialog.showCamera ~= true %>">
+                <pe:gridview uiname="OpenImageDialog.gvImg " name="gvFilterFiles" DataSource="<%={}%>"  CellPadding="24" ItemsPerLine="4" AllowPaging="false" DefaultNodeHeight="72" >
+                    <Columns>
+                        <div  style="width: 110px; height: 91px; ">  
+                        <%=GetIconStyle(Eval("attr"))%>
+                        <%=GetLimitName(commonlib.Encoding.DefaultToUtf8(GetName(Eval("attr"))),11)%> 
+                        </div>
+                        <input tooltip='<%=commonlib.Encoding.DefaultToUtf8(GetName(Eval("attr")))%>' type="button" onclick='OnClickIcon' name='<%="OpenImageDialog.img" .. commonlib.Encoding.DefaultToUtf8(GetFileName(Eval("attr")))%>' uiname='<%="OpenImageDialog.img" .. commonlib.Encoding.DefaultToUtf8(GetFileName(Eval("attr")))%>' style="margin-top: -90px; width: 110px; height: 90px; background: url();"/>
+                    </Columns>
+                </pe:gridview>
+            </pe:if>
+            <pe:if condition="<%=OpenImageDialog.showCamera == true %>">
+                <div style="margin-left: 40px; margin-top:15px;height:30px; background-color: #fff60000;">
+                    <div style = "width:370px;height: 30px;">
+                        <div onclick = "onClickTextSnapImage" style="float:left;color:#000000;text-align:left; font-size: 20px;">
+                            点击视频拍照
+                        </div>
+                        <pe:container uiname= "btn_snapshot" style="float:left;margin-left: 18px;margin-top: -4px;color:#000000;text-align:center; font-size: 20px;width:107px; height: 38px;background: url(Texture/Aries/Creator/keepwork/EntityImage/queding_107x38_32bits.png#0 0 107 38);">
+                            <div style = "margin-top:3px;">
+                                <%=L"长按连拍"%>
+                            </div>
+                        </pe:container>
+                        <div style="float:left;color:#000000;text-align:left; margin-left: 150px; font-size: 20px;height: 30px;">
+                            大小：
+                        </div>
                     </div>
-                    <input tooltip='<%=commonlib.Encoding.DefaultToUtf8(GetName(Eval("attr")))%>' type="button" onclick='OnClickIcon' name='<%="OpenImageDialog.img" .. commonlib.Encoding.DefaultToUtf8(GetFileName(Eval("attr")))%>' uiname='<%="OpenImageDialog.img" .. commonlib.Encoding.DefaultToUtf8(GetFileName(Eval("attr")))%>' style="margin-top: -90px; width: 110px; height: 90px; background: url();"/>
-                </Columns>
-            </pe:gridview>
+                    <div align = "right"  style="margin-right:40px; margin-top: 10px;font-size:11px;width:150px;height:35px;">
+                        <select name = "ImageResolution" AllowUserEdit="false" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="width: 160px; height:28px">
+                            <option value="32x32" selected="true">32 * 32</option>
+                            <option value="64x64">64 * 64</option>
+                            <option value="128x128">128 * 128</option>
+                            <option value="256x256">256 * 256</option>
+                        </select>
+                    </div>
+                    <div align = "right" style="font-size: 20px;color:#000000;text-align:left;width:150px;height:35px;line-height: 35px;margin-right:40px; margin-top: 5px;">
+                        预览：
+                    </div>
+                    <div style = "margin-top: 10px; margin-left:370px; width: 150px; height: 150px; background: url(Texture/Aries/Creator/keepwork/EntityImage/shulukuang_20x20_32bits.png#0 0 20 20:8 8 8 8);">
+                        <pe:if condition="<%=not ShowSnapshot()%>">
+                            <div style = "float:left;width: 36px;height: 36px;background-color: #00000000;">
+                                <img src='<%=GetCameraImg()%>' name = "preview_img" style=' margin-top: 0px; margin-left:0px; width: 150px; height: 150px; ' />
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%=ShowSnapshot()%>">
+                            <div style ="width: 150px;height: 150px;">
+                                <pe:gridview style="margin-left:5px;margin-top:5px;width:142px;height:142px;"  name="item_gridview" RememberScrollPos = true CellPadding="0" VerticalScrollBarStep="20" VerticalScrollBarOffsetX="0" ItemsPerLine="4" DefaultNodeHeight = "32" 
+                                    DataSource="<%=GetPreviews()%>">
+                                    <Columns>
+                                        <div style = "float:float; margin-top: 0px;margin-left:0px; width: 31px;height: 31px;background-color: #000000;">
+                                            <img src='<%=Eval("icon")%>' name = "<%=Eval('index')%>" onclick = "" style=' width: 30px; height: 30px; ' />
+                                        </div>
+                                    </Columns>
+                                </pe:gridview>
+                            </div>
+                        </pe:if>
+                    </div>
+                </div>
+                <div name="point_set"  style="width:37px;height:35px;margin-left:30px; margin-top: 10px; background-color: #fff60000;"/>
+            </pe:if>
         </div>
         <div style="margin-left: 2px; margin-top: 42px; width: 596px; height: 100px;  background: url(Texture/Aries/Creator/keepwork/EntityImage/huidi_58x40_32bits.png#0 0 58 40:27 18 27 18);">
             
             <div style="margin-top: 10px;">
-                <input type="text" SkipAutoBadWordFilter="true" EmptyText='<%= L"输入图片名或路径" %>' uiname="OpenImageDialog.text" onchange="OpenImageDialog.OnTextChange"  name="text" enable_ime="false" style="margin-left: 48px; height:31px;width:462px;background: url(Texture/Aries/Creator/keepwork/EntityImage/shulukuang_20x20_32bits.png#0 0 20 20:8 8 8 8);"/>
-                <input type="button" uiname="OpenImageDialog.openfile"  name="openfile"  style="min-width:37px;height:35px;margin-left:3px; margin-top: -1px; background: url(Texture/Aries/Creator/keepwork/EntityImage/wenjianjia_37x35_32bits.png#0 0 37 35);" onclick="OpenImageDialog.OnOpenFileDialog"/>
+                <input type="text" SkipAutoBadWordFilter="true" EmptyText='<%= L"输入图片名或路径" %>' uiname="OpenImageDialog.text" onchange="OpenImageDialog.OnTextChange"  name="text" enable_ime="false" style="margin-left: 48px; height:31px;width:422px;background: url(Texture/Aries/Creator/keepwork/EntityImage/shulukuang_20x20_32bits.png#0 0 20 20:8 8 8 8);"/>
+                <pe:if condition="<%=System.os.IsEmscripten()%>">
+                    <input type="button" uiname="OpenImageDialog.opennet"  name="opennet"  style="min-width:33px;height:31px;margin-left:3px; margin-top: -1px; background: url(Texture/Aries/Creator/keepwork/EntityImage/netdisk_33x31_32bits.png#0 0 33 31);" onclick="OpenImageDialog.OnOpenFileDialog"/>
+                </pe:if>
+                <input type="button" uiname="OpenImageDialog.openfile"  name="openfile"  style="min-width:34px;height:32px;margin-left:3px; margin-top: -1px; background: url(Texture/Aries/Creator/keepwork/EntityImage/wenjianjia_37x35_32bits.png#0 0 37 35);" onclick="OpenImageDialog.OnOpenFileDialog"/>
+                <pe:if condition="<%= not System.os.IsTouchMode()%>">
+                    <input type="button" uiname="OpenImageDialog.openCamera"  name="opencamera"  style="min-width:37px;height:35px;margin-left:3px; margin-top: -1px; background: url(Texture/Aries/Creator/keepwork/Paralife/main/camera_32bits.png#0 0 128 128);" onclick="showCameraUi"/>
+                </pe:if>
             </div>
             <div style="margin-top:5px;">
                 <input type="button" uiname="OpenImageDialog.OK" name="OK" DefaultButton="true" align="left" style="position: relative; margin-left:444px;width:107px; height: 38px; background: url(Texture/Aries/Creator/keepwork/EntityImage/queding_107x38_32bits.png#0 0 107 38);" onclick="OpenImageDialog.OnOK" value='<%=L"确定"%>' />
-                <input type="button" uiname="OpenImageDialog.Cancel" name="Cancel" DefaultButton="true" align="left" style="position: relative; margin-left:354px;width:82px; height: 38px; background: url(Texture/Aries/Creator/keepwork/EntityImage/quxiao_82x38_32bits.png#0 0 82 38);" onclick="OpenImageDialog.OnClose" value='<%=L"取消"%>' />
+                <input type="button" uiname="OpenImageDialog.Cancel" name="Cancel" align="left" style="position: relative; margin-left:354px;width:82px; height: 38px; background: url(Texture/Aries/Creator/keepwork/EntityImage/quxiao_82x38_32bits.png#0 0 82 38);" onclick="OpenImageDialog.OnClose" value='<%=L"取消"%>' />
                 <!-- <input type="checkbox" uiname="OpenImageDialog.Checkbox" name = "checkRemind" checked='<%=fasle%>' onclick="OnSelectUpload" style="position: relative; float: left;margin-top: -3px; margin-left: 71px; width:14px;height:14px;" UncheckedBG="Texture/Aries/Creator/keepwork/EntityImage/weixuanzhong_13x13_32bits.png#0 0 14 14" CheckedBG="Texture/Aries/Creator/keepwork/EntityImage/xuanzhong_13x13_32bits.png#0 0 14 14"/>
                 <div style="margin-top: -16px; margin-left: 90px;">上传原图</div> -->
             </div>

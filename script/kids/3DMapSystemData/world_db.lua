@@ -195,6 +195,10 @@ function world:LoadWorldFromDB(name, password)
 	if(System.options and System.options.ignorePlayerAsset) then
 		PlayerAsset = "";
 	end
+	if(PlayerAsset == "") then
+		-- this fixed a crash bug on android on empty filename. 
+		PlayerAsset = "character/CC/02human/Camera/Camera.x";
+	end
 	local asset = ParaAsset.LoadParaX("", PlayerAsset);
 	
 	local player;

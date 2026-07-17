@@ -40,6 +40,31 @@ NPL.export({
 },
 
 {
+	type = "cmd_wait", 
+	message0 = L"等待%1秒",
+	arg0 = {
+		{
+			name = "seconds",
+			text = "1",
+			type = "input_value",
+			shadow = { type = "math_number", value = "1",},
+		},
+	},
+	category = "CommandControl", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "wait",
+	func_description = '/wait %s',
+	ToNPL = function(self)
+		return string.format('/wait %s\n', self:getFieldAsString('seconds'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+	]]}},
+},
+
+{
 	type = "cmd_if", 
 	message0 = L"如果%1那么",
 	message1 = L"%1",
@@ -303,7 +328,7 @@ NPL.export({
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "kill",
-	func_description = '/kill @e{r = %s, type = %s}',
+	func_description = '/kill @e{r = %s, type = "%s"}',
 	ToNPL = function(self)
 		return string.format('/kill @e{r = %s, type = "%s"}\n', self:getFieldAsString('radius'), self:getFieldAsString('className'));
 	end,

@@ -32,7 +32,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["loadtemplate"] = {
 	name="loadtemplate", 
 	quick_ref="/loadtemplate [-r] [-history]  [-abspos] [-tp] [-a seconds] [x y z] [-rename bool][-write_reference_from_path bool][templatename]", 
-	desc=[[load template to the given position
+	desc=[[load template or ply point file to the given position
 @param -a seconds: animate building progress. the followed number is the number of seconds (duration) of the animation. 
 @param -l seconds: according to the tier to load. the followed number is the number of seconds (duration) of the animation. 
 @param -r: remove blocks
@@ -48,6 +48,7 @@ default name is "default"
 /loadtemplate -r test
 /loadtemplate -history test    allow ctrl+z to undo
 /loadtemplate ~/test   in writable global temp directory
+/loadtemplate blocktemplates/test.ply
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		
@@ -118,7 +119,8 @@ default name is "default"
 			if(filename:match("^~")) then
 				filename = ParaIO.GetWritablePath().."temp"..filename:sub(2, -1)
 			end
-			if(not filename:match("%.xml$") and not filename:match("%.bmax$")) then
+			local fileExt = filename:match("%.(%w+)$");
+			if(fileExt ~= "xml" and fileExt ~= "bmax" and fileExt ~= "ply") then
 				filename = filename .. ".blocks.xml";
 			end
 
@@ -222,18 +224,22 @@ Commands["savetemplate"] = {
 
 Commands["savemodel"] = {
 	name="savemodel", 
-	quick_ref="/savemodel [-auto_scale false] [-f] [-interactive|i][-hidetip] [modelname]", 
+	quick_ref="/savemodel [-auto_scale false] [-f] [-ply] [-autopivot] [-sortblocks] [-interactive|i][-hidetip] [modelname]", 
 	desc=[[save bmax model with current selection. 
 @param -auto_scale: whether or not scale model to one block size. default value is true
-@param modelname: if no name is provided, it will be "default"
+@param modelname: if no name is provided, it will be "default", if "~/" is prefixed, it will be saved to global writable temp directory
 @param -interactive or -i: we will ask the user if file already exists
 @param -f: force overwrite existing file
+@param -ply: save as ply point cloud file
+@param -autopivot: if true, use the bottom center of all blocks as pivot
+@param -sortblocks: if true, we will sort blocks from bottom to top before saving.
 @return true, filename
 /savemodel test
 /savemodel -auto_scale false test
 /savemodel -interactive test
 /savemodel -interactive "file name"
-/savemodel ~/test   in writable global temp directory
+/savemodel -f -sortblocks -auto_pivot ~/test  in writable global temp directory
+/savemodel test.ply
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local option;
@@ -264,14 +270,15 @@ Commands["savemodel"] = {
 		local filename;
 		local use_map
 		local relative_path_map
+		local fileExt = options.ply and "ply" or "bmax";
 		if(commonlib.Files.IsAbsolutePath(templatename)) then
-			templatename = templatename:gsub("%.bmax$", "");
-			relative_path = format("%s.bmax", templatename);
+			templatename = templatename:gsub("%."..fileExt.."$", "");
+			relative_path = format("%s.%s", templatename, fileExt);
 			filename = relative_path;
 		else
-			templatename = templatename:gsub("^blocktemplates/", ""):gsub("%.bmax$", "");
+			templatename = templatename:gsub("^blocktemplates/", ""):gsub("%."..fileExt.."$", "");
 			templatename = commonlib.Encoding.Utf8ToDefault(templatename);
-			relative_path = format("blocktemplates/%s.bmax", templatename);
+			relative_path = format("blocktemplates/%s.%s", templatename, fileExt);
 			local re = ParaIO.CreateDirectory(GameLogic.GetWorldDirectoryAt()..relative_path);
 			if not re then
 				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -284,7 +291,7 @@ Commands["savemodel"] = {
 				chineseMap[md5] = commonlib.Encoding.DefaultToUtf8(templatename);
 				commonlib.SaveTableToFile(chineseMap, "worlds/DesignHouse/blocktemplates/chinese_map.json",true);
 				templatename = commonlib.Encoding.Utf8ToDefault(md5);
-				relative_path = format("blocktemplates/%s.bmax", templatename);
+				relative_path = format("blocktemplates/%s.%s", templatename, fileExt);
 				use_map = true
 			end
 		
@@ -294,11 +301,12 @@ Commands["savemodel"] = {
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 			local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, 
-				filename = filename, auto_scale = auto_scale, bSelect=nil, 
+				filename = filename, auto_scale = auto_scale, bSelect=nil, isPlyFile = options.ply, 
+				auto_pivot = options.autopivot, sort_blocks = options.sortblocks
 			})
 			if(task:Run()) then
 				if not options.hidetip then
-					BroadcastHelper.PushLabel({id="savemodel", label = format(L"BMax模型成功保存到:%s", use_map and relative_path_map or commonlib.Encoding.DefaultToUtf8(relative_path)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+					BroadcastHelper.PushLabel({id="savemodel", label = format(L"模型成功保存到:%s", use_map and relative_path_map or commonlib.Encoding.DefaultToUtf8(relative_path)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 				end
 				
 				if(options.interactive or options.i) then
@@ -382,8 +390,9 @@ Commands["generatemodel"] = {
 
 Commands["exportgltf"] = {
 	name="exportgltf", 
-	quick_ref="/exportgltf [-region] [parax] [output]", 
+	quick_ref="/exportgltf [-region] [-f] [parax] [output]", 
 	desc=[[--export all blocks in the given regions to gltf(glb) files, save to current world dictionary
+--@param -f: force overwrite existing file
 /exportgltf -region 37_37|37_38
 -- export all selected blocks to gltf(glb) file, save as the output file in current world dictionary
 /exportgltf selected1.gltf(glb)
@@ -492,14 +501,14 @@ Commands["exportgltf"] = {
 			else
 				local filename;
 				filename, cmd_text = CmdParser.ParseFilename(cmd_text);
-				local ext = ParaIO.GetFileExtension(filename);
+				local ext = filename:match("%.(%w+)$");
 				if (ext == "x") then
 					-- export parax to gltf(glb)
 					local gltf = cmd_text;
 					if (not gltf) then
 						gltf = ParaIO.ChangeFileExtension(filename, "glb");
 					end
-					if(ParaIO.DoesFileExist(gltf)) then
+					if(not options.f and ParaIO.DoesFileExist(gltf)) then
 						_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", commonlib.Encoding.DefaultToUtf8(gltf)), function(res)
 							if(res and res == _guihelper.DialogResult.Yes) then
 								ParaXToGltf(filename, gltf);
@@ -512,6 +521,9 @@ Commands["exportgltf"] = {
 				else
 					-- export selected blocks to gltf(glb)
 					if (not filename) then return end
+					if (ext ~= "gltf" and ext ~= "glb") then
+						filename = filename .. ".gltf";
+					end
 					local selected_blocks = Game.SelectionManager:GetSelectedBlocks();
 					if (selected_blocks) then
 						options.blocks_string = commonlib.serialize_compact(selected_blocks, true);
@@ -519,8 +531,13 @@ Commands["exportgltf"] = {
 						_guihelper.MessageBox(L"请先选择物体, Ctrl+左键多次点击场景可选择");
 						return;
 					end
-
-					filename = GameLogic.current_worlddir.."blocktemplates/"..filename
+					if(not commonlib.Files.IsAbsolutePath(filename)) then
+						if(not filename:match("/")) then
+							filename = GameLogic.current_worlddir.."blocktemplates/"..filename
+						else
+							filename = GameLogic.current_worlddir..filename
+						end
+					end
 					options.filename = filename;
 					options.command = "selected";
 				end

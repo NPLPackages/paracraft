@@ -97,6 +97,10 @@ function Entity:init()
 	end
 end
 
+-- when the body of the player hit this entity. 
+function Entity:OnCollideWithPlayer(entity, bx,by,bz)
+end
+
 
 -- when the body of the player hit this entity. 
 function Entity:OnCollideWithPlayer(entity, bx,by,bz)
@@ -137,6 +141,15 @@ end
 
 function Entity:FallDown(deltaTime)
 	-- do not fall down
+end
+
+-- right click to show item
+function Entity:OnClick(x, y, z, mouse_button)
+	if(mouse_button == "right" and GameLogic.GameMode:CanEditBlock()) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
+		local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=self:GetInnerObject()})
+		task:Run();
+	end
 end
 
 -- called every frame

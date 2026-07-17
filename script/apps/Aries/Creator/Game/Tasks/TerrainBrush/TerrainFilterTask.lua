@@ -106,6 +106,7 @@ function TerrainFilter:PaintBlocks(paint_op, block_id, block_data, xcent,ycent,z
 			end
 		end 
 	end
+	self:SendOperateHistory()
 end
 
 
@@ -291,6 +292,7 @@ function TerrainFilter:MorphTerrainHeight(x, y, new_height, old_height, max_heig
 				end
 			end
 		end
+		self:SendOperateHistory()
 	end
 end
 
@@ -416,6 +418,11 @@ function TerrainFilter:SetBlock(x, y, z, block_id, block_data, flag, block_entit
 			if(from_id == block_id and (from_data or 0) == (block_data or 0)) then
 				return;
 			else
+				local bCanDelete = GameLogic.EditableWorld:GetBlockCanDestroy(x, y, z)
+				if block_id == 0 and not bCanDelete then
+					GameLogic.AddBBS(nil, L'包含冻结世界前的方块无法删除,请先解冻世界', 5000, '0 255 0')
+					return
+				end
 				BlockEngine:SetBlock(x, y, z, block_id, block_data, flag, block_entitydata);
 				self.history[index] = {x,y,z, block_id, block_data, block_entitydata, from_id, from_data, from_entity_data};	
 			end
@@ -437,4 +444,14 @@ function TerrainFilter:Undo()
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[7] or 0, b[8], nil, b[9]);
 		end
 	end
+end
+
+function TerrainFilter:SendOperateHistory()
+	local blocks = {}
+	if self.history then
+		for k,v in pairs(self.history) do
+			blocks[#blocks + 1] = v
+		end
+	end
+	GameLogic.GetFilters():apply_filters("BatchModifyBlocks", blocks)
 end

@@ -1,0 +1,107 @@
+<!-- "script/apps/Aries/Creator/Game/KeepWorkMall/MallSaveUtil" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="CommunityUserInfo.lua">
+<![CDATA[
+local MallUtils = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallUtils.lua");
+MallSaveUtil = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallSaveUtil.lua");
+MallSaveUtil.OnInit()
+
+function ClosePage()
+    MallSaveUtil.ClosePage()
+end
+
+function GetCurMenuName()
+    return MallSaveUtil.GetCurMenuName()
+end
+
+function OnClickPre()
+    MallSaveUtil.OnClickPrevMenu()
+end
+
+function OnClickNext()
+    MallSaveUtil.OnClickNextMenu()
+end
+
+
+function GetModelXmlInfo()
+    local modelData = MallSaveUtil.GetModelData()
+    if not modelData then
+        return nil
+    end
+    echo(modelData.xmlInfo)
+    return modelData.xmlInfo
+end
+
+function GetModelIcon()
+    local modelData = MallSaveUtil.GetModelData()
+    if not modelData then
+        return nil
+    end
+    local icon = MallUtils.GetIcon(modelData)
+    echo(icon)
+    print("icon==========")
+    return icon
+end
+
+function GetId()
+    local modelData = MallSaveUtil.GetModelData()
+    return modelData and "物品Id:"..(modelData.id or "")
+end
+
+
+function GetNameText()
+    local modelData = MallSaveUtil.GetModelData()
+    return modelData and ((modelData.name or "").."<br/>".."类型："..(modelData.modelType or "")) or ""
+end
+
+function OnClickUpdateGood()
+    MallSaveUtil.OnClickUpdateGood()
+end
+]]>
+</script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#1a1a1acc;">
+    <pe:container alignment="_ct" ClickThrough="true" style="position: relative; width: 600px; height: 400px; margin-left:-300px;margin-top:-200px; background: ;">
+        <kp:window width="600" height="400" title="商城图片下载上传工具"   onclose="ClosePage">
+            <div style="width: 600px; height: 60px; margin-top: 38px;">
+                <input type="button" onclick="OnClickPre" style="float: left; margin-top: 10px; margin-left: 10px; width: 46px; height: 46px; background: url(Texture/Aries/temp/btn1_46X46_32bits.png#0 0 46 46);"/>
+                <div style="float: left; margin-top: 16px; margin-left: 50px; font-size: 24px; color: #ff00ff; font-weight: bolder;"><%="当前商品分类："..GetCurMenuName()%></div>
+                <input type="button" onclick="OnClickNext" style="float: left; margin-top: 10px; margin-left: 50px; width: 46px; height: 46px; background: url(Texture/Aries/temp/btn2_46X46_32bits.png#0 0 46 46);"/>
+            </div>
+
+            <div align="center" style="width: 128px; height: 128px; margin-top: 60px; background-color: #ff00ff;">
+                <div style="width: 128px; height: 128px; background: url(Texture/Aries/Creator/keepwork/Mall1/model_bg1_190x138_32bits.png#0 0 190 138);">
+                    <pe:if condition="<%=MallSaveUtil.CanShowCanva3d()%>">
+                        <pe:canvas3d name='MallSaveUtilCanvas3D' xmlInfo='<%=GetModelXmlInfo()%>'
+                            DefaultRotY="-0.785"
+                            IsInteractive="false"
+                            autoRotateSpeed="0"
+                            DefaultCameraObjectDist = "4"
+                            miniscenegraphname='MallSaveUtilCanvas3D'
+                            RenderTargetSize="128" 
+                            value='<%=GetModelIcon()%>'
+                            style="position: relative;
+                                    width: 90px;
+                                    height: 90px;
+                                    margin-top: 18px;
+                                    margin-left: 25px;" />
+                    </pe:if>
+                    <div style="position: relative; text-align: center; margin-top: 60px; font-size: 12px; font-weight: bolder;"><%=GetId()%></div>
+                    <div style="position: relative; margin-top: 80px; text-align: center; font-size: 18px; base-font-size: 18px; font-weight: bolder;"><%=GetNameText()%></div>
+                    
+                </div>
+            </div>
+            <input type="button" onclick="OnClickUpdateGood" value="上传" style="width: 100px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Window/button/huanganniu_32x32_32bits.png#0 0 32 32:14 14 14 14);" />
+        </kp:window>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

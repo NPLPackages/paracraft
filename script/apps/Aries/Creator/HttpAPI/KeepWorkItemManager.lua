@@ -60,7 +60,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local Keepwork = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
 local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
 local ServerConfigManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/ServerConfigManager.lua");
-
+local SkinUnLockManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/SkinUnLockManager.lua")
 local KeepWorkItemManager = NPL.export()
 
 KeepWorkItemManager.globalstore_map = {};
@@ -75,6 +75,12 @@ KeepWorkItemManager.loaded = false;
 KeepWorkItemManager.filter = nil;
 KeepWorkItemManager.is_init = false;
 KeepWorkItemManager.exid_preload_items = 11000; --preload item after login
+KeepWorkItemManager.thirdPartyInfo = {}
+
+--local global config，don‘t modify it
+local globalStoreFilePath = "script/apps/Aries/Creator/HttpAPI/data/GlobalStore.table"
+local extendedCostFilePath = "script/apps/Aries/Creator/HttpAPI/data/ExtendCost.table"
+-------------------------------------
 
 KeepWorkItemManager.page_size = 10000;
 function KeepWorkItemManager.TestMsg(gsid)
@@ -104,6 +110,11 @@ function KeepWorkItemManager.StaticInit()
         local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
         QuestAction.OnClickLogin()
     end);
+
+    SkinUnLockManager.RegisterEventCallback("onDataLoaded",function(result)
+        local SkinManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/SkinManager.lua")
+        SkinManager.UpdateSkinByExpireTime()
+    end)
 	
     KeepWorkItemManager.GetFilter():add_filter("KeepWorkItemManager_LoadItems", function()
         KeepWorkItemManager.LoadItems(nil, function()
@@ -145,17 +156,12 @@ function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
 
         Keepwork:OnLogin();  -- 用户登录成功 数据准备就绪
 
-        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestProvider.lua");
-        local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
-        QuestProvider:Clear()
-        QuestProvider:OnInit();
+        -- NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestProvider.lua");
+        -- local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
+        -- QuestProvider:Clear()
+        -- QuestProvider:OnInit();
 
 		GameLogic.ResetABPath();
-        -- 皮肤检测 检测用户皮肤是否可以继续用
-        local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
-        if UserInfoPage and UserInfoPage.CheckUserSkin then
-            UserInfoPage.CheckUserSkin()
-        end
     end)            
     return res;
 end
@@ -367,32 +373,6 @@ function KeepWorkItemManager.GetGoal(exid)
     end
 end
 
---[[
-{
-  bagId=2,
-  canHandsel=false,
-  canTrade=false,
-  canUse=true,
-  coins=999999999999,
-  createdAt="2020-05-21T06:54:00.000Z",
-  dayMax=1,
-  deleted=false,
-  desc="免费入场券",
-  destoryAfterUse=true,
-  expiredRules=1,
-  expiredSeconds=0,
-  gsId=10004,
-  icon="Texture/Aries/Item/1022_LargeLollipop.png",
-  id=13,
-  max=7,
-  name="免费入场券",
-  price=999999999999,
-  stackable=true,
-  typeId=3,
-  updatedAt="2020-05-21T06:54:00.000Z",
-  weekMax=2 
-}
---]]
 function KeepWorkItemManager.GetItemTemplate(gsid)
     gsid = tonumber(gsid)
     local template = KeepWorkItemManager.globalstore_map[gsid];
@@ -425,41 +405,51 @@ function KeepWorkItemManager.Load(bForced, callback)
         return
     end
 
-    KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载GlobalStore");
-    KeepWorkItemManager.LoadGlobalStore(false, function()
+    local function onLoadComplete()
+        KeepWorkItemManager.loaded = true;
+        if(callback)then
+            callback();
+        end  
+        KeepWorkItemManager.LoadMutingInfo(true)
+        KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载完成");
+        KeepWorkItemManager.GetFilter():apply_filters("loaded_all");
+    end
+
+    local function onStaticExIdLoaded()
+        SkinUnLockManager.Init(true)
+        onLoadComplete()
+    end
+
+    local function onProfileLoaded()
+        UserPermission.LoadUserRoles()
+        ServerConfigManager.RequestConfig()
+        KeepWorkItemManager.LoadItemsFromStaticExId(onStaticExIdLoaded)
+    end
+
+    local function onItemsLoaded()
+        KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载人物信息");
+        KeepWorkItemManager.LoadProfile(true, onProfileLoaded)
+    end
+
+    local function onBagsLoaded()
+        KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载物品");
+        KeepWorkItemManager.LoadItems(nil, onItemsLoaded)
+    end
+
+    local function onExtendedCostLoaded()
+        KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载背包");
+        KeepWorkItemManager.LoadBags(true, onBagsLoaded)
+    end
+
+    local function onGlobalStoreLoaded()
         KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载ExtendedCost");
-        KeepWorkItemManager.LoadExtendedCost(false, function()
-            KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载背包");
-            KeepWorkItemManager.LoadBags(true, function()
-                KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载物品");
-                KeepWorkItemManager.LoadItems(nil, function()
-                    KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载人物信息");
-                    KeepWorkItemManager.LoadProfile(true, function()
-                        KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载学校信息");
-                        KeepWorkItemManager.LoadSchool(true, function()
+        KeepWorkItemManager.LoadExtendedCost(false, onExtendedCostLoaded)
+    end
 
-                            UserPermission.LoadUserRoles()
-                            ServerConfigManager.RequestConfig()
-                            KeepWorkItemManager.LoadItemsFromStaticExId(function()
-                                KeepWorkItemManager.loaded = true;
-                                if(callback)then
-                                    callback();
-                                end  
-                                KeepWorkItemManager.LoadMutingInfo(true)
-
-                                KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载完成");
-                                KeepWorkItemManager.GetFilter():apply_filters("loaded_all");
-                            end)
-                            
-                            
-                        end)
-                        
-                    end)
-                end)
-            end)
-        end)
-    end)
+    KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载GlobalStore");
+    KeepWorkItemManager.LoadGlobalStore(false, onGlobalStoreLoaded)
 end
+
 
 -- create or load items from a static exid, these item are used to read/save client data in common
 function KeepWorkItemManager.LoadItemsFromStaticExId(callback)
@@ -500,7 +490,16 @@ function KeepWorkItemManager.LoadItemsFromStaticExId(callback)
         end
     end)
 end
+
 function KeepWorkItemManager.LoadGlobalStore(bForced, callback)
+    local loadResult = KeepWorkItemManager.LoadTableFromFile(globalStoreFilePath)
+    if loadResult then
+        KeepWorkItemManager.globalstore = loadResult
+        if(callback)then
+            callback();
+        end
+        return
+    end
     local cache_policy;
     if(bForced)then
         cache_policy = "access plus 0";
@@ -514,7 +513,6 @@ function KeepWorkItemManager.LoadGlobalStore(bForced, callback)
         end
         if(data and data.data and data.data.rows)then
             KeepWorkItemManager.globalstore = data.data.rows;
-
             if(callback)then
                 callback();
             end
@@ -522,7 +520,93 @@ function KeepWorkItemManager.LoadGlobalStore(bForced, callback)
     end)
 end
 
+
+function KeepWorkItemManager.LoadTableFromFile(file_path)
+    if not file_path or file_path == "" then
+        return
+    end
+    local file = ParaIO.open(file_path, "r")
+    if not file then
+        return
+    end
+    local content = file:GetText(0,-1)
+    file:close()
+    if content and content ~= "" then
+        local data = commonlib.LoadTableFromString(content)
+        return data
+    end
+end
+
+
+-- you need load local script first
+-- if load script from pkg file, it will update failed
+-- if updated sucessed and then you need push the code to git
+function KeepWorkItemManager.UpdateGlobalConfig()
+    if not System.options.isInternal then
+        GameLogic.AddBBS("GlobalStore", L"当前非内部环境，无法更新全局配置。", 5000, "255 0 0");
+        return
+    end
+    local cache_policy;
+    if(bForced)then
+        cache_policy = "access plus 0";
+    end
+
+    --更新兑换物品配置
+    keepwork.extendedcost.get({
+        cache_policy = cache_policy,
+        ["x-per-page"] = KeepWorkItemManager.page_size,
+    },function(err, msg, data)
+        if(err ~= 200)then
+            return
+        end
+        if (data and data.data and data.data.rows) then
+            local extendedcost = data.data.rows;
+            local extendedcostCotent = commonlib.serialize_compact3(extendedcost)
+            local file = ParaIO.open(extendedCostFilePath, "w")
+            if file then
+                file:WriteString(extendedcostCotent,#extendedcostCotent)
+                file:close()
+
+                GameLogic.AddBBS("ExtendedCost", L"已更新兑换物品配置，请重启游戏生效。", 5000, "0 255 0");
+            else
+                GameLogic.AddBBS("ExtendedCost", L"无法打开兑换物品配置文件，请检查文件路径是否正确。", 5000, "255 0 0");
+            end
+        end
+    end)
+    --更新全局配置
+    keepwork.globalstore.get({
+        cache_policy = cache_policy,
+        ["x-per-page"] = KeepWorkItemManager.page_size,
+    },function(err, msg, data)
+        if(err ~= 200)then
+            return
+        end
+        if (data and data.data and data.data.rows) then
+            local globalstore = data.data.rows;
+            local globalstoreContent = commonlib.serialize_compact3(globalstore)
+            local file = ParaIO.open(globalStoreFilePath, "w")
+            if file then
+                file:WriteString(globalstoreContent,#globalstoreContent)
+                file:close()
+                
+                GameLogic.AddBBS("GlobalStore", L"已更新全局配置，请重启游戏生效。", 5000, "0 255 0");
+            else
+                GameLogic.AddBBS("GlobalStore", L"无法打开全局配置文件，请检查文件路径是否正确。", 5000, "255 0 0");
+            end
+        end
+    end)
+
+end
+
 function KeepWorkItemManager.LoadExtendedCost(bForced, callback)
+    local loadResult = KeepWorkItemManager.LoadTableFromFile(extendedCostFilePath)
+    if loadResult then
+        KeepWorkItemManager.extendedcost = loadResult
+        if(callback)then
+            callback();
+        end
+        return
+    end
     local cache_policy;
     if(bForced)then
         cache_policy = "access plus 0";
@@ -709,25 +793,23 @@ function KeepWorkItemManager.LoadMutingInfo(bForced, callback)
         end
     end)
 end
---[[
-{
-  channel=0,
-  createdAt="2020-06-03T06:57:52.000Z",
-  extra={  },
-  id=763,
-  nickname="zhangleio3",
-  orgAdmin=0,
-  roleId=0,
-  student=0,
-  tLevel=0,
-  updatedAt="2020-06-03T06:57:52.000Z",
-  username="zhangleio3",
-  vip=0 
-}
---]]
--- http://yapi.kp-para.cn/project/32/interface/api/492               
+-- http://yapi.kp-para.cn/project/32/interface/api/492 
+local defaultUser = {
+    channel=0,
+    createdAt="2020-06-03T06:57:52.000Z",
+    extra={  },
+    id=0,
+    nickname="defaultUser1",
+    orgAdmin=0,
+    roleId=0,
+    student=0,
+    tLevel=0,
+    updatedAt="2020-06-03T06:57:52.000Z",
+    username="defaultUser",
+    vip=0 
+}              
 function KeepWorkItemManager.GetProfile()
-    return KeepWorkItemManager.profile or {};
+    return KeepWorkItemManager.profile or defaultUser
 end
 
 function KeepWorkItemManager.GetUserRegion()
@@ -756,6 +838,11 @@ function KeepWorkItemManager.LoadProfile(bForced, callback)
 				GameLogic.options:SetMainPlayerSkins(data.extra.ParacraftPlayerEntityInfo.skin);
 			end
             KeepWorkItemManager.profile = data;
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameMgr.lua")
+            local MiniGameMgr = commonlib.gettable("MyCompany.Aries.Game.Tasks.MiniGame.MiniGameMgr")
+            MiniGameMgr:LoadThirdPartyGameInfo(function(data)
+                LOG.std(nil, "info", "KeepWorkItemManager.LoadProfile", "LoadThirdPartyGameInfo data = "..commonlib.serialize_compact(data))
+            end)
             if(callback)then
                 callback(err, msg, data);
             end
@@ -816,6 +903,11 @@ function KeepWorkItemManager.GetSchool()
 end
 -- load school of logined user
 function KeepWorkItemManager.LoadSchool(bForced, callback)
+    if true then
+        if(callback)then
+            callback(err, msg, data);
+        end
+    end
     local cache_policy;
     if(bForced)then
         cache_policy = "access plus 0";
@@ -1005,7 +1097,9 @@ function KeepWorkItemManager.SearchBagsNoFromExid(exid)
                 if(v.goods and v.goods.bagId)then
                     local bagId = v.goods.bagId;
                     local bagNo = KeepWorkItemManager.SearchBagNo(bagId)
-                    bags_id_map[bagNo] = bagNo;
+                    if(bagNo) then
+                        bags_id_map[bagNo] = bagNo;
+                    end
                 end
             end 
         end
@@ -1097,9 +1191,15 @@ function KeepWorkItemManager.GetItemTemplateById(id)
     end
 end
 function KeepWorkItemManager.IsVip()
-	local gsid = 10;
-	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
-	return (copies and copies > 0) or (System and System.User and System.User.isVip);
+    local profile = KeepWorkItemManager.GetProfile();
+    local isThirdPartyVip = KeepWorkItemManager.IsThirdPartyVip()
+    return (profile and (profile.vip == 1) or (profile.commonVip == 1)) or isThirdPartyVip
+end
+
+function KeepWorkItemManager.IsThirdPartyVip()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameMgr.lua")
+    local MiniGameMgr = commonlib.gettable("MyCompany.Aries.Game.Tasks.MiniGame.MiniGameMgr")
+    return MiniGameMgr:IsMaisiVip()
 end
 
 -- 是否为机构会员

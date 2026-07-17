@@ -1,0 +1,29 @@
+<html>
+<body> 
+<pe:mcml>
+    <script type="text/npl">
+        <![CDATA[
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityVipPage")
+            local CommunityVipPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Tasks.Community.CommunityVipPage")
+            CommunityVipPage:InitUI()
+
+            function get_url()
+                if (CommunityVipPage) then
+                    return CommunityVipPage.url;
+                end
+            end
+        ]]>
+    </script>
+    <pe:container alignment="_fi"
+        ClickThrough='true'
+        uiname="community_container"
+        name="community_container"
+        style="background-color:#1A1A1A;">
+            <pe:nplbrowser name="community_nplbrowser_instance"
+                userControl="true"
+                url="<%= get_url() %>"
+                visible="true"/>
+    </pe:container>
+</pe:mcml>
+</body>
+</html>

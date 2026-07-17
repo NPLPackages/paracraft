@@ -483,7 +483,7 @@ function LessonBoxTip.RegisterHooks()
 	GameLogic.events:AddEventListener("CreateBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip, "LessonBoxTip");
     GameLogic.events:AddEventListener("CreateDiffIdBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip, "LessonBoxTip");
     GameLogic.events:AddEventListener("DestroyBlockTask", LessonBoxTip.OnDestroyBlockTask, LessonBoxTip, "LessonBoxTip");
-    GameLogic.GetFilters():add_filter("lessonbox_change_region_blocks",function(blocks, is_delete)
+    GameLogic.GetFilters():add_filter("BatchModifyBlocks",function(blocks, is_delete)
         -- echo(commonlib.debugstack(),true)
         -- print("block num changes============",blocks and #blocks or 0)
         -- echo(blocks)
@@ -501,7 +501,7 @@ function LessonBoxTip.UnregisterHooks()
 	GameLogic.events:RemoveEventListener("CreateBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip);
     GameLogic.events:RemoveEventListener("CreateDiffIdBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip);
     GameLogic.events:RemoveEventListener("DestroyBlockTask", LessonBoxTip.OnDestroyBlockTask, LessonBoxTip);
-    GameLogic.GetFilters():remove_filter("lessonbox_change_region_blocks", function() end);
+    GameLogic.GetFilters():remove_filter("BatchModifyBlocks", function() end);
     LessonBoxTip.EndTip()
 end
 

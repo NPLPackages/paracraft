@@ -52,6 +52,7 @@ local Item = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commo
 
 -- whether to draw the icon with DrawIcon virtual function. 
 Item:Property({"m_bIsOwnerDrawIcon", false, "IsOwnerDrawIcon", "SetOwnerDrawIcon", auto=true})
+Item:Property({"isShowModelInHand", true, "IsShowModelInHand", "SetShowModelInHand", auto=true})
 Item:Property({"IconColor", "#ffffff", auto=true})
 
 Item.mouseTracking = false;
@@ -132,6 +133,20 @@ function Item:OnClick()
 	if(self.auto_equip) then
 		
 	else
+		if(self.pin_index) then
+			local pin_index = tonumber(self.pin_index);
+			local player = EntityManager.GetPlayer();
+			if(player and player.inventory) then
+				local item = player.inventory:GetItem(pin_index);
+				if(item and item.id == self.id) then
+					GameLogic.RunCommand(string.format("/take -unpin -bag %d", pin_index));
+					GameLogic.RunCommand(string.format("/take 0 -replace -bag %d", pin_index));
+					return;
+				end
+			end
+			GameLogic.RunCommand(string.format("/take %d -replace -pin -bag %d %s", self.id, tonumber(self.pin_index), self.server_data and commonlib.serialize_compact(self.server_data) or ""));
+			return
+		end
 		local hand_block_id = GameLogic.GetBlockInRightHand();
 		if(hand_block_id and hand_block_id>0) then
 			local hand_item = ItemClient.GetItem(hand_block_id);
@@ -237,7 +252,7 @@ end
 function Item:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
 	if (itemStack and itemStack.count == 0) then
 		return;
-	elseif (entityPlayer and not entityPlayer:CanPlayerEdit(x,y,z, data, itemStack)) then
+	elseif (entityPlayer and type(entityPlayer.CanPlayerEdit) == "function" and not entityPlayer:CanPlayerEdit(x,y,z, data, itemStack)) then
 		return;
 	elseif (self:CanPlaceOnSide(x,y,z,side, data, side_region, entityPlayer, itemStack)) then
 		-- 4096 is hard coded
@@ -277,7 +292,7 @@ function Item:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
 				end
 
 				if(BlockEngine:SetBlock(x, y, z, block_id, data, 3)) then
-					block_template:play_create_sound();
+					block_template:play_create_sound(block_template:ComputeSoundVolumeByBlockPos(x, y, z));
 
 					block_template:OnBlockPlacedBy(x,y,z, entityPlayer);
 					if(itemStack) then
@@ -371,19 +386,22 @@ function Item:GetTexture()
 end
 
 -- @return ParaAsset icon
-function Item:GetIconObject()
-	if(self.icon_obj~=nil) then
-		return self.icon_obj;
-	else
-		local icon = self:GetIcon();
-		if(icon and icon~="") then
-			self.icon_obj = ParaAsset.LoadTexture("", icon, 1);
-			return self.icon_obj;
-		else
-			self.icon_obj = false;
-			return false;
+function Item:GetIconObject(itemStack, notSaveToCache)
+	local icon = self:GetIcon(itemStack);
+	if(icon and icon~="") then
+		if(not self.icon_objs) then
+			self.icon_objs = {};
 		end
+		if(self.icon_objs[icon] == nil) then
+			if(not notSaveToCache) then
+				self.icon_objs[icon] = ParaAsset.LoadTexture("", icon, 1) or false;
+			else
+				return ParaAsset.LoadTexture("", icon, 1);
+			end
+		end
+		return self.icon_objs[icon] or nil;
 	end
+	return nil;
 end
 
 -- get the primary asset file
@@ -494,7 +512,7 @@ function Item:GetSearchKey2()
 	return self.searchkey2;
 end
 
-function Item:GetDisplayName()
+function Item:GetDisplayName(itemStack)
 	if(self.displayname) then
 		return self.displayname;
 	else
@@ -536,6 +554,9 @@ end
 
 function Item:IsSelected()
 	return self.isSelected;
+end
+
+function Item:CheckMousePick()
 end
 
 -- update in world count

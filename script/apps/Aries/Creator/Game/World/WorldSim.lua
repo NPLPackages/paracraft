@@ -59,6 +59,7 @@ end
 -- detach from previous and attach to the new one.
 function WorldSim:AttachWorld(world)
 	if(self.world~=world) then
+		-- LOG.std(nil, "info", "WorldSim", "Attaching to world");
 		if(self.world) then
 			self.world:RemoveWorldTracker(self);
 		end
@@ -90,7 +91,7 @@ function WorldSim:InitDayLightParams()
 
 	if(not self.daylight_anim) then
 		NPL.load("(gl)script/ide/TimeSeries/TimeSeries.lua");
-		local ctl = TimeSeries:new{name = "daylight",};
+		local ctl = commonlib.TimeSeries:new{name = "daylight",};
 		self.daylight_anim = ctl;
 		-- fog color animation data in 0,1000 time range. 0 is night, 1000 is noon. 
 		ctl:Load({
@@ -205,6 +206,14 @@ function WorldSim:OnTickDayLight(fForceUpdate)
 				if(r and g and b) then
 					self:GetSkyAttr():SetField("SkyColor", {r, g, b});
 				end
+			end
+		end
+		
+		-- 根据时间启动光照
+		if (System.os.IsEmscripten()) then
+			local attr = ParaTerrain.GetBlockAttributeObject();
+			if(attr:GetFieldIndex("IsAsyncLightCalculation") >= 0) then
+				attr:SetField("IsAsyncLightCalculation", time_std < -0.4 or time_std > 0.4);
 			end
 		end
 	end
@@ -444,6 +453,7 @@ function WorldSim:FrameMove(deltaTime)
 	self.tick_count = self.tick_count + 1;
 
 	self:CheckAttachWorld();
+	self:SetTempBlockUpdateCallback(nil)
 
 	if(self.tick_count%3 == 0) then
 		self:TickRandom();
@@ -460,3 +470,14 @@ function WorldSim:FrameMove(deltaTime)
 	end
 end
 
+function WorldSim:SetTempBlockUpdateCallback(callback)
+	self.tempBlockUpdateCallback = callback;
+end
+
+-- On the client, re-renders the block. On the server, sends the block to the client (which will re-render it),
+-- including the tile entity description packet if applicable. 
+function WorldSim:MarkBlockForUpdate(x, y, z)
+	if(self.tempBlockUpdateCallback) then
+		self.tempBlockUpdateCallback(x, y, z);
+	end
+end

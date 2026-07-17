@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyCloneBag.lua" refresh="true">
+<![CDATA[
+EasyCloneBag = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyCloneBag");
+EasyCloneBag.InitPage(Page);
+
+function ds_BagSlots(index)
+    if(not index) then
+        return #EasyCloneBag.bagDS;
+    else
+        return EasyCloneBag.bagDS[index];
+    end
+end
+
+function OnClickBagSlot(mcmlNode)
+    EasyCloneBag.OnClickSlot(mcmlNode.slot.slotIndex);
+end
+]]>
+</script>
+<div style="padding:10px;background-color:#000000;color:#ffffff;width:360px;">
+    <!-- Header with title and instructions -->
+    <div style="margin:5px 0 5px 5px;">
+        <input type="button" align="right" name="ClearAll" value="清空" style="position:relative;color:#ffffff;background-color:#e24a4a;min-width:80px;height:40px;" onclick="EasyCloneBag.OnClickClearAll" />
+        <div style="float:left;width:250px;">
+            <div style="font-size:18px;color:#5af05a;margin-bottom:8px;">
+                <img src="Texture/Aries/Common/ThemeKid/magic_star/bag_32bits.png;0 0 48 48" style="width:24px;height:24px;"/>
+                <span style="margin-left:5px;">时空口袋</span>
+            </div>
+            <div style="font-size:14px;color:#dddddd;">
+                时空口袋可在不同存档间搬运物品。点击场景中的模型收入口袋，点击格子在脚下放置。
+            </div>
+        </div>
+    </div>
+    <!-- Bag Slots Grid -->
+    <div style="margin:0;">
+        <pe:gridview uiname="EasyCloneBag.tvwSlots" name="tvwSlots" 
+            ScrollBarTrackWidth="32" 
+            CustomScrollBar="true"
+            UpLeftBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_upleft.png"
+            DownRightBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_downright.png"
+            TrackBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_track.png"
+            ThumbBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_thumb.png"
+            VerticalScrollBarStep="80"
+            DataSource='<%=ds_BagSlots%>' ItemsPerLine="3" DefaultNodeHeight="90" AllowPaging="false" style="background:;height:260px;">
+            <Columns>
+                <div style="margin:3px;">
+                    <div style="width:80px;height:80px;background-color:#ffffff30;">
+                        <pe:mc_slot uiname='<%=format("EasyCloneBag.slot%d", Eval("index"))%>' 
+                            bagpos='<%=Eval("index")%>' 
+                            ContainerView="<%=EasyCloneBag.inventoryView%>"
+                            DisableDrag="true"
+                            style="width:80px;height:80px;" 
+                            onclick='OnClickBagSlot' />
+                    </div>
+                </div>
+            </Columns>
+        </pe:gridview>
+    </div>
+</div>
+<pe:container ClickThrough="true" style="width:360px;height:64px;background:;">
+    <input type="button" name="CloseBtn" onclick="EasyCloneBag.OnClickClose" align="right" style="position:relative;width:56px;height:56px;background:url(Texture/player/close.png)" />
+</pe:container>
+</pe:mcml>
+</html>

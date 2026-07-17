@@ -69,12 +69,22 @@ end
 	ToNPL = function(self)
 		return string.format('turn(%s)\n', self:getFieldAsString('degree'));
 	end,
-	examples = {{desc = "", canRun = true, code = [[
+	examples = {
+{desc = "", canRun = true, code = [[
 turnTo(-60)
 for i=1, 100 do
     turn(-3)
 end
-]]}},
+]]},
+{desc = L"三轴旋转", canRun = true, code = [[
+turnTo(0, 0, 0)
+turn(0, 0, 45)
+wait(1)
+turn(0, 45, 0)
+wait(1)
+turn(0, nil, 45)
+]]},
+	},
 },
 {
 	type = "turnTo", 
@@ -465,7 +475,7 @@ walkForward(0.1, 0.1, true)
 attachTo("parent", "R_Hand")
 -- with position offset
 attachTo("parent", "R_Hand", {0,1,1})
--- with offset and rotation {roll, pitch, roll}
+-- with offset and rotation {roll, pitch, yaw}
 attachTo("parent", "R_Hand", {0,1,1}, {0, 0, 1.57})
 -- without parent bone's rotation
 attachTo("parent", "R_Hand", nil, nil, false)
@@ -758,6 +768,7 @@ say(getPlayerPos("z"));
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = false,
+	hide_in_toolbox = true, -- use turn instead
 	funcName = "rotate",
 	func_description = 'rotate(%s, %s, %s)',
 	ToNPL = function(self)
@@ -795,6 +806,7 @@ say(getPlayerPos("z"));
 	helpUrl = "", 
 	canRun = false,
 	funcName = "rotateTo",
+	hide_in_toolbox = true, -- use turnTo instead
 	func_description = 'rotateTo(%s, %s, %s)',
 	ToNPL = function(self)
 		return string.format('rotateTo(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));

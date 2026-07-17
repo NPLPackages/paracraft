@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="BuyConfirm.lua" ><![CDATA[
+    BuyConfirm = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/AIGC/BuyConfirm.lua")
+    BuyConfirm.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetIcon()
+        local skinDt = BuyConfirm.skinData
+        if skinDt and skinDt.smallicon and skinDt.smallicon ~= "" then
+            return skinDt.smallicon
+        end
+        return skinDt.icon
+    end
+
+    function GetText()
+        local text = BuyConfirm.GetBuyText()
+        return text
+    end
+
+    function OnClickBuy()
+        BuyConfirm.OnClickFirm()
+    end
+
+    function OnClickOpenVip()
+        BuyConfirm.OpenVip()
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#00000088"  > 
+    <div zorder="-3" align="center" valign="center" style=" width: 502px; height: 296px; background: url(Texture/Aries/Creator/keepwork/minigame/user/bg_502x296_32bits.png#0 0 502 296);">
+        <div style="position: relative; text-align: center; color: #bd4018; font-size: 22px; base-font-size: 22px; font-weight: bold; margin-top: 10px;"><%=L"物品购买"%></div>
+        <input type="button" onclick="ClosePage()" style="position: relative; margin-left: 440px; width: 64px; height: 64px; background:url(Texture/Aries/Creator/keepwork/minigame/user/close_64x64_32bits.png)" />
+        <div style="position: relative; margin-top: 85px; margin-left: 40px; width: 90px; height: 90px; background: url(Texture/Aries/Creator/keepwork/minigame/user/bg_90x90_32bits.png#0 0 90 90);">
+            <img src="<%=GetIcon()%>" style="width: 64px; height: 64px; margin-left: 13px; margin-top: 13px;" />
+        </div>
+        <div style=" position: relative; width: 336px; color: #bd4018; font-size: 16px; base-font-size: 16px; font-weight: bold; margin-left: 150px; margin-top: 110px;">
+            <%=GetText()%>
+        </div>
+
+        <pe:if condition="<%=BuyConfirm.IsVip()%>">
+            <input type="button" value="<%=L'购买'%>" onclick="OnClickBuy" style="position: relative; color: #bd4018; font-size: 16px; base-font-size: 16px; font-weight: bold; margin-left: 180px; margin-top: 230px; width: 128px; height: 41px; background: url(Texture/Aries/Creator/keepwork/minigame/user/ok_128x41_32bits.png#0 0 128 41);"/>
+        </pe:if>
+        <pe:if condition="<%=not BuyConfirm.IsVip()%>">
+            <input type="button" value="<%=L'开通VIP'%>" onclick="OnClickOpenVip" style="position: relative; color: #bd4018; font-size: 16px; base-font-size: 16px; font-weight: bold; margin-left: 100px; margin-top: 230px; width: 128px; height: 41px; background: url(Texture/Aries/Creator/keepwork/minigame/user/ok_128x41_32bits.png#0 0 128 41);"/>
+            <input type="button" value="<%=L'购买'%>" onclick="OnClickBuy" style="position: relative; color: #bd4018; font-size: 16px; base-font-size: 16px; font-weight: bold; margin-left: 270px; margin-top: 230px; width: 128px; height: 41px; background: url(Texture/Aries/Creator/keepwork/minigame/user/ok_128x41_32bits.png#0 0 128 41);"/>
+        </pe:if>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

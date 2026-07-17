@@ -1,0 +1,38 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.mobile.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="BuildQuestTask.lua"><![CDATA[
+BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest")
+local cur_task = BuildQuest.GetCurrentQuest();
+local page = document:GetPageCtrl()
+function OnCancelClick()
+    page:CloseWindow()
+    if cur_task then
+        cur_task:OnExit()
+    end
+end
+
+function OnOkClick()
+    page:CloseWindow()
+    if cur_task then
+        cur_task:OnConfirmOrigin();
+    end
+end
+
+]]></script>
+<pe:container alignment="_ctt" style="position:relative;margin-left:0px;margin-top:0px;width:1280px;height:720px;background:url()">
+    <div align="center" style="margin-top: 96px; width: 290px;">
+        <input type="button" value="<%='确定'%>" onclick="OnOkClick" style="font-size: 20px; base-font-size: 20px; width: 130px; height: 50px; background: url(Texture/Aries/Creator/keepwork/Window/button/huanganniu_32x32_32bits.png#0 0 32 32:14 14 14 14);"/>
+        <input type="button" value="<%='取消'%>" onclick="OnCancelClick" style="font-size: 20px; base-font-size: 20px; margin-left: 30px; width: 130px; height: 50px; background: url(Texture/Aries/Creator/keepwork/Window/button/huianniu_32x32_32bits.png#0 0 32 32:14 14 14 14);" />
+    </div>
+</pe:container>
+</pe:mcml> 
+</body>
+</html>
+

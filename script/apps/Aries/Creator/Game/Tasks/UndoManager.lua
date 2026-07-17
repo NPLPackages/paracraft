@@ -32,7 +32,7 @@ function UndoManager.PushCommand(cmd)
 		redo_list:clear();
 		undo_list:push_back({cmd});
 		
-		UndoManager:commandAdded(); -- signal
+		UndoManager:commandAdded(cmd); -- signal
 
 		if(undo_list:size() > max_history) then
 			undo_list:remove(undo_list:first());
@@ -50,7 +50,7 @@ function UndoManager.UndoCommandImp(cmd)
 	if(cmd) then
 		if(cmd[1].Undo) then
 			cmd[1]:Undo();
-			UndoManager:commandAdded(); -- signal
+			UndoManager:commandAdded(cmd[1]); -- signal
 		end
 		undo_list:remove(cmd);
 		redo_list:push_back(cmd);
@@ -81,7 +81,7 @@ function UndoManager.RedoCommandImp(cmd)
 	if(cmd) then
 		if(cmd[1].Redo) then
 			cmd[1]:Redo();
-			UndoManager:commandAdded(); -- signal
+			UndoManager:commandAdded(cmd[1]); -- signal
 		end
 		redo_list:remove(cmd);
 		undo_list:push_back(cmd);

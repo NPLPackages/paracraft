@@ -43,6 +43,12 @@ local before_widthPerDegree;
 local before_stereoMode;
 -- automatically download and install the plugin
 function VideoRecorder.InstallPlugin(callbackFunc)
+	if System.os.GetPlatform() ~= "win32" then
+		if(callbackFunc) then
+			callbackFunc(false);
+		end
+		return
+	end
 	-- GameLogic.RunCommand("/install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12")
 	
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
@@ -72,6 +78,10 @@ function VideoRecorder.InstallPlugin(callbackFunc)
 end
 
 function VideoRecorder.ToggleRecording()
+	if System.os.GetPlatform() ~= "win32" then
+		GameLogic.AddBBS(nil,L"该功能暂不支持")
+		return 
+	end
 	if(ParaMovie.IsRecording()) then
 		-- may be is recording in VideoSharing
 		if (VideoRecorder.isRecording) then
@@ -210,6 +220,7 @@ function VideoRecorder.BeginCaptureImp(callbackFunc)
 				attr:SetField("MarginBottom", marginRect[4]);
 				ParaMovie.BeginCapture(VideoRecorderSettings.GetOutputFilepath())
 				VideoRecorder.ShowRecordingArea(true);
+				VideoRecorder.StartCheckRecordResult()
 				if(callbackFunc) then
 					callbackFunc(true);
 				end
@@ -225,6 +236,22 @@ function VideoRecorder.BeginCaptureImp(callbackFunc)
 	end)
 end
 
+function VideoRecorder.StartCheckRecordResult()
+	local check_time = 3*1000
+	VideoRecorder.check_timer = VideoRecorder.check_timer or commonlib.Timer:new({callbackFunc = function(timer)
+		if not ParaMovie.IsRecording() then
+			_guihelper.MessageBox(
+            L"当前录制分辨率设备不支持，点击确定按钮停止录制",
+            function(res)
+                if res then
+                    VideoRecorder.EndCapture()
+                end
+            end,
+            _guihelper.MessageBoxButtons.OKCancel_CustomLabel)
+		end
+	end})
+	VideoRecorder.check_timer:Change(3000,nil)
+end
 
 -- @param callbackFunc: called when started. function(bSucceed) end
 function VideoRecorder.BeginCapture(callbackFunc)
@@ -337,6 +364,9 @@ function VideoRecorder.EndCapture()
 	VideoRecorder.RestoreWindowResolution();
 	VideoRecorder.isRecording = false;
 	ParaMovie.GetAttributeObject():SetField("StereoCaptureMode", 0);
+	if VideoRecorder.check_timer then
+		VideoRecorder.check_timer:Change()
+	end
 end
 
 function VideoRecorder.ShowRecordingArea(bShow)

@@ -68,6 +68,7 @@ local groupindex_hint_auto = 6; -- auto selected block
 BuildQuest.hint_duration = 5000;
 BuildQuest.cur_value = 0;
 BuildQuest.max_value = 100;
+BuildQuest.relativeTarget = "player"; -- "player" or "mouse"
 
 local ignore_blocks;
 
@@ -192,6 +193,11 @@ function BuildQuest:Run()
 	-- BuildQuest.ShowPage();
 
 	self:StartEditing();
+
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if IsMobileUIEnabled and self.task  then
+		BuildQuest.ShowMobileTaskTip() --从商城下载的建组显示移动端显示操作按钮
+	end
 end
 
 -- whether current task has been finished before
@@ -324,12 +330,33 @@ function BuildQuest:StartEditing()
 	end
 end
 
+function BuildQuest.ShowMobileTaskTip()
+	System.App.Commands.Call("File.MCMLWindowFrame", {
+		url = "script/apps/Aries/Creator/Game/Tasks/BuildConfirmDialog.html", 
+		name = "BuildQuestTask.ShowMobileTaskTip", 
+		isShowTitleBar = false,
+		DestroyOnClose = true,
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		allowDrag = false,
+		bShow = bShow,
+		zorder = -5,
+		click_through = true, 
+		directPosition = true,
+			align = "_ctt",
+			x = 0,
+			y = 0,
+			width = 1280,
+			height = 720,
+	});
+end
+
 function BuildQuest.CancelTask()
 	GameLogic.HideTipText("<player>");
 	if(cur_instance) then
 		local self = cur_instance;
 		self:UnregisterHooks();
 		self:ResetHints();
+		BuildQuest.relativeTarget = "player";
 		self.finished = true;
 		cur_instance = nil;
 		if(self.task and self.task:GetIndex()) then
@@ -579,9 +606,24 @@ function BuildQuest:FrameMove_Building()
 					ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint);
 					ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint_bling);
 					-- destroy the block when it is wrong. 
-					if(self.step and self.step:isAutoDelete() and not ignoreBlocks[dest_id] and not ignoreBlocks[block_id] and dest_id ~= names.Water and dest_id ~= names.Still_Water) then
-						local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = x,blockY = y, blockZ = z})
-						task:Run();
+					
+					if(self.step and not ignoreBlocks[dest_id] and not ignoreBlocks[block_id] and dest_id ~= names.Water and dest_id ~= names.Still_Water) then
+						if self.step:isAutoDelete()  then
+							local task = MyCompany.Aries.Game.Tasks.DestroyBlock:new({blockX = x,blockY = y, blockZ = z})
+							task:Run();
+						elseif self.step:isAutoCreate() then
+							-- create the block when it is wrong.
+							if(not block.finished) then
+								BlockEngine:SetBlock(x,y,z,block_id,block[5], nil, block[6]);
+								self:FinishBlock(block, i);
+								if(self.finished) then
+									return;
+								end
+								ParaTerrain.SelectBlock(x,y,z, false, groupindex_wrong);
+								ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint);
+								ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint_bling);
+							end
+						end
 					end
 				else
 					if(self.step and self.step:isInvertCreate()) then
@@ -671,11 +713,26 @@ end
 
 -- framemove set origin. 
 function BuildQuest:FrameMove_SetOrigin()
-	local x,y,z = ParaScene.GetPlayer():GetPosition();
+	local x, y, z;
+	if(self.relativeTarget == "mouse") then
+		local result = Game.SelectionManager:GetPickingResult();
+		if (not result or not result.x) then
+			x, y, z = ParaScene.GetPlayer():GetPosition();
+		else
+			x, y, z = result.x, result.y, result.z;
+		end
+	else
+		x, y, z = ParaScene.GetPlayer():GetPosition();
+	end
 	local bx, by, bz = BlockEngine:block(x, y+0.1, z);
 
 	if((self.is_valid and ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_X)) or (self.task.UseAbsolutePos)) then
 		self:OnConfirmOrigin();
+		return;
+	end
+
+	if((ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_ESCAPE))) then
+		self:OnExit()
 		return;
 	end
 
@@ -729,12 +786,20 @@ function BuildQuest:FrameMove_SetOrigin()
 	end
 	self.is_valid = is_valid;
 
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
 	local tips
 	if(is_valid) then
 		self.bx, self.by, self.bz = bx, by, bz;
-		tips = L"按【X】键确认建造位置, 【W,A,S,D】键可以移动"
+		tips = IsMobileUIEnabled and L"请移动到合适的建造位置，点击【确定】进行建造，点击【取消】退出建造" 
+		or L"按【X】键确认建造位置, 【W,A,S,D】键可以移动,按【ESC】键取消"
+		if(self.relativeTarget == "mouse") then
+			tips = L"按【X】键确认建造位置, \n按【ESC】键取消"
+		end
 	else
 		tips = L"当前位置有障碍物, 请走到一个空旷的位置!"
+		if(self.relativeTarget == "mouse") then
+			tips = L"当前位置有障碍物, 请选择一个空旷的位置!"
+		end
 	end
 	if(tips) then
 		GameLogic.RunCommand("/voice "..tips)
@@ -743,10 +808,22 @@ function BuildQuest:FrameMove_SetOrigin()
 end
 
 function BuildQuest:OnConfirmOrigin()
-	ParaTerrain.DeselectAllBlock(groupindex_hint);
-	ParaTerrain.DeselectAllBlock(groupindex_wrong);
-	self.is_origin_confirmed = true;
-	self:OnDoNextStep();
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if self.task.templatename ~= nil and self.task.templatename ~= "" then
+		local str = string.format("/loadtemplate -history %s,%s,%s %s",self.bx, self.by, self.bz,self.task.templatename);
+		GameLogic.RunCommand(str);
+		self:OnExit()
+		return
+	-- elseif IsMobileUIEnabled then
+	-- 	self.finished = true;
+	-- 	self.task:ClickOnceDeploy(self.UseAbsolutePos);
+	-- 	self:OnExit()	
+	else
+		ParaTerrain.DeselectAllBlock(groupindex_hint);
+		ParaTerrain.DeselectAllBlock(groupindex_wrong);
+		self.is_origin_confirmed = true;
+		self:OnDoNextStep();
+	end
 end
 
 function BuildQuest:ResetHints()
@@ -950,7 +1027,7 @@ function BuildQuest.ClosePage()
 	if(page) then
 		page:CloseWindow();
 		if(System.options.IsMobilePlatform) then
-			MyCompany.Aries.Creator.Game.Desktop.ShowMobileDesktop(true);
+			-- MyCompany.Aries.Creator.Game.Desktop.ShowMobileDesktop(true);
 		end
 	end
 end

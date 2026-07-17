@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EditModelTask.lua" refresh="true">
+<![CDATA[
+EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+EditModelTask.InitPage(Page);
+task = EditModelTask.GetInstance();
+]]>
+</script>
+<div style="padding:5px;font-size:16px;background-color:#000000a0;color:#ffffff;width:512px;height:170px" >
+    <pe:if condition='<%=task and task:IsTransformMode()%>'>
+        <input type="button" name="CloseBtn" onclick="EditModelTask.OnClickClose" align="right" style="position:relative;width:56px;height:56px;background:url(Texture/player/close.png)" />
+        <pe:if condition='<%=task:GetSelectedModel()~=nil%>'>
+            <div style="margin-top:0px;">
+                <input name="toggleTransformModeBtn" uiname="EditModelTask.toggleTransformModeBtn" value='<%=task:IsWorldTransformMode() and L"世界坐标" or L"模型坐标"%>' tooltip='<%=L"点击切换坐标系(T)"%>' type="button" style="height:46px;max-width:58px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" onclick="EditModelTask.OnClickToggleTransformMode" />
+                <input name="colorBtn" uiname="EditModelTask.colorBtn" value='<%=L"颜色"%>' type="button" style="margin-left:5px;min-width:46px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" onclick="EditModelTask.OnClickChangeColor" />
+                <div style="float:left;margin-left:10px;margin-top:2px">
+                    <div style="color:#ffffff;"><%=commonlib.Encoding.EncodeHTMLInnerTextWithSpace(task:GetLongDisplayName(3,true))%></div>
+                    <pe:label style="color:#4af337;" value="<%=task:GetLongDisplayName(2)%>"/>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div style="float:left;">
+                    <input style="min-width:36px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" type="button" value='<%=L"方向"%>' onclick="EditModelTask.OnClickToggleRotationMode" tooltip='<%=L"点击切换三轴旋转 (快捷键3)"%>'/>
+                    <input uiname="EditModelTask.facing" auto_virtual_keyboard="true" name="facing" type="text" style="margin-left:5px;width:36px;height:46px;color:#000000" value='<%=string.format("%d", task:GetFacingDegree())%>' onchange="EditModelTask.OnFacingDegreeChanged"/>
+                    <input type="button" value="左转" style="min-width:60px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" onclick="EditModelTask.OnClickRotateLeft" />
+                    <input type="button" value="右转" style="margin-left:2px;min-width:60px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" onclick="EditModelTask.OnClickRotateRight" />
+                    
+                    <input uiname="EditModelTask.scale" name="scale" type="text" auto_virtual_keyboard="true" style="margin-left:10px;width:30px;height:46px;color:#000000;" value='<%=string.format("%.2f", task:GetSelectedModel():GetScaling())%>'  onchange="EditModelTask.OnScalingChanged"/>
+                    <input type="button" value="缩小" style="min-width:60px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" onclick="EditModelTask.OnClickScaleDown" />
+                    <input type="button" value="放大" style="margin-left:2px;min-width:60px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" onclick="EditModelTask.OnClickScaleUp" />
+
+                    <input uiname="EditModelTask.resetBtn" name="resetBtn" value='<%=L"重置"%>' type="button" style="margin-left:5px;min-width:60px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" onclick="EditModelTask.OnResetModel" />
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <input uiname="EditModelTask.propertyBtn" name="propertyBtn" value='<%=L"属性..."%>' type="button" style="margin-right:0px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8)" onclick="EditModelTask.OnClickProperty" />
+                <input type="text" uiname="EditModelTask.mountpointCount" auto_virtual_keyboard="true" name="mountpointCount"  style="float: left; margin-left: 5px; width: 20px; height:46px; color: #000000;" value='<%=string.format("%d", task:GetMountPointCount())%>' onenter="EditModelTask.OnMountPointCountEnter"/>
+                <input type="button" uiname="EditModelTask.addMountPointBtn" name="addMountPointBtn" value='<%="+"..L"插件点"%>' tooltip='<%=L"添加插件点"%>' style="float: left; height:46px; background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8);" onclick="EditModelTask.OnAddMountPoint" />
+                <input type="button" uiname="EditModelTask.removeMountPointBtn" name="removeMountPointBtn" value="-" tooltip='<%=L"删除插件点"%>' style="float: left; margin-left: 2px; width: 36px; height:46px; background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8);" onclick="EditModelTask.OnRemoveMountPoint" />
+                <input uiname="EditModelTask.physicsBtn" name="physicsBtn" value='<%=task:GetSelectedModel():HasPhysics() and L"有物理" or L"无物理"%>' type="button" style='<%=string.format("margin-left:5px;min-width:36px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8);%s", task:GetSelectedModel():HasPhysics() and "color:#4af337;" or "")%>' onclick="EditModelTask.OnClickTogglePhysics" />
+                <input uiname="EditModelTask.draggableBtn" name="draggableBtn" value='<%=task:GetSelectedModel():GetCanDrag() and L"可拖动" or L"不可拖动"%>' type="button" style='<%=string.format("margin-left:5px;min-width:60px;height:46px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8);%s", task:GetSelectedModel():GetCanDrag() and "color:#4af337;" or "")%>' onclick="EditModelTask.OnClickToggleDraggable" />
+                <input uiname="EditModelTask.cloneBtn" name="cloneBtn" value='<%=L"复制"%>' type="button" style="margin-left:5px;min-width:60px;height:46px;" onclick="EditModelTask.OnClickCloneModel" />
+                <input uiname="EditModelTask.deleteBtn" name="deleteBtn" value='<%=L"删除"%>' type="button" style="color:#ff3333;margin-left:5px;min-width:80px;height:46px;" onclick="EditModelTask.OnClickDeleteModel" />
+            </div>
+        </pe:if>
+    </pe:if>
+    <pe:if condition='<%=task and not task:IsTransformMode()%>'>
+        <input uiname="EditModelTask.changeModelBtn" name="changeModelBtn" value='<%=L"模型..."%>' tooltip='<%=L"Ctrl+左键选择方块与骨骼, 并保存为bmax模型"%>' type="button" style="margin-left:5px;height:46px;" onclick="EditModelTask.OnClickChangeModelFile" />
+        <pe:if condition='<%=task and task:GetDragBtVisible()%>'>
+            <input uiname="EditModelTask.changeDraggableBtn" name="changeDraggableBtn" value='<%=EditModelTask.GetDraggableText()%>' tooltip='<%=L"点击可切换模型是否可拖动"%>' type="button" style="margin-left:5px;height:46px;" onclick="EditModelTask.OnClickChangeDraggable" />
+        </pe:if>
+        <div><pe:label value="<%=task:GetModelFileInHand()%>"/></div>
+        <div><pe:label value="<%=task:GetOnClickEventInHand()%>"/></div>
+    </pe:if>
+</div>
+</pe:mcml>
+</html>
+

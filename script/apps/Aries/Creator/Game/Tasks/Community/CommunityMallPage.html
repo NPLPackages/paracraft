@@ -1,0 +1,477 @@
+<!-- "script/apps/Aries/Creator/Game/KeepWorkMall/CommunityMallPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="CommunityMallPage.lua">
+            <![CDATA[
+                local MallUtils = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallUtils.lua");
+                CommunityMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityMallPage.lua");
+                local page = document:GetPageCtrl()
+                CommunityMallPage.OnInit(page);
+
+                function ClosePage()
+                    Page:CloseWindow();
+                    CommunityMallPage.CloseView()
+                end
+
+                function IsMenuSelected(index)
+                    return CommunityMallPage.menu_select_index == index;
+                end
+
+                function MenuItems()
+                    local menu_data = commonlib.filter(CommunityMallPage.menu_data_sources,function(item)
+                        return item.id ~= 99999
+                    end)
+                    return menu_data
+                end
+
+                function OnChangeMenu(name)
+                    CommunityMallPage.OnChangeMenu(name)
+                end
+
+                function MenuChildItems()
+                    return CommunityMallPage.GetChildMenuData()
+                end
+
+                function IsChildMenuSelected(index)
+                    return CommunityMallPage.menu_select_children_index == index;
+                end
+
+                function OnChangeChildMenu(name)
+                    CommunityMallPage.OnChangeChildMenu(name)
+                end
+
+                function GetSortData()
+                    return CommunityMallPage.sort_data;
+                end
+
+                function IsSortSelected(index)
+                    return CommunityMallPage.sort_select_index == index;
+                end
+
+                local sort_button_width = {
+                    normal = {60,80,100},
+                    english = {56,100,100},
+                }
+                function GetSortButtonWidth(index)
+                    local key = Mod.WorldShare.Utils.IsEnglish() and "english" or "normal"
+                    local width = sort_button_width[key][index]
+                    local style = format("width:%dpx ; background: url();", width)
+                    return style
+                end
+
+                function OnChangeSort(name)
+                    CommunityMallPage.OnChangeSort(name)
+                end
+
+                function onSearchInputFocusIn()
+                    
+                end
+
+                function onSearchInputFocusOut()
+                   
+                end
+
+                function GridsItems(index)
+                    if (index == nil) then
+                        return #CommunityMallPage.data_hits;
+                    else
+                        return CommunityMallPage.data_hits[index];
+                    end
+                end
+
+                function getIcon(itemData)
+                    local icon = MallUtils.GetIcon(itemData)
+                    
+                    return icon
+                end
+
+                function CanUseCanvas3dIcon(itemData)
+                    return MallUtils.CanUseCanvas3dIcon(itemData)
+                end
+
+                function IsSpecialModel(itemData)
+                    return MallUtils.IsSpecialModel(itemData)
+                end
+
+                function IsShowUseCount(count)
+                    local count = count or 0
+                    return count >= 0
+                end
+            
+                function GetUseCount(count)
+                    local count = tonumber(count) or 0
+                    return MallUtils.FormatCount(count)
+                end
+
+                function load_more()
+                    CommunityMallPage.LoadMore(Eval("index"));
+                end
+
+                function CheckIsCollected(item)
+                    return CommunityMallPage:CheckIsCollected(item);
+                end
+
+                function OnClickCollect(name,mcmlNode)
+                    local attr = mcmlNode:GetAttribute("param1")
+                    CommunityMallPage.OnClickCollect(attr);
+                end
+
+                function OnclickBuy(name, mcmlNode)
+                    local data = mcmlNode:GetAttribute("param1");
+                    CommunityMallPage.OnClickItem(data);
+                end
+
+                function OnSearch()
+                    local search_key = page:GetValue("search_text")
+                    CommunityMallPage.OnClickSearch(search_key)
+                end
+
+                function OnSearchKey()
+                    if(virtual_key and virtual_key == Event_Mapping.EM_KEY_RETURN) then
+                        local search_key = page:GetValue("search_text")
+                        CommunityMallPage.OnClickSearch(search_key)
+                    end 
+                end
+
+                function OnTextChange()
+                    local search_key = page:GetValue("search_text")
+                    --CommunityMallPage.OnClickSearch(search_key)
+                end
+
+                function GetNameText(name)
+                    local nameText = name or ""
+                    local fontName = "System;18;bold"
+                    local width = _guihelper.GetTextWidth(nameText, fontName)
+                    if width > 170 then
+                        return _guihelper.TrimUtf8TextByWidth(nameText,156, fontName).."..."
+                    else
+                        return nameText
+                    end
+                end
+
+                function GetToolTip(name)
+                    local nameText = name or ""
+                    local fontName = "System;18;bold"
+                    local width = _guihelper.GetTextWidth(nameText, fontName)
+                    if width > 170 then
+                        return nameText
+                    end
+                    return ""
+                end
+
+                function GetSearchText()
+                    print("CommunityMallPage.SearchText========",CommunityMallPage.SearchText)
+                    return CommunityMallPage.SearchText
+                end
+
+                function OnClickClearSearch()
+                    page:SetValue("search_text","")
+                    CommunityMallPage.OnClickSearch("")
+                end
+
+                function GetModelType(type)
+                    local type = type or ""
+                    if type == "liveModel" then
+                        return string.upper("model")
+                    end
+                    return string.upper(type)
+                end
+
+                function TreeItems(index)
+                    return CommunityMallPage.menu_data_sources
+                end
+                
+                function TypeBeExpand(expanded)
+                    if(expanded and expanded == true) then
+                        return true;
+                    else
+                        return false;
+                    end
+                end
+                function ChangeMenuType(treenode)
+                    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.mall_page.click_menu", {useNoId=true},nil,true);
+                    local attr = treenode.mcmlNode:GetPreValue("this");
+                    CommunityMallPage.ChangeMenuType(attr.level, attr.index)
+                    
+                end
+                function ChangeMenuItem(name,mcmlNode)
+                    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.mall_page.click_menu", {useNoId=true},nil,true);
+                    local attr = mcmlNode:GetAttribute("param1")
+                    CommunityMallPage.ChangeMenuItem(attr)
+                end
+
+                function IsNodeSelected(data)
+                    return CommunityMallPage.IsNodeSelected(data)
+                end
+
+                function GetTemplateStyle(level)
+                    local style = ""
+                    if level == 1 then
+                        style = "width:80px ; height: 30px; margin-left: -12px; margin-top: 0px;"
+                    elseif level == 2 then
+                        style = "width:50px ; height: 26px; margin-left: 10px; margin-top: 0px;"
+                    else
+                        style = "width:50px ; height: 26px; margin-left: 10px; margin-top: 0px;"
+                    end
+                    return style
+                end
+            ]]>
+        </script>
+        <div width="100%" style="position: relative; height: 640px; ">
+            <div style="position: relative; width: 126px; height: 670px; margin-left: 10px; margin-top: 10px;">
+                <pe:treeview name="tvwMallMenus" DataSource='<%=TreeItems()%>' OnClick="ChangeMenuType" ItemToggleSize="0" RememberScrollPos="true" DefaultNodeHeight="35" style="height:670px;margin-left:0px;margin-top:4px;background:" VerticalScrollBarOffsetX="12000">
+                    <NodeTemplates>
+                        <NodeTemplate DataType="type">
+                            <pe:treenode RenderTemplate="type_template" MouseOverBG="" expanded='<%=XPath("this|expanded")%>' can_select="true"></pe:treenode>
+                        </NodeTemplate>
+                        <NodeTemplate DataType="type_template">
+                            <div style="width:106px ; height: 30px; margin-left: 0px; margin-top: 0px; background: url();">
+                                <pe:if condition='<%=IsNodeSelected(XPath("this")) == true%>'>
+                                    <div width="100%" height="100%" style="background-color: #6761C7; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"></div>
+                                </pe:if>
+                                <pe:if condition='<%= IsNodeSelected(XPath("this")) == false%>'>
+                                    <div width="100%" height="100%" style="background-color: #454545; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"></div>
+                                </pe:if>
+                                <div style="float:left;margin-left: 6px;margin-top: -26px;">
+                                    <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == false %>'>
+                                        <div zorder="1" style="float: left; margin-top:7px;width:10px;height:10px;background:url(Texture/Aries/Creator/keepwork/community_32bits.png#6 214 16 16);" />
+                                        <div style="float: left; margin-left: 4px; color: #ffffff;"><%=XPath("this|text") %></div>
+                                    </pe:if>
+                                    <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == true %>'>
+                                        <div zorder="1" style="float: left; margin-top:7px;width:10px;height:10px;background:url(Texture/Aries/Creator/keepwork/community_32bits.png#32 215 16 16);" />
+                                        <div style="float: left; margin-left: 4px; color: #ffffff;"><%=XPath("this|text") %></div>
+                                    </pe:if>
+                                </div>
+                            </div>
+                        </NodeTemplate>
+                        <NodeTemplate DataType="item">
+                            <div style="<%=GetTemplateStyle(XPath('this|level'))%>">
+                                <pe:if condition="<%=XPath('this|level') == 1%>">
+                                    <pe:if condition='<%= IsNodeSelected(XPath("this"))%>'>
+                                        <input type="button" height="100%" value='<%=XPath("this|text") %>' onclick="" param1='<%= XPath("this") %>' style="text-offset-x:-19; width:106px ; background-color: #6761C7; color: #ffffff;  background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"/>
+                                    </pe:if>
+                                    <pe:if condition='<%= not IsNodeSelected(XPath("this"))%>'>
+                                        <input type="button" height="100%" value='<%=XPath("this|text") %>' onclick="ChangeMenuItem" param1='<%= XPath("this") %>' style="text-offset-x:-19; width:106px ; background-color: #454545; color: #ffffff;  background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"/>
+                                    </pe:if>
+                                </pe:if>
+                                <pe:if condition="<%=XPath('this|level') ~= 1%>">
+                                    <pe:if condition='<%= IsNodeSelected(XPath("this"))%>'>
+                                        <input type="button" width="100%" height="100%" value='<%=XPath("this|text") %>' onclick="" param1='<%= XPath("this") %>' style="text-align: left; color:#ffffff;text-offset-x:-6; background:url()"/>
+                                    </pe:if>
+                                    <pe:if condition='<%= not IsNodeSelected(XPath("this"))%>'>
+                                        <input type="button" width="100%" height="100%" value='<%=XPath("this|text") %>' onclick="ChangeMenuItem" param1='<%= XPath("this") %>' style="text-align: left; color:#7B7A8A;text-offset-x:-6; background:url()"/>
+                                    </pe:if>
+                                </pe:if>
+                                
+                            </div>
+                        </NodeTemplate>
+                    </NodeTemplates>
+                </pe:treeview>
+            </div>
+            <div style="position: relative; width: 1px; height: 700px; margin-top: 0px; margin-left: 130px; background-color: #313131ff"></div>
+            <div style="position: relative; width: 990px; margin-top: 0px; margin-left:150px; height: 660px; ">
+                <!-- 排序和搜索 -->
+                <div style="position: relative; margin-left: -37px; margin-top: 15px; width: 1034px; height: 42px;">
+                    <div style="position: relative; width: 400px; height: 42px; ">
+                        <pe:repeat DataSource="<%=GetSortData()%>" >
+                            <pe:repeatitem>
+                                <div style="float: left; margin-left: 43px; height:42px; ">
+                                    <div style="position: relative;">
+                                        <pe:if condition='<%=IsSortSelected(Eval("index")) %>'>
+                                            <div style='float: left; font-size: 14px; base-font-size: 14px; color: #d3d3d3;'><%=Eval("name")%></div>
+                                            <pe:if condition="<%=CommunityMallPage.sort_select_type == 0 %>">
+                                                <div style="float: left; margin-left: 5px; margin-top: 4px; width: 10px; height: 6px; background-color: #D3D3D3; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#470 106 8 6);"></div>
+                                                <div style="float: left; margin-left: -10px; margin-top: 14px; width: 10px; height: 6px; background-color: #7B7A8A; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#434 106 8 6);"></div>
+                                            </pe:if>
+                                            <pe:if condition="<%=CommunityMallPage.sort_select_type == 1 %>">
+                                                <div style="float: left; margin-left: 5px; margin-top: 4px; width: 10px; height: 6px; background-color: #7B7A8A; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#470 106 8 6);"></div>
+                                                <div style="float: left; margin-left: -10px; margin-top: 14px; width: 10px; height: 6px; background-color: #D3D3D3; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#434 106 8 6);"></div>
+                                            </pe:if>
+                                            <pe:if condition="<%=CommunityMallPage.sort_select_type == -1 %>">
+                                                <div style="float: left; margin-left: 5px; margin-top: 4px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#470 106 8 6);"></div>
+                                                <div style="float: left; margin-left: -10px; margin-top: 14px; width: 10px; height: 6px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#434 106 8 6);"></div>
+                                            </pe:if>
+                                            
+                                        </pe:if>
+                                        <pe:if condition='<%=not IsSortSelected(Eval("index")) %>'>
+                                            <div style='float: left; font-size: 14px; base-font-size: 14px; color: #7B7A8A; '><%=Eval("name")%></div>
+                                            <div style="float: left; margin-left: 5px; margin-top: 4px; width: 10px; height: 6px; background-color: #7B7A8A; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#470 106 8 6);"></div>
+                                            <div style="float: left; margin-left: -10px; margin-top: 14px; width: 10px; height: 6px; background-color: #7B7A8A; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#434 106 8 6);"></div>
+                                        </pe:if>
+                                    </div> 
+                                    <input type="button" name="<%=Eval('index')%>" onclick="OnChangeSort" height="100%" style="<%=GetSortButtonWidth(Eval('index'))%>" />
+                                </div>
+                            </pe:repeatitem>
+                        </pe:repeat>
+                    </div>
+                    <div style="position: relative; margin-left: 824px; margin-top: -14px; width: 240px;height: 42px;">
+                        <div style='background-color: #141414; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);
+                                    width: 240px;
+                                    height: 34px;
+                                    margin-left: 8px;
+                                    margin-top: 10px;'>
+                            <div style='width: 240px;'>
+                                <input type='text'
+                                        auto_virtual_keyboard="true"
+                                        EmptyText='<%= L"请输入模型名称或编号" %>'
+                                        onkeyup="OnSearchKey"
+                                        onchange="OnTextChange"
+                                        onfocusin='onSearchInputFocusIn'
+                                        onfocusout ="onSearchInputFocusOut"
+                                        value="<%= GetSearchText() %>"
+                                        SkipAutoBadWordFilter="true"
+                                        name="search_text"
+                                        uiname="CommunityMallPage.search_text"
+                                        CaretColor="#FFffffff"
+                                        textcolor="#ffffffff"
+                                        style='position: relative;;
+                                                width: 190px;
+                                                height: 30px;
+                                                font-size: 12px;
+                                                margin-left: 7px;
+                                                base-font-size: 12px;
+                                                text-valign: center;
+                                                background:;'/>
+                                <input type='button'
+                                        DefaultButton='true'
+                                        style='position: relative;;
+                                                width: 45px;
+                                                height: 26px;
+                                                margin-left: 192px;
+                                                text-offset-y: -3px;
+                                                font-weight: bold;
+                                                font-size: 14px;
+                                                base-font-size: 14px;
+                                                margin-top: -28px;
+                                                color: #FFFFFFFF;
+                                                background-color: #333333; 
+                                                background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)'
+                                        name='OK'
+                                        uiname="CommunityMallPage.OK"
+                                        onclick='OnSearch'
+                                        value='<%= L"搜索" %>' />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 物品列表 -->
+                <div style="position: relative; width: 1090px; height: 580px; margin-left: 0px; margin-top: 50px;">
+                    <pe:gridview style="margin-left: -12px;
+                                        margin-top: -10px;"
+                                    uiname="CommunityMallPage.item_gridview"
+                                    name="item_gridview"
+                                    VerticalScrollBarOffsetX="-10086"
+                                    CellPadding="16"
+                                    AllowPaging="false"
+                                    ItemsPerLine="5"
+                                    DefaultNodeHeight="200"
+                                    DataSource="<%= GridsItems %>"
+                                    RememberScrollPos="true"
+                                    onmousewheel='NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityMallPage.lua").OnMouseWheel()'>
+                        <Columns>
+                            <div style="width: 193px; height: 200px; ">
+                                <div style="position: relative; margin-top: 1px; margin-left: 1px; width: 193px; height: 172px; background-color: #3d3d3d; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <div style="position: relative; width: 81px; height: 20px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#286 152 81 20);">
+                                        <div style="color: #A8A7B0; margin-left: 8px; margin-top: 0px; font-weight: bold; "><%=GetModelType(Eval("modelType"))%></div>
+                                    </div>
+                                    <pe:if condition="<%=CheckIsCollected(Eval('this'))%>">
+                                        <input zorder="4"  type="button" param1='<%= XPath("this") %>' onclick="OnClickCollect"  style="position: relative; margin-top: 10px; margin-left: 162px; width: 23px; height: 23px; background: url(Texture/Aries/Creator/keepwork/Mall1/star_23x23_32bits.png#0 0 23 23);" />
+                                    </pe:if>
+                                    <pe:if condition="<%=not CheckIsCollected(Eval('this'))%>">
+                                        <input zorder="4"  type="button" param1='<%= XPath("this") %>' onclick="OnClickCollect"  style="position: relative; margin-top: 10px; margin-left: 162px; width: 23px; height: 23px; background: url(Texture/Aries/Creator/keepwork/Mall1/unstar_23x23_32bits.png#0 0 23 23);" />
+                                    </pe:if>
+                                    
+                                    <div style="position: relative; margin-top: 10px; margin-left: 30px; width: 130px; height: 130px;">
+                                        <pe:if condition="<%=Eval('hasIcon') and not CanUseCanvas3dIcon(Eval('this'))%>">
+                                            <pe:if condition='<%=Eval("use_little_icon") == true%>'>
+                                                <img zorder="0" src='<%=Eval("icon")%>' width="64" height="64" style="margin-left: 32px; margin-top: 26px;" />
+                                            </pe:if>
+                                            <pe:if condition='<%=Eval("use_little_icon") == false%>'>
+                                                <img zorder="0" src='<%=Eval("icon")%>' width="128" height="64" style="margin-top: 26px;" />
+                                            </pe:if>
+                                        </pe:if>
+                                        <pe:if condition="<%=CanUseCanvas3dIcon(Eval('this'))%>">
+                                            <pe:if condition='<%= IsSpecialModel(Eval("this")) %>'>
+                                                <pe:canvas3d name='<%= format("community_canvas3d_%d", Eval("index")) %>'
+                                                            xmlInfo='<%= Eval("xmlInfo") %>'
+                                                            DefaultRotY="-0.785"
+                                                            IsInteractive="false"
+                                                            autoRotateSpeed="0"
+                                                            miniscenegraphname='<%= format("commonity_minisceneBmaxPreview_%d", Eval("index") % 30 + 1) %>'
+                                                            RenderTargetSize="128" 
+                                                            value='<%=getIcon(Eval("this"))%>'
+                                                            style="position: relative;
+                                                                    width: 73px;
+                                                                    height: 73px;
+                                                                    margin-top: 18px;
+                                                                    margin-left: 25px;" />
+                                            </pe:if>
+                                            <pe:if condition='<%= not IsSpecialModel(Eval("this")) %>'>
+                                                <pe:if condition='<%= Eval("isLiveModel") %>'>
+                                                    <pe:canvas3d name='<%= format("community_canvas3d_%d", Eval("index")) %>'
+                                                                xmlInfo='<%= Eval("xmlInfo") %>'
+                                                                DefaultRotY="1.57"
+                                                                IsInteractive="false"
+                                                                autoRotateSpeed="0"
+                                                                miniscenegraphname='<%= format("commonity_minisceneBmaxPreview_%d", Eval("index") % 30 + 1) %>'
+                                                                RenderTargetSize="128" 
+                                                                value='<%= getIcon(Eval("this")) %>'
+                                                                style="position: relative;
+                                                                        width: 73px;
+                                                                        height: 73px;
+                                                                        margin-top: 18px;
+                                                                        margin-left: 25px;" />
+                                                </pe:if>
+                                                <pe:if condition='<%= not Eval("isLiveModel") %>'>
+                                                    <pe:canvas3d name='<%= format("community_canvas3d_%d", Eval("index")) %>'
+                                                                xmlInfo='<%= Eval("xmlInfo") %>'
+                                                                DefaultRotY="-1.57"
+                                                                IsInteractive="false"
+                                                                autoRotateSpeed="0"
+                                                                miniscenegraphname='<%= format("commonity_minisceneBmaxPreview_%d", Eval("index") % 30 + 1) %>'
+                                                                RenderTargetSize="128" 
+                                                                value='<%= getIcon(Eval("this")) %>'
+                                                                style="position: relative;
+                                                                        width: 73px;
+                                                                        height: 73px;
+                                                                        margin-top: 18px;
+                                                                        margin-left: 25px;" />
+                                                </pe:if>
+                                            </pe:if>
+                                        </pe:if>
+                                    </div>
+
+                                    <pe:if condition="<%=IsShowUseCount(Eval('useCount'))%>">
+                                        <div style="position: relative; margin-left: 6px; margin-top: 146px; padding-left: 4px; padding-right: 4px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#486 153 16 16:6 6 6 6);">
+                                            <div style="float: left; margin-top: 4px; width: 14px; height: 8px; background: url(Texture/Aries/Creator/keepwork/Mall1/use_14x8_32bits.png#0 0 14 8);"></div>
+                                            <div style="float: left; color: #38374D; margin-top: -1px; margin-left: 3px; font-size: 10px;"><%=GetUseCount(Eval("useCount"))%></div>
+                                        </div>
+                                    </pe:if>
+                                    <div style="position: relative; color: #7B7A8A; margin-top: 146px; margin-right: 6px; text-align: right; font-size: 12px; font-weight: bolder;"><%="#"..Eval("id")%></div>
+                                    <div tooltip='<%=GetToolTip(Eval("name"))%>' style="position: relative; color: #ffffff; margin-top: 180px; text-align: center; font-size: 16px; base-font-size: 16px; font-weight: bolder;"><%=GetNameText(Eval("name"))%></div>
+                                </div>
+                                
+                                <pe:custom oncreate='<%= load_more() %>'></pe:custom>
+                            </div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <div style='font-weight: bold;'>
+                                <div align='center'style='width: 160px;height: 128px; margin-top: 160px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#2 2 160 128)'>
+                                </div>
+                                <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: -10px; color: #A8A7B0;" ><%=L"未搜索到相关结果"%></div>
+                            </div>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+            </div>
+        </div>
+    </pe:mcml>
+</body>
+</html>

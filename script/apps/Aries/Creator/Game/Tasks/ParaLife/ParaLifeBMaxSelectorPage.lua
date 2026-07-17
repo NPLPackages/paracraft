@@ -49,13 +49,17 @@ function ParaLifeBMaxSelectorPage.OnClosed()
 end
 
 function ParaLifeBMaxSelectorPage:DesktopModeChanged(mode)
-	ParaLifeBMaxSelectorPage.ShowPage(false)
+	if not ParaLifeBMaxSelectorPage.IsCommand then
+		ParaLifeBMaxSelectorPage.ShowPage(false)
+	end
 	return mode
 end
 
 function ParaLifeBMaxSelectorPage:OnShowBuilderMenu(event)
 	if(event.bShow) then
-		ParaLifeBMaxSelectorPage.ShowPage(false)
+		if not ParaLifeBMaxSelectorPage.IsCommand then
+			ParaLifeBMaxSelectorPage.ShowPage(false)
+		end
 	end
 end
 
@@ -117,14 +121,16 @@ function ParaLifeBMaxSelectorPage.OnWorldUnload()
 	ParaLifeBMaxSelectorPage.ShowPage(false)
 end
 
-function ParaLifeBMaxSelectorPage.ShowPage(bShow)
+function ParaLifeBMaxSelectorPage.ShowPage(bShow,isCommand)
 	if bShow==false then 
 		if page then 
 			page:CloseWindow()
 			page = nil 
 		end
+		ParaLifeBMaxSelectorPage.IsCommand = nil
 		return 
 	end
+	ParaLifeBMaxSelectorPage.IsCommand = isCommand or false
 	ParaLifeBMaxSelectorPage.FindAll()
 	
 	local params = {
@@ -436,7 +442,7 @@ function ParaLifeBMaxSelectorPage.GetModelValue(index)
 	if skin then
 		CustomGeosets = skin
 	elseif(PlayerAssetFile:IsCustomModel(filepath)) then
-		CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
+		CCSInfoStr = PlayerAssetFile:GetDefaultCCSString(filepath)
 	elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 		-- TODO:  hard code worker skin here
 		ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
@@ -483,13 +489,27 @@ function ParaLifeBMaxSelectorPage.OnDragEnd(name)
     local info = ds[index]
 	index = info.attr.index
 	local selectedEntity = ParaLifeBMaxSelectorPage.GetResultAt(index);
-	if selectedEntity then 
+	if selectedEntity and selectedEntity.CloneMe then 
 		local newEntity = selectedEntity:CloneMe()
 		newEntity:GetItemClass():StartDraggingEntity(newEntity)
 		newEntity:GetItemClass():UpdateDraggingEntity(newEntity)
 		newEntity:GetItemClass():DropDraggingEntity(newEntity,nil,nil,function()
 			commonlib.TimerManager.SetTimeout(function()
 				newEntity:SetDeadWithAllChildren()
+			end,1)
+		end);
+	elseif(selectedEntity and selectedEntity.filename) then
+		local entity = EntityManager.EntityLiveModel:new():init()
+        entity:SetModelFile(selectedEntity.filename)
+		if(selectedEntity.scale) then
+			entity:SetScaling(selectedEntity.scale)
+		end
+        entity:Attach()
+		entity:GetItemClass():StartDraggingEntity(entity)
+		entity:GetItemClass():UpdateDraggingEntity(entity)
+		entity:GetItemClass():DropDraggingEntity(entity,nil,nil,function()
+			commonlib.TimerManager.SetTimeout(function()
+				entity:SetDeadWithAllChildren()
 			end,1)
 		end);
 	end

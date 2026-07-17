@@ -27,9 +27,9 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|playertouch|
+	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|mobilepad|playertouch|
 terrain|mod|physics|vision|quickselectbar|tips|map|camera|anim|paralife|axis|
-miniuserinfo|chatwindow|
+miniuserinfo|chatwindow|serialport|privacywindow|actionbutton|minigame.tabbar|builder|easybuilder|editableworld
 dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
@@ -42,6 +42,9 @@ Other show filters:
 /show playertouch   : a simple touch controller for kids
 /show paralife
 /show paralife -showplayer : show the default player
+/show mobilepad only show _lb(left bottom) and _rb(right bottom) zone,if is win32 will not show virtual keyboard when click the move_button_touch
+/show privacywindow -event eventname : show the privacy window with callback eventname
+/show objviewer : show the objviewer
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local name, bIsShow;
@@ -91,6 +94,20 @@ Other show filters:
 				System.options.IsTouchDevice = true;
 				GameLogic.options:ShowTouchPad(true);
 			end
+		elseif(name == "mobilepad") then
+			local options
+			options, cmd_text = CmdParser.ParseOptions(cmd_text);
+			if not options.useOld and MobileUIRegister.GetIsDevMode() then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileMainPage.lua")
+				local MobileMainPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileMainPage");
+				MobileUIRegister.SetMobileUIEnable(true)
+				MobileMainPage.ShowButtonsByAlign("_lt",false)
+				MobileMainPage.ShowButtonsByAlign("_rt",false)
+			else
+				MobileUIRegister.SetMobileUIEnable(false)
+				System.options.IsTouchDevice = true;
+				GameLogic.options:ShowTouchPad(true);
+			end
 		elseif(name == "terrain") then
 			if(bIsShow == nil) then
 				bIsShow = true;
@@ -103,6 +120,7 @@ Other show filters:
 		elseif(name == "player" or name=="") then
 			if EntityManager.GetPlayer() then
 				EntityManager.GetPlayer():SetVisible(true);
+				EntityManager.GetPlayer():SetSkipPicking(true)
 			end
 		elseif(name == "camera" ) then
 			local entity = EntityManager.GetFocus();
@@ -185,6 +203,74 @@ Other show filters:
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
 			MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
 			GameLogic.options:SetShowChatWnd(true)
+		elseif(name == "serialport") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/SerialPort/SerialPortConnector.lua");
+			local SerialPortConnector = commonlib.gettable("MyCompany.Aries.Game.Code.SerialPortConnector");
+			SerialPortConnector.Show()
+		elseif(name == "privacywindow") then
+			local eventname
+			local pre_cmd_text = cmd_text	
+			local options, cmd_text = CmdParser.ParseOptions(cmd_text);
+			if options and options.event then
+				local text,cmd_text = CmdParser.ParseString(pre_cmd_text);
+				eventname,cmd_text = CmdParser.ParseString(cmd_text);
+			end
+			local UserProtocolPre = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/UserProtocolPre.lua");
+			UserProtocolPre.CheckShow(function()
+				if eventname and eventname ~= "" then
+					GameLogic.RunCommand("/sendevent "..eventname) 
+				end
+			end);
+		elseif (name == "objviewer") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ObjectViewer/ObjectViewer.lua");
+			local ObjectViewer = commonlib.gettable("MyCompany.Aries.Game.Tasks.ObjectViewer");	
+			ObjectViewer:Open(nil, CmdParser.ParseString(cmd_text));
+		elseif (name == "window.role")	then
+			local isSigned = GameLogic.GetFilters():apply_filters("is_signed_in")
+			if isSigned then
+				local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/AIGC/UserInfoPage.lua")
+				UserInfoPage.ShowPage()
+			else
+				local UserInfoOfflinePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/AIGC/UserInfoOfflinePage.lua")
+				UserInfoOfflinePage.ShowPage()
+			end
+		elseif (name == "paralife.bag") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeBMaxSelectorPage.lua");
+			local ParaLifeBMaxSelectorPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeBMaxSelectorPage");
+			ParaLifeBMaxSelectorPage.ShowPage(true,true)
+		elseif (name == "minigame.tabbar") then
+			local MiniGameMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameMainPage.lua");
+			if MiniGameMainPage and MiniGameMainPage.ShowPage then
+				MiniGameMainPage.ShowPage()
+			end
+		elseif(name == "actionbutton") then
+			local ActionNameDetector = commonlib.gettable("MyCompany.Aries.Game.Common.ActionNameDetector");
+			if(ActionNameDetector.SetEnabled) then
+				ActionNameDetector:SetEnabled(true);
+				ActionNameDetector:SetShow3DMarker(true);
+			end
+		elseif(name == "builder") then
+			GameLogic.ShowBuilder(true)
+		elseif(name == "easybuilder") then
+			GameLogic.RunCommand('/show actionbutton')
+			GameLogic.RunCommand('/take EasyBuilder -replace -pin -bag 1 {toolname="map"}')
+			GameLogic.RunCommand('/take 0 -replace -bag 2')
+			GameLogic.RunCommand('/take EasyBuilder -select -replace -pin -bag 3 {toolname="play"}') 
+			GameLogic.RunCommand('/take EasyBuilder -select -replace -pin -bag 4 {toolname="livemodel"}') 
+			GameLogic.RunCommand('/take EasyBuilder -replace -pin -bag 5 {toolname="model"}') 
+			GameLogic.RunCommand('/take EasyBuilder -replace -pin -bag 6 {toolname="char"}')
+			GameLogic.RunCommand('/take EasyBuilder -replace -pin -bag 7 {toolname="action"}')
+			GameLogic.RunCommand('/take EasyBuilder -replace -pin -bag 8 {toolname="env"}')
+			GameLogic.RunCommand('/take EasyBuilder -replace -pin -bag 9 {toolname="bag"}')
+			local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+			if(QuickSelectBar.ShowRightButtons) then
+				QuickSelectBar.ShowRightButtons(false, false)
+			end
+
+		elseif(name == "editableworld") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/EasyEditableWorld.lua");
+			local EasyEditableWorld = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyEditableWorld");
+			EasyEditableWorld:new({operation="Load", worldName = nil}):Run();
 		end
 	end,
 };
@@ -194,7 +280,7 @@ Commands["hide"] = {
 	name="hide", 
 	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|mobile|playertouch|
 terrain|vision|ui|keyboard|quickselectbar|tips|map|info|camera|paralife|axis|
-miniuserinfo|chatwindow|
+miniuserinfo|chatwindow|serialport|codewindow|actionbutton|easybuilder|builder|
 dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|
 ]], 
 	desc=[[hide different type of things.e.g.
@@ -223,12 +309,31 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|
 		elseif(name == "info") then
 			GameLogic.options:SetShowInfoWindow(false);
 		elseif(name == "touch") then
+			if System.os.IsMobilePlatform() then
+				GameLogic.options:ShowTouchPad(false);
+				return
+			end
 			if MobileUIRegister.GetIsDevMode() then
 				MobileUIRegister.SetMobileUIEnable(false)
 			else
 				GameLogic.options:ShowTouchPad(false);
 			end
 		elseif(name == "mobile") then
+			if System.os.IsMobilePlatform() then
+				GameLogic.options:ShowTouchPad(false);
+				return
+			end
+			if MobileUIRegister.GetIsDevMode() then
+				MobileUIRegister.SetMobileUIEnable(false)
+			else
+				System.options.IsTouchDevice = false;
+				GameLogic.options:ShowTouchPad(false);
+			end
+		elseif(name == "mobilepad") then
+			if System.os.IsMobilePlatform() then
+				GameLogic.options:ShowTouchPad(false);
+				return
+			end
 			if MobileUIRegister.GetIsDevMode() then
 				MobileUIRegister.SetMobileUIEnable(false)
 			else
@@ -236,7 +341,10 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|
 				GameLogic.options:ShowTouchPad(false);
 			end
 		elseif(name == "player" or name=="") then
-			EntityManager.GetPlayer():SetVisible(false);
+			if EntityManager.GetPlayer() then
+				EntityManager.GetPlayer():SetVisible(false);
+				EntityManager.GetPlayer():SetSkipPicking(true)
+			end
 		elseif(name == "camera" ) then
 			local entity = EntityManager.GetFocus();
 			if(entity and entity:isa(EntityManager.EntityCamera)) then
@@ -297,6 +405,44 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|
 			MyCompany.Aries.ChatSystem.ChatWindow.HideAll();
 			MyCompany.Aries.ChatSystem.ChatWindow.HideEdit();
 			GameLogic.options:SetShowChatWnd(false)
+		elseif(name == "codewindow") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+			local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+			CodeBlockWindow.Close()
+		elseif(name == "serialport") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/SerialPort/SerialPortConnector.lua");
+			local SerialPortConnector = commonlib.gettable("MyCompany.Aries.Game.Code.SerialPortConnector");
+			SerialPortConnector.Close()
+		elseif (name == "objviewer") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ObjectViewer/ObjectViewer.lua");
+			local ObjectViewer = commonlib.gettable("MyCompany.Aries.Game.Tasks.ObjectViewer");	
+			ObjectViewer:Close();	
+		elseif (name == "ggsuserinfo") then
+			local TeamPlayerPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/TeamPlayerPage.lua");
+			TeamPlayerPage.ClosePage()
+		elseif (name == "window.role")	then
+			local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/AIGC/UserInfoPage.lua")
+			UserInfoPage.ClosePage()
+			local UserInfoOfflinePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/AIGC/UserInfoOfflinePage.lua")
+			UserInfoOfflinePage.ClosePage()		
+		elseif (name == "paralife.bag") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeBMaxSelectorPage.lua");
+			local ParaLifeBMaxSelectorPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeBMaxSelectorPage");
+			ParaLifeBMaxSelectorPage.ShowPage(false);
+		elseif(name == "actionbutton") then
+			local ActionNameDetector = commonlib.gettable("MyCompany.Aries.Game.Common.ActionNameDetector");
+			if(ActionNameDetector.SetEnabled) then
+				ActionNameDetector:SetEnabled(false);
+			end
+		elseif(name == "builder") then
+			GameLogic.ShowBuilder(false)
+		elseif(name == "easybuilder") then
+			GameLogic.RunCommand('/show actionbutton')
+    		GameLogic.RunCommand("/clearbag")
+			local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+			if(QuickSelectBar.ShowRightButtons) then
+				QuickSelectBar.ShowRightButtons(true, true)
+			end
 		end
 	end,
 };

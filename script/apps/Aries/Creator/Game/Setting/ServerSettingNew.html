@@ -1,0 +1,375 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type='text/npl' refresh='false'>
+                <![CDATA[
+                    
+                    ServerSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/ServerSetting.lua')
+                    ServerSetting.OnInit()
+                    local page = document:GetPageCtrl()
+                    function close()
+                        page:CloseWindow()
+                    end
+
+                    function open_url()
+                        local url = Page:GetValue("server_url","");
+                        ServerSetting.OnClickGotoUrl(url)
+                    end
+
+                    function OnChangeTabview(index)
+                        ServerSetting.OnChangeTabview(index)
+                    end
+
+                    function is_seach_finished()
+                        return ServerSetting.IsSeachFinished()
+                    end
+
+                    function get_source(index)
+                        if index == nil then
+                            return #ServerSetting.history_server_list
+                        else
+                            return ServerSetting.history_server_list[index]
+                        end
+                    end
+
+                    function createserver()
+                        ServerSetting.CreateServer()
+                    end
+
+                    function GetIp() 
+                        if ServerSetting.serverUrl and ServerSetting.serverUrl ~= "" then
+                            return ServerSetting.serverUrl
+                        end
+                        if ServerSetting.ips and ServerSetting.ips[1] then
+                            return ServerSetting.ips[1].text
+                        end
+                    end
+
+                    function GetPassWord()
+                        return ServerSetting.GetServerPassword() or ""
+                    end
+
+                    function onclickNewServer()
+                        ServerSetting.OnClickNewServer()
+                    end
+
+                    function onclickConnect()
+                        ServerSetting.OnClickConnect()
+                    end
+
+                    function onclickRefresh()
+                        ServerSetting.OnClickRefresh()
+                    end
+
+                    function onclickCloseServer()
+                        ServerSetting.OnClickCloseServer()
+                    end
+
+                    function onCopyToClipBoard(name)
+                        local text = "" 
+                        if name == "server_password" then
+                            text = page:GetValue("text_server_password","127.0.0.1")
+                        elseif name=="server_ip" then
+                            text = page:GetValue("text_server_ip","123456")                   
+                        end
+                        ParaMisc.CopyTextToClipboard(text);
+                        GameLogic.AddBBS(nil,"已拷贝到剪切板")
+                    end
+
+                    function join()
+                        if ServerSetting.select_server_index <= 0 then
+                            return false
+                        end
+                        local selectIndex = ServerSetting.select_server_index
+                        local udpServerList = {}
+                        if ServerSetting.select_tab_index == 1 then
+                            udpServerList = Mod.WorldShare.Store:Get('user/udpServerList') or {}
+                        elseif ServerSetting.select_tab_index == 2 then
+                            udpServerList = ServerSetting.history_server_list
+                        end
+
+                        if #udpServerList == 0 or not udpServerList[index] then
+                            return false
+                        end
+
+                        ServerSetting.Connect(udpServerList[index]['ip'], udpServerList[index]['port'])
+                    end
+
+                    function GetPassWordDesc(password)
+                        if not password or password == "" then
+                            return L"无密码"
+                        end
+                        return L"需要密码"
+                    end
+
+                    function GetServerPlayerCount(server_ip)
+                        local  udpServerList = Mod.WorldShare.Store:Get('user/udpServerList') or {}
+                        if #udpServerList > 0 then
+                            for k,v in pairs(udpServerList) do
+                                if v.ip == server_ip or v.ip:find(server_ip) then
+                                    return v.playerCount or 1
+                                end
+                            end
+                        end
+                        return 0
+                    end
+
+                    function IsSelectServer(index)
+                        local isSelect = index and ServerSetting.select_server_index == tonumber(index)
+                        return isSelect
+                    end
+
+                    function onclickServerList(index)
+                        ServerSetting.select_server_index = tonumber(index)
+                        page:Refresh(0.01)
+                    end
+
+                    function GetNetDelay(server_ip)
+                        local  udpServerList = Mod.WorldShare.Store:Get('user/udpServerList') or {}
+                        if #udpServerList > 0 then
+                            for k,v in pairs(udpServerList) do
+                                if v.ip == server_ip or v.ip:find(server_ip) then
+                                    return (v.delay or 1).."ms"
+                                end
+                            end
+                        end
+                        return "N/A"
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    flat_button = {
+                        color = "#cccccc",
+                        ["margin-top"] = 0,
+                        background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8"
+                    },
+                }
+            </style>
+            <div style="width: 960px; height: 464px;">
+                <div style="position: relative; width: 960px; height: 464px;">
+                    <div zorder="-1" style="position: relative; width: 960px; height: 56px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/wtitle_32x32_32bits.png:14 14 14 14);">
+                        <div style="position: relative; font-size: 24px; base-font-size: 24px; font-weight: bold; color: #ffffff; margin-left: 16px; margin-top: 10px;"><%=L"多人联网"%></div>
+                        <input type="button" value="" onclick="close()" style="position: relative; margin-left: 914px; margin-top: 12px; width: 36px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/guanbi_44x44_32bits.png#0 0 44 44);" />
+                    </div>
+                    <div zorder="-2" style="position: relative; width: 960px; height: 464px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/wbg_32x32_32bits.png:14 14 14 14);"></div>
+                </div>
+                <div style="margin-top: 56px;">
+                    <div  style="position: relative; margin-left: 546px; margin-top: 10px; ">
+                        <input type="text" name="server_url" EmptyText="<%= L'输入服务器地址' %>" style="float: left; text-valign: center; font-size: 20px; base-font-size: 20px; width: 310px;height: 42px;background:url(Texture/Aries/Creator/keepwork/Mobile/server/input_32x32_32bits.png:15 15 15 15);textcolor:#ffffff"/>
+                        <input type="button" style="width: 72px;margin-left: 4px;margin-top: 2px;margin-right: 2px;height: 40px;color: #ffffff; background:url(Texture/Aries/Creator/keepwork/Mobile/server/btn_32x32_32bits.png:15 15 15 15);" value="<%=L'加入'%>" onclick="open_url" />
+                    </div>
+                    <div style=" margin-left: -4px;">
+                       <div style="margin-left: 20px; margin-top: 20px;">
+                            <pe:repeat DataSource="<%=ServerSetting.tabview_ds%>">
+                                <pe:repeatitem style="float:left;width:90px;">
+                                    <pe:if condition='<%=ServerSetting.select_tab_index == Eval("index") %>' >
+                                        <input type="button" value='<%=Eval("text")%>' uiname = '<%=format("ServerSetting.tab_%d", Eval("index"))%>' name='<%=Eval("index")%>' onclick="OnChangeTabview" style="font-weight:bold;margin-right:2px;margin-top:1px;color:#ffffff;font-size:16px; base-font-size:16px; min-width:84px;height:36px;background:url(Texture/Aries/Creator/keepwork/Mobile/server/btn_select_32bits.png:14 14 14 14)" />
+                                    </pe:if>
+                                    <pe:if condition='<%=ServerSetting.select_tab_index ~= Eval("index") %>' >
+                                        <input type="button" value='<%=Eval("text")%>' uiname = '<%=format("ServerSetting.tab_%d", Eval("index"))%>' name='<%=Eval("index")%>' onclick="OnChangeTabview" style="font-weight:bold;margin-right:2px;margin-top:1px;color:#ffffff;font-size:16px; base-font-size:16px; min-width:90px;height:36px;background:url(Texture/Aries/Creator/keepwork/Mobile/server/btn_normal_32bits.png:14 14 14 14)" />
+                                    </pe:if>
+                                </pe:repeatitem>
+                            </pe:repeat>
+                       </div>
+                        <pe:if condition="<%=ServerSetting.select_tab_index == 1%>">
+                            <pe:if condition="<%= not is_seach_finished() %>">
+                                <div style="text-align: center;margin-top: 120px;margin-bottom: 60px;color: #ffffff;">
+                                    <%=L"正在搜索附近局域网服务器..."%>
+                                </div>
+                            </pe:if>
+                            <pe:if condition="<%= is_seach_finished() %>">
+                                <div >
+                                    <div style=" margin-left: 20px;margin-top: 0px; width:916px; height:40px; text-align:left; text-valign:center; font-size: 16px; base-font-size: 16px; color:#ffffff;background:url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:14 14 14 14)" >
+                                        <div style="float: left; margin-top: 8px; margin-left: 18px; width: 200px;"><%=L"服务器"%></div>
+                                        <div style="float: left; margin-top: 8px; width: 200px;"><%=L"创建人"%></div>
+                                        <div style="float: left; margin-top: 8px; width: 200px;"><%=L"人数"%></div>
+                                        <div style="float: left; margin-top: 8px; width: 190px;"><%=L"权限"%></div>
+                                        <div style="float: left; margin-top: 8px; width: 98px;"><%=L"延迟"%></div>
+                                    </div>
+                                    <div style="width: 936px; height: 240px; ">
+                                        <pe:gridview RememberScrollPos="true"
+                                                    AllowPaging="false"
+                                                    VerticalScrollBarStep="50"
+                                                    DefaultNodeHeight="22"
+                                                    ItemsPerLine="1"
+                                                    name="udp_server_list">
+                                            <Columns>
+                                                <div onclick="onclickServerList" name="<%=Eval('index')%>" style=" margin-left: 20px;margin-top: 0px; width:916px; height:40px; text-align:left; text-valign:center; font-size: 16px; base-font-size: 16px; color:#ffffff;" >
+                                                    <pe:if condition="<%=not IsSelectServer(Eval('index')) %>">
+                                                        <div style="float: left; margin-top: 8px; margin-left: 18px; width: 200px;"><%=Eval("ip") or Eval('serverName') %></div>
+                                                        <div style="float: left; margin-top: 8px; width: 200px;"><%= Eval('username') %></div>
+                                                        <div style="float: left; margin-top: 8px; width: 200px;"><%=GetServerPlayerCount(Eval("ip")).."/"..ServerSetting.GetMaxPlayerCount() %></div>
+                                                        <div style="float: left; margin-top: 8px; width: 190px;"><%=GetPassWordDesc(Eval("password"))%></div>
+                                                        <div style="float: left; margin-top: 8px; width: 98px;"><%= GetNetDelay(Eval("ip")) %></div>
+                                                    </pe:if>
+                                                    <pe:if condition="<%=IsSelectServer(Eval('index')) %>">
+                                                        <div style="float: left; margin-top: 8px; color:#ffffff88; margin-left: 18px; width: 200px;"><%=Eval("ip") or Eval('serverName') %></div>
+                                                        <div style="float: left; margin-top: 8px; color:#ffffff88; width: 200px;"><%= Eval('username') %></div>
+                                                        <div style="float: left; margin-top: 8px; color:#ffffff88; width: 200px;"><%=GetServerPlayerCount(Eval("ip")).."/"..ServerSetting.GetMaxPlayerCount() %></div>
+                                                        <div style="float: left; margin-top: 8px; color:#ffffff88; width: 190px;"><%=GetPassWordDesc(Eval("password"))%></div>
+                                                        <div style="float: left; margin-top: 8px; color:#ffffff88; width: 98px;"><%= GetNetDelay(Eval("ip")) %></div>
+                                                    </pe:if>
+                                                </div>
+                                            </Columns>
+                                        </pe:gridview>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; margin-left: 460px;">
+                                    <input type='button' value='<%=L"新建服务器"%>' onclick='onclickNewServer' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                                    <input type='button' value='<%=L"刷新"%>' onclick='onclickRefresh' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                                    <input type='button' value='<%=L"连接"%>' onclick='onclickConnect' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                                </div>
+                            </pe:if>
+                        </pe:if>
+                        <pe:if condition="<%=ServerSetting.select_tab_index == 2%>">
+                            <div >
+                                <div style=" margin-left: 20px;margin-top: 0px; width:916px; height:40px; text-align:left; text-valign:center; font-size: 16px; base-font-size: 16px; color:#ffffff;background:url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:14 14 14 14)" >
+                                    <div style="float: left; margin-top: 8px; margin-left: 18px; width: 200px;"><%=L"服务器"%></div>
+                                    <div style="float: left; margin-top: 8px; width: 200px;"><%=L"创建人"%></div>
+                                    <div style="float: left; margin-top: 8px; width: 200px;"><%=L"人数"%></div>
+                                    <div style="float: left; margin-top: 8px; width: 190px;"><%=L"权限"%></div>
+                                    <div style="float: left; margin-top: 8px; width: 98px;"><%=L"延迟"%></div>
+                                </div>
+                                <div style="width: 936px; height: 240px; margin-left: 19px;">
+                                    <pe:gridview RememberScrollPos="true" AllowPaging="false" VerticalScrollBarStep="20" DefaultNodeHeight="19" VerticalScrollBarOffsetX="15" ItemsPerLine="1" name="history_udp_server_list"
+                                                DataSource="<%=get_source%>">
+                                        <Columns>
+                                            <div onclick="onclickServerList" name="<%=Eval('index')%>" style=" margin-top: 0px; width:916px; height:40px; text-align:left; text-valign:center; font-size: 16px; base-font-size: 16px; color:#ffffff;" >
+                                                <pe:if condition="<%=not IsSelectServer(Eval('index')) %>">
+                                                    <div style="float: left; margin-top: 8px; margin-left: 18px; width: 200px;"><%=Eval("ip") or Eval('serverName') %></div>
+                                                    <div style="float: left; margin-top: 8px; width: 200px;"><%= Eval('username') %></div>
+                                                    <div style="float: left; margin-top: 8px; width: 200px;"><%=GetServerPlayerCount(Eval("ip")).."/"..ServerSetting.GetMaxPlayerCount() %></div>
+                                                    <div style="float: left; margin-top: 8px; width: 190px;"><%=GetPassWordDesc(Eval("password"))%></div>
+                                                    <div style="float: left; margin-top: 8px; width: 98px;"><%= GetNetDelay(Eval("ip")) %></div>
+                                                </pe:if>
+                                                <pe:if condition="<%=IsSelectServer(Eval('index')) %>">
+                                                    <div style="float: left; margin-top: 8px; color:#ffffff88; margin-left: 18px; width: 200px;"><%=Eval("ip") or Eval('serverName') %></div>
+                                                    <div style="float: left; margin-top: 8px; color:#ffffff88; width: 200px;"><%= Eval('username') %></div>
+                                                    <div style="float: left; margin-top: 8px; color:#ffffff88; width: 200px;"><%=GetServerPlayerCount(Eval("ip")).."/"..ServerSetting.GetMaxPlayerCount() %></div>
+                                                    <div style="float: left; margin-top: 8px; color:#ffffff88; width: 190px;"><%=GetPassWordDesc(Eval("password"))%></div>
+                                                    <div style="float: left; margin-top: 8px; color:#ffffff88; width: 98px;"><%= GetNetDelay(Eval("ip")) %></div>
+                                                </pe:if>
+                                            </div>
+                                        </Columns>
+                                    </pe:gridview>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; margin-left: 460px;">
+                                <input type='button' value='<%=L"新建服务器"%>' onclick='onclickNewServer' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                                <input type='button' value='<%=L"刷新"%>' onclick='onclickRefresh' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                                <input type='button' value='<%=L"连接"%>' onclick='onclickConnect' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%=ServerSetting.select_tab_index == 3%>">
+                            <pe:if condition="<%=ServerSetting.local_server_index == 1%>">
+                                <div style="margin-top:12px; font-size: 16px; base-font-size: 16px; margin-left: 20px; width: 960px; height: 130px; color: #FFFFFF;">
+                                    <div >
+                                        <div style="float:left;min-width:100px; margin-top: 8px;">
+                                            <%=L"服务器名称"%>
+                                        </div>
+                                        <div style="float:left;margin-left:5px">
+                                            <input type="text" name="text_server_name_create" value="<%= ServerSetting.GetName() %>" style="width:300px;height:40px;text-valign: center; font-size: 20px; base-font-size: 20px; background:url(Texture/Aries/Creator/keepwork/Mobile/server/input_32x32_32bits.png:15 15 15 15);textcolor:#ffffff"/>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top:22px;">
+                                        <div style="float:left;min-width:60px;">
+                                            <%=L"联网方式"%>
+                                        </div>
+                                        <div style="float:left;margin-left:15px">
+                                            <div>
+                                                <input type="radio" checked="checked" id="Lan" name="NetWorkMode" value="Lan" style="margin-top:3px;margin-right:5px"/>
+                                                <div style="float:left; margin-left: 12px;">
+                                                    <div for="Lan" style="float:left;"><%=L"局域网, IP地址:"%><%=ServerSetting.GetServerIp() %></div>
+                                                    <input type="button" onclick="ServerSetting.onClickGetPublicIP"  value='<%=L"如何获得互联网IP?"%>' class="linkbutton_yellow" style="margin-left: 18px;" />
+                                                </div>
+                                            </div>
+                                            <div style="margin-top:23px;">
+                                                <input type="radio" onclick="OnSelectNetWorkMode" id="TunnelServer" name="NetWorkMode" value="TunnelServer" style="margin-top:3px;margin-right:5px"/>
+                                                <div style="float:left; margin-left: 12px;">
+                                                    <div for="TunnelServer"><%=L"互联网代理"%><%=L"(Beta版)"%></div>
+                                                    <select name="TunnelServerAddress" AllowUserEdit="true" style="height:26px; margin-left: 160px; margin-top: -22px;">
+                                                        <option selected="true" value="t1.tunnel.keepwork.com:8099">t1.tunnel.keepwork.com:8099</option>
+                                                        <option value="127.0.0.1:8088">127.0.0.1:8088</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="margin-top:20px; font-size: 16px; base-font-size: 16px; margin-left: 20px; width: 480px; height: 90px; color: #ffffff;">
+                                    <div style="margin-top:5px;color:#ffffff;">
+                                        <%=L"密码"%>
+                                    </div>
+                                    <div style="margin-left: 78px; margin-top: -26px;">
+                                        <div style="margin-top:5px;">
+                                            <input type="radio" checked="checked" id="Anonymous" name="BasicAuthMethod" value="Anonymous" style="margin-top:3px;margin-right:5px"/><div for="Anonymous" style="float:left; margin-left: 12px;"><%=L"任何人可进入"%></div>
+                                        </div>
+                                        <div style="margin-top:16px;">
+                                            <input type="radio" id="UniversalPassword" name="BasicAuthMethod" value="UniversalPassword" style="margin-top:11px;margin-right:5px"/>
+                                            <div style="float:left; margin-left: 12px;">
+                                                <div for="UniversalPassword" style="float:left; margin-top: 8px;"><%=L"统一密码为："%></div>
+                                                <input type="text" name="room_password" EmptyText="请输入密码" style="width:300px;height:40px;text-valign: center; font-size: 20px; base-font-size: 20px; background:url(Texture/Aries/Creator/keepwork/Mobile/server/input_32x32_32bits.png:15 15 15 15);textcolor:#ffffff" value=""/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 40px; margin-left: 780px;">
+                                    <pe:if condition="<%=Mod.WorldShare.Utils.IsEnglish()%>">
+                                        <input type='button' value='<%=L"新建服务器"%>' onclick='onclickNewServer' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                                    </pe:if>
+                                    <pe:if condition="<%=not Mod.WorldShare.Utils.IsEnglish()%>">
+                                        <input type='button' value='<%=L"新建服务器"%>' onclick='onclickNewServer' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                                    </pe:if>
+                                </div>
+                            </pe:if>
+                            <pe:if condition="<%=ServerSetting.local_server_index == 2%>">
+                                <div style="width: 960px; height: 160px; font-size: 16px; base-font-size: 16px;  color: #ffffff; margin-left: 20px;">
+                                    <div style="float: left; width: 330px; height: 36px; margin-top:30px;"><%="服务器名称："..ServerSetting.GetName()%></div>
+                                    <div style="float: left; width: 330px; height: 36px; margin-top:30px;"><%="在线人数："..ServerSetting.GetServerPlayerCount().."/" ..ServerSetting.GetMaxPlayerCount()%></div>
+                                    
+                                    <div style="float: left; width: 330px; height: 36px; margin-top:14px;"><%="联网方式："..(ServerSetting.GetServerModel() == "Lan" and "局域网" or "互联网")%></div>
+    
+                                    <div style="float: left; width: 460px; height: 36px; margin-top:14px; ">
+                                        <div style="float:left;min-width:80px;">
+                                            <%=L"联网地址："%>
+                                        </div>
+                                        <div style="float:left;margin-left:0px ;margin-top: -6px;">
+                                            <input type="text" name="text_server_ip" value="<%= GetIp() %>" style="float: left; text-valign: center; font-size: 20px; base-font-size: 20px; width: 260px;height: 42px;background:url(Texture/Aries/Creator/keepwork/Mobile/server/input_32x32_32bits.png:15 15 15 15);textcolor:#ffffff"/>
+                                            
+                                            <input type='button' name="server_ip" onclick='onCopyToClipBoard' style=' margin-top: 6px; margin-left: 15px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/copy_32bits.png#0 0 32 32);' />
+                                            <div for="server_ip" style="float:left; margin-left: 4px; margin-top: 8px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffffdd;"><%=L"复制"%></div>
+                                        </div>
+                                    </div>
+    
+                                    <div style="float: left; width: 460px; height: 36px; margin-top:24px;">
+                                        <pe:if condition="<%=ServerSetting.GetBasicAuthMethod() == 'UniversalPassword'%>">
+                                            <div style="float:left;min-width:30px;">
+                                                <%=L"密码："%>
+                                            </div>
+                                            <div style="float:left;margin-left:0px ;margin-top: -6px;">
+                                                <input type="text" name="text_server_password" value="<%= GetPassWord() %>" style="float: left; text-valign: center; font-size: 20px; base-font-size: 20px; width: 260px;height: 42px;background:url(Texture/Aries/Creator/keepwork/Mobile/server/input_32x32_32bits.png:15 15 15 15);textcolor:#ffffff"/>
+                                                
+                                                <input type='button' name="server_password" onclick='onCopyToClipBoard' style=' margin-top: 6px; margin-left: 15px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/copy_32bits.png#0 0 32 32);' />
+                                                <div for="server_password" style="float:left; margin-left: 4px; margin-top: 8px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffffdd;"><%=L"复制"%></div>
+                                            </div>
+                                        </pe:if>
+                                    </div>
+    
+                                    <div style="margin-top: 120px; margin-left: 760px;">
+                                        <pe:if condition="<%=Mod.WorldShare.Utils.IsEnglish()%>">
+                                            <input type='button' value='<%=L"关闭服务器"%>' onclick='onclickCloseServer' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                                        </pe:if>
+                                        <pe:if condition="<%=not Mod.WorldShare.Utils.IsEnglish()%>">
+                                            <input type='button' value='<%=L"关闭服务器"%>' onclick='onclickCloseServer' style='color: #FFFFFF; margin-left: 15px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/bg_32x32_32bits.png:15 15 15 15);' />
+                                        </pe:if>
+                                    </div>
+                                </div>
+                            </pe:if>
+                        </pe:if>
+                    </div>
+                </div>
+            </div>
+        </pe:mcml>
+    </body>
+</html>

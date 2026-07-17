@@ -62,7 +62,7 @@ function DragEntity:DropDraggingEntity()
 	if(self.draggingEntity) then
 		self.toXmlNode = self.draggingEntity:SaveToXMLNode();
 
-		if(not self.nohistory and GameLogic.GameMode:CanAddToHistory()) then
+		if(not self.draggingEntity.nohistory and (self.addToHistory or (not self.nohistory and GameLogic.GameMode:CanAddToHistory()))) then
 			UndoManager.PushCommand(self);
 		end
 	end	
@@ -80,7 +80,7 @@ end
 function DragEntity:EndModifyEntity()
 	if(self.draggingEntity) then
 		self.toXmlNode = self.draggingEntity:SaveToXMLNode();
-		if(not self.nohistory and GameLogic.GameMode:CanAddToHistory()) then
+		if(self.addToHistory or (not self.nohistory and GameLogic.GameMode:CanAddToHistory())) then
 			-- do nothing if they are equal.
 			if(not commonlib.compare(self.fromXmlNode, self.toXmlNode)) then
 				UndoManager.PushCommand(self);

@@ -72,6 +72,7 @@ function ItemClient.PreloadItemClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemMinimap.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemColorBlock.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemColorVine.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemMaterial.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemEmpty.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemSign.lua");
@@ -91,6 +92,14 @@ function ItemClient.PreloadItemClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemNplCadEditor.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemLiveModel.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemInvisibleClickSensor.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemSlope.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemStair.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemPlayerAnim.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemEasyBuilder.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemEditableWorld.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemItemFrame.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemEasyCloneBag.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemUserPoint.lua");
 
 	GameLogic.GetFilters():apply_filters("register_item");
 end
@@ -131,7 +140,7 @@ function ItemClient.LoadGlobalBlockList()
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(xmlRoot) then
 		LOG.std(nil, "info", "ItemClient", "loaded block list category from file %s", filename);
-		xmlRoot = GameLogic.GetFilters():apply_filters("block_list", xmlRoot);
+		-- xmlRoot = GameLogic.GetFilters():apply_filters("block_list", xmlRoot);
 
 		local version = if_else(System.options.mc, "mc", "haqi");
 		local is_sdk = System.options.isAB_SDK;
@@ -151,12 +160,15 @@ function ItemClient.LoadGlobalBlockList()
 						end
 					end
 					if(from_id) then
-						local itemDS = ItemClient.AddBlock(from_id, nil, category_name);
+						local itemDS = ItemClient.AddBlock(from_id, nil, category_name, attr.uid);
 						if(attr.block_data) then
 							itemDS.block_data = tonumber(attr.block_data);
 						end
 						if(attr.server_data) then
 							itemDS.server_data = NPL.LoadTableFromString(attr.server_data);
+						end
+						if(attr.pin_index) then
+							itemDS.pin_index = tonumber(attr.pin_index);
 						end
 						if(attr.uid) then
 							itemDS.uid = attr.uid;
@@ -193,7 +205,7 @@ end
 -- @return blockDsItem
 function ItemClient.AddBlock(block_id, index, category_name, blockName, isWorldOnly)
 	local item = ItemClient.CreateGetByBlockID(block_id);
-	if item.hideforSchool and (System.options.isChannel_430 or System.options.isSchool) then
+	if item.hideforSchool and (System.options.isEducatePlatform or System.options.isChannel_430 or System.options.isSchool) then
 		return {}
 	end
 	local blockDSItem = { __index = item, block_id = block_id, uid = blockName, isWorldOnly=isWorldOnly};
@@ -230,21 +242,21 @@ function ItemClient.SearchBlocks(block_id_or_name, category_name, ds)
 					--if(item.block_id == block_id) then
 					local id = tostring(item.id);
 					local bMatch;
-					if(id and string.match(id,block_id_or_name)) then
+					if(id and string.find(id,block_id_or_name, 1, true)) then
 						bMatch = true;
 					else
 						local searchkey = item:GetSearchKey();
 						if searchkey=="" then
 							searchkey = item:GetDisplayName()
 						end
-						if(searchkey and string.match(searchkey,block_id_or_name)) then
+						if(searchkey and string.find(searchkey,block_id_or_name, 1, true)) then
 							bMatch = true;
 						else
 							local searchkey2 = item:GetSearchKey2();
 							if searchkey2 and searchkey2~="" then
 								local keys = commonlib.split(searchkey2,";")
 								for k,v in pairs(keys) do
-									if string.match(v,block_id_or_name) then
+									if string.find(v,block_id_or_name, 1, true) then
 										bMatch = true;
 										break
 									end
@@ -422,7 +434,21 @@ function ItemClient.CreateByBlockID(block_id, item_class)
 end
 
 function ItemClient.OnLeaveWorld()
-	named_blocks = {};
+	local worldOnlyNames
+	for name, item in pairs(named_blocks) do
+		if(item.isWorldOnly) then
+			worldOnlyNames = worldOnlyNames or {}
+			worldOnlyNames[name] = true;
+		end
+	end
+	-- remove all items in worldOnlyNames from named_blocks
+	if(worldOnlyNames) then
+		for name, item in pairs(named_blocks) do
+			if(worldOnlyNames[name]) then
+				named_blocks[name] = nil;
+			end
+		end
+	end
 
 	-- custom_block_ids
 	local block_ids;

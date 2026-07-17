@@ -1,0 +1,316 @@
+<!-- "script/apps/Aries/Creator/Game/Mobile/MobileEscFramePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="EscFramePage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldStacks.lua");
+WorldStacks = commonlib.gettable("MyCompany.Aries.Game.WorldStacks");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
+local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
+EscFramePage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetCategoryButtons()
+    return EscFramePage.category_ds;
+end
+
+function OnChangeCategory(index)
+    EscFramePage.OnChangeCategory(index);
+end
+
+function OnLeave()
+    --GameLogic.RunCommand("/menu file.exit");
+    local MobileSaveWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileSaveWorldPage.lua")
+    MobileSaveWorldPage.ShowPage("exit_world")
+end
+
+function OnSaveAndLeave()
+    GameLogic.QuickSave();
+    --GameLogic.RunCommand("/menu file.exit");
+    local MobileSaveWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileSaveWorldPage.lua")
+    MobileSaveWorldPage.ShowPage("exit_world")
+end
+
+function OnHelp()
+    GameLogic.RunCommand("/menu help.help");
+end
+
+function OnGameMarket()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/EnterGamePage.lua");
+	local EnterGamePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnterGamePage");
+	EnterGamePage.ShowPage(true)
+end
+
+function OnLoadGame()
+    GameLogic.RunCommand("/menu file.loadworld");
+end
+
+function OnUploadGame()
+    --GameLogic.RunCommand("/menu file.uploadworld");
+    local MobileSaveWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileSaveWorldPage.lua")
+    MobileSaveWorldPage.ShowPage("upload_world")
+end
+
+function OnFriendsPage()
+    System.App.Commands.Call("Profile.Aries.FriendsWnd");
+end
+
+function OnTextureModPage()
+    GameLogic.RunCommand("/menu window.texturepack");
+end
+
+function OnSaveGame()
+    --GameLogic.RunCommand("/menu file.saveworld");
+    local MobileSaveWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileSaveWorldPage.lua")
+    MobileSaveWorldPage.ShowPage("save_world")
+end
+
+function OnSettings()
+    GameLogic.RunCommand("/menu file.settings");
+end
+
+function GetCurWorldName()
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local text = WorldCommon.GetWorldTag("name") or ""
+    local width = 0
+    local name = ""
+    if text~= nil and text ~= "" then
+        for uchar in string.gmatch(text, '([%z\1-\127\194-\244][\128-\191]*)') do
+            local w = _guihelper.GetTextWidth(uchar, "System;14");
+            width = width + tonumber(w)
+            if width < 350 then
+                name = name.. uchar
+            end
+        end
+    end
+    return name
+end
+
+function GetVersion()
+    local ver = System.options.ClientVersion;
+    if(ver) then
+        if(ver == "") then
+            ver = nil;
+        else
+            ver = "ver "..ver;
+        end
+    end
+    return ver or "";
+end
+
+function OnOpenWorldDir()
+    GameLogic.RunCommand("/menu file.openworlddir");
+end
+
+function CreateNewWorld()
+    GameLogic.RunCommand("/menu file.createworld");
+end
+
+function OnClickButton(name,mcmlNode)
+    ClosePage();
+    if(name=="shareWorld") then
+        OnUploadGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.share_world");
+    elseif(name=="saveWorld") then
+        OnSaveGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.save_world");
+    elseif(name=="changeTexture") then
+        OnTextureModPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.change_texture");
+    elseif(name=="loadWorld") then
+        OnLoadGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.load_world");
+    elseif(name=="systemSetting") then
+        OnSettings();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.system_setting");
+    elseif(name=="exitWorld") then
+        OnLeave();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.exit_world");
+    elseif(name=="friends") then
+        OnFriendsPage()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.friends");
+    elseif(name=="continueGame") then
+        ClosePage();
+        GaeLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.continue_game");
+    elseif(name=="createNewWorld") then
+        CreateNewWorld();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.create_new_world");
+    elseif(name=="openServerPage") then
+        ServerPage.ShowPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.open_server_page");
+    end
+end
+
+function Dummy()
+end
+
+function GetServerButtonValue()
+    if(ServerPage.IsServer() or ServerPage.IsClient()) then
+        return L"私服信息";
+    else
+        return L"架设私服";
+    end
+end
+
+function OnClickRevision()
+    GameLogic.RunCommand("/menu file.worldrevision");
+end
+function OnClickViewHistory()
+    GameLogic.RunCommand("/menu file.openbackupfolder");
+end
+    
+function OnReturnLastWorld()
+    ClosePage();
+    WorldStacks:ReturnLastWorld();
+end
+
+function GetSchoolName()
+    return EscFramePage.GetSchoolName()
+end
+
+function GetNickName()
+    local nickname = EscFramePage.GetNickName()
+    if(nickname == nil or nickname == "")then
+        nickname = EscFramePage.GetUserName()
+    end
+    if nickname ~= nil and nickname ~= "" then
+        local width = 0
+        local name = ""
+        for uchar in string.gmatch(nickname, '([%z\1-\127\194-\244][\128-\191]*)') do
+            local w = _guihelper.GetTextWidth(uchar, "System;32");
+            width = width + tonumber(w)
+            if width < 240 then
+                name = name.. uchar
+            else
+                name = name.. "..."
+                break
+            end
+        end
+        return name
+    end
+    return ""
+end
+
+function GetAccountStr()
+    if not EscFramePage.profile then
+        return L"暂无用户信息"
+    end
+    local username = EscFramePage.GetUserName() or ""
+    return L"账号：" .. username
+end
+
+function GetRegisterTimeStr()
+    if not EscFramePage.profile then
+        return L"暂无用户注册信息"
+    end
+    local dateTime = EscFramePage.profile.createdAt or ""
+    local year, month, day = commonlib.timehelp.GetYearMonthDayFromStr(dateTime);
+    local registerAt = tostring(year) .. "." .. tostring(month) .. "." .. tostring(day); 
+    return L"注册："..registerAt
+end
+
+function onClickUserLicense()
+    local UserProtocol = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/UserProtocol.lua");
+    UserProtocol.ShowPage(1);
+end
+
+function OnClickUserPrivacy()
+    local UserProtocol = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/UserProtocol.lua");
+    UserProtocol.ShowPage(2);
+end
+
+]]></script>
+<div style="width: 1104px; height: 556px;">
+    <div style="position: relative; width: 1104px; height: 556px;">
+        <div zorder="-1" style="position: relative; width: 1104px; height: 60px; background: url(Texture/Aries/Creator/keepwork/Mobile/esc/title.png);">
+            <div style="position: relative; font-size: 22px; base-font-size: 22px; font-weight: bold; color: #ffffff; margin-left: 24px; margin-top: 15px;"><%=L"设置"%></div>
+            <input type="button" value="" onclick="ClosePage()" style="position: relative; margin-left: 1050px; margin-top: 12px; width: 33px; height: 33px; background: url(Texture/Aries/Creator/keepwork/Mobile/esc/guanbi_44x44_32bits.png#0 0 44 44);" />
+        </div>
+        <div zorder="-2" style="position: relative; width: 1104px; height: 556px; background: url(Texture/Aries/Creator/keepwork/Mobile/esc/bg_32bits.png:20 20 20 20);"></div>
+    </div>
+    <div style="float:left;width:272px;height:364px;margin-top:104px;margin-left:24px;background:url(Texture/Aries/Creator/keepwork/Mobile/esc/item_bg_32bits.png:20 20 20 20);">
+        <div align="center" style="margin-top:20px;width:128px;height:128px; background:url(Texture/Aries/Creator/keepwork/Mobile/esc/touxiang_128x128_32bits.png#0 0 128 128);">
+            <pe:mc_player name="main_user_player" miniscenegraphname="Avatar_User_Character" style="width:128px;height:128px;margin-left: 0px; margin-top: -10px;" IsInteractive="false" fisrtFrameMove = "false" NoFrameMove="true" RenderTargetSize="256" DefaultCameraObjectDist="3.8" DefaultLiftupAngle = "0"/>
+        </div>
+        <div  style="margin-top:24px;font-size: 28px; base-font-size: 28px; font-weight: bold; color:#333333;text-align:center;overflow-y: auto;margin-left:0px;font-weight:bold;">
+            <%=_guihelper.AutoTrimTextByWidth(GetNickName(), 220, "System;28;bold")%>             
+        </div>
+        <div  style="margin-top:16px;font-size: 22px; base-font-size: 22px; color:#A8A7B0FF;text-align:left; margin-left: 30px;">
+            <%=GetAccountStr()%>
+        </div>
+        <div  style="margin-top:16px;font-size: 22px; base-font-size: 22px; color:#A8A7B0FF;text-align:left; margin-left: 30px;">
+            <%=GetRegisterTimeStr()%>
+        </div>
+    </div> 
+    <div style="float:left;margin-top:105px;margin-left:28px;width: 780px;height:304px;background-color: #33333300;">
+        <pe:if condition = '<%=not GameLogic.IsReadOnly()%>'>
+            <div style="float:left;width:194px;height: 192px;">
+                <pe:container uiname = "MobileEscFramePage.shareWorld" name="shareWorld" onclick="OnClickButton" style="background: url(Texture/Aries/Creator/keepwork/Mobile/esc/item_bg_32bits.png:30 30 30 30); width:168px; height:170px;">
+                    <div align="center" style="margin-top:32px;width:44px;height: 40px;background:url(Texture/Aries/Creator/keepwork/Mobile/esc/fabu_44x40_32bits.png#0 0 44 40)"/>
+                    <pe:label value='<%=L"上传世界"%>' style="font-size: 24px;margin-top: 34px; text-align:center;height:32px;font-weight:bold;color:#7B7A8AFF;"/>
+                </pe:container>
+            </div>
+        </pe:if>
+        <div style="float:left; width:194px;height: 192px;">
+            <pe:container uiname = "MobileEscFramePage.createNewWorld" name="createNewWorld" onclick="OnClickButton" style="background: url(Texture/Aries/Creator/keepwork/Mobile/esc/item_bg_32bits.png:30 30 30 30); width:168px; height:170px;">
+                <div align="center" style="margin-top:32px;width:48px;height: 50px;background:url(Texture/Aries/Creator/keepwork/Mobile/esc/chuangjianshijie_48x50_32bits.png#0 0 48 50)"/>
+                <pe:label value='<%=L"新建世界"%>' style="font-size: 24px;margin-top: 23px; text-align:center;height:32px;font-weight:bold;color:#7B7A8AFF;background-color:#fff600;"/>
+            </pe:container>
+        </div>
+        <div style="float:left; width:194px;height: 192px;">
+            <pe:container uiname = "MobileEscFramePage.loadWorld" name="loadWorld"  onclick="OnClickButton" style="background: url(Texture/Aries/Creator/keepwork/Mobile/esc/item_bg_32bits.png:30 30 30 30); width:168px; height:170px;">
+                <div align="center" tooltip="Ctrl+O" style="margin-top:32px;width:34px;height: 37px;background:url(Texture/Aries/Creator/keepwork/Mobile/esc/jiazaishijie_34x37_32bits.png#0 0 34 37)"/>
+                <pe:label value='<%=L"加载世界"%>' style="font-size: 24px;margin-top: 36px; text-align:center;height:32px;font-weight:bold;color:#7B7A8AFF;background-color:#fff600;"/>
+            </pe:container>
+        </div>
+        <div style="float:left; width:194px;height: 192px;">
+            <pe:container uiname = "MobileEscFramePage.openServerPage" name="openServerPage"  onclick="OnClickButton" style="background: url(Texture/Aries/Creator/keepwork/Mobile/esc/item_bg_32bits.png:30 30 30 30); width:168px; height:170px;">
+                <div align="center" style="margin-top:32px;width:42px;height: 42px;background:url(Texture/Aries/Creator/keepwork/Mobile/esc/net_56x56_32bits.png#0 0 56 56)"/>
+                <pe:label value='<%=L"多人联网"%>' style="font-size: 24px;margin-top: 30px; text-align:center;height:32px;font-weight:bold;color:#7B7A8AFF;background-color:#fff600;"/>
+            </pe:container>
+        </div>
+        <div style="float:left; width:194px;height: 192px;">
+            <pe:container uiname = "MobileEscFramePage.changeTexture" name="changeTexture"  onclick="OnClickButton" style="background: url(Texture/Aries/Creator/keepwork/Mobile/esc/item_bg_32bits.png:30 30 30 30); width:168px; height:170px;">
+                <div align="center" style="margin-top:32px;width:45px;height: 42px;background:url(Texture/Aries/Creator/keepwork/Mobile/esc/genghuancaizhi_45x42_32bits.png#0 0 45 42)"/>
+                <pe:label value='<%=L"更换材质"%>' style="font-size: 24px;margin-top: 26px; text-align:center;height:32px;font-weight:bold;color:#7B7A8AFF;background-color:#fff600;"/>
+            </pe:container>
+        </div>
+        <div style="float:left; width:194px;height: 192px;">
+            <pe:container uiname = "MobileEscFramePage.systemSetting" name="systemSetting"  onclick="OnClickButton" style="background: url(Texture/Aries/Creator/keepwork/Mobile/esc/item_bg_32bits.png:30 30 30 30); width:168px; height:170px;">
+                <div align="center" style="margin-top:32px;width:38px;height: 42px;background:url(Texture/Aries/Creator/keepwork/Mobile/esc/xitongshezhi_38x42_32bits.png#0 0 38 42)"/>
+                <pe:label value='<%=L"系统设置"%>' style="font-size: 24px;margin-top: 26px; text-align:center;height:32px;font-weight:bold;color:#7B7A8AFF;background-color:#fff600;"/>
+            </pe:container>
+        </div>
+        <div style="float:left; width:194px;height: 192px;">
+            <pe:container uiname = "MobileEscFramePage.exitWorld" name="exitWorld"  onclick="OnClickButton" style="background: url(Texture/Aries/Creator/keepwork/Mobile/esc/item_bg_32bits.png:30 30 30 30); width:168px; height:170px;">
+                <div align="center" style="margin-top:32px;width:38px;height: 42px;background:url(Texture/Aries/Creator/keepwork/Mobile/esc/baocunbingtuichu_40x42_32bits.png#0 0 40 42)"/>
+                <pe:label value='<%=L"退出世界"%>' style="font-size: 24px;margin-top: 26px; text-align:center;height:32px;font-weight:bold;color:#7B7A8AFF;background-color:#fff600;"/>
+            </pe:container>
+        </div>
+    </div>
+    <pe:container alignment="_ctt" style="width:480px;height:84px;background-color: #33333300;">
+        <div style="float:left;margin-top:30px;width:220px;height:144px;text-align:center;font-size: 24px; base-font-size: 24px; color:#404BF5FF;" onclick="onClickUserLicense()">
+            《用户许可协议》
+        </div>
+        <div style="float:left;margin-top:30px;width:40px;height:144px;text-align:center;font-size: 24px; base-font-size: 24px; color:#404BF5FF;">
+            |
+        </div>
+        <div  style="float:left;margin-top:30px;width:220px;height:144px;text-align:center;font-size: 24px; base-font-size: 24px; color:#404BF5FF;" onclick="OnClickUserPrivacy()">
+            《用户隐私协议》
+        </div>
+    </pe:container>
+</div>
+</pe:mcml>
+</body>
+</html>
+

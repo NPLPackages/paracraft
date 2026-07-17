@@ -46,6 +46,10 @@ function AutoSaver:SetInterval(intervalMins)
 	end
 end
 
+function AutoSaver:OnCommandAdded(cmd)
+	self:IncreaseOperation(1);
+end
+
 -- each user operation will increase the count by 1. 
 -- When the operation count reach autosave_operation_count, we will automatically save. 
 -- @param nCount: default to 1
@@ -93,14 +97,14 @@ function AutoSaver:DoAutoSave()
 		if self.isCheckModified then
 			return
 		end
+		if (self:IsSaveMode()) then
+			-- save mode
+			GameLogic.QuickSave();
+		end
 		if(self.autosave_operation_count > 0 and self.operation_count > self.autosave_operation_count) then
 			self.timeout = false;
 			self.operation_count = 1;
-
-			if (self:IsSaveMode()) then
-				-- save mode
-				GameLogic.QuickSave();
-			else
+			if (not self:IsSaveMode()) then
 				-- tip mode
 				if(not GameLogic.IsRemoteWorld() and not ParaMovie.IsRecording()) then
 					if(System.os.IsMobilePlatform()) then
@@ -113,19 +117,19 @@ function AutoSaver:DoAutoSave()
 		else
 			self.timeout = true;
 		end
-		if self.mode == "autosave" and GameLogic.world_revision and GameLogic.world_revision:IsModifiedAndNotAutoSaved() then
+		if self.mode == "autosave" and GameLogic.world_revision and GameLogic.world_revision:IsModifiedAndNotAutoSaved() and not GameLogic.world_revision:IsStageLocked() then
 			GameLogic.RunCommand("/autosave -stage");
 		end
 	end
 end
 
 function AutoSaver:OnEnterWorld()
-	UndoManager:Connect("commandAdded", self, self.IncreaseOperation, "UniqueConnection");
+	UndoManager:Connect("commandAdded", self, self.OnCommandAdded, "UniqueConnection");
 	self:Init();
 end
 
 function AutoSaver:OnLeaveWorld()
-	UndoManager:Disconnect("commandAdded", self, self.IncreaseOperation);
+	UndoManager:Disconnect("commandAdded", self, self.OnCommandAdded);
 
 	if(self:IsSaveMode()) then
 		-- TODO: shall we save on leave, currently this is done manually by external logics. 

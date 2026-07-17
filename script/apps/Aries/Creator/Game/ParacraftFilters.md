@@ -129,8 +129,10 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "OnWorldTageChange": on world tage change
   - "SyncWorldFinish": on world sync finish
   - "SyncWorldFinishBegin": on world sync start
+  - "SyncWorldFinishNoUI": on world sync finish
+  - "SyncWorldEnded": on syncfinish page closed
   - "EnterWorldFailed": onEnterWorldFailed
-  --"ConnectServerFailed": ConnectServerFailed
+  --"ConnectServer": ConnectServer failed or success
   --"CheckShowIfApplyStagedChanges", true: if we shall display an UI asking the user if we need to recover
 
 - global:
@@ -180,6 +182,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "handleLogin", packet_login: whenever client received confirmed login packet from server. 
   - "entity_player_mp_other_entity_action_state_updated", entity_player_mp_other: after every time entity action state get updated for EntityPlayerMPOther
   - "entity_player_mp_entity_action_state_updated", entity_player_mp: after every time entity action state get updated for EntityPlayerMP
+  - "net_status", socket close or open status
 - movie: 
   - "pop_movie_mode", lastMode:when the movie mode is popped
 - sound: 
@@ -200,7 +203,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "CustomCodeBlockClicked": false, determine whether code block can be opened
   - "OnCodeBlockLineStep": locationInfo: in format of "filename:line:"
 - player rules
-  -"OnPlayerRuleChange": when player rule register or unregister
+  - "OnPlayerRuleChange": when player rule register or unregister
+  - "OnPlayerToggleFly": when player toggle flying
 
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 

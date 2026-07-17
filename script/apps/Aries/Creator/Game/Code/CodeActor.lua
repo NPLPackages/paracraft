@@ -167,17 +167,20 @@ function Actor:OnClick(mouse_button)
 end
 
 function Actor:OnCollideWithEntity(fromEntity)
-	self:collided(self, fromEntity:GetActor());
+	self:collided(self, fromEntity:GetActor() or fromEntity);
 end
 
 -- @param block_id: if nil, it means any obstruction block.
+-- @param minYOffset: default to -0.001. -0.001 will make sure the actor is on the ground. or 0.001 will make sure the actor is in the air.
 -- @return true
-function Actor:IsTouchingBlock(block_id)
+function Actor:IsTouchingBlock(block_id, minYOffset)
 	if(not self.entity) then
 		return;
 	end
+	minYOffset = minYOffset or -0.001
 	local aabb = self.entity:GetCollisionAABB();
-	local blockMinX,  blockMinY, blockMinZ = BlockEngine:block(aabb:GetMinValues());
+	local minX, minY, minZ = aabb:GetMinValues()
+	local blockMinX,  blockMinY, blockMinZ = BlockEngine:block(minX, minY + minYOffset, minZ); -- 0.001 for ground detection. 
 	local blockMaxX,  blockMaxY, blockMaxZ = BlockEngine:block(aabb:GetMaxValues());
 
     for bx = blockMinX, blockMaxX do
@@ -612,9 +615,19 @@ end
 
 function Actor:Say(text, duration, bAbove3D)
 	local entity = self:GetEntity();
-	if(entity) then	
+	if(entity) then
+		local text = self:GenerateSayText(text);	
 		entity:Say(text, duration, bAbove3D)
 	end
+end
+
+local SmileyConfig
+function Actor:GenerateSayText(text)
+	if not text or text == "" then
+		return "";
+	end
+	SmileyConfig = SmileyConfig or NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/SmileyConfig.lua");
+	return SmileyConfig.GenerateNormalHtml(text,12)
 end
 
 function Actor:SetFacingDegree(degree)

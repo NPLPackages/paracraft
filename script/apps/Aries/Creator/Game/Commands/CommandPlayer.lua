@@ -31,7 +31,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 Commands["clearbag"] = {
 	name="clearbag", 
-	quick_ref="/clearbag [@playername] [itemid] [count]", 
+	quick_ref="/clearbag [@playername] [itemid] [-e filter][count]", 
 	desc=[[clear all or given item in the inventory of a given player
 /clearbag @p   clear all 
 /clearbag [item_id]   clear all items with the give id
@@ -39,11 +39,15 @@ Commands["clearbag"] = {
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		if(not System.options.is_mcworld) then
-			return;
+			return ;
 		end
-		local item_id, item_count, playerEntity, hasInputName;
+		local item_id, item_count, playerEntity, hasInputName,filter,option;
 		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 		item_id,cmd_text  = CmdParser.ParseInt(cmd_text);
+		option,cmd_text = CmdParser.ParseOption(cmd_text)
+		if option == "e" then
+			filter,cmd_text = CmdParser.ParseString(cmd_text)
+		end
 		item_count, cmd_text = CmdParser.ParseInt(cmd_text);
 		
 		playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
@@ -52,7 +56,7 @@ Commands["clearbag"] = {
 				playerEntity.inventory:ClearItems(item_id, item_count);
 			else
 				-- clear all
-				playerEntity.inventory:Clear();
+				playerEntity.inventory:Clear(nil,nil,filter);
 			end
 		end
 	end,
@@ -87,9 +91,13 @@ e.g.
 
 Commands["take"] = {
 	name="take", 
-	quick_ref="/take [@playername] [block] [count] [serverdata]", 
+	quick_ref="/take [@playername] [block] [count] [-bag number] [-replace] [-select] [-pin|unpin] [serverdata]", 
 	desc=[[set a given block to the hand of the player
-@param block : block id or name
+@param block: block id or name
+@param -replace: replace the item in bag pos
+@param -select: select the item in bag pos
+@param -bag [number]: set item bag pos from number (1-9 are for quick select bar, default to 10)
+@param -pin|upin: we can pin or unpin the item in quick select bar. once pinned, it will not be replaced or removed by the user.
 @param serverdata: server data table in {}
 e.g.
 /take 61
@@ -97,16 +105,37 @@ e.g.
 /take ColorBlock 100 {color="#ff0000"}
 /take AgentItem {name="circuit.lever"}
 /take LiveModel {tooltip="onlinestore/1.blocks.xml"}
+/take Book -bag {tooltip="blocktemplates/1.bmax"}
+/take 61 -replace -bag 2 
+/take 0 -replace -bag 2 
+/take 62 -replace -pin -bag 2 
+/take -unpin -bag 2 
+/take -select -bag 5
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local playerEntity, blockid, count, data, method, serverdata, hasInputName;
+		local playerEntity, blockid, count, data, method, serverdata, hasInputName, bagpos;
 		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 		blockid, cmd_text = CmdParser.ParseBlockId(cmd_text);
 		count, cmd_text = CmdParser.ParseInt(cmd_text);
+		local options = {};
+		
+		local option_name = "";
+		while (option_name and cmd_text) do
+			option_name, cmd_text = CmdParser.ParseOption(cmd_text);
+			if(option_name == "bag") then
+				bagpos, cmd_text = CmdParser.ParseInt(cmd_text);
+				if(not bagpos)then
+					bagpos = 10;
+				end
+			elseif(option_name) then
+				options[option_name] = true;
+			end
+		end
+
 		serverdata, cmd_text = CmdParser.ParseServerData(cmd_text);
 		if(blockid) then
 			playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
-			if(playerEntity and playerEntity.inventory and playerEntity.inventory) then
+			if(playerEntity and playerEntity.inventory) then
 				local itemStack = ItemStack:new():Init(blockid, count or 1, serverdata);
 				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 				local filename = serverdata and serverdata.tooltip or nil
@@ -143,13 +172,37 @@ e.g.
 				end
 
 				local item = ItemClient.GetItem(blockid)
-				if(item and item:GetPreferredBlockData()) then
-					itemStack:SetPreferredBlockData(item:GetPreferredBlockData())
+				local item_data
+				if(item and item.GetPreferredBlockData and item:GetPreferredBlockData()) then
+					item_data = item:GetPreferredBlockData()
 				end
-				if(playerEntity.SetBlockInRightHand) then
-					playerEntity:SetBlockInRightHand(itemStack);
+				if item_data and tonumber(item_data) == 4095 then
+					if not serverdata or not serverdata.color then
+						itemStack:SetPreferredBlockData(item_data)
+					end
 				end
+				if bagpos then
+					if(options.replace) then
+						playerEntity.inventory:SetItemByBagPos(bagpos, itemStack.id, itemStack.count, itemStack);
+					else
+						playerEntity.inventory:AddItemToInventory(itemStack, bagpos);
+					end
+				else
+					if(playerEntity.SetBlockInRightHand) then
+						playerEntity:SetBlockInRightHand(itemStack);
+					end
+				end
+				
 			end
+		end
+
+		if(bagpos and options.select) then
+			GameLogic.GetPlayerController():SetHandToolIndex(bagpos);
+		end
+
+		if(bagpos and (options.pin or options.unpin)) then
+			-- pin the item in quick select bar
+			GameLogic.events:DispatchEvent({type = "PinPlayerItemSlot", slot_index = bagpos, is_pin = options.pin == true});
 		end
 	end,
 };
@@ -205,9 +258,10 @@ Commands["speedscale"] = {
 		playerEntity = CmdParser.ParsePlayer(cmd_text);
 		speed, cmd_text = CmdParser.ParseInt(cmd_text);
 		if(speed) then
-			local player = playerEntity or EntityManager:GetFocus();
-			if(player) then
-				player:SetSpeedScale(speed);
+			if(playerEntity) then
+				playerEntity:SetSpeedScale(speed);
+			else
+				GameLogic.options:SetWalkSpeedScale(speed);
 			end
 		end
 	end,
@@ -447,15 +501,13 @@ Commands["skin"] = {
 	quick_ref="/skin [@playername] [filename]", 
 	desc=[[change skin. if no filename is specified a random one is used. 
 @param playername: if not specified and containing entity is a biped, it is the containing entity like NPC; otherwise it is current player
-@param filename: can be relative to world directory, or "Texture/blocks/human/" or root path. It can also be preinstalled id 
-/skin 1     :change current player's skin to id=1
+@param filename: can be relative to world directory, or "Texture/blocks/human/" or root path. It can also be preinstalled id. "editor"
+/skin editor :open GUI editor for current player
 /skin texture/blocks/1.png :change current player's skin to a file in current world directory
 /skin @test 1:  change 'test' player's skin to id=1
+/skin 1     :change current player's skin to id=1
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		if(GameLogic.IsSocialWorld()) then
-			return
-		end
 		local playerEntity, hasInputName;
 		playerEntity, cmd_text, hasInputName = CmdParser.ParsePlayer(cmd_text);
 		if(not playerEntity and not hasInputName) then
@@ -469,10 +521,22 @@ Commands["skin"] = {
 		if(cmd_text) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 			local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
-			local skin_filename = PlayerSkins:GetSkinByString(cmd_text);
-			
-			if(skin_filename and playerEntity and playerEntity.SetSkin) then
-				playerEntity:SetSkin(skin_filename);
+				
+			if(cmd_text == "editor") then
+				PlayerSkins:OpenEditor(playerEntity);
+			else
+				local skin_filename
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+				local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+				local suitItem = CustomCharItems:GetSuitItemById(cmd_text)
+				if(suitItem) then
+					skin_filename = suitItem.skin
+				else
+					PlayerSkins:GetSkinByString(cmd_text);
+				end
+				if(skin_filename and playerEntity and playerEntity.SetSkin) then
+					playerEntity:SetSkin(skin_filename);
+				end
 			end
 		end
 	end,
@@ -480,18 +544,23 @@ Commands["skin"] = {
 
 Commands["/avatar"] = {
 	name="avatar", 
-	quick_ref="/avatar [@playername] [filename]", 
+	quick_ref="/avatar [-pet] [@playername] [filename]", 
 	desc=[[change current avatar model. if no filename is specified, default one is used. 
+@param -pet: change the pet avatar instead of player avatar	
 @param playername: if not specified and containing entity is a biped, it is the containing entity like NPC; otherwise it is current player
-@param filename: can be relative to current world directory or one of the preinstalled ones like "actor". 
+@param filename: can be relative to current world directory or one of the preinstalled ones like 
 /avatar dog    : change the current player to dog avator
+/avatar -pet dog  :change pet avatar to dog
 /avatar @test test.fbx :change 'test' player to a fbx file in current world directory. 
+/avatar actor   :block actor
+/avatar customchar  :paper actor
+/avatar haqi
+/avatar haqiFemale
+/avatar haqiMale
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		if(GameLogic.IsSocialWorld()) then
-			return
-		end
-		local playerEntity, hasInputName;
+		local playerEntity, hasInputName, options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
 		playerEntity, cmd_text, hasInputName  = CmdParser.ParsePlayer(cmd_text);
 		if(not playerEntity and not hasInputName) then
 			if(fromEntity and fromEntity:IsBiped()) then
@@ -506,25 +575,33 @@ Commands["/avatar"] = {
 		
 		if(cmd_text and playerEntity) then
 			local assetfile = cmd_text;
-			assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(assetfile);
-			if(assetfile and assetfile~=playerEntity:GetMainAssetPath()) then
-				local oldAssetFile = playerEntity:GetMainAssetPath()
-				if(playerEntity.SetModelFile) then
-					playerEntity:SetModelFile(old_filename);
-				else
-					playerEntity:SetMainAssetPath(assetfile);
+
+			if(options.pet) then
+				assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(assetfile);
+				if GameLogic.MiniGameMgr and assetfile then
+					GameLogic.MiniGameMgr:ChangeMainPetAsset(assetfile)
 				end
-				-- this ensure that at least one default skin is selected
-				if(playerEntity:GetSkin()) then
-					playerEntity:SetSkin(nil);
-				else
-					playerEntity:RefreshSkin();
+			else
+				assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(assetfile);
+				if(assetfile and assetfile~=playerEntity:GetMainAssetPath()) then
+					local oldAssetFile = playerEntity:GetMainAssetPath()
+					if(playerEntity.SetModelFile) then
+						playerEntity:SetModelFile(assetfile);
+					else
+						playerEntity:SetMainAssetPath(assetfile);
+					end
+					-- this ensure that at least one default skin is selected
+					if(playerEntity:GetSkin()) then
+						playerEntity:SetSkin(nil);
+					else
+						playerEntity:RefreshSkin();
+					end
+					if(math.abs(EntityManager.PlayerAssetFile:GetDefaultScale(oldAssetFile) - playerEntity:GetScaling()) < 0.01) then
+						playerEntity:SetScaling(EntityManager.PlayerAssetFile:GetDefaultScale(assetfile))
+					end
+				elseif(not assetfile) then
+					LOG.std(nil, "warn", "cmd:avatar", "file %s not found", cmd_text or "");
 				end
-				if(math.abs(EntityManager.PlayerAssetFile:GetDefaultScale(oldAssetFile) - playerEntity:GetScaling()) < 0.01) then
-					playerEntity:SetScaling(EntityManager.PlayerAssetFile:GetDefaultScale(assetfile))
-				end
-			elseif(not assetfile) then
-				LOG.std(nil, "warn", "cmd:avatar", "file %s not found", cmd_text or "");
 			end
 		end
 	end,

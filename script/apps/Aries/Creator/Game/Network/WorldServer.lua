@@ -81,6 +81,7 @@ function WorldServer:OnExit()
 	ParaTerrain.GetBlockAttributeObject():SetField("IsServerWorld", false);
 
 	GameLogic:Disconnect("texturePackChanged", self, self.OnTexturePackChanged, "UniqueConnection");
+	GameLogic.GetFilters():apply_filters("exit_world_server")
 	return self;
 end
 
@@ -112,6 +113,7 @@ function WorldServer:CreateAdminPlayer()
 			entityMP:SetGravity(oldPlayer:GetGravity());
 			entityMP:SetPosition(oldPlayer:GetPosition());
 			entityMP:SetSpeedScale(oldPlayer:GetSpeedScale());
+			entityMP:SetScaling(oldPlayer:GetScaling());
 			entityMP:SetSkipPicking(true);
 			if(entityMP:IsShowHeadOnDisplay() and System.ShowHeadOnDisplay) then
 				System.ShowHeadOnDisplay(true, entityMP:GetInnerObject(), entityMP:GetDisplayName(), GameLogic.options.PlayerHeadOnTextColor);	

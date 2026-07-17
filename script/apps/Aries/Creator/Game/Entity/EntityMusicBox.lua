@@ -162,5 +162,6 @@ function Entity:OpenEditor(editor_name, entity)
 			OpenAudioFileDialog.OnClose()
 			onClose(filename)
 		end})
+		return true;
 	end
 end

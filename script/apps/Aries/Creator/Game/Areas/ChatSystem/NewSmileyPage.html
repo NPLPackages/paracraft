@@ -1,0 +1,44 @@
+<!-- "script/apps/Aries/Creator/Game/Areas/ChatSystem/NewSmileyPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="NewSmileyPage.lua"><![CDATA[
+local pageCtrl = document:GetPageCtrl();
+local NewSmileyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/NewSmileyPage.lua");
+NewSmileyPage.OnInit();
+function DS_Func_Items(index)
+    return NewSmileyPage.DS_Func_Items(index);
+end
+function ClosePage()
+    NewSmileyPage.ClosePage()
+end
+
+function OnClickIcon(index)
+    NewSmileyPage.SendSmiley(index);
+    ClosePage();
+end
+]]></script>
+
+<div style="padding-left:10px;padding-top:10px;padding-bottom:10px;background:Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#228 40 32 32:14 14 14 14">
+    <pe:gridview DataSource="<%=DS_Func_Items%>" name="DS_Func_Items" 
+        VerticalScrollBarStep="34" CellPadding="6"  DefaultNodeHeight = "34" ItemsPerLine="6" AllowPaging="false" pagesize="250">
+        <Columns>
+            <a width="32" height="32" tooltip='<%=Eval("cn")%>' style="padding:6px;background-color: #111113; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"
+                onclick="OnClickIcon" param1='<%=Eval("index")%>'>
+                <div zorder="1" style="<%=string.format('width:20px;height:20px; background:url(%s);',Eval('icon'))%>"></div>
+            </a>
+        </Columns>
+        <EmptyDataTemplate>
+        </EmptyDataTemplate>
+        <FetchingDataTemplate>
+        </FetchingDataTemplate>
+    </pe:gridview>
+</div>
+</pe:mcml> 
+</body>
+</html>

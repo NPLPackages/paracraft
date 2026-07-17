@@ -1806,6 +1806,13 @@ function MyCompany.Aries.OnWorldLoad()
 
 		NPL.load("(gl)script/apps/Aries/Combat/main.lua");
 		MyCompany.Aries.Combat.OnWorldLoad();
+		
+		if System.options.IsTouchDevice or System.os.IsMobilePlatform() then
+			System.options.IsMobilePlatform = true
+		end
+		if System.options.IsMobilePlatform or System.os.IsEmscripten() then
+			ParaCamera.GetAttributeObject():SetField("IsShiftMoveSwitched", true);
+		end
 	end
 	
 	-- "UseRightButtonBipedFacing" boolean attribute is added to ParaCamera.
@@ -2455,7 +2462,7 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 
 	-- try start the loader asset file if any
 	local function stage_loader_asset_list()
-		if(params.loader_asset_list and not (System.options.IsMobilePlatform or System.options.mc)) then
+		if(params.loader_asset_list and not (System.options.IsMobilePlatform or System.options.mc or System.os.IsEmscripten())) then
 			stage_states.loader_asset_list = "waiting";
 			
 			-- Motion ------------------------------------------------------------
@@ -2941,7 +2948,7 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 	end
 
 	-- state machine processor. 
-	OnNextStage = function()
+	local OnNextStage_imp = function()
 		LOG.std(nil, "debug", "LoadWorld_stage_change", stage_states);
 		if(stage_states.preworld_loader == nil) then
 			stage_preworld_loader();
@@ -2977,6 +2984,16 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 			end
 		end
 	end
+
+	--[[ this is will lead to worldinfo.born_pos to be set after the default world.db. for PVP world, we may need to fix born_pos.x from 10120 to 10150. 
+	OnNextStage = function()
+		-- fix max call stack size on iOS web browser. 
+		commonlib.TimerManager.SetTimeout(function()
+			OnNextStage_imp();
+		end, 1)
+	end
+	]]
+	OnNextStage = OnNextStage_imp
 
 	-- now start the state machine
 	OnNextStage();

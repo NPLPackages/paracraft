@@ -1,0 +1,93 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Community/AIGC/UserInfoOfflinePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="UserInfoOfflinePage.lua">
+<![CDATA[
+local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
+UserInfoOfflinePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/AIGC/UserInfoOfflinePage.lua")
+UserInfoOfflinePage.OnInit()
+local page = document:GetPageCtrl();
+
+function OnClickClose()
+    page:CloseWindow();
+end
+
+function OnclickPreview()
+    UserInfoOfflinePage.OnPreviewAvatar()
+end
+function OnClickNext()
+    UserInfoOfflinePage.OnNextAvatar()
+end
+
+function OnSelectAvatar(name)
+    if name == "preview" then
+        UserInfoOfflinePage.OnSelectAvatar(1)
+    elseif name == "next" then
+        UserInfoOfflinePage.OnSelectAvatar(2)
+    end
+end
+
+function OnClickConfirm()
+    UserInfoOfflinePage.OnConfirm()
+end
+
+function OnClickLogin()
+    UserInfoOfflinePage.OnClickLogin()
+end
+
+function OnClickRandom()
+    UserInfoOfflinePage.OnRandomName()
+end
+
+]]>
+</script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#1a1a1a22;">
+    <pe:container alignment="_ct" width="560" height="470" style="margin-left:-280px;margin-top:-235px;background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#44 447 32 32:14 14 14 14);">
+        <div width="100%" style="height: 60px; ">
+            <div style="float: left; margin-left: 60px; margin-top: 32px; font-size: 18px; base-font-size: 18px; font-weight: bold;"><%=L"选择你的主角形象"%></div>
+            <input type="button" value="" onclick="OnClickClose" style="float: left; width: 18px; height: 18px; margin-top: 20px; margin-left: 316px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#4 394 36 36);"/>
+        </div>
+        <div style="width: 500px; height: 180px; margin-left: 32px; margin-top: 36px;">
+            <input type="button" onclick="OnclickPreview" uiname="UserInfoOfflinePage.previewAvatar" value=""  style="float: left; width: 60px; height: 40px;  margin-top: 70px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#260 176 120 84);" />
+            <pe:container uiname="UserInfoOfflinePage.previewBg" style="float: left; margin-left: 40px; margin-top: 10px; width: 136px; height: 180px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#44 447 32 32:14 14 14 14);">
+                <div zorder = "2" style="position: relative; margin-left:0px;margin-top:0px;width:100px;height:100px;background-color: #00000000;">
+                    <pe:mc_player name="UserInfoMyPlayer1" miniscenegraphname="UserInfoCharacterScene1" style="margin-left:-6px;margin-top:6px;width:146px;height:146px;" IsInteractive="true" NoFrameMove="true" DefaultCameraObjectDist="4" LookAtHeight="1.1" CameraObjectDist="5"/>
+               </div>
+               <input type="button" zorder = "3" name="preview" onclick="OnSelectAvatar()" style="position: relative; margin-left:0px;margin-top:0px;width:136px;height:180px;background: ;" />
+            </pe:container>
+            <pe:container uiname="UserInfoOfflinePage.nextBg" style="float: left; margin-left: 24px; margin-top: 10px; width: 136px; height: 180px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#44 447 32 32:14 14 14 14);">
+                <div zorder = "2" style="position: relative; margin-left:0px;margin-top:0px;width:100px;height:100px;background-color: #00000000;">
+                    <pe:mc_player name="UserInfoMyPlayer2" miniscenegraphname="UserInfoCharacterScene2" style="margin-left:-6px;margin-top:6px;width:146px;height:146px;" IsInteractive="true" NoFrameMove="true" DefaultCameraObjectDist="4" LookAtHeight="1.1" CameraObjectDist="5"/>
+               </div>
+               <input type="button" zorder = "3" name="next" onclick="OnSelectAvatar()" style="position: relative; margin-left:0px;margin-top:0px;width:136px;height:180px;background: ;" />
+            </pe:container>
+            <input type="button" onclick="OnClickNext" uiname="UserInfoOfflinePage.nextAvatar" value=""  style="float: left; margin-left: 40px; margin-top: 70px; width: 60px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#388 265 120 84);" />
+        </div>
+        <div style="width: 332px; height: 52px; margin-left: 114px; margin-top: 40px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#948 500 64 52:31 25 31 25);">
+            <input type='text'
+                name='offlineName'
+                style='float: left;
+                        background: url();  
+                        textcolor: #86909C;
+                        height: 28px;
+                        width: 230px;
+                        margin-top: 14px;
+                        margin-left: 20px;
+                        font-size: 16px;'
+                EmptyText='<%= L"请输入您的角色昵称" %>'
+                RemoveSpaces='true'
+                MoveViewWhenAttachWithIME='true' />
+            <input type="button" onclick="OnClickRandom" value="<%= L'随机' %>"  icon="Texture/Aries/Creator/keepwork/Community/community_userinfo.png#386 357 30 30" icon_width="16" icon_height="16" icon_off_x="-18" icon_off_y="-1" style="float: left; text-offset-x:9; text-offset-y:-2; font-weight: bold; width: 70px; height: 36px;  margin-top: 9px; background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#44 448 32 32:14 14 14 14);" />
+        </div>
+        <div style="width: 560px; height: 50px; margin-top: 30px;">
+            <input align="center" type="button" onclick="OnClickConfirm" value="<%= L'确定' %>"  style="float: left; font-weight: bold; font-size: 16px; base-font-size: 16px; color: #ffffff; width: 108px; height: 44px;  background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#84 448 32 32:14 14 14 14);" />
+            <input type="button" onclick="OnClickLogin" value="<%= L'登录' %>"  style="float: left; text-offset-y:-2; margin-left: 130px; margin-top: 16px; font-weight: bold; width: 64px; height: 32px;  background: url(Texture/Aries/Creator/keepwork/Community/community_userinfo.png#44 448 32 32:14 14 14 14);" />
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

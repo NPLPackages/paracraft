@@ -541,7 +541,7 @@ function GenerateModel:Run()
 		end});
 		self.timer:Change(30);
 	end
-
+	if(not self.blocks) then return end
 	_guihelper.MessageBox(string.format("当前选中%d个方块,是否确定生成模型？",#(self.blocks)), function(res)
 		if(res and res == _guihelper.DialogResult.No) then
 			return;

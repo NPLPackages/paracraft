@@ -20,6 +20,8 @@ NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/ide/math/ShapeAABB.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TransformWnd.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
+local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local TransformWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.TransformWnd");
@@ -45,6 +47,10 @@ SelectBlocks:Property({"yaw", 0, "GetYaw", "SetYaw", auto=true})
 SelectBlocks:Property({"pitch", 0, "GetPitch", "SetPitch", auto=true})
 SelectBlocks:Property({"roll", 0, "GetRoll", "SetRoll", auto=true})
 SelectBlocks:Property({"PivotPointColor", "#00ffff",})
+SelectBlocks:Property({"clickToSelect", false,}) -- default to ctrl+click to select
+-- save bmax to temp folder when user click save, file name is hash of the selection, which is stored in self.saveAsBmaxPath
+SelectBlocks:Property({"autoSaveBMaxToTemp", nil,}) 
+SelectBlocks:Property({"onlySelectEditable", false,}) -- check if only editable blocks are selectable
 
 SelectBlocks:Signal("valueChanged");
 SelectBlocks:Signal("selectionCanceled");
@@ -77,6 +83,11 @@ function SelectBlocks:ctor()
 	self.PivotPoint = vector3d:new(0,0,0);
 	self.PivotPointReal = vector3d:new(0,0,0);
 	self.position = vector3d:new(0,0,0);
+	
+	-- Double-click detection for clickToSelect mode
+	self.lastClickTime = 0;
+	self.lastClickPos = nil;
+	self.doubleClickThreshold = 300; -- 300ms threshold for double-click
 
 	GameLogic.GetFilters():add_filter("file_exported", SelectBlocks.filter_file_exported);
 end
@@ -100,6 +111,10 @@ function SelectBlocks.filter_file_exported(id, filename)
 		filename = commonlib.Encoding.DefaultToUtf8(filename);
 		GameLogic.AddBBS(nil, L"文件已自动导入你手中的CAD方块", 6000);
 		_guihelper.MessageBox(format(L"文件成功保存在%s,现在打开吗?", filename), function(res)
+			if (System.os.GetPlatform() == "emscripten") then
+				_guihelper.MessageBox(L"Web端暂时不支持此功能，请安装客户端");
+				return;
+			end
 			if(res and res == _guihelper.DialogResult.Yes) then
 				ParaGlobal.ShellExecute("open", output_file_name, "", "", 1);
 			end
@@ -108,7 +123,7 @@ function SelectBlocks.filter_file_exported(id, filename)
 		GameLogic.RunCommand("take", format("NPLCADCodeBlock {displayname=\"%s\" nplCode=\"importStl('union','%s','#ff0000')\"}", displayName, filename))
 	end
 	SelectBlocks.CancelSelection();
-	return id;
+	return id,filename;
 end
 
 -- static function
@@ -162,17 +177,20 @@ function SelectBlocks:UpdateManipulators()
 	NPL.load("(gl)script/ide/System/Scene/Manipulators/BlockPivotManipContainer.lua");
 	local BlockPivotManipContainer = commonlib.gettable("System.Scene.Manipulators.BlockPivotManipContainer");
 
-	local manipCont = BlockPivotManipContainer:new()
-	manipCont.radius = 0.5;
+	local manipCont
+	if(self:IsMirrorMode() or not self.clickToSelect) then
+		manipCont = BlockPivotManipContainer:new()
+		manipCont.radius = 0.5;
 
-	manipCont.xColor = self.PivotPointColor;
-	manipCont.yColor = self.PivotPointColor;
-	manipCont.zColor = self.PivotPointColor;
-	-- manipCont.showArrowHead = false;
-	manipCont:init();
-	manipCont:SetPivotPointPlugName("PivotPoint");
-	self:AddManipulator(manipCont);
-	manipCont:connectToDependNode(self);
+		manipCont.xColor = self.PivotPointColor;
+		manipCont.yColor = self.PivotPointColor;
+		manipCont.zColor = self.PivotPointColor;
+		-- manipCont.showArrowHead = false;
+		manipCont:init();
+		manipCont:SetPivotPointPlugName("PivotPoint");
+		self:AddManipulator(manipCont);
+		manipCont:connectToDependNode(self);
+	end
 
 	if(self:IsMirrorMode()) then
 		local MirrorWnd = commonlib.gettable("MyCompany.Aries.Game.GUI.MirrorWnd");
@@ -201,16 +219,28 @@ function SelectBlocks:UpdateManipulators()
 		manipCont:connectToDependNode(self);
 	
 		-- For rotation of blocks
-		NPL.load("(gl)script/ide/System/Scene/Manipulators/RotateManipContainer.lua");
-		local RotateManipContainer = commonlib.gettable("System.Scene.Manipulators.RotateManipContainer");
-		local manipCont = RotateManipContainer:new():init();
-		manipCont:SetPositionPlugName("PivotPointReal");
-		manipCont:SetRealTimeUpdate(false);
-		manipCont:SetYawInverted(true);
-		-- manipCont:SetRollInverted(true);
-		-- manipCont:SetPitchInverted(true);
-		self:AddManipulator(manipCont);
-		manipCont:connectToDependNode(self);
+		if(not self.clickToSelect) then
+			NPL.load("(gl)script/ide/System/Scene/Manipulators/RotateManipContainer.lua");
+			local RotateManipContainer = commonlib.gettable("System.Scene.Manipulators.RotateManipContainer");
+			local manipCont = RotateManipContainer:new():init();
+			manipCont:SetPositionPlugName("PivotPointReal");
+			manipCont:SetRealTimeUpdate(false);
+			manipCont:SetYawInverted(true);
+			-- manipCont:SetRollInverted(true);
+			-- manipCont:SetPitchInverted(true);
+			self:AddManipulator(manipCont);
+			manipCont:connectToDependNode(self);
+		end
+	end
+	
+	if(self.manipulatorsDisabledUntil) then
+		local currentTime = commonlib.TimerManager.GetCurrentTime();
+		if(currentTime < self.manipulatorsDisabledUntil) then
+			-- Still in the disabled period, keep them disabled
+			if(self:GetSceneContext()) then
+				self:GetSceneContext():EnableAllManipulators(false);
+			end
+		end
 	end
 end
 
@@ -277,9 +307,20 @@ end
 
 
 -- set pivot point vector3d in block coordinate system
+-- @param vec: if nil, we will use self.aabb's bottom center if player is in air, otherwise it will use the player's block position
 function SelectBlocks:SetPivotPoint(vec)
 	if(not vec) then
-		vec = {EntityManager.GetPlayer():GetBlockPos()};
+		local x, y, z = EntityManager.GetPlayer():GetBlockPos();
+		local xx, yy, zz = EntityManager.GetPlayer():GetPosition();
+		xx, yy, zz = BlockEngine:block(xx, yy-0.2, zz)
+		local block = BlockEngine:GetBlock(xx, yy, zz)
+		if(block and block.obstruction) then
+			vec = {x, y, z};
+		else
+			-- player is in air, use the bottom center of the selection box
+			local bx, by, bz = self.aabb:GetBottomCenter()
+			vec = {math.floor(bx), math.floor(by), math.floor(bz)};
+		end
 	end
 	if(not self.PivotPoint:equals(vec)) then
 		self.PivotPoint:set(vec);
@@ -306,6 +347,9 @@ function SelectBlocks:CheckCanSelectNow()
 			end
 		end
 		return;
+	end
+	if(self.blockX and not GameLogic.CreateGetEditableWorld():IsEditableBlock(self.blockX,self.blockY,self.blockZ)) then
+		return
 	end
 	return true;
 end
@@ -371,6 +415,13 @@ function SelectBlocks:Run(bIsDataPrepared)
 
 	cur_selection = self.blocks;
 	SelectBlocks.finished = false;
+
+	-- Initialize double-click tracking for single block selection
+	if(self.blockX) then
+		self.lastClickTime = commonlib.TimerManager.GetCurrentTime();
+		self.lastClickPos = {self.blockX, self.blockY, self.blockZ};
+	end
+	
 	SelectBlocks.RegisterHooks();
 	if not ShareBlocksPage.IsOpen() then
 		SelectBlocks.ShowPage();
@@ -442,6 +493,37 @@ function SelectBlocks:RefreshImediately()
 	end
 end
 
+-- automatically select blocks near a given position. 
+-- it first find the closest block within the radius, and then select all connected blocks to it. 
+-- @param radius: default to 7;
+-- @return the number of blocks selected.
+function SelectBlocks.AutoSelectNearbyBlocks(cx, cy, cz, radius)
+	radius = radius or 7;
+	NPL.load("(gl)script/ide/System/Util/Iterators.lua");
+	local Iterators = commonlib.gettable("System.Util.Iterators");
+	
+	for dx, dz in Iterators.Spiral3d(radius) do 
+		local x, y, z = cx + dx, cy, cz + dz;
+		local blockId = BlockEngine:GetBlockId(x, y, z);
+		if(blockId and blockId ~= 0) then
+			local block_data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
+			local self = cur_instance;
+			local count = 0;
+			if(cur_instance) then
+				self:SelectSingleBlock(x,y,z, blockId, block_data);
+				count = SelectBlocks.SelectAll(true, 2000)
+			else
+				local task = SelectBlocks:new({blockX = x, blockY = y, blockZ = z, blocks = {}})
+				task:Run()
+				task:SelectSingleBlock(x,y,z, blockId, block_data);
+				count = SelectBlocks.SelectAll(true, 2000)
+			end
+			return count or 0;
+		end
+	end
+	return 0;
+end
+
 -- static function:
 -- select all blocks connected with current selection but not below current selection. 
 -- @param max_new_count: max number of blocks to be added. default to 20000
@@ -451,31 +533,37 @@ function SelectBlocks.SelectAll(bImmediateUpdate, max_new_count)
 	if(not self) then
 		return
 	end 
-	local baseBlockCount = #(self.blocks);
 	local blockIndices = {}; -- mapping from block index to true for processed bones
 	local block = self.blocks[1];
-	if(not block) then
-		return;
+	local cx, cy, cz;
+	if(block) then
+		cx, cy, cz = block[1], block[2], block[3];
+	elseif(self.blockX) then
+		cx, cy, cz = self.blockX, self.blockY, self.blockZ;
+		self.blocks[1] = {cx, cy, cz};
+	else
+		return
 	end
-	local cx, cy, cz = block[1], block[2], block[3];
+	local baseBlockCount = #(self.blocks);
+	
 	local min_y = 9999;
 	for i, block in ipairs(self.blocks) do
 		local x, y, z = block[1], block[2], block[3];
-		local boneIndex = BlockEngine:GetSparseIndex(x-cx,y-cy,z-cz)
-		blockIndices[boneIndex] = true;
+		local blockIdx = BlockEngine:GetSparseIndex(x-cx,y-cy,z-cz)
+		blockIndices[blockIdx] = true;
 		if(y < min_y) then
 			min_y = y;
 		end
 	end
 	local function IsBlockProcessed(x, y, z)
-		local boneIndex = BlockEngine:GetSparseIndex(x-cx,y-cy,z-cz);
-		return blockIndices[boneIndex];
+		local blockIdx = BlockEngine:GetSparseIndex(x-cx,y-cy,z-cz);
+		return blockIndices[blockIdx];
 	end
 	local newlyAddedCount = 0;
 	local function AddBlock(x, y, z)
-		local boneIndex = BlockEngine:GetSparseIndex(x-cx,y-cy,z-cz)
-		if(not blockIndices[boneIndex]) then
-			blockIndices[boneIndex] = true;
+		local blockIdx = BlockEngine:GetSparseIndex(x-cx,y-cy,z-cz)
+		if(not blockIndices[blockIdx]) then
+			blockIndices[blockIdx] = true;
 			local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 			if(block_id > 0) then
 				local block = block_types.get(block_id);
@@ -515,6 +603,7 @@ function SelectBlocks.SelectAll(bImmediateUpdate, max_new_count)
 
 	self:OnSelectionRefreshed();
 	SelectBlocks.UpdateBlockNumber(#(self.blocks));
+	return #(self.blocks);
 end
 
 -- return a table containing all blocks that has been selected. 
@@ -549,8 +638,10 @@ end
 
 -- add a single block to selection. 
 function SelectBlocks:SelectSingleBlock(x,y,z, block_id, block_data)
-	self.blocks[#(self.blocks)+1] = {x,y,z, block_id, block_data};
-	ParaTerrain.SelectBlock(x,y,z,true);
+	if(not self.onlySelectEditable or GameLogic.CreateGetEditableWorld():IsEditableBlock(x,y,z)) then
+		self.blocks[#(self.blocks)+1] = {x,y,z, block_id, block_data};
+		ParaTerrain.SelectBlock(x,y,z,true);
+	end
 end
 
 -- highlight all blocks that are selected. Each frame we will only select a limited number of blocks for framerate. 
@@ -630,9 +721,22 @@ function SelectBlocks:UpdateLiveEntitySelection()
 	if(self.aabb and (self.aabb:GetVolume() < 100000)) then
 		local liveEntities = SelectBlocks.GetLiveEntities(self.aabb)
 		if(liveEntities) then
-			self.liveEntities = liveEntities;
-			liveEntityCount = #liveEntities;
-			for _, entity in ipairs(liveEntities) do
+			if(self.onlySelectEditable) then
+				-- Filter out non-editable entities
+				local editableLiveEntities = {};
+				for _, entity in ipairs(liveEntities) do
+					if(entity.isFromEditableWorld) then
+						editableLiveEntities[#editableLiveEntities + 1] = entity;
+					end
+				end
+				self.liveEntities = editableLiveEntities;
+				liveEntityCount = #editableLiveEntities;
+			else
+				self.liveEntities = liveEntities;
+				liveEntityCount = #liveEntities;
+			end
+			
+			for _, entity in ipairs(self.liveEntities) do
 				local x, y, z = entity:GetBlockPos()
 				ParaTerrain.SelectBlock(x,y,z,true);
 			end
@@ -699,7 +803,7 @@ function SelectBlocks:handleRightClickScene(event)
 		local ctrl_pressed = event.ctrl_pressed;
 		if ctrl_pressed then
 			local result = {};
-			result = ParaTerrain.MousePick(GameLogic.GetPickingDist(), result, self.filter);
+			result = SelectionManager:MousePick(GameLogic.GetPickingDist(), result, self.filter);
 			
 			if(result.blockX) then
 				local block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
@@ -708,16 +812,53 @@ function SelectBlocks:handleRightClickScene(event)
 					if(block) then
 						if(block.invisible and not block.solid) then
 							-- we will skip picking for invisible non solid block. instead we will only pick solid or customModel object.
-							result = ParaTerrain.MousePick(GameLogic.GetPickingDist(), result, mathlib.bit.band(0x84, self.filter));
+							result = SelectionManager:MousePick(GameLogic.GetPickingDist(), result, mathlib.bit.band(0x84, self.filter));
 						end
 					end
 				end
 			end
 			SelectBlocks.ExtendAABB(result.blockX,result.blockY,result.blockZ)
+			self:SetPivotPoint();
 			self:SetManipulatorPosition({result.blockX,result.blockY,result.blockZ});
 		end
 		return 
 	end
+end
+
+function SelectBlocks:CanSelectAtPos(x,y,z)
+	if(x and GameLogic.CreateGetEditableWorld():IsEditableBlock(x,y,z)) then
+		return true;
+	end
+	return false;
+end
+
+function SelectBlocks:mousePressEvent(event)
+end
+
+function SelectBlocks:mouseMoveEvent(event)
+end
+
+function SelectBlocks:mouseReleaseEvent(event)
+    local context = self:GetSceneContext();
+	if(not context) then
+		return;
+	end
+    context.is_click = event:isClick()
+    
+	if(context.is_click) then
+		local result = context:CheckMousePick();
+		if(event.mouse_button == "left") then
+			self:handleLeftClickScene(event, result)
+		elseif(event.mouse_button == "right") then
+			self:handleRightClickScene(event, result);
+		elseif(event.mouse_button == "middle") then
+			self:handleMiddleClickScene(event, result);
+		end
+	end
+end
+
+function SelectBlocks:handleMiddleClickScene(event)
+
 end
 
 function SelectBlocks:handleLeftClickScene(event)
@@ -726,39 +867,90 @@ function SelectBlocks:handleLeftClickScene(event)
 	local alt_pressed = event.alt_pressed;
 	local shift_pressed = event.shift_pressed;
 
-	if(ctrl_pressed) then
-		-- pick any scene object
-		local result = {};
-		result = ParaTerrain.MousePick(GameLogic.GetPickingDist(), result, self.filter);
-		
-		if(result.blockX) then
-			local block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
-			if(block_id and block_id > 0) then
-				local block = block_types.get(block_id);
-				if(block) then
-					if(block.invisible and not block.solid) then
-						-- we will skip picking for invisible non solid block. instead we will only pick solid or customModel object.
-						result = ParaTerrain.MousePick(GameLogic.GetPickingDist(), result, mathlib.bit.band(0x84, self.filter));
+	if(ctrl_pressed or self.clickToSelect) then
+		local itemLiveModel = ItemClient.GetItem(block_types.names.LiveModel)
+		local result = itemLiveModel:MousePickBlock(event)
+		local hasEntityResult;
+		if(result.entity and result.entity:isa(EntityManager.EntityLiveModel) and result.blockX) then
+			-- Handle the live model selection
+			if(not self.onlySelectEditable or result.entity.isFromEditableWorld) then
+				result.blockX,result.blockY,result.blockZ = result.entity:GetBlockPos()
+				hasEntityResult = true;
+			end
+		end
+
+		-- pick non-entity blocks
+		if (not hasEntityResult) then
+			result = {};
+			result = SelectionManager:MousePick(GameLogic.GetPickingDist(), result, self.filter);
+			
+			if(result.blockX) then
+				local block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
+				if(block_id and block_id > 0) then
+					local block = block_types.get(block_id);
+					if(block) then
+						if(block.invisible and not block.solid) then
+							-- we will skip picking for invisible non solid block. instead we will only pick solid or customModel object.
+							result = SelectionManager:MousePick(GameLogic.GetPickingDist(), result, mathlib.bit.band(0x84, self.filter));
+						end
 					end
 				end
 			end
 		end
 
-		if(result.blockX) then
+		if(hasEntityResult or (result.blockX and self:CanSelectAtPos(result.blockX, result.blockY, result.blockZ))) then
+			-- Check for double-click when clickToSelect is true
+			local isDoubleClick = false;
+			if(self.clickToSelect and result.blockX) then
+				local currentTime = commonlib.TimerManager.GetCurrentTime();
+				if(self.lastClickPos and 
+				   self.lastClickPos[1] == result.blockX and 
+				   self.lastClickPos[2] == result.blockY and 
+				   self.lastClickPos[3] == result.blockZ and
+				   (currentTime - self.lastClickTime) < self.doubleClickThreshold) then
+					isDoubleClick = true;
+				end
+				self.lastClickTime = currentTime;
+				self.lastClickPos = {result.blockX, result.blockY, result.blockZ};
+			end
+			
 			if(shift_pressed) then
 				-- ctrl+shift+ left click to toggle a single block's selection state
 				SelectBlocks.ToggleBlockSelection(result.blockX,result.blockY,result.blockZ)
 			elseif(alt_pressed) then
 				-- ctrl+alt+ left click to filter the given block in the current selection. 
 				SelectBlocks.FilterOnlyBlock(result.blockX,result.blockY,result.blockZ)
+			elseif(isDoubleClick) then
+				-- Double-click: select all connected blocks
+				SelectBlocks.SelectAll(true, 2000)
 			else
 				SelectBlocks.ExtendAABB(result.blockX,result.blockY,result.blockZ)
+				self:SetPivotPoint();
 				self:SetManipulatorPosition({result.blockX,result.blockY,result.blockZ});
+				
+				-- Disable manipulators temporarily for clickToSelect mode to allow double-click detection
+				if(self.clickToSelect) then
+					self.manipulatorsDisabledUntil = commonlib.TimerManager.GetCurrentTime() + self.doubleClickThreshold;
+					if(self:GetSceneContext()) then
+						self:GetSceneContext():EnableAllManipulators(false);
+					end
+					
+					-- Schedule re-enabling of manipulators after doubleClickThreshold
+					if(not self.manipulatorTimer) then
+						self.manipulatorTimer = commonlib.Timer:new({callbackFunc = function(timer)
+							if(self:GetSceneContext()) then
+								self:GetSceneContext():EnableAllManipulators(true);
+							end
+							self.manipulatorsDisabledUntil = nil;
+						end});
+					end
+					self.manipulatorTimer:Change(self.doubleClickThreshold, nil);
+				end
 			end
 		end
 	elseif(alt_pressed) then
 		local result = {};
-		result = ParaTerrain.MousePick(GameLogic.GetPickingDist(), result, self.filter);
+		result = SelectionManager:MousePick(GameLogic.GetPickingDist(), result, self.filter);
 
 		if(result.blockX) then
 			self:SetPivotPoint({result.blockX,result.blockY,result.blockZ});
@@ -767,7 +959,7 @@ function SelectBlocks:handleLeftClickScene(event)
 	elseif(shift_pressed) then
 		local result = Game.SelectionManager:MousePickBlock();
 
-		if(result.blockX) then
+		if(result.blockX and self:CanSelectAtPos(result.blockX, result.blockY, result.blockZ)) then
 			local x,y,z
 			if(result.side) then
 				x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
@@ -825,7 +1017,8 @@ function SelectBlocks:keyPressEvent(event)
 	elseif(dik_key == "DIK_C" or dik_key == "DIK_V" or dik_key == "DIK_X" )then
 		if(event.ctrl_pressed) then
 			if(dik_key == "DIK_C")then
-				self:CopyBlocks();
+				local isExportReferences = event.shift_pressed;
+				self:CopyBlocks(nil, isExportReferences);
 			elseif(dik_key == "DIK_X")then
 				self:CopyBlocks(true);
 			else
@@ -871,6 +1064,8 @@ function SelectBlocks.ShowPage(bShow)
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		isShowTitleBar = false,
 		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+		-- we need to mark dirty when new model textures are prepared.
+		SelfPaint = true, SelfPaintTextureName = "SelectBlocksTask", 
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		zorder = 1,
 		allowDrag = true,
@@ -894,6 +1089,8 @@ function SelectBlocks.ShowEditPage()
 			name = "SelectBlocksTask.ShowEditPage", 
 			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			isShowTitleBar = false,
+			-- we need to mark dirty when new model textures are prepared.
+			SelfPaint = true, SelfPaintTextureName = "SelectBlocksTask", 
 			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			zorder = -2,
@@ -937,6 +1134,7 @@ function SelectBlocks.UpdateBlockNumber(count, liveEntityCount)
 				page:Refresh(0.01);
 			else
 				page:SetUIValue("title", SelectBlocks.GetBlockCountText())
+				page:InvalidateRect()
 			end
 
 			GameLogic.GetFilters():apply_filters('UpdateBlockNumber');
@@ -967,15 +1165,24 @@ function SelectBlocks.GetEventSystem()
 	return SelectBlocks.events;
 end
 
+function SelectBlocks.IsAutoSaveToBmax()
+	return cur_instance and cur_instance.autoSaveBMaxToTemp;
+end
+
 function SelectBlocks.DoClick(name)
-	local self = SelectBlocks;
+	local self = cur_instance or SelectBlocks;
 	if(name == "delete")then
 		self.DeleteSelection()
 	elseif(name == "btn_selectall")then
 		self.SelectAll(true);
 	elseif(name == "save_template" or name == "btn_template")then
-		GameLogic.RunCommand("export");
-		-- self.SaveToTemplate();
+		if(self.autoSaveBMaxToTemp) then
+			-- auto save to template
+			self.SaveAsBMaxFileInTemp();
+			SelectBlocks.CancelSelection();
+		else
+			GameLogic.RunCommand("export");
+		end
 	elseif(name == "extrude_negY")then
 		self.AutoExtrude(false);
 	elseif(name == "extrude_posY")then
@@ -1025,8 +1232,9 @@ end
 -- Get a copy of blocks including block's server data
 -- @param pivot: the pivot point vector, if nil, it will default to self:GetPivotPoint()
 -- this can be {0,0,0} which will retain absolute position. 
+-- @param bSortBlocks: if true, the blocks are sorted by y,x,z
 -- @return blocks: array of {x,y,z,id, data, entity_data}
-function SelectBlocks:GetCopyOfBlocks(pivot)
+function SelectBlocks:GetCopyOfBlocks(pivot, bSortBlocks)
 	pivot = pivot or self:GetPivotPoint()
 	local pivot_x,pivot_y,pivot_z = unpack(pivot);
 	
@@ -1037,6 +1245,11 @@ function SelectBlocks:GetCopyOfBlocks(pivot)
 		-- x,y,z,block_id, data, serverdata
 		local b = cur_selection[i];
 		blocks[i] = {b[1]-pivot_x, b[2]-pivot_y, b[3]- pivot_z, b[4], if_else(b[5] == 0, nil, b[5]), b[6]};
+	end
+	if(bSortBlocks) then
+		table.sort(blocks, function(a, b)
+			return a[2] < b[2] or (a[2] == b[2] and a[1] < b[1]) or (a[2] == b[2] and a[1] == b[1] and a[3] < b[3]);
+		end);
 	end
 	return blocks;
 end
@@ -1063,6 +1276,46 @@ function SelectBlocks.GetLiveEntitiesInAABB(aabb, pivot)
 			end
 
 			return entityNodes;
+		end
+	end
+end
+
+function SelectBlocks.SaveAsBMaxFileInTemp()
+	if(cur_selection and cur_instance) then
+		local self = cur_instance;
+
+		local succeed, filename = GameLogic.RunCommand("/savemodel -f -sortblocks -autopivot -hidetip ~/temp");
+		if(succeed) then
+			local file = ParaIO.open(filename, "r");
+			if(file:IsValid()) then
+				local content = file:GetText();
+				file:close();
+				
+				-- Compute hash of the content
+				local hash = ParaMisc.md5(content);
+				
+				-- Save to temp/blocktemplates/[hash].bmax
+				local targetDir = ParaIO.GetWritablePath() .. "temp/blocktemplates/";
+				local targetFilename = targetDir .. hash .. ".bmax";
+				ParaIO.CreateDirectory(targetFilename);
+				
+				local targetFile = ParaIO.open(targetFilename, "w");
+				if(targetFile:IsValid()) then
+					targetFile:WriteString(content);
+					targetFile:close();
+					LOG.std(nil, "info", "SelectBlocks", "Saved to temp file: %s", targetFilename);
+					self.saveAsBmaxPath = targetFilename;
+				else
+					LOG.std(nil, "warn", "SelectBlocks", "Failed to save to temp file: %s", targetFilename);
+					GameLogic.AddBBS(nil, L"无法保存到临时文件，请检查权限。", 3000, "255 0 0");
+				end
+			else
+				LOG.std(nil, "warn", "SelectBlocks", "Failed to read source file: %s", filename);
+				GameLogic.AddBBS(nil, L"无法读取源文件。", 3000, "255 0 0");
+			end
+		else
+			LOG.std(nil, "warn", "SelectBlocks", "Failed to save model to temp");
+			GameLogic.AddBBS(nil, L"无法保存到临时文件，请检查权限。", 3000, "255 0 0");
 		end
 	end
 end
@@ -1189,7 +1442,7 @@ function SelectBlocks.ExtrudeSelection(dx, dy, dz)
 		self.px, self.py, self.pz = (self.px or 0), (self.py or 0), (self.pz or 0);
 		if( (dx~=0) or (dy~=0) or (dz~=0)) then
 			self:UpdateSelectionEntityData();
-			local params = {blocks = cur_selection};
+			local params = {blocks = cur_selection, add_to_history = self.add_to_history};
 
 			-- tricky: only allow extruding one direction.
 			if(self.px*dx <= 0) then
@@ -1225,8 +1478,16 @@ function SelectBlocks.DeleteLiveEntitiesInAABB(aabb)
 		local max_x, max_y, max_z = aabb:GetMaxValues()
 		local entities = EntityManager.GetEntitiesByMinMax(min_x, min_y, min_z, max_x, max_y, max_z, EntityManager.EntityLiveModel)
 		if(entities and #entities > 0) then
+			local fail_count = 0;
 			for _, entity in ipairs(entities) do
-				entity:Destroy();
+				if(not entity:IsLocked()) then
+					entity:Destroy();
+				else
+					fail_count = fail_count + 1
+				end
+			end
+			if(fail_count > 0) then
+				GameLogic.AddBBS(nil, L"有部分实体被锁定，无法删除", 3000, "255 0 0");
 			end
 		end
 	end
@@ -1235,6 +1496,7 @@ end
 -- delete entity without saving to history
 function SelectBlocks.DeleteEntitiesInAABB(aabb)
 	if(aabb) then
+		local fail_count = 0;
 		local min_x, min_y, min_z = aabb:GetMinValues()
 		local max_x, max_y, max_z = aabb:GetMaxValues()
 		for x = min_x, max_x do
@@ -1244,12 +1506,19 @@ function SelectBlocks.DeleteEntitiesInAABB(aabb)
 					if(entities) then
 						for entity,_ in pairs(entities) do
 							if entity and (entity:isa(EntityManager.EntityLiveModel) or entity:isa(EntityManager.EntityRailcar)) then
-								entity:Destroy();
+								if(not entity:IsLocked()) then
+									entity:Destroy();
+								else
+									fail_count = fail_count + 1
+								end
 							end
 						end
 					end
 				end
 			end
+		end
+		if(fail_count > 0) then
+			GameLogic.AddBBS(nil, L"有部分实体被锁定，无法删除", 3000, "255 0 0");
 		end
 	end
 end
@@ -1274,6 +1543,7 @@ function SelectBlocks.DeleteSelection(bFastDelete)
 			explode_time=200, 
 			destroy_blocks = cur_selection,
 			liveEntities = SelectBlocks.GetLiveEntitiesInAABB(self.aabb, {0,0,0}),
+			add_to_history = self.add_to_history,
 		})
 		SelectBlocks.CancelSelection();
 		task:Run();
@@ -1296,7 +1566,7 @@ function SelectBlocks:GetPivotInClipboard()
 	return pivotInClipboard;
 end
 
-function SelectBlocks:CopyBlocks(bRemoveOld)
+function SelectBlocks:CopyBlocks(bRemoveOld, isExportReferences)
 	if(self.aabb:IsValid()) then
 		local mExtents = self.aabb.mExtents;
 		local center = self.aabb:GetCenter();
@@ -1325,7 +1595,7 @@ function SelectBlocks:CopyBlocks(bRemoveOld)
 					blocks[i] = {b[1]-pivot_x, b[2]-pivot_y, b[3]- pivot_z, b[4], if_else(b[5] == 0, nil, b[5]), b[6]};
 				end
 				local liveEntities = SelectBlocks.GetLiveEntitiesInAABB(self.aabb, {pivot_x,pivot_y,pivot_z})
-				SelectBlocks.CopyToClipboard(blocks, liveEntities)
+				SelectBlocks.CopyToClipboard(blocks, liveEntities, isExportReferences)
 			end
 		end
 
@@ -1335,22 +1605,29 @@ end
 
 -- static public function: 
 -- copy current mouse cursor block to clipboard
-function SelectBlocks.CopyToClipboard(blocks, liveEntities)
+function SelectBlocks.CopyToClipboard(blocks, liveEntities, isExportReferencedFiles)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
 	local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
 
 	local result = Game.SelectionManager:MousePickBlock();
 	local bFound;
-	if(result.entity) then
+	if(result.entity and not liveEntities) then
 		if(result.entity:isa(EntityManager.EntityLiveModel)) then
 			bFound = true;
 			local xmlNode = result.entity:SaveToXMLNode()
-			if(Clipboard.Save("EntityLiveModel", xmlNode)) then
-				GameLogic.AddBBS(nil, format(L"1个模型已存到裁剪版"), 4000, "0 255 0");
+			if(isExportReferencedFiles) then
+				xmlNode.attr.x, xmlNode.attr.y, xmlNode.attr.z = BlockEngine:real_bottom(0, 0, 0);
+				xmlNode.attr.bx, xmlNode.attr.by, xmlNode.attr.bz = nil, nil, nil;
+				liveEntities = {xmlNode};
+				blocks = blocks or {};
+			else
+				if(Clipboard.Save("EntityLiveModel", xmlNode)) then
+					GameLogic.AddBBS(nil, format(L"1个模型已存到裁剪版"), 4000, "0 255 0");
+				end
 			end
 		end
 	end
-	if(not bFound and result.blockX and result.side) then
+	if((liveEntities or blocks) or (not bFound and result.blockX and result.side)) then
 		if(not blocks) then
 			local bx, by, bz = result.blockX, result.blockY, result.blockZ;
 			local b = {0, 0, 0}
@@ -1360,20 +1637,23 @@ function SelectBlocks.CopyToClipboard(blocks, liveEntities)
 			end
 		end
 		
-		if(blocks) then
+		if(blocks or liveEntities) then
 			bFound = true;
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 			local task = BlockTemplate:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, 
-				blocks = blocks,liveEntities=liveEntities,
-				relative_motion=true, UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false, relative_to_player = (#blocks>1)})
+				blocks = blocks or {}, liveEntities = liveEntities,
+				relative_motion=true, UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = isExportReferencedFiles == true, relative_to_player = (#blocks>1)})
 				
 			local filedata = task:SaveTemplateToString();
 			if(filedata) then
 				if(Clipboard.Save("block_template", filedata)) then
-					local text = format(L"%d个方块已存到裁剪版", #blocks)
+					local text = format(L"%d个方块已存到裁剪版", blocks and #blocks or 0)
 					if(liveEntities and #liveEntities>0) then
 						text = format(L"%d个实体, %s", #liveEntities, text);
+					end
+					if(isExportReferencedFiles) then
+						text = text..L"(包含引用文件)";
 					end
 					GameLogic.AddBBS(nil, text, 4000, "0 255 0");
 				end
@@ -1384,6 +1664,10 @@ end
 
 -- static public function: clipboard
 function SelectBlocks.PasteFromClipboard(bx, by, bz)
+	if not GameLogic.options.CanPasteBlock then
+		GameLogic.AddBBS(nil,L"粘贴失败，该世界禁止从外部粘贴方块！")
+		return
+	end
 	local bHasSpecifiedPasteLocation;
 	local x, y, z;
 	if(bx) then
@@ -1414,7 +1698,9 @@ function SelectBlocks.PasteFromClipboard(bx, by, bz)
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 					local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 					local task = BlockTemplate:new({blockX = bx,blockY = by, blockZ = bz, 
-						UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false})
+						UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false,
+						add_to_history = cur_instance and cur_instance.add_to_history
+					})
 					if(task:LoadTemplateFromXmlNode(xmlRoot)) then
 						
 					end
@@ -1437,7 +1723,7 @@ function SelectBlocks.PasteFromClipboard(bx, by, bz)
 				local entity = entityClass:Create({bx=bx,by=by,bz=bz, x=x, y=y, z=z}, xmlNode);
 				entity:Attach();
 
-				if(GameLogic.GameMode:IsEditor()) then
+				if(GameLogic.GameMode:IsEditor() or self.add_to_history) then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
 					local dragTask = MyCompany.Aries.Game.Tasks.DragEntity:new({})
 					dragTask:CreateEntity(entity)
@@ -1455,7 +1741,9 @@ function SelectBlocks:PasteBlocks(bx, by, bz)
 	end
 
 	if(self.copy_task) then
-		local copy_task = {blocks = self.copy_task.blocks, liveEntities = self.copy_task.liveEntities, aabb =  self.copy_task.aabb:clone(), operation = self.copy_task.operation};
+		local copy_task = {blocks = self.copy_task.blocks, liveEntities = self.copy_task.liveEntities, aabb =  self.copy_task.aabb:clone(), 
+			operation = self.copy_task.operation, 
+			add_to_history = self.add_to_history};
 		
 		if(not bx) then
 			local result = Game.SelectionManager:MousePickBlock();
@@ -1539,11 +1827,13 @@ function SelectBlocks.MirrorSelection()
 			self:SetMirrorMode(false);
 			if(result) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MirrorBlocksTask.lua");
-				local task = MyCompany.Aries.Game.Tasks.MirrorBlocks:new({method=settings.method, from_blocks=MirrorWnd.blocks, pivot_x=MirrorWnd.pivot_x,pivot_y=MirrorWnd.pivot_y,pivot_z=MirrorWnd.pivot_z, mirror_axis=settings.xyz, })
+				local task = MyCompany.Aries.Game.Tasks.MirrorBlocks:new({method=settings.method, from_blocks=MirrorWnd.blocks, 
+					pivot_x=MirrorWnd.pivot_x,pivot_y=MirrorWnd.pivot_y,pivot_z=MirrorWnd.pivot_z, mirror_axis=settings.xyz, 
+					add_to_history = self.add_to_history,})
 				task:Run();
 			end
 		end);
-
+		self:UpdateManipulators()
 		MirrorWnd:Connect("axisChanged", SelectBlocks, SelectBlocks.OnMirrorAxisChange, "UniqueConnection");
 	end
 end
@@ -1592,8 +1882,9 @@ function SelectBlocks.TransformSelection(trans)
 
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TransformBlocksTask.lua");
 			local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({dx = trans.dx, dy=trans.dy, dz=trans.dz, pivot = self:GetPivotPoint(), rot_axis = trans.rot_axis, rot_angle=trans.rot_angle, scalingX=trans.scalingX, scalingY=trans.scalingY, scalingZ=trans.scalingZ, 
-				blocks=cur_selection, liveEntities = liveEntities,
-				aabb=cur_instance.aabb, operation = trans.method})
+				blocks=cur_selection, liveEntities = liveEntities, 
+				aabb=cur_instance.aabb, operation = trans.method,
+				add_to_history = self.add_to_history})
 			task:Run();
 
 			self:ReplaceSelection(commonlib.clone(task.final_blocks));
@@ -1627,6 +1918,17 @@ function SelectBlocks.EnterNeuronEditMode()
 		local EditNeuronBlockPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditNeuronBlockPage");
 		local task = MyCompany.Aries.Game.Tasks.EditNeuronBlockPage:new({blockX = bx,blockY = by, blockZ = bz})
 		task:Run();
+	end
+end
+
+function SelectBlocks.OnClickEditEntity()
+	local self = cur_instance;
+	if(self and self.liveEntities) then
+		local entity = self.liveEntities[1]
+		if(entity and entity.OpenEditor) then
+			SelectBlocks.CancelSelection();
+			entity:OpenEditor();
+		end
 	end
 end
 
@@ -1674,5 +1976,70 @@ function SelectBlocks.ReplaceBlocks(from_block_id, to_block_id)
 				end
 			end
 		end
+	end
+end
+
+
+-- make blocks in the selected aabb area solid (without hollow blocks)
+-- @param fillBlockId: if nil, it will be 62 grass block. 
+-- @return number of blocks filled.
+function SelectBlocks.MakeSolid(fillBlockId, fillBlockData)
+	local self = cur_instance;
+	if(self and self:HasSelection()) then
+		local min = self.aabb:GetMin();
+		local max = self.aabb:GetMax();
+		local minX, minY, minZ = min[1], min[2], min[3];
+		local maxX, maxY, maxZ = max[1], max[2], max[3];
+
+		-- mark block states: 0 for light, 1 for solid, 2 for hollow, -1 for unknown
+		local blocks = {};
+		local lightBlocks = {};
+		for x = minX, maxX do
+			for y = minY, maxY do
+				for z = minZ, maxZ do
+					local sparseIndex = BlockEngine:GetSparseIndex(x, y, z);
+					local id = BlockEngine:GetBlockId(x, y, z);
+					if(x == minX or x == maxX or y == minY or y == maxY or z == minZ or z == maxZ) then
+						if(id > 0) then
+							blocks[sparseIndex] = 1;
+						else	
+							lightBlocks[#lightBlocks+1] = sparseIndex;
+							blocks[sparseIndex] = 0;
+						end
+					else
+						blocks[sparseIndex] = (id > 0) and 1 or -1;
+					end
+				end
+			end
+		end
+		-- for each light block, also light the nearby blocks, use a breath first search
+		while(#lightBlocks > 0) do
+			local sparseIndex = lightBlocks[#lightBlocks];
+			lightBlocks[#lightBlocks] = nil;
+			local x, y, z = BlockEngine:FromSparseIndex(sparseIndex);
+			for i = 0, 5 do
+				local dx, dy, dz = Direction.GetOffsetBySide(i)
+				local newSparseIndex = BlockEngine:GetSparseIndex(x+dx, y+dy, z+dz);
+				if(blocks[newSparseIndex] == -1) then
+					blocks[newSparseIndex] = 0;
+					lightBlocks[#lightBlocks+1] = newSparseIndex;
+				end
+			end
+		end
+		-- everything else marked -1 is hollow blocks, and we shall fill it with a default block
+		fillBlockId = fillBlockId or 62;
+		local count = 0
+		for x = minX, maxX do
+			for y = minY, maxY do
+				for z = minZ, maxZ do
+					local sparseIndex = BlockEngine:GetSparseIndex(x, y, z);
+					if(blocks[sparseIndex] == -1) then
+						BlockEngine:SetBlock(x, y, z, fillBlockId, fillBlockData);
+						count = count + 1;
+					end
+				end
+			end
+		end
+		return count;
 	end
 end

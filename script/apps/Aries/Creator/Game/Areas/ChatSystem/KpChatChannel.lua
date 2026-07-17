@@ -26,6 +26,7 @@ KpChatChannel.PreloadSocketIOUrl();
 http://yapi.kp-para.cn/project/60/interface/api/1952
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/System/os/os.lua");
 NPL.load("(gl)script/ide/timer.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
@@ -115,7 +116,7 @@ function KpChatChannel.OnWorldLoaded()
     local id = WorldCommon.GetWorldTag("kpProjectId");
 	LOG.std(nil, "info", "KpChatChannel", "OnWorldLoaded: %s",tostring(id));
     TipRoadManager:Clear();
-    if(id)then
+    if(id and System.User.keepworkUsername)then
         KpChatChannel.TryToConnect();
     else
         KpChatChannel.Clear();
@@ -132,6 +133,9 @@ function KpChatChannel.OnWorldUnloaded()
 end
 
 function KpChatChannel.OnKeepWorkLogin_Callback()
+    if KpChatChannel.client then
+        KpChatChannel.client.state = "CONNECTING"
+    end
     KpChatChannel.TryToConnect();
 end
 function KpChatChannel.OnKeepWorkLogout_Callback()
@@ -177,7 +181,14 @@ function KpChatChannel.Connect(url,options,onopen_callback)
     end
     url  = url or KpChatChannel.GetUrl();
     if(not KpChatChannel.client)then
-        KpChatChannel.client = SocketIOClient:new();
+        if (System.os.IsEmscripten()) then
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Emscripten/EmscriptenWebSocket.lua");
+            local EmscriptenWebSocket = commonlib.gettable("MyCompany.Aries.Game.GameLogic.EmscriptenWebSocket");
+            KpChatChannel.client = EmscriptenWebSocket:new();
+        else
+            KpChatChannel.client = SocketIOClient:new();
+        end
+        -- KpChatChannel.client = SocketIOClient:new();
         KpChatChannel.client:AddEventListener("OnOpen",KpChatChannel.OnOpen,KpChatChannel);
         KpChatChannel.client:AddEventListener("OnMsg",KpChatChannel.OnMsg,KpChatChannel);
         KpChatChannel.client:AddEventListener("OnClose",KpChatChannel.OnClose,KpChatChannel);
@@ -196,8 +207,12 @@ function KpChatChannel.ClearReconnectAction()
     if(KpChatChannel.reconnect_timer)then
         KpChatChannel.reconnect_timer:Change();
     end
+    if System.options.isPapaAdventure and not KpChatChannel.IsConnected() then
+        KpChatChannel.TryToConnect()
+    end
 end
 function KpChatChannel.TryToConnect()
+    -- if (System.os.IsEmscripten()) then return end
     if(not KpChatChannel.reconnect_timer)then
         KpChatChannel.reconnect_timer = commonlib.Timer:new({callbackFunc = function(timer)
             if(KpChatChannel.IsConnected())then
@@ -253,13 +268,14 @@ function KpChatChannel.OnOpen(self)
     KpChatChannel.RefreshChatWindow();
 
     TipRoadManager:CreateRoads();
-    
+    GameLogic.GetFilters():apply_filters('net_status',{status = "connected"})
 end
 function KpChatChannel.OnClose(self, msg)
     msg = msg or {};
 	LOG.std("", "info", "KpChatChannel", "Connection is closed, from = %s", msg.from);
     if(msg.from == "ping")then
         KpChatChannel.TryToConnect();
+        GameLogic.GetFilters():apply_filters('net_status',{status = "closed"})
         return
     end
     KpChatChannel.Clear();
@@ -314,14 +330,15 @@ function KpChatChannel.OnMsg(self, msg)
         local meta = info.meta;
         local action = info.action;
         local userInfo = info.userInfo;
-
-        if (key == "app/msg" or key == "paracraftGlobal") then
+        if key == "join/ack" then
+            GameLogic.GetFilters():apply_filters("SocketJoinRoom", {result = info})
+        elseif (key == "app/msg" or key == "paracraftGlobal") then
             if (payload) then
                 local ChannelIndex = payload.ChannelIndex;
                 local worldId = payload.worldId;
                 local type = payload.type;
                 local content = payload.content;
-
+                content = KpChatChannel.FilterString(content);
                 local userId = payload.id;
                 local username = payload.username;
                 local nickname = payload.nickname;
@@ -396,7 +413,7 @@ function KpChatChannel.OnMsg(self, msg)
                     if msgdata.supportJumpWorld then
                         TipRoadManager:PushNode(mcmlStr, msgdata.sourceProjectId);
                     else
-                        TipRoadManager:PushNode(mcmlStr);
+                        -- TipRoadManager:PushNode(mcmlStr);
                     end
                 end
 
@@ -425,40 +442,26 @@ function KpChatChannel.OnMsg(self, msg)
                 end
             end
         elseif(key == "msg")then
-            -- system broadcast to user
-
-            --[[
-            {
-                  meta={ timestamp="2020-06-11 16:56" },
-                  payload={
-                    all=0,
-                    createdAt="2020-06-11T08:56:11.211Z",
-                    extra={  },
-                    id=969,
-                    msg={ text="<p>666</p>", type=0 },
-                    operator="kevinxft",
-                    organizationId=0,
-                    receivers="zhangleio,zhangleio2",
-                    roleId=0,
-                    sendSms=0,
-                    sender=0,
-                    type=0,
-                    updatedAt="2020-06-11T08:56:11.211Z" 
-                  } 
-                }
-            ]]
             if(payload and payload.chargeType == 1) then
                 local product = payload.product
                 KeepWorkItemManager.LoadProfile(true, function()  --刷新用户信息                  
                     GameLogic.GetFilters():apply_filters('login_with_token')
                     GameLogic.GetFilters():apply_filters('cellar.vip_notice.close')
                     GameLogic.GetFilters():apply_filters('became_vip')
-                    _guihelper.MessageBox("恭喜您"..product.description)
+                    GameLogic.GetFilters():apply_filters('community.vip.notice',payload)
+                    if not System.options.isCommunity then
+                        _guihelper.MessageBox("恭喜您"..product.description)
+                    end
                end)
                 return
             end
             if(payload and payload.muteType == 1)then
                 KeepWorkItemManager.LoadMutingInfo(true);
+                return
+            end
+            if(payload and payload.ChannelIndex == ChatChannel.EnumChannels.KpFriend)then
+                local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
+                FriendManager:OnMsg(payload, msg);
                 return
             end
             if(payload and payload.receivers and payload.msg)then
@@ -471,6 +474,7 @@ function KpChatChannel.OnMsg(self, msg)
                 local content = payload.msg.text;
                 content = string.gsub(content, "<p>","");
                 content = string.gsub(content, "</p>","");
+                content = KpChatChannel.FilterString(content);
                 local ChannelIndex = ChatChannel.EnumChannels.KpSystem;
                 local channelname = ChatChannel.channels[ChannelIndex];
                 local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, is_keepwork = true, }
@@ -497,6 +501,7 @@ function KpChatChannel.OnMsg(self, msg)
                 if DockPage then
                     DockPage.HandMsgCenterMsgData(payload.msgType)
                 end
+                GameLogic.GetFilters():apply_filters('friend_chat_msg', payload)
             end
 
             if payload then 
@@ -514,6 +519,11 @@ function KpChatChannel.CreateMcmlStrToTipRoad(chatdata)
     if(not chatdata)then
         return
     end
+    if chatdata.ChannelIndex == ChatChannel.EnumChannels.KpTeam
+        or chatdata.ChannelIndex == ChatChannel.EnumChannels.KpNearBy then
+        local ChatManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatManager.lua");
+        return ChatManager.CreateMcmlStrToTipRoad(chatdata)
+    end
     local mcmlStr = "";
     local words = chatdata.words or "";
     local color = chatdata.color or "ffffff";
@@ -527,7 +537,7 @@ function KpChatChannel.CreateMcmlStrToTipRoad(chatdata)
 
     local channel_tag = "";
     local name_tag_start = [[<div style="float:left">[</div>]]
-    local user_tag = KpUserTag.GetMcml(chatdata);
+    local user_tag = ""--KpUserTag.GetMcml(chatdata);
     local name_tag_end = [[<div style="float:left">]:</div>]]
 
     local timestamp_tag = "";
@@ -549,6 +559,13 @@ function KpChatChannel.CreateMcmlStrToChatWindow(chatdata)
     if(not chatdata)then
         return
     end
+    if chatdata.ChannelIndex == ChatChannel.EnumChannels.KpPrivate 
+        or chatdata.ChannelIndex == ChatChannel.EnumChannels.KpTeam
+        or chatdata.ChannelIndex == ChatChannel.EnumChannels.KpNearBy then
+        local ChatManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatManager.lua");
+        return ChatManager.CreateMcmlStrToChatWindow(chatdata)
+    end
+
     local mcmlStr = "";
     local words = chatdata.words or "";
     local color = chatdata.color or "ffffff";
@@ -572,10 +589,10 @@ function KpChatChannel.CreateMcmlStrToChatWindow(chatdata)
     local channel_tag = string.format([[<div style="float:left">[%s]</div>]],chatdata.channelname);
     local name_tag_start = [[<div style="float:left">[</div>]]
 
-    local user_tag = KpUserTag.GetMcml(chatdata);
+    local user_tag = ""--KpUserTag.GetMcml(chatdata);
     local name_tag_end = [[<div style="float:left">]:</div>]]
 
-    local timestamp_tag = string.format([[<input type="button" value="%s" style="float:left;margin-left:10px;color:#8b8b8b;background:url();" />]],tostring(timestamp));
+    local timestamp_tag = ""--string.format([[<input type="button" value="%s" style="float:left;margin-left:10px;color:#8b8b8b;background:url();" />]],tostring(timestamp));
     if(chatdata.ChannelIndex == ChatChannel.EnumChannels.KpSystem)then
         mcmlStr = string.format([[<div style="color:#%s">%s%s%s%s%s%s%s%s</div>]],color,channel_tag,"","","","",":",words,timestamp_tag);
     else
@@ -647,13 +664,9 @@ function KpChatChannel.JoinWorld(worldId)
     local room = KpChatChannel.GetRoom();
 	LOG.std(nil, "info", "KpChatChannel", "try to join world %s", room);
     KpChatChannel.client:Send("app/join",{ rooms = { room }, });
-
-    local room_school = KpChatChannel.GetSchoolRoom();
-    if(room_school)then
-        LOG.std(nil, "info", "KpChatChannel", "try to join school room %s", room_school);
-        KpChatChannel.client:Send("app/join",{ rooms = { room_school }, });
-    end
+    GameLogic.GetFilters():apply_filters('send_world_msg' , {room = room , msg = "join"})
 end
+
 function KpChatChannel.LeaveWorld(worldId)
     if(not worldId)then
         return
@@ -663,6 +676,7 @@ function KpChatChannel.LeaveWorld(worldId)
 	if(KpChatChannel.client) then
 		KpChatChannel.client:Send("app/leave",{ rooms = { room }, });
 	end
+    GameLogic.GetFilters():apply_filters('send_world_msg' , {room = room , msg = "leave"})
     KpChatChannel.Clear();
 end
 function KpChatChannel.IsConnected()
@@ -786,7 +800,7 @@ end
 
 function KpChatChannel.IsBlockedChannel(ChannelIndex)
     local channels = {
-        ChatChannel.EnumChannels.KpNearBy,
+        -- ChatChannel.EnumChannels.KpNearBy,
         ChatChannel.EnumChannels.KpBroadCast,
     }
     for k,v in ipairs(channels) do
@@ -801,6 +815,10 @@ end
 --]]---------------------------------------------------------------------------------------------------
 function KpChatChannel.SendToServer(msgdata)
     if (not msgdata or type(msgdata) ~= "table") then
+        return
+    end
+    if System.options.isEducatePlatform then
+        LOG.std(nil, "info", "KpChatChannel", "EducatePlatform is not support send message to server");
         return
     end
 
@@ -828,13 +846,12 @@ function KpChatChannel.SendToServer(msgdata)
             student = user_info.student,
             orgAdmin = user_info.orgAdmin,
             tLevel = user_info.tLevel,
-            tLevel = user_info.tLevel,
             isSystem = msgdata.isSystem,
             supportJumpWorld = msgdata.supportJumpWorld,
             sourceProjectId = msgdata.sourceProjectId,
         },
     }
-
+    LOG.std(nil, "info", "KpChatChannel", "send message to server: %s", commonlib.serialize_compact(kp_msg));
     KpChatChannel.client:Send("app/msg", kp_msg);
 end
 

@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyEnv.lua" refresh="true">
+<![CDATA[
+EasyEnv = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyEnv");
+EasyEnv.InitPage(Page);
+function onClickDummy()
+end
+]]>
+</script>
+<script refresh="false" type="text/npl" src="script/apps/Aries/Creator/Game/Areas/EnvFramePage.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+EnvFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnvFramePage");
+WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+EnvFramePage.OnInit();
+function GetShaderDS()
+    return EnvFramePage.shader_ds;
+end
+
+]]></script>
+
+<div zorder="-1" onclick="onClickDummy" style="padding:10px;background-color:#808080a0;color:#ffffff;width:300px;">
+    <div style="width:280px;color:#cccccc;">
+        <div style="padding:8px;padding-right:5px;width:280px;background-color:#000000a0;" >
+            <div style="float:left;margin-left:9px;margin-top:-3px;"><%=L"天气"%></div>
+            <div style="margin-top:3px;">
+                <input type="button" uiname="EnvFramePage.weather_sun" name="weather_sun" style="margin-left:9px;width:38px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 238 19 20)" onclick="EnvFramePage.ChangeWeather" tooltip='<%=L"切换至原始天空"%>'/>
+                <input type="button" uiname="EnvFramePage.weather_cloudy" name="weather_cloudy" style="margin-left:11px;width:38px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#59 238 19 20)" onclick="EnvFramePage.ChangeWeather" tooltip='<%=L"切换至仿真天空"%>'/>
+                <input type="button" uiname="EnvFramePage.weather_rain" name="weather_rain" style="margin-left:14px;width:22px;height:38px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#89 239 11 19)" onclick="EnvFramePage.ChangeWeather" tooltip='<%=L"切换下雨效果"%>'/>
+                <input type="button" uiname="EnvFramePage.weather_snow" name="weather_snow" style="margin-left:14px;width:34px;height:36px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#112 238 17 18)" onclick="EnvFramePage.ChangeWeather" tooltip='<%=L"切换下雪效果"%>'/>
+            </div>
+        </div>
+        <div style="padding:8px;padding-right:5px;margin-top:7px;width:280px;background-color:#000000a0;">
+            <div style="float:left;margin-left:9px;margin-top:-3px;"><%=L"光照"%></div>
+            <div style="margin-left:5px;margin-top:4px;">
+                <div style="float:left;margin-left:3px;margin-top:0px;width:42px;height:44px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#167 238 21 22)"/>
+                <div style="float:left;margin-top:8px;width:150;margin-left:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 264 138 7);">
+                    <pe:sliderbar uiname="EnvFramePage.mcTimeSlider" name="mcTimeSlider" min="0" max="1000" min_step="1" value="<%=(GameLogic.RunCommand('/time now')/2+0.5)*1000%>" button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;139 238 18 18" 
+                        button_width="32" button_height="32" style="float:left;width:150px;height:18px;background:;" onchange="EnvFramePage.OnTimeSliderChanged" tooltip='<%=L"拖动滑块调整光线强调"%>'></pe:sliderbar>
+                </div>
+                <div style="float:left;margin-left:7px;margin-top:-2px;width:26px;height:44px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#196 238 13 22)"/>
+            </div>
+        </div>
+        <div style="padding:8px;padding-right:5px;margin-top:7px;width:280px;background-color:#000000a0;">
+            <div style="float:left;margin-left:9px;margin-top:-3px;"><%=L"光源颜色"%></div>
+            <div style="margin-top:10px;margin-bottom:5px;">
+                <input type="button" uiname="EnvFramePage.btn_red" name="btn_red" style="float:left;margin-left:7px;margin-top:4px;width:32px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                <input type="button" uiname="EnvFramePage.btn_yellow" name="btn_yellow" style="float:left;margin-left:7px;margin-top:4px;width:32px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                <input type="button" uiname="EnvFramePage.btn_green" name="btn_green" style="float:left;margin-left:7px;margin-top:4px;width:32px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#448 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                <input type="button" uiname="EnvFramePage.btn_light_blue" name="btn_light_blue" style="float:left;margin-left:7px;margin-top:4px;width:32px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#468 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                <input type="button" uiname="EnvFramePage.btn_dark_blue" name="btn_dark_blue" style="float:left;margin-left:7px;margin-top:4px;width:32px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#487 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                <input type="button" uiname="EnvFramePage.btn_purple" name="btn_purple" style="float:left;margin-left:7px;margin-top:4px;width:32px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#388 256 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                <input type="button" uiname="EnvFramePage.btn_white" name="btn_white" style="float:left;margin-left:7px;margin-top:4px;width:32px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 256 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                <input type="button" uiname="EnvFramePage.btn_black" name="btn_black" style="float:left;margin-left:7px;margin-top:4px;width:32px;height:32px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 256 13 13)" onclick="EnvFramePage.SetLightColor"/>
+            </div>            
+        </div>
+        <div style="margin-top:7px;padding:8px;background-color:#000000a0;" width="100%">
+            <div style="margin-top:5px;">
+                <div style="float:left;margin-left:7px;width:90px;height:20px;" ><%=L"真实光影"%></div>
+                <div style="float:left;margin-top:0px;margin-left:9px;">
+                    <select uiname="EnvFramePage.comboShader" name="comboShader" style="margin-top:0px;height:22px" onselect="EnvFramePage.OnToggleShader" AllowUserEdit="false" DataSource="<%=GetShaderDS()%>"></select>
+                </div>
+            </div>
+            <div style="margin-top:5px;">
+                <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"需要shader HDR下生效,可调整画面整体亮度"%>'><%=L"亮度"%></div>
+                <div style="float:left;margin-top:1px;margin-left:9px;">
+                    <pe:sliderbar uiname="EnvFramePage.eye_bightness" name="eye_bightness" min="0.01" max="0.9" value="0.5" style="height:22px" onchange="EnvFramePage.OnChangeEyeBrightness()"></pe:sliderbar>
+                </div>
+            </div>
+            <div style="margin-top:5px;">
+                <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"高级shader中影响影子的深浅"%>'><%=L"云量"%></div>
+                <div style="float:left;margin-top:1px;margin-left:9px;">
+                    <pe:sliderbar uiname="EnvFramePage.cloudness" name="cloudness" min="0" max="1" value='<%=GameLogic.options:GetCloudThickness()%>' style="height:22px" onchange="EnvFramePage.OnCloudnessChanged()"></pe:sliderbar>
+                </div>
+            </div>
+            <div style="margin-top:5px;">
+                <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"过大会导致运行缓慢, 可以考虑使用超级远景"%>'><%=L"可视距离"%></div>
+                <div style="float:left;margin-top:1px;margin-left:9px;">
+                    <pe:sliderbar uiname="EnvFramePage.renderDist" name="renderDist" min="30" max="200" value="96" style="height:22px" onchange="EnvFramePage.OnRenderDistChanged()" ></pe:sliderbar>
+                </div>
+            </div>
+            <div style="margin-top:5px;">
+                <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"摄影机不动时,会持续渲染几公里内的场景,并不消耗显存"%>'><%=L"超级远景"%></div>
+                <div style="float:left;margin-top:4px;margin-left:9px;">
+                    <pe:sliderbar uiname="EnvFramePage.superRenderDist" name="superRenderDist" min="0" max="5000" value="96" style="height:22px" onchange="EnvFramePage.OnSuperRenderDistChanged()"></pe:sliderbar>
+                </div>
+            </div>
+        </div>
+        
+    </div>  
+</div>
+<pe:container ClickThrough="true" style="width:300px;height:56px;background:;">
+    <input type="button" name="CloseBtn" onclick="EasyEnv.OnClickClose" align="right" style="position:relative; margin-right: 20px; width:56px;height:56px;background:url(Texture/player/close.png)" />
+</pe:container>
+</pe:mcml>
+</html>

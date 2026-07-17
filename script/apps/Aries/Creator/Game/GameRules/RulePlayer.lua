@@ -36,6 +36,7 @@ function RulePlayer:Init(rule_name, rule_value)
 		rule_value = value;
 	end
 	self.name = name;
+	self.value = rule_value
 	GameLogic.GetFilters():apply_filters('OnPlayerRuleChange')
 	if(rule_name == "AutoWalkupBlock") then
 		self:SetAutoWalkupBlock(rule_value);

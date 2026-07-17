@@ -1,0 +1,43 @@
+<pe:mcml>
+<script refresh="false" type="text/npl" src="FriendActionTips.lua"><![CDATA[
+    FriendActionTips = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/FriendActionTips.lua")
+    FriendActionTips.OnInit();
+
+    function DSItems()
+        return FriendActionTips.actionDatas
+    end
+
+    function OnClickItem(index)
+        FriendActionTips.OnClickItem(index)
+    end
+
+    function GetItemWidth()
+        local num = #FriendActionTips.actionDatas
+        local itemWidth = 100
+        local itemWidthTotal = itemWidth * num + num  * 10
+        return itemWidthTotal
+    end
+
+]]></script>
+<div style="width: 1000px; height: 64px;">
+    <div align="center" zorder="-2" style="<%='width: '..(GetItemWidth() + 100)..'px; height: 64px; position: relative; background: url(Texture/Aries/Common/gradient_white_32bits.png#0 0 16 16); background-color: #d3d3d3;' %>"></div>
+    <div align="center" style="<%='width: '..GetItemWidth()..'px; height: 47px; margin-top: 8px;' %>">
+        <pe:repeat DataSource="<%=DSItems()%>">
+            <pe:repeatitem style="float:left;">
+                <pe:if condition="<%=Eval('msgType') == 'request'%>">
+                    <div style="float:left; text-align: center; margin-left: 10px; width: 100px; height: 47px; background-color: #ffffffaa;">
+                        <div style="font-size: 16px; font-weight: bold; color: #696767aa;"><%=Eval('action')%></div>
+                        <div style="font-size: 10px; font-weight: bold; color: #696767aa;"><%=L"等回复"%></div>
+                    </div>
+                </pe:if>
+                <pe:if condition="<%=Eval('msgType') == 'response'%>">
+                    <div zorder="-1" name="<%=Eval('index')%>" onclick="OnClickItem" style="float:left; text-align: center; margin-left: 10px; width: 100px; height: 47px; background-color: #ffffffaa;">
+                        <div  style="font-size: 16px; font-weight: bold; color: #db27c3aa;"><%=Eval('action')%></div>
+                        <div style="font-size: 10px; font-weight: bold; color: #db27c3aa;"><%=L"来自:"..commonlib.GetLimitLabelByTextWidth((Eval('nickname') or Eval('username')), 60, "System;10;norm", true)%></div>
+                    </div>
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+</div>
+</pe:mcml>

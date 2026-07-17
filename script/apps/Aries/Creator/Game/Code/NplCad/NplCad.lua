@@ -159,15 +159,22 @@ function NplCad.GetAllCmds()
 	return all_cmds;
 end
 
+-- get relative filename 
+function NplCad.GetRelativeFileNameByBlockName(block_name)
+	local relativePath = format("blocktemplates/nplcad/%s.x",commonlib.Encoding.Utf8ToDefault(block_name));
+	return relativePath;
+end
+
 -- custom compiler here: 
 -- @param codeblock: code block object here
 function NplCad.CompileCode(code, filename, codeblock)
     local block_name = codeblock:GetBlockName();
     if(not block_name or block_name == "")then
-        block_name = "default"
-		GameLogic.AddBBS("error", L"请给CAD方块指定角色名称", 15000, "255 0 0")
+        block_name = NplCad.AutoFindNonExistBlockName()
+		codeblock:SetBlockName(block_name)
+		-- GameLogic.AddBBS("error", L"请给CAD方块指定角色名称", 15000, "255 0 0")
 	end
-	local relativePath = format("blocktemplates/nplcad/%s.x",commonlib.Encoding.Utf8ToDefault(block_name));
+	local relativePath = NplCad.GetRelativeFileNameByBlockName(block_name);
 
 	GameLogic.AddBBS("NPLCAD", format(L"CAD模型将保存到%s", relativePath), 5000, "255 0 0")
 
@@ -239,22 +246,34 @@ function NplCad.RefreshFile(filename)
 	end
 end
 
+function NplCad.IsPluginLoaded()
+	NPL.load("(gl)script/ide/System/os/os.lua");
+	if (System.os.IsEmscripten() or
+        System.os.GetPlatform() == "ios") then
+		return true;
+	else
+		return false;
+	end
+end
+
 -- @param relativePath: can be nil, in which case filepath will be used. 
 function NplCad.GetCode(code, filename, relativePath)
 	if(not NplCad.templateCode) then
 			NplCad.templateCode = [[
     local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
     local ShapeBuilder = NPL.load("Mod/NplCad2/Blocks/ShapeBuilder.lua");
-	local isFinished = false;
-	SceneHelper.LoadPlugin(co:MakeCallbackFuncAsync(function()
-		isFinished = true;
-		resume();
-    end))
-	if(not isFinished) then
-		yield();
+    local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
+	if (not NplCad.IsPluginLoaded()) then
+		local isFinished = false;
+		SceneHelper.LoadPlugin(co:MakeCallbackFuncAsync(function()
+			isFinished = true;
+			resume();
+		end))
+		if(not isFinished) then
+			yield();
+		end
 	end
     ShapeBuilder.create();
-    local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
     NplCad.InstallMethods(codeblock:GetCodeEnv(), ShapeBuilder);
     <code>
     local result = SceneHelper.saveSceneToParaX(%q,ShapeBuilder.getScene(), ShapeBuilder.liner, ShapeBuilder.angular);
@@ -266,9 +285,9 @@ function NplCad.GetCode(code, filename, relativePath)
     end
 	NplCad.StopCodeBlock(codeblock)
 ]]
-		NplCad.templateCode = NplCad.templateCode:gsub("(\r?\n)", ""):gsub("<code>", "%%s")
+		NplCad.templateCode = NplCad.templateCode:gsub("(\r?\n)", ""):gsub("<code>", "%%s\n")
 	end
-    local s = string.format(NplCad.templateCode, code or "", filename, filename, filename, relativePath or filepath, relativePath or filepath);
+    local s = string.format(NplCad.templateCode, code or "", filename, filename, filename, relativePath or filename, relativePath or filename);
     return s
 end
 
@@ -526,7 +545,6 @@ function NplCad.OnClickSaveFile()
     NPL.load("(gl)script/ide/OpenFileDialog.lua");
     local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32({{"All Files (*.xml)", "*.xml"}},nil,nil,true);
     if(filename) then
-
         local __,postfix = string.match(filename,"(.+)%.(.+)$");
         if(not postfix or ( postfix and string.lower(postfix) ~= "xml" ))then
             filename = filename .. ".xml";
@@ -552,3 +570,42 @@ end
 function NplCad.GetCustomCodeUIUrl()
 	return "script/apps/Aries/Creator/Game/Code/NplCad/CodeBlockWindowCAD.html"
 end
+
+-- @return "default", "default1", "default2", ...
+function NplCad.AutoFindNonExistBlockName()
+	local filename = "default"
+
+	local entities = GameLogic.EntityManager.FindEntities({category = "b", type = "EntityCode"});
+	if(entities) then
+		local function HasCodeBlock_(name)
+			for _, entity in ipairs(entities) do
+				if(entity:GetDisplayName() == name) then
+					return true;
+				end
+			end
+		end
+
+		-- use a different name if already exists. 
+		local i = 1;
+		while(HasCodeBlock_(filename)) do
+			filename = "default"..i;
+			i = i + 1;
+		end
+	end
+	
+	local check_disk_file = false
+	if(check_disk_file) then
+		local relativePath = NplCad.GetRelativeFileNameByBlockName(filename);
+		local filepath = GameLogic.GetWorldDirectory()..relativePath;
+		local i = 1;
+		while(ParaIO.DoesFileExist(filepath)) do
+			filename = "default"..i;
+			relativePath = NplCad.GetRelativeFileNameByBlockName(filename);
+			filepath = GameLogic.GetWorldDirectory()..relativePath;
+			i = i + 1;
+		end
+	end
+	return filename;
+end
+
+

@@ -2,8 +2,10 @@
 Author: LiXizhi
 Email: lixizhi@yeah.net
 Date: 2016.8.18
-Desc: convert from left/right eye image to red/blue stereo image 
+Desc: pass 0 to convert from left/right eye image to red/blue stereo image 
+pass 1 to convert from left/right eye image to interlaced stereo image 
 */
+float2 screenParam = float2(1280, 720);
 
 texture sourceTexture0;
 sampler leftSampler:register(s0) = sampler_state
@@ -30,6 +32,7 @@ void StereoVS(float3 iPosition:POSITION,
 	inout float2 texCoord:TEXCOORD0)
 {
 	oPosition = float4(iPosition,1);
+    texCoord += 0.5 / screenParam;
 }
 
 float4 StereoPS(float2 texCoord:TEXCOORD0):COLOR
@@ -44,6 +47,23 @@ float4 StereoPS(float2 texCoord:TEXCOORD0):COLOR
 	return Color1;
 }
 
+float4 InterlacedPS(float2 texCoord : TEXCOORD0) : COLOR
+{
+    float4 color;
+    // interlaced vertically 
+    if (floor(fmod(floor(texCoord.x * screenParam.x), 2.0)) == 0.0)
+    {
+        color = tex2D(leftSampler, texCoord.xy);
+    }
+    else
+    {
+        color = tex2D(rightSampler, texCoord.xy);
+    }
+    color.a = 1.0f;
+    return color;
+}
+
+
 technique Default
 {
     pass P0
@@ -54,5 +74,14 @@ technique Default
 		FogEnable = False;
 		VertexShader = compile vs_2_0 StereoVS();
         PixelShader = compile ps_2_0 StereoPS();
+    }
+    pass P1
+    {
+        cullmode = none;
+        ZEnable = false;
+        ZWriteEnable = false;
+        FogEnable = False;
+        VertexShader = compile vs_2_0 StereoVS();
+        PixelShader = compile ps_2_0 InterlacedPS();
     }
 }

@@ -112,7 +112,7 @@ function CommandHelpPage.ShowPage()
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = false,
 			--bShow = bShow,
-			-- zorder = 2,
+			zorder = 12,
 			click_through = false,
 			directPosition = true,
 				align = "_lt",
@@ -127,6 +127,9 @@ end
 
 function CommandHelpPage.ShowCommandHelpInfo(text)
 	--CommandHelpPage.OnInit();
+	if CommandHelpPage.IsChatCommand(text) then
+		return
+	end
 	if(not CommandHelpPage.cmd_helps) then
 		CommandHelpPage.cmd_helps = CommandManager:GetCmdHelpDS();
 	end
@@ -161,7 +164,19 @@ function CommandHelpPage.ShowCommandHelpInfo(text)
 	cur_chat_edit_text = text;
 end
 
+function CommandHelpPage.IsChatCommand(text)
+	local ChatManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatManager.lua");
+	if ChatManager.IsChatCommand(text) then
+		CommandHelpPage.ClosePage();
+		return true
+	end
+	return false
+end
+
 function CommandHelpPage.ShowOrRefreshPage()
+	if CommandHelpPage.IsChatCommand(cur_chat_edit_text) then
+		return
+	end
 	-- when the content of page switched between "cmds list" and "cmd detail" or "cmds list" changed,wo need refresh the page;
 	local need_refresh_page = false;
 	--CommandHelpPage.HasGotCommandName = false;

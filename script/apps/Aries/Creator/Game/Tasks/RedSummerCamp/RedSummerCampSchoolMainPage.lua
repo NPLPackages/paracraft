@@ -110,7 +110,8 @@ function RedSummerCampSchoolMainPage.Show()
 	local isVerified = GameLogic.GetFilters():apply_filters('store_get', 'user/isVerified');
 	local hasJoinedSchool = GameLogic.GetFilters():apply_filters('store_get', 'user/hasJoinedSchool');
 
-	if not isVerified or not hasJoinedSchool then
+	if not RedSummerCampSchoolMainPage.isShowCertificate and (not isVerified or not hasJoinedSchool) then
+		RedSummerCampSchoolMainPage.isShowCertificate = true
 		local username = GameLogic.GetFilters():apply_filters('store_get', 'user/username');
 		local session = GameLogic.GetFilters():apply_filters('database.sessions_data.get_session_by_username', username);
 	
@@ -170,10 +171,12 @@ function RedSummerCampSchoolMainPage.OnCreate()
 		obj:SetScale(1)
 	end
 
-	RedSummerCampSchoolMainPage.HandleQuestRedTip()
-	RedSummerCampSchoolMainPage.HandleFriendsRedTip()
-	DockPage.HandMsgCenterMsgData()
-	RedSummerCampSchoolMainPage.UpdateRedTip()
+	-- RedSummerCampSchoolMainPage.HandleQuestRedTip()
+	-- RedSummerCampSchoolMainPage.HandleFriendsRedTip()
+	-- DockPage.HandMsgCenterMsgData()
+	-- RedSummerCampSchoolMainPage.UpdateRedTip()
+
+	RedSummerCampSchoolMainPage.UpdateVideoRedTip()
 end
 
 function RedSummerCampSchoolMainPage.GetAutoNoticeText()
@@ -593,10 +596,25 @@ function RedSummerCampSchoolMainPage.IsFinishVideo()
 end
 
 function RedSummerCampSchoolMainPage.UpdateVideoRedTip()
-	local uiObj = ParaUI.GetUIObject("red_tip")
-	if uiObj and uiObj:IsValid() then
-		uiObj.visible = not RedSummerCampSchoolMainPage.IsFinishVideo()
+	local IsFinishVideo = RedSummerCampSchoolMainPage.IsFinishVideo()
+	if IsFinishVideo then
+		local uiObj = ParaUI.GetUIObject("red_tip")
+		if uiObj and uiObj:IsValid() then
+			uiObj.visible = false
+		end
+		return
 	end
+	RedSummerCampSchoolMainPage.UpdateRedTipTimer = RedSummerCampSchoolMainPage.UpdateRedTipTimer or commonlib.Timer:new({callbackFunc = function(timer)
+		local uiObj = ParaUI.GetUIObject("red_tip")
+		local IsFinishVideo = RedSummerCampSchoolMainPage.IsFinishVideo()
+		if uiObj and uiObj:IsValid() then
+			uiObj.visible = not IsFinishVideo
+		end
+		if IsFinishVideo then
+			timer:Change()
+		end
+	end})
+	RedSummerCampSchoolMainPage.UpdateRedTipTimer:Change(0, 1000);
 end
 
 function RedSummerCampSchoolMainPage.RefreshPage()
@@ -647,25 +665,9 @@ function RedSummerCampSchoolMainPage.HandleQuestRedTip()
 end
 
 function RedSummerCampSchoolMainPage.HandleFriendsRedTip()
-	if not RedSummerCampSchoolMainPage.IsVisible() then
-		if RedSummerCampSchoolMainPage.CheckRedTipTimer then
-			RedSummerCampSchoolMainPage.CheckRedTipTimer:Change()
-			RedSummerCampSchoolMainPage.CheckRedTipTimer = nil
-		end
-		return
-	end
-
-	if nil == RedSummerCampSchoolMainPage.CheckRedTipTimer then
-		RedSummerCampSchoolMainPage.CheckRedTipTimer = commonlib.Timer:new({callbackFunc = function(timer)
-			RedSummerCampSchoolMainPage.HandleFriendsRedTip()
-		end})
-
-		RedSummerCampSchoolMainPage.CheckRedTipTimer:Change(60000, 60000);
-	end
-
 	FriendManager:LoadAllUnReadMsgs(function ()
 		-- 处理未读消息
-		if FriendManager.unread_msgs and FriendManager.unread_msgs.data then
+		if FriendManager.unread_msgs and type(FriendManager.unread_msgs) == "table" and FriendManager.unread_msgs.data then
 			for k, v in pairs(FriendManager.unread_msgs.data) do
 				if v.unReadCnt and v.unReadCnt > 0 then
 					RedSummerCampSchoolMainPage.ChangeRedTipState("friend_red_icon", true)

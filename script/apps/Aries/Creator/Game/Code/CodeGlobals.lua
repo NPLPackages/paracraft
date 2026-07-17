@@ -24,6 +24,10 @@ NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeLibraryManager.lua");
+NPL.load("(gl)script/ide/System/Concurrent/AsyncTask.lua");
+local UdpSocket = NPL.load("(gl)script/ide/System/os/network/UdpSocket.lua");
+local String = NPL.load("script/ide/System/Util/String.lua");
+local AsyncTask = commonlib.gettable("System.Concurrent.AsyncTask");
 local CodeLibraryManager = commonlib.gettable("MyCompany.Aries.Game.Code.CodeLibraryManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
@@ -42,6 +46,13 @@ local CodeGlobals = commonlib.inherit(commonlib.gettable("System.Core.ToolBase")
 
 CodeGlobals:Signal("logAdded", function(text) end)
 
+local function tostring_2f(num)
+	if type(num) ~= "number" then
+		return "0";
+	end
+	return string.format("%.2f", num);
+end
+
 function CodeGlobals:ctor()
 	-- exposing these API to globals
 	self.shared_API = {
@@ -50,7 +61,7 @@ function CodeGlobals:ctor()
 		pairs = pairs,
 		tostring = tostring,
 		tonumber = tonumber,
-	
+		
 		type = type,
 		unpack = unpack,
 		setmetatable = setmetatable,
@@ -66,14 +77,15 @@ function CodeGlobals:ctor()
 			  min = math.min, modf = math.modf, pi = math.pi, pow = math.pow, 
 			  rad = math.rad, random = math.random, sin = math.sin, sinh = math.sinh, 
 			  sqrt = math.sqrt, tan = math.tan, tanh = math.tanh, 
-			  tonumber = tonumber, tostring=tostring },
+			  tonumber = tonumber, tostring=tostring, tostring_2f = tostring_2f,degrees=mathlib.degrees,
+			  randomseed = math.randomseed},
 		bit = mathlib.bit,
 		mathlib = mathlib,
 		string = { byte = string.byte, char = string.char, find = string.find, 
 			  format = string.format, gmatch = string.gmatch, gsub = string.gsub, 
 			  len = string.len, lower = string.lower, match = string.match, 
 			  rep = string.rep, reverse = string.reverse, sub = string.sub, 
-			  upper = string.upper },
+			  upper = string.upper, join = String.join },
 		format = string.format,
 		table = { insert = table.insert, maxn = table.maxn, remove = table.remove, 
 			getn = table.getn, sort = table.sort, concat = table.concat, clear=table.clear, contains = CodeGlobals.table_contains },
@@ -84,6 +96,7 @@ function CodeGlobals:ctor()
 		block = function(x,y,z)
 			return BlockEngine:block(x,y,z);
 		end,
+		-- use commonlib.select for the builtin function. 
 		select = function(block_id)
 			GameLogic.SetBlockInRightHand(block_id)
 		end,
@@ -105,12 +118,16 @@ function CodeGlobals:ctor()
 			return result.blockX, result.blockY, result.blockZ, result.block_id, result.side;
 		end,
 		-- get block id and data at given position
-		getBlock = function(x,y,z)
-			return BlockEngine:GetBlockIdAndData(math.floor(x), math.floor(y), math.floor(z));
+		getBlock = function(x, y, z)
+			if(x and y and z) then
+				return BlockEngine:GetBlockIdAndData(math.floor(x), math.floor(y), math.floor(z));
+			end
 		end,
 		-- get the block entity: advanced function
 		getBlockEntity = function(x, y, z)
-			return EntityManager.GetBlockEntity(math.floor(x), math.floor(y), math.floor(z));
+			if(x and y and z) then
+				return EntityManager.GetBlockEntity(math.floor(x), math.floor(y), math.floor(z));
+			end
 		end,
 		-- set block id at given position
 		-- @param blockId: can be number or string of "id:data"
@@ -191,17 +208,21 @@ function CodeGlobals:ctor()
 		----------------------
 		-- @NOTE: the following may not be safe to expose to users
 		----------------------
-		NPL = { load = NPL.load, FromJson = NPL.FromJson },
+		NPL = { load = NPL.load, FromJson = NPL.FromJson},
 		System = System, 
 		commonlib = commonlib, 
 		ParaIO = ParaIO,
 		ParaAsset = ParaAsset,
+		ParaScene = ParaScene,
 		GameLogic = GameLogic,
         NplOce = NplOce,
 		_guihelper = _guihelper,
 		Game = MyCompany.Aries.Game,
+		setmetatable = setmetatable,
+		setfenv = setfenv,
+		LOG = LOG,
+		L = L, -- translation table
 	};
-	
 	self:Reset();
 
 	GameLogic:Connect("beforeWorldSaved", self, self.OnWorldSave, "UniqueConnection");
@@ -243,6 +264,7 @@ function CodeGlobals:Reset()
 
 	self.actors = {};
 	self.playerActor = nil;
+	self.actorCount = 0;
 
 	-- active code blocks
 	self.codeblocks= {};
@@ -255,10 +277,14 @@ function CodeGlobals:Reset()
 	CodeUI:Clear();
 
 	self.libraryManager = CodeLibraryManager:new();
-
+	
 	-- TODO: 
 	LobbyServer.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
 	LobbyServerViaTunnel.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
+
+	if(NPL.IsMainThread()) then
+		AsyncTask.UnRegisterSandBoxEnvFunc("CodeAPI")
+	end
 end
 
 function CodeGlobals:GetGGS()
@@ -293,11 +319,9 @@ function CodeGlobals:log(obj, ...)
 	local bPrintArgs = #args > 0;
 	if(type(obj) == "string") then
 		text = obj;
-		if(obj:match("%%")) then
-			if(bPrintArgs) then
-				text = string.format(obj, ...);
-				bPrintArgs = false;
-			end
+		if(bPrintArgs and obj:match("%%")) then
+			text = string.format(obj, ...);
+			bPrintArgs = false;
 		end
 	else
 		text = commonlib.serialize_in_length(obj, 100);
@@ -312,9 +336,9 @@ function CodeGlobals:log(obj, ...)
 		end
 	end
 	if(text) then
-		commonlib.echo(text);
+		log(text);
 		self:logAdded(text);
-		GameLogic.AppendChat(text);
+		GameLogic.AppendChat(text, nil, true); -- bAppendToLast
 	end
 end
 
@@ -335,7 +359,10 @@ function CodeGlobals:print(...)
 		end
 	end
 	if(text) then
-		commonlib.echo(text);
+		if(not text:match("\n$")) then
+			text = text.."\n";
+		end
+		log(text);
 		self:logAdded(text);
 		GameLogic.AppendChat(text);
 	end
@@ -416,11 +443,15 @@ function CodeGlobals:LoadWorldData(name, value, filename)
 		data = data or {};
 		self.worldData[filename] = data;
 	end
-	return data[name or ""];
+	return data[name or ""] or value;
 end
 
 function CodeGlobals:SetCurrentCoroutine(co)
 	self.cur_co = co;
+end
+
+function CodeGlobals:GetCurrentCoroutine()
+	return self.cur_co;
 end
 
 function CodeGlobals:GetCurrentCodeBlock()
@@ -441,7 +472,12 @@ function CodeGlobals:GetCodeBlockByName(name)
 	return self.codeblocks[name];
 end
 
+function CodeGlobals:IsTooManyActors()
+	return self.actorCount > 3000;
+end
+
 function CodeGlobals:AddActor(actor)
+	self.actorCount = self.actorCount + 1;
 	local name = actor:GetName() or ""
 	if(name ~= "") then
 		local actors = self.actors[name];
@@ -456,6 +492,7 @@ function CodeGlobals:AddActor(actor)
 end
 
 function CodeGlobals:RemoveActor(actor)
+	self.actorCount = self.actorCount - 1;
 	local name = actor:GetName() or "";
 	if(name ~= "") then
 		local actors = self.actors[name];
@@ -719,7 +756,7 @@ function CodeGlobals:CheckLobbyServer(bSigninIfNot)
 	if((not lobbyServerStarted or not LobbyServerViaTunnelStarted) and bSigninIfNot) then
 		if(not self.hasAskedSignin) then
 			self.hasAskedSignin = true;
-			GameLogic.SignIn(L"", onSignIn);
+			GameLogic.SignIn("", onSignIn);
 		end
 	end
 	
@@ -735,6 +772,22 @@ function CodeGlobals:RegisterNetworkEvent(event_name, callbackFunc)
 			-- if server is already started when registering this event
 			callbackFunc(_, {type="net", msg={username = "admin", entityId = EntityManager.GetPlayer().entityId, displayname=EntityManager.GetPlayer():GetDisplayName(), isServer = true}});
 		end
+	elseif(event_name:match("^ble:.+")) then
+		-- for bluetooth low energy event
+		self:RegisterTextEvent(event_name, callbackFunc);
+		local bleEventName = event_name:match("^ble:(.+)");
+		GameLogic.All.BlueTooth:StartBluetooth()
+		GameLogic.All.BlueTooth:RegisterEvent(bleEventName, function(msg)
+			self:BroadcastTextEvent(event_name, msg);
+		end)
+	elseif(event_name:match("^udp:%d+")) then
+		local port = event_name:match("^udp:(%d+)");
+		port = tonumber(port) or 8099;
+		UdpSocket:Open(port);
+		self:RegisterTextEvent("__udp__", callbackFunc);
+		UdpSocket:Recv(function(data)
+			self:BroadcastTextEvent("__udp__", data);
+		end);
 	else
 		local event = self:CreateGetTextEvent(event_name);
 		event:AddEventListener("net", callbackFunc);
@@ -758,6 +811,12 @@ end
 function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc, codeblock)
 	if(text:match("^ps_")) then
 		self:UnregisterTextEvent(text, callbackFunc);
+	elseif(text:match("^ble:.+")) then
+		local bleEventName = text:match("^ble:(.+)");
+		self:UnregisterTextEvent(text, callbackFunc);
+		GameLogic.All.BlueTooth:UnRegisterEvent(bleEventName)
+	elseif(text:match("^udp:.+")) then
+		self:UnregisterTextEvent("__udp__", callbackFunc);
 	else
 		local event = self:GetTextEvent(text);
 		if(event) then
@@ -772,12 +831,34 @@ function CodeGlobals:UnregisterNetworkEvent(text, callbackFunc, codeblock)
 end
 
 -- send a named message to one computer in the network
--- @param username: entity id or player name
+-- @param username: entity id or player name 
+--    or "ble" for bluetooth low energy, 
+--    or "udp" for udp message, where event_name is "ip:port" or just "port"
 -- @param event_name: if nil, we will send an binary stream (msg) to keepworkUsername, 
 -- @param msg: msg.from will be the sender username if not filled. 
 -- which needs to be nid/ip:port (*8099, \\\\10.27.3.5 8099)
 function CodeGlobals:SendNetworkEvent(username, event_name, msg)
-	if(GameLogic.isRemote) then
+	if(username == "ble") then
+		-- for bluetooth low energy event
+		GameLogic.All.BlueTooth:StartBluetooth()
+		GameLogic.All.BlueTooth:SendEvent(event_name, msg)
+	elseif(username == "udp") then
+		local ip, port = event_name:match("^(.-):(%d+)$");
+		if(not ip) then
+			port = event_name:match("^(%d+)$");
+		end
+		local data
+		if(type(msg) == "table") then
+			data = commonlib.serialize_compact(msg)
+		else
+			data = tostring(msg);
+		end
+		if(not ip or ip == "" or ip == "*") then
+			UdpSocket:Broadcast(data, port);
+		else
+			UdpSocket:Send(ip, port, data);
+		end
+	elseif(GameLogic.isRemote) then
 		if(type(msg) == "table") then
 			msg.from = msg.from or EntityManager.GetPlayer():GetUserName();
 		end
@@ -848,8 +929,16 @@ function CodeGlobals:SendNetworkEvent(username, event_name, msg)
 end
 
 -- send a named message to all computers in the network
+-- @param event_name: if start with "ble:" it is a bluetooth low energy event
 function CodeGlobals:BroadcastNetworkEvent(event_name, msg)
-	if(GameLogic.isRemote or GameLogic.isServer) then
+	if(event_name:match("^ble:.+")) then
+		local bleEventName = event_name:match("^ble:(.+)");
+		GameLogic.All.BlueTooth:StartBluetooth()
+		GameLogic.All.BlueTooth:SendEvent(bleEventName, msg)
+	elseif(event_name:match("^udp:%d+")) then
+		local port = event_name:match("^udp:(%d+)");
+		self:SendNetworkEvent("udp", port, msg)
+	elseif(GameLogic.isRemote or GameLogic.isServer) then
 		self:SendNetworkEvent("@all", event_name, msg)
 	elseif(self:CheckLobbyServer()) then
 		if LobbyServer.GetSingleton():IsStarted() then
@@ -954,6 +1043,19 @@ function CodeGlobals:IsKeyPressed(keyname)
 	return false;
 end
 
+-- key press is not ignored when UI has focus
+function CodeGlobals:ParaUIIsKeyPressed(keyname)
+	if(self:IsAnyKeyDown()) then
+		keyname = self:GetKeyNameFromString(keyname);
+		if(keyname) then
+			if(ParaUI.IsKeyPressed(DIK_SCANCODE[keyname])) then
+				return true;
+			end
+		end
+	end
+	return false;
+end
+
 -- in in-memory agent block world, that only exists in memory and has nothing to do with the actual block world.
 function CodeGlobals:GetAgentWorld()
 	if(not self.agentWorld) then
@@ -981,6 +1083,13 @@ function CodeGlobals:RunAsCodeBlockFunction(func, msg)
 	local codeblock = self:CreateGetMemoryCodeBlock()
 	if(codeblock) then
 		return codeblock:RunAsCodeBlockFunction(func, msg);
+	end
+end
+
+function CodeGlobals:RunAsCodeBlock(code, msg, filename, onFinishedCallback)
+	local codeblock = self:CreateGetMemoryCodeBlock()
+	if(codeblock) then
+		return codeblock:RunAsCodeBlock(code, msg, filename, onFinishedCallback);
 	end
 end
 

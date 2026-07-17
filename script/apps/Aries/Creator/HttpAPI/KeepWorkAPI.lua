@@ -34,3 +34,4 @@ NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.update.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.course.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.class.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.exampaper.lua");
+NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.thirdparty.lua")

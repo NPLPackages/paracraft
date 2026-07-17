@@ -633,7 +633,7 @@ end
 
 function Camera.reopen()
 	cameraTryInit();
-	local entity = Camera.codeBlock:GetEntity();
+	local entity = Camera.codeBlock and Camera.codeBlock:GetEntity();
 	if(entity) then
 		entity:OpenEditor("entity", entity);
 		Camera.showWithEditor(entity);

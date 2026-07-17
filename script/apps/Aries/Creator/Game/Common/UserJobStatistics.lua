@@ -64,14 +64,13 @@ function UserJobStatistics.OnChangeDesktopMode(mode)
 end
 
 function UserJobStatistics.openTimer_6000(bOpen)
-    if this.timer_60000 then
-        this.timer_60000:Change()
-        this.timer_60000 = nil
+    if this.timer_5000 then
+        this.timer_5000:Change()
     end
     if bOpen==false then 
         return
     end
-    this.timer_60000 = commonlib.Timer:new({callbackFunc = function(timer) --每隔一分钟检查一下是否在焦点
+    this.timer_5000 = this.timer_5000 or commonlib.Timer:new({callbackFunc = function(timer) --每隔5s检查一下是否在焦点
         local bAppHasFocus = ParaEngine.GetAttributeObject():GetField("AppHasFocus", true);
         if bAppHasFocus then
             this._addWorldInfoTagValue("totalEditSeconds",timer.delta/1000)
@@ -80,7 +79,7 @@ function UserJobStatistics.openTimer_6000(bOpen)
             this.lastRecordTime = nil
         end
     end})
-    this.timer_60000:Change(1000*60, 1000*60)
+    this.timer_5000:Change(0, 1000*5)
 end
 
 function UserJobStatistics.OnKeyPressed(_,msg)
@@ -115,19 +114,19 @@ end
 
 --清理以前的数据（集锦视频发版之前已经有很多数据了，清理掉并备份）
 function UserJobStatistics.clear()
-    local old_score = WorldCommon.GetWorldInfo():GetTotalWorkScore() or 0
-    WorldCommon.SetWorldTag("totalWorkScore_bak",old_score)
-    local arr = {
-        "totalClicks",
-        "totalKeyStrokes",
-        "totalSingleBlocks",
-        "totalEditSeconds",
-    }
-    for k,key in pairs(arr) do
-        this._info[key] = 0
-        WorldCommon.SetWorldTag(key,this._info[key])
-    end
-    WorldCommon.SaveWorldTag()
+    -- local old_score = WorldCommon.GetWorldInfo():GetTotalWorkScore() or 0
+    -- WorldCommon.SetWorldTag("totalWorkScore_bak",old_score)
+    -- local arr = {
+    --     "totalClicks",
+    --     "totalKeyStrokes",
+    --     "totalSingleBlocks",
+    --     "totalEditSeconds",
+    -- }
+    -- for k,key in pairs(arr) do
+    --     this._info[key] = 0
+    --     WorldCommon.SetWorldTag(key,this._info[key])
+    -- end
+    -- WorldCommon.SaveWorldTag()
 end
 
 return UserJobStatistics

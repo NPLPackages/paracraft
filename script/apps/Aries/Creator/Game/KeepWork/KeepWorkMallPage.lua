@@ -838,7 +838,7 @@ function KeepWorkMallPage.GetIcon(item_data)
 		if skin then
 			CustomGeosets = skin
 		elseif(PlayerAssetFile:IsCustomModel(filepath)) then
-			CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
+			CCSInfoStr = PlayerAssetFile:GetDefaultCCSString(filepath)
 		elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 			-- TODO:  hard code worker skin here
 			ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};

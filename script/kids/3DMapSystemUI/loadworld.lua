@@ -24,8 +24,9 @@ function Map3DSystem.UI.LoadWorld.LoadWorldImmediate(worldpath, bPerserveUI, bHi
 		worldpath = string.gsub(worldpath, "[/\\]+$", "")
 	end
 
-	if (string.find(worldpath, ".*%.zip$") ~= nil or
-	    string.find(worldpath, ".*%.pkg$") ~= nil) then
+	local fileExt = string.match(worldpath, "%.(%w%w%w)$");
+
+	if(fileExt == "zip" or fileExt == "pkg" or fileExt == "p3d") then
 		-- open zip archive with relative path
 		if (Map3DSystem.World.worldzipfile and Map3DSystem.World.worldzipfile~= worldpath) then
 			ParaAsset.CloseArchive(Map3DSystem.World.worldzipfile); -- close last world archive

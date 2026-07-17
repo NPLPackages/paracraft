@@ -17,6 +17,10 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BonesVariable.lua");
 NPL.load("(gl)script/ide/math/Quaternion.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local Matrix4 = commonlib.gettable("mathlib.Matrix4");
 local Quaternion = commonlib.gettable("mathlib.Quaternion");
@@ -226,7 +230,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	timeseries:CreateVariableIfNotExist("gravity", "Discrete");
 	timeseries:CreateVariableIfNotExist("scaling", "Linear");
 	timeseries:CreateVariableIfNotExist("name", "Discrete");
-	timeseries:CreateVariableIfNotExist("isAgent", "Discrete"); -- true, nil|false, "relative", "searchNearPlayer"
+	timeseries:CreateVariableIfNotExist("isAgent", "Discrete"); -- true, nil|false, "relative", "searchNearPlayer", "relativeToPlayer"
 	timeseries:CreateVariableIfNotExist("isServer", "Discrete"); -- false, whether this entity is a server mode entity
 	timeseries:CreateVariableIfNotExist("isIgnoreSkin", "Discrete"); -- true, nil|false
 	
@@ -243,12 +247,11 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	local movieClip = self:GetMovieClip();
 	local x, y, z = self:CheckSetDefaultPosition();
 
-	local HeadUpdownAngle, HeadTurningAngle, anim, facing,skin, opacity, name;
+	local HeadUpdownAngle, HeadTurningAngle, anim, facing, opacity, name;
 	HeadUpdownAngle = self:GetValue("HeadUpdownAngle", 0);
 	HeadTurningAngle = self:GetValue("HeadTurningAngle", 0);
 	anim = self:GetValue("anim", 0);
 	facing = self:GetValue("facing", 0);
-	skin = self:GetValue("skin", 0);
 	opacity = self:GetValue("opacity", 0);
 	name = newName or self:GetValue("name", 0);
 	local isAgent = self:GetValue("isAgent", 0);
@@ -257,21 +260,30 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	if(isIgnoreSkin) then
 		self:SetIgnoreSkinAnim(isIgnoreSkin)
 	end
-
 	if(isReuseActor == nil) then
 		isReuseActor = isAgent
 	end
-
+	
 	if((isReuseActor or isAgent) and name and name~="") then
-		local entity, offsetFacing = self:FindAgentEntity(name, isReuseActor or isAgent);
+		local agentName = isAgent and self:GetValue("name", 0) or name;
+		local entity, offsetFacing = self:FindAgentEntity(agentName, isReuseActor or isAgent);
 		
 		if(isAgent and isReuseActor==false and (not newName) and entity) then
 			-- tricky: we still need to reuse actor, even if isReuseActor == false under above conditions
 			isReuseActor = true;
 		end
-
-		if(isReuseActor and entity) then
+					
+		if(isAgent == "relativeToPlayer" and entity) then
+			self:CalculateRelativeParams(entity);
+			if(offsetFacing) then
+				self:SetOffsetFacing(offsetFacing);
+			end
+			if(not newName) then
+				name = "relative_to_"..name;
+			end
+		elseif(isReuseActor and entity) then
 			self:BecomeAgent(entity);
+			entity:ResetModelLocalTransform();
 			if(isReuseActor == "relative" or isReuseActor == "searchNearPlayer") then
 				self:CalculateRelativeParams();
 				if(offsetFacing) then
@@ -299,7 +311,6 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 		self.entity:SetGroupId(nil);
 		self.entity:SetSentientField(0);
 		self.entity:SetServerEntity(isServerEntity == true);
-		self.entity:SetSkin(skin);
 			
 		self.entity:SetCanRandomMove(false);
 		self.entity:SetDisplayName(name);
@@ -308,10 +319,13 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 		self.entity:Attach();
 		self:CheckLoadBonesAnims();
 
-		if(isReuseActor) then
+		if(isReuseActor and isAgent ~= "relativeToPlayer") then
 			-- just incase the reused actor is not found, we will create a new one and become an agent of it. 
 			self:BecomeAgent(self.entity);
 		end
+	end
+	if(self.entity) then
+		self.entity.boneController = "ActorNPC";
 	end
 	return self;
 end
@@ -408,8 +422,8 @@ end
 -- so that all time series values are relative to time 0, instead of absolute values in data source. 
 -- currently, only entity position and facing are taking in to account and snapped to block position and 4 direction. 
 -- calculated values in self.offset_x, self.offset_y, self.offset_z, self.offset_facing
-function Actor:CalculateRelativeParams()
-	local entity = self:GetEntity();
+function Actor:CalculateRelativeParams(entity)
+	entity = entity or self:GetEntity();
 	if(entity) then
 		local obj = entity:GetInnerObject();
 		if(not obj) then
@@ -586,20 +600,17 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
 		OpenAssetFileDialog.ShowPage(title, function(result)
 			if(result) then
-				local filepath = PlayerAssetFile:GetValidAssetByString(result);
-				if(filepath or result=="0" or result=="") then
-					-- PlayerAssetFile:GetNameByFilename(filename)
-					local skin = CustomCharItems:GetSkinByAsset(result)
-					if skin then
-						self:AddKeyFrameByName("skin", nil, skin);
-					end
-					result = commonlib.Encoding.DefaultToUtf8(result)
-					self:AddKeyFrameByName(keyname, nil, result);
-					self:FrameMovePlaying(0);
-					if(callbackFunc) then
-						callbackFunc(true);
-						return
-					end
+				local skin, assetfile = CustomCharItems:GetSkinByAsset(result)
+				if skin then
+					self:AddKeyFrameByName("skin", nil, skin);
+					result = assetfile or CustomCharItems.defaultModelFile;
+				end
+				result = commonlib.Encoding.DefaultToUtf8(result)
+				self:AddKeyFrameByName(keyname, nil, result);
+				self:FrameMovePlaying(0);
+				if(callbackFunc) then
+					callbackFunc(true);
+					return
 				end
 			end
 			if(callbackFunc) then
@@ -674,7 +685,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 							callbackFunc(true);
 						end
 					end
-				end, old_value,nil,nil, {auto_virtual_keyboard=true});
+				end, old_value, assetFilename,nil, {auto_virtual_keyboard=true});
 			else
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
 				local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
@@ -864,33 +875,92 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				local rotVarCpp = bone:GetVariable(1);
 				local rotVar = rotVarCpp:CreateGetTimeVar();
 				local quat = rotVar:getValue(1, curTime);
-				if(quat) then
+				local hasRot = quat and rotVar:getStartTime(1, curTime) == curTime;
+				
+				local transVarCpp = bone:GetVariable(2);
+				local transVar = transVarCpp:CreateGetTimeVar();
+				local trans = transVar:getValue(1, curTime);
+				local hasTrans = trans and transVar:getStartTime(1, curTime) == curTime;
+
+				local scaleVarCpp = bone:GetVariable(3);
+				local scaleVar = scaleVarCpp:CreateGetTimeVar();
+				local scale = scaleVar:getValue(1, curTime);
+				local hasScale = scale and scaleVar:getStartTime(1, curTime) == curTime;
+
+				if(hasRot) then
 					local yaw, roll, pitch = Quaternion.ToEulerAngles(quat) 
-					local title = format(L"起始时间%s, 请输入roll, pitch, yaw [-180, 180]<br/>", strTime);
-					old_value = string.format("%f, %f, %f", (roll or 0) / math.pi * 180, (pitch or 0) / math.pi * 180, (yaw or 0) / math.pi * 180);
-					-- TODO: use a dedicated UI 
-					NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
-					local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
-					EnterTextDialog.ShowPage(title, function(result)
-						if(result and result~="") then
-							local vars = CmdParser.ParseNumberList(result, nil, "|,%s");
-							if(result and vars and vars[1] and vars[2] and vars[3]) then
-								self:BeginUpdate();
-								roll, pitch, yaw  = vars[1] / 180 * math.pi, vars[2] / 180 * math.pi, vars[3] / 180 * math.pi;
-								self:BeginModify();
-								quat = Quaternion.FromEulerAngles(quat, yaw, roll, pitch);
-								rotVarCpp:LoadFromTimeVar();
-								self:SetModified();
-								self:EndModify();
-								self:EndUpdate();
-								self:FrameMovePlaying(0);
-								if(callbackFunc) then
-									callbackFunc(true);
-								end
+					old_value = string.format("%f, %f, %f\n", (roll or 0) / math.pi * 180, (pitch or 0) / math.pi * 180, (yaw or 0) / math.pi * 180);
+				else
+					old_value = "\n"
+				end
+				if(hasTrans) then
+					old_value = string.format("%s%f, %f, %f\n", old_value, trans[1], trans[2], trans[3])
+				else
+					old_value = old_value.."\n"
+				end
+				if(hasScale) then
+					old_value = string.format("%s%f, %f, %f\n", old_value, scale[1], scale[2], scale[3])
+				else
+					old_value = old_value.."\n"
+				end
+
+				-- TODO: use a dedicated UI 
+				local title = format(L"起始时间%s, 第一行roll, pitch, yaw [-180, 180]<br/>第二行位移0,0,0 第三行放缩1,1,1", strTime);
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+				local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+				EnterTextDialog.ShowPage(title, function(result)
+					if(result) then
+						-- get first line text from result
+						local line1, line2, line3
+						line1, result = string.match(result, "^([^\r\n]*)\r?\n?(.*)");
+						line2, result = string.match(result, "^([^\r\n]*)\r?\n?(.*)");
+						line3, result = string.match(result, "^([^\r\n]*)\r?\n?(.*)");
+
+						local vars = CmdParser.ParseNumberList(line1 or "", nil, "|,%s");
+						local vars2 = CmdParser.ParseNumberList(line2 or "", nil, "|,%s");
+						local vars3 = CmdParser.ParseNumberList(line3 or "", nil, "|,%s");
+						local hasValue;
+						if((vars and vars[1]) or (vars2 and vars2[1]) or (vars2 and vars2[1])) then
+							hasValue = true;
+						end
+						if(hasValue) then
+							self:BeginUpdate();
+							self:BeginModify();
+						end
+						if(vars and vars[1] and vars[2] and vars[3]) then
+							local roll, pitch, yaw  = vars[1] / 180 * math.pi, vars[2] / 180 * math.pi, vars[3] / 180 * math.pi;
+							local quat = Quaternion.FromEulerAngles({}, yaw, roll, pitch);
+							rotVar:AddKey(curTime, quat)
+							rotVarCpp:LoadFromTimeVar();
+						elseif(hasRot) then
+							rotVar:RemoveKeyFrame(curTime)
+							rotVarCpp:LoadFromTimeVar();
+						end
+						if(vars2 and vars2[1] and vars2[2] and vars2[3]) then
+							transVar:AddKey(curTime, vars2)
+							transVarCpp:LoadFromTimeVar();
+						elseif(hasTrans) then
+							transVar:RemoveKeyFrame(curTime)
+							transVarCpp:LoadFromTimeVar();
+						end
+						if(vars3 and vars3[1] and vars3[2] and vars3[3]) then
+							scaleVar:AddKey(curTime, vars3)
+							scaleVarCpp:LoadFromTimeVar();
+						elseif(hasScale) then
+							scaleVar:RemoveKeyFrame(curTime)
+							scaleVarCpp:LoadFromTimeVar();
+						end
+						if(hasValue) then
+							self:SetModified();
+							self:EndModify();
+							self:EndUpdate();
+							self:FrameMovePlaying(0);
+							if(callbackFunc) then
+								callbackFunc(true);
 							end
 						end
-					end,old_value,nil,nil, {auto_virtual_keyboard=true})
-				end
+					end
+				end,old_value,"multiline",nil, {auto_virtual_keyboard=true})
 			else
 				local rangeVar = var:GetRangeVariable();
 				if(rangeVar) then
@@ -963,25 +1033,31 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			local lastEntity = self:GetEntity()
 			local isAgent = self:GetValue("isAgent", 0)
 			local name = self:GetValue("name", "")
-			if(isAgent and name) then
+			if(isAgent and name and isAgent ~= "relativeToPlayer") then
 				local entity, offsetFacing = self:FindAgentEntity(name, isAgent);
 				if(entity) then
 					if(not self:IsAgent() or lastEntity ~= entity) then
 						self:BecomeAgent(entity);
 						-- copy transform and model file onto frame 0. 
-						local x, y, z = entity:GetPosition()
-						local facing = entity:GetFacing()
-						local scaling = entity:GetScaling()
 						local assetfile = entity.GetModelFile and entity:GetModelFile() or entity:GetMainAssetPath();
 						local skin = entity.GetSkin and entity:GetSkin()
 						self:BeginUpdate();
-						self:AddKeyFrameByName("x", 0, x);
-						self:AddKeyFrameByName("y", 0, y);
-						self:AddKeyFrameByName("z", 0, z);
-						self:AddKeyFrameByName("facing", 0, facing);
-						self:AddKeyFrameByName("scaling", 0, scaling);
+						if(isAgent ~= "relative") then
+							local x, y, z = entity:GetPosition()
+							local facing = entity:GetFacing()
+							local scaling = entity:GetScaling()
+
+							self:AddKeyFrameByName("x", 0, x);
+							self:AddKeyFrameByName("y", 0, y);
+							self:AddKeyFrameByName("z", 0, z);
+							self:AddKeyFrameByName("facing", 0, facing);
+							self:AddKeyFrameByName("scaling", 0, scaling);
+						end
+						
 						self:AddKeyFrameByName("assetfile", 0, assetfile);
-						self:AddKeyFrameByName("skin", 0, skin);
+						if(not values.isIgnoreSkin) then
+							self:AddKeyFrameByName("skin", 0, skin);
+						end
 						self:EndUpdate();
 						self:FrameMovePlaying(0);
 					end
@@ -1117,6 +1193,26 @@ function Actor:KeyTransform()
 	self:EndUpdate();
 end
 
+function Actor:SetRecording(isRecording)
+	Actor._super.SetRecording(self, isRecording);
+	if(self.entity) then
+		if(isRecording) then
+			self.entity.boneController = nil;
+		else
+			if(self.entity.boneController and self.entity.boneController ~= "ActorNPC") then
+				self.entity.boneController = "ActorNPC";
+				if(self.entity.bones_variable) then
+					local bones = self:GetBonesVariable();
+					if(bones) then
+						bones:LoadFromActor();
+						self:SetModified();
+					end
+				end
+			end
+		end
+	end
+end
+
 function Actor:FrameMoveRecording(deltaTime)
 	local curTime = self:GetTime();
 	local entity = self.entity;
@@ -1178,8 +1274,29 @@ function Actor:FrameMoveRecording(deltaTime)
 		assetfile = PlayerAssetFile:GetNameByFilename(assetfile)
 		assetfile = commonlib.Encoding.DefaultToUtf8(assetfile)
 		self:AutoAddKey("assetfile", curTime, assetfile);
+		
+		if(entity.bones_variable and entity.boneController and entity.boneController ~= "ActorNPC") then
+			-- capture from entity.bones_variable to actor.bones_variable
+			local bones = self:GetBonesVariable();
+			if(bones) then
+				for name, fromBone in entity.bones_variable:pairs() do
+					local toBone = bones:GetChild(name)
+					if(toBone) then
+						local quatRot = fromBone:GetRotationData()
+						if(quatRot) then
+							-- bone recording will replace all keys from startRecordTime to current time. 
+							local timeVar = toBone:GetRotationVar():CreateGetTimeVar()
+							timeVar:RemoveKeysInTimeRange(self.startRecordTime or curTime, curTime)
+							timeVar:AddKey(curTime, quatRot:clone(), false);
+							timeVar:RemoveConstantKeyAtTime(curTime)
+						end
+					end
+				end
+			end
+		end
 	end
 	self:EndUpdate();
+	self.startRecordTime = curTime+1;
 end
 
 -- return the parent link and parent actor if found.
@@ -1238,6 +1355,9 @@ function Actor:ComputeBoneWorldTransform(bonename, bUseParentRotation)
 		end
 		if(bFoundTarget) then
 			local parentObj = self:GetEntity():GetInnerObject();
+			if(not parentObj) then
+				return link_x, link_y, link_z;
+			end
 			local parentScale = parentObj:GetScale() or 1;
 			local dx,dy,dz = 0,0,0;
 			if(not bUseParentRotation and localPos) then
@@ -1308,6 +1428,9 @@ function Actor:ComputeWorldTransform(keypath, curTime, localPos, localRot, bUseP
 		end 
 		if(bFoundTarget) then
 			local parentObj = self:GetEntity():GetInnerObject();
+			if(not parentObj) then
+				return;
+			end
 			local parentScale = parentObj:GetScale() or 1;
 			local dx,dy,dz = 0,0,0;
 			if(not bUseParentRotation and localPos) then
@@ -1444,7 +1567,7 @@ function Actor:FrameMovePlaying(deltaTime)
 	assetfile = assetfile and PlayerAssetFile:GetBuildInFilenameByName(assetfile)
 	blockinhand = self:GetValue("blockinhand", curTime);
 	cam_dist = self:GetValue("cam_dist", curTime);
-
+	
 	self:GetBonesVariable():AutoEnableBonesAtTime(curTime);
 	
 	if(obj) then
@@ -1453,11 +1576,16 @@ function Actor:FrameMovePlaying(deltaTime)
 		end
 
 		-- in case of explicit animation
-		obj:SetField("yaw", yaw or 0);
+		local isAgent = self:IsAgent()
+		if(not isAgent) then
+			obj:SetField("yaw", yaw or 0);
+		else
+			entity:SetFacing(yaw or 0); -- this fixed a bug to inform linked entities to update facing.
+		end
 		obj:SetField("roll", roll or 0);
 		obj:SetField("pitch", pitch or 0);
 
-		if(new_x) then
+		if(new_x and new_y and new_z) then
 			entity:SetPosition(new_x, new_y, new_z);
 		end
 		
@@ -1474,7 +1602,9 @@ function Actor:FrameMovePlaying(deltaTime)
 		if(not self:IsIgnoreSkinAnim()) then
 			skin = self:HandleSkin(skin, assetfile)
 			entity:SetSkin(skin);
-			entity:SetBlockInRightHand(blockinhand);
+			if type(entity.SetBlockInRightHand) == "function" then
+				entity:SetBlockInRightHand(blockinhand);
+			end
 		end
 
 		obj:SetField("Time", curTime); 
@@ -1562,7 +1692,13 @@ function Actor:FrameMovePlaying(deltaTime)
 		
 		entity:SetSpeedScale(speedscale or 1);
 		obj:SetField("Speed Scale", speedscale or 1);
-		obj:SetScale(scaling or 1);
+		
+		-- this fixed a bug to inform linked entities to update scaling.
+		if(not isAgent) then
+			obj:SetScale(scaling or 1);
+		else
+			entity:SetScaling(scaling or 1); 
+		end
 		
 		if(gravity) then
 			obj:SetField("Gravity", gravity);
@@ -1579,7 +1715,7 @@ function Actor:SelectMe()
 	if(entity) then
 		local editmodel = entity:GetEditModel();
 		editmodel:Connect("EndEdit", self, "OnEndEdit");
-		Actor._super.SelectMe(self);	
+		return Actor._super.SelectMe(self);
 	end
 end
 
@@ -1641,6 +1777,9 @@ function Actor:SetBoneTime(boneName, time)
 end
 
 function Actor:DestroyEntity()
+	if(self.entity) then
+		self.entity.boneController = nil;
+	end
 	if(self:IsAgent() and self.entity) then
 		self:ReleaseEntityControl();
 	end
@@ -1650,6 +1789,7 @@ function Actor:DestroyEntity()
 		self:Disconnect("assetfileChanged", self.bones_variable, self.bones_variable.OnAssetFileChanged)
 		self.bones_variable = nil;
 	end
+	
 end
 
 function Actor:UnbindAnimInstance()
@@ -1663,7 +1803,10 @@ end
 
 function Actor:BecomeAgent(entity)
 	Actor._super.BecomeAgent(self, entity);
-	self:CheckLoadBonesAnims();
+	--self:CheckLoadBonesAnims(); -- why is this needed? preload bone anims?
+	if(self.entity) then
+		self.entity.boneController = "ActorNPC"
+	end
 end
 
 -- when deactivated we will release the control to human player with this function.
@@ -1674,7 +1817,7 @@ end
 
 function Actor:SetVoiceMouthSkin(mouth_skin)
 	self.mouth_skin = mouth_skin
-	-- 恢复下皮肤
+	-- restore skin
 	if self.entity then
 		local entity = self.entity;
 		local curTime = self:GetTime();
@@ -1701,25 +1844,38 @@ function Actor:SetVoiceMouthSkin(mouth_skin)
 end
 
 function Actor:HandleSkin(skin, assetfile)
-	if not skin and assetfile ~= CustomCharItems.defaultModelFile then
+	local isCustomChar = CustomCharItems:IsCustomCharAsset(assetfile)
+	if not skin and not isCustomChar then
 		return skin
 	end
 	
 	if not self.mouth_skin then
-		if not skin and assetfile == CustomCharItems.defaultModelFile then
+		if not skin and isCustomChar then
 			return ""
 		end
 
 		return skin
 	end
 
-	-- 可换装模型的话 也给他装上嘴巴
-	if not skin and assetfile == CustomCharItems.defaultModelFile then
+	-- add mouse skin to custom char without skins 
+	if not skin and isCustomChar then
 		return tostring(self.mouth_skin)
 	end
-
-	local result_skin = CustomCharItems:AddMouthSkin(skin, self.mouth_skin, true)
-	return result_skin
+	if(isCustomChar) then
+		local result_skin = CustomCharItems:AddMouthSkin(skin, self.mouth_skin, true)
+		return result_skin
+	else
+		local skins, skinId = PlayerSkins:GetSkinsByTag(assetfile, "mouth")
+		if(skins and skin) then
+			local mouth_skin = "Texture/blocks/Paperman/mouth/mouth_girl_fps10_a004.png"
+			local skin_with_mouth = skin:gsub(format("(%d:)([^;]+);", skinId), "%1"..mouth_skin..";")
+			if(skin_with_mouth == skin) then
+				skin_with_mouth = skin..format("%d:%s;", skinId, mouth_skin)
+			end
+			return skin_with_mouth;
+		end
+	end
+	return skin;
 end
 
 function Actor:SetBoneManipContainer(manipCont)

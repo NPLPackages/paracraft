@@ -28,6 +28,7 @@ local open_on_click_blockid_list = {
 	[211] = 1,
 	[271] = 1,
 	[228] = 1,
+	[212] = 1,
 }
 MobileContext:Property("Name", "MobileContext");
 
@@ -136,6 +137,10 @@ function MobileContext:handleLeftClickScene(event, result)
 				 	task:RefreshImediately();
 				 	-- Ctrl + shift + left click to select all connected blocks
 				 	task.SelectAll(true);
+				else
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InfoWindow.lua");
+					local InfoWindow = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InfoWindow");
+					InfoWindow.CopyToClipboard("mousepos")
 				end
 				event:accept();
 				return

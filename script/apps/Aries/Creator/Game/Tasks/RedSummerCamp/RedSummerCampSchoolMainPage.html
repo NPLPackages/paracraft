@@ -317,18 +317,6 @@ end
                     <div tooltip='<%=GetUserData("nickname")%>' name="user_nickname" class="head_text" style="margin-left: 5px;margin-top: 0px;">
                         <%=GetUserData("limit_nickname")%>
                     </div>
-
-                    <!-- <pe:if condition='<%= not need_certificate() %>'>
-                        <div style="width:46px;
-                                    height:23px;
-                                    float:left;
-                                    margin-left: 5px;
-                                    margin-top: 1px;">
-                            <input type='button'
-                                   value='<%= L"已实名" %>'
-                                   class="green_button" />
-                        </div>
-                    </pe:if> -->
                     
                     <pe:if condition='<%= need_certificate()%>'>
                         <div style="margin-left: 5px;margin-top: 1px; float: left;">
@@ -355,32 +343,7 @@ end
                             </div>
                         </pe:if>
                     </pe:if>
-                </div>
-                <div style="float: left;margin-top: 8px;">
-                    <div onclick="ClickSchoolName" tooltip='<%="点击切换学校"%>' name="user_name" style="position: relative;width: 310px; margin-left: 5px;margin-top: 0px;base-font-size:15px; font-size: 15px;color: #ffffff;">
-                        <%=GetUserData("limit_school_name")%>
-                    </div>
-
-                    <div style="position: relative;margin-left: 168px;margin-top: 0px;">
-                        <!-- <div tooltip='<%=GetUserData("school_name")%>' name="school_name" style="float: left; margin-left: 0px;margin-top: 0px;base-font-size:14px; font-size: 14px;color: #ffffff;">
-                            <%=GetUserData("limit_school_name")%>
-                        </div> -->
-    
-                        <!-- <pe:if condition='<%=HasSchool()%>'>
-                            <div style="margin-left: 5px;margin-top: 1px;float: left;">
-                                <input type="button" value='' onclick="ClickSchool" class="green_button" style="position: relative;" />
-                                <div class="green_button" style="position: relative;background: ;">更改</div>
-                            </div>
-                        </pe:if> -->
-        
-                        <!-- <pe:if condition='<%=not HasSchool()%>'>
-                            <div style="margin-left: 5px;margin-top: 1px;float: left;">
-                                <input type="button" value='' onclick="ClickSchool" class="green_button" style="position: relative;" />
-                                <div class="green_button" style="position: relative;background: ;">关联</div>
-                            </div>
-                        </pe:if>  -->
-                    </div> 
-                </div>              
+                </div>        
             </div>
         </div>
 
@@ -391,7 +354,7 @@ end
                     <input type='text'
                             name='opus_content'
                             spacing='10'
-                            EmptyText='<%= L"输入项目ID或课程ID或服务器地址" %>'
+                            EmptyText='<%= L"输入作品ID或作品链接" %>'
                             EmptyTextColor='#FF25282E'
                             class="opus_content_textfield"
                             style='<%= Mod.WorldShare.Utils.IsEnglish() and "width: 396px" or "width: 336px" %>'/>

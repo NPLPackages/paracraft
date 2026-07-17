@@ -35,8 +35,10 @@ EditModelManipContainer:Property({"RollPlugName", "roll", auto=true});
 EditModelManipContainer:Property({"OffsetPosPlugName", "offsetPos", auto=true});
 EditModelManipContainer:Property({"AngleGridStep", math.pi / 12, "GetAngleGridStep", "SetAngleGridStep", auto=true});
 EditModelManipContainer:Property({"SupportUndo", true, "IsSupportUndo", "SetSupportUndo", auto=true});
+EditModelManipContainer:Property({"showPosition", true, "IsShowPosition", "ShowPosition", auto=true});
 EditModelManipContainer:Property({"showRotation", true, "IsShowRotation", "ShowRotation", auto=true});
 EditModelManipContainer:Property({"showScaling", true, "IsShowScaling", "ShowScaling", auto=true});
+EditModelManipContainer:Property({"showDragMoveIcon", false, "IsShowDragMoveIcon", "SetShowDragMoveIcon", auto=true});
 
 function EditModelManipContainer:ctor()
 	self:AddValue("position", {0,0,0});
@@ -46,15 +48,17 @@ function EditModelManipContainer:createChildren()
 	self.translateManip = self:AddTranslateManip();
 	self.translateManip:SetFixOrigin(true);
 	self.translateManip:SetShowGroundSnap(true);
-	self.scaleManip = self:AddScaleManip();
-	self.scaleManip.radius = 0.5;
-	self.scaleManip:SetUniformScaling(true);
 	self.rotateManip = self:AddRotateManip();
 	self.rotateManip:SetYawPitchRollMode(true);
 	self.rotateManip:SetYawEnabled(true);
 	self.rotateManip:SetPitchEnabled(false);
 	self.rotateManip:SetRollEnabled(false);
 	self.rotateManip:SetGridStep(self:GetAngleGridStep());
+
+	self.scaleManip = self:AddScaleManip();
+	self.scaleManip.radius = 0.5;
+	self.scaleManip:SetUniformScaling(true);
+	
 	self:AddMountPointsManip()
 end
 
@@ -84,6 +88,23 @@ end
 
 function EditModelManipContainer:paintEvent(painter)
 	EditModelManipContainer._super.paintEvent(self, painter);
+
+	if(self:IsShowDragMoveIcon()) then
+		if(self:IsPickingPass()) then
+			return;
+		end
+		
+		-- Draw a drag move icon at the center of the manipulator
+		painter:PushMatrix();
+		painter:LoadBillboardMatrix();
+		painter:SetPen("#ffffffff");
+		
+		local textscale = self.textScale * 2;
+		painter:DrawTextScaled(-5 * textscale, 0, L"▲ 拖动", textscale);
+		-- texture not working
+		-- painter:DrawTexture(0, 0, 0.2, 0.2, "Texture/3DMapSystem/Creator/Objects/Tool_Move.png");
+		painter:PopMatrix();
+	end
 end
 
 function EditModelManipContainer:OnValueChange(name, value)
@@ -170,10 +191,11 @@ function EditModelManipContainer:connectToDependNode(node)
 					end
 				end
 			end)
-			
+
 			self:addPlugToManipConversionCallback(manipPosPlug, function(self, manipPlug)
 				return plugPos:GetValue();
 			end);
+
 			local manipTranslatePlug = self.translateManip:findPlug("position");
 			self:addManipToPlugConversionCallback(plugPos, function(self, plug)
 				local offsetPos = manipTranslatePlug:GetValue();
@@ -183,6 +205,11 @@ function EditModelManipContainer:connectToDependNode(node)
 				self.translateManip:SetField("position", {0, 0, 0});
 				return {x, y, z};
 			end);
+		end
+
+		if(not self:IsShowPosition()) then
+			self.translateManip:SetVisible(false)
+			-- self.translateManip.enabled = false	
 		end
 
 		-- two-way binding for scaling conversion:

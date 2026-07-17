@@ -12,6 +12,7 @@ SoundRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.SoundRecorder");
 SoundRecorder.OnInit();
 
 ]]></script>
+<pe:if condition="<%=SoundRecorder.mode ~= 'immediate' %>">
 <aries:window mode="thin" style="width:400px;" title='<%=L"录制声音"%>' onclose="SoundRecorder.OnClose">
 <div style="padding:5px;margin-right:10px;">
     <pe:if condition="<%= SoundRecorder.status == nil %>">
@@ -47,6 +48,17 @@ SoundRecorder.OnInit();
     </pe:if>
 </div>
 </aries:window>
+</pe:if>
+<pe:if condition="<%=SoundRecorder.mode == 'immediate' %>">
+<div style="width:300px;background-color:#00000033">
+    <div style="margin:10px;color:#cccccc">
+        <pe:label name="textImmediate" style="text-align:center;" value='<%=L"录制中"%>'></pe:label>
+    </div>
+    <div style="margin-left:128px;margin-bottom:10px">
+        <input type="button" name="stop" value="" style="background:url(Texture/player/stop.png);width:64px;height:64px;" onclick="SoundRecorder.OnStopRecord"/>
+    </div>
+</div>
+</pe:if>
 </pe:mcml>
 </body>
 </html>

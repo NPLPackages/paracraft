@@ -31,18 +31,29 @@ function EducateProjectManager.GetUserWorldDirectory()
     return LocalServiceWorld:GetUserFolderPath()
 end
 
-function EducateProjectManager.RegisterEvent()
+function EducateProjectManager.RegisterEvent()   
+    GameLogic:Disconnect("WorldLoaded", EducateProjectManager, EducateProjectManager.OnWorldLoaded, "UniqueConnection");
+    GameLogic:Connect("WorldLoaded", EducateProjectManager, EducateProjectManager.OnWorldLoaded, "UniqueConnection");
+
+    GameLogic.GetEvents():RemoveEventListener("createworld_callback",EducateProjectManager.CreateWorldCallback, EducateProjectManager, "EducateProjectManager")
+    GameLogic.GetEvents():AddEventListener("createworld_callback", EducateProjectManager.CreateWorldCallback, EducateProjectManager, "EducateProjectManager");
+
+    GameLogic.GetFilters():remove_filter("apps.aries.creator.game.login.swf_loading_bar.close_page",  EducateProjectManager.OnLoadingProgressFinish);
+    GameLogic.GetFilters():add_filter("apps.aries.creator.game.login.swf_loading_bar.close_page", EducateProjectManager.OnLoadingProgressFinish);
+
     GameLogic.GetFilters():add_filter("OnWorldCreate",  function(worldPath)
         EducateProjectManager.CurrentCreateWorldName = worldPath
         return worldPath
     end)
-    -- GameLogic.GetFilters():add_filter("SyncWorldFinish", EducateProjectManager.OnSyncWorldFinish);
-    GameLogic:Connect("WorldLoaded", EducateProjectManager, EducateProjectManager.OnWorldLoaded, "UniqueConnection");
-    GameLogic.GetFilters():add_filter("apps.aries.creator.game.login.swf_loading_bar.close_page", function()
-        EducateProjectManager.OnLoadingProgressFinish()
-        return true
-    end);
-    -- GameLogic:Connect("WorldUnloaded", EducateProjectManager, EducateProjectManager.OnWorldUnloaded, "UniqueConnection");
+end
+
+function EducateProjectManager.CreateWorldCallback(_, event)
+    local worldPath = commonlib.Encoding.DefaultToUtf8(event.world_path)
+    local paths = commonlib.split(worldPath,"/")
+    local worldName = paths[#paths]
+    if worldName and worldName ~= "" then
+        EducateProjectManager.CurrentCreateWorldName = worldName
+    end
 end
 
 function EducateProjectManager.OnLoadingProgressFinish()
@@ -59,28 +70,37 @@ function EducateProjectManager.StartSycUserWorld()
     if not EducateProjectManager.IsSwfLoadingFinished or not EducateProjectManager.IsWorldLoaded then
         return
     end
-
-    if System.options.channelId_431 then
-        if EducateProjectManager.CurrentCreateWorldName and EducateProjectManager.CurrentCreateWorldName ~= "" then
-            GameLogic.AddBBS(nil,"世界创建成功，开始自动保存世界")
-            GameLogic.QuickSave();
-            ShareWorld:SysncWorld(function()
-                EducateProjectManager.CurrentCreateWorldName = ""
-                EducateProjectManager.IsWorldLoaded = false
-                EducateProjectManager.IsSwfLoadingFinished = false
-                GameLogic.AddBBS(nil,"世界保存成功")
-            end)
+    print("EducateProjectManager.CurrentCreateWorldName===============",EducateProjectManager.CurrentCreateWorldName)
+    if System.options.isEducatePlatform then
+        if not System.options.isOffline then
+            if EducateProjectManager.CurrentCreateWorldName and EducateProjectManager.CurrentCreateWorldName ~= "" then
+                GameLogic.AddBBS(nil,"世界创建成功，开始自动保存世界")
+                GameLogic.QuickSave();
+                ShareWorld:SyncWorld(function()
+                    EducateProjectManager.CurrentCreateWorldName = ""
+                    EducateProjectManager.IsWorldLoaded = false
+                    EducateProjectManager.IsSwfLoadingFinished = false
+                    GameLogic.AddBBS(nil,"世界保存成功")
+                end)
+            end
+        else
+            EducateProjectManager.IsWorldLoaded = false
+            EducateProjectManager.IsSwfLoadingFinished = false
+            EducateProjectManager.CurrentCreateWorldName = ""
         end
-    end
-    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
-    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-    local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
-    --start auto save every 2 minite
-    if isHomeWorkWorld == true or isHomeWorkWorld == "true" then
+        
+        if GameLogic.IsReadOnly() then
+            return
+        end
+        --开始自动保存
+        if System.options.isDevMode then
+            GameLogic.AddBBS(nil,"开启世界自动保存")
+        end
         GameLogic.CreateGetAutoSaver():SetCheckModified()
         GameLogic.CreateGetAutoSaver():SetSaveMode();
         GameLogic.CreateGetAutoSaver():SetInterval(2);
     end
+   
 end
 
 
@@ -216,4 +236,3 @@ function EducateProjectManager.DeleteUserWorldsLocal()
     end
 end
 
-EducateProjectManager.Init()

@@ -14,9 +14,12 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
 local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
-local entity = EntityManager.EntityLiveModel:Create({bx=bx,by=by,bz=bz,});
-entity:SetModelFile(filename)
-entity:Attach();
+local task = EditModelTask:new({theme = "easy"});
+task:SelectModel(modelEntity);
+task:Connect("taskFinished", function() 
+	log("EditModelTask finished\n");
+end)
+task:Run()
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
@@ -33,10 +36,14 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local EditModelTask = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask"));
 
+EditModelTask:Signal("taskFinished")
+EditModelTask:Signal("modelChanged")
+
 local curInstance;
 
 -- this is always a top level task. 
 EditModelTask.is_top_level = true;
+EditModelTask.theme = "default"; -- can also be "easy"
 
 function EditModelTask:ctor()
 	self.position = vector3d:new(0,0,0);
@@ -92,6 +99,10 @@ function EditModelTask:RefreshPage()
 end
 
 function EditModelTask:Run()
+	if(curInstance) then
+		LOG.std(nil, "warn", "EditModelTask", "there is already an instance running. exiting it.");
+		curInstance:OnExit();
+	end
 	curInstance = self;
 	self.finished = false;
 	if(self:IsTransformMode()) then
@@ -103,13 +114,27 @@ function EditModelTask:Run()
 end
 
 function EditModelTask:OnExit()
+	EditModelTask.CancelEdit()
+end
+
+function EditModelTask.CancelEdit()
+	local self = EditModelTask.GetInstance();
+	if(not self) then
+		return
+	end
+	curInstance = nil;
 	self:SelectModel(nil);
 	self:SetFinished();
 	self:UnloadSceneContext();
 	self:CloseWindow();
-	curInstance = nil;
-	page = nil;
 	self.modelManip = nil;
+
+	page = nil;
+	self:taskFinished();
+end
+
+function EditModelTask.OnClickClose()
+	EditModelTask.CancelEdit()
 end
 
 function EditModelTask:UpdateUIFromModel()
@@ -137,6 +162,7 @@ function EditModelTask:SelectModel(entityModel)
 			self.entityModel:Connect("valueChanged", self, self.UpdateUIFromModel, "UniqueConnection")
 		end
 		self:UpdateManipulators();
+		self:modelChanged();
 	end
 end
 
@@ -188,6 +214,9 @@ function EditModelTask.OnResetModel()
 end
 
 function EditModelTask:UpdateManipulators()
+	if(not self.sceneContext) then
+		return;
+	end
 	self:DeleteManipulators();
 	self.modelManip = nil;
 	if(self.entityModel) then
@@ -196,6 +225,9 @@ function EditModelTask:UpdateManipulators()
 			local EditModelManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.EditModelManipContainer");
 			local manipCont = EditModelManipContainer:new();
 			manipCont:init();
+			if self:GetSelectedModel():GetCategory() == "staticblock" then
+				manipCont:SetAngleGridStep(math.pi/180)
+			end
 			self:AddManipulator(manipCont);
 			self.modelManip = manipCont;
 			manipCont:connectToDependNode(self:GetSelectedModel());
@@ -223,23 +255,86 @@ function EditModelTask:ShowPage()
 	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 	local viewport = ViewportManager:GetSceneViewport();
 	local parent = viewport:GetUIObject(true)
-	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
-	if IsMobileUIEnabled then
-		local window = self:CreateGetToolWindow();
+	local window = self:CreateGetToolWindow();
+	if(self.theme == "easy") then
 		window:Show({
 			name="EditModelTask", 
-			url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
-			alignment="_ctb", left=52, top= -110, width = 700, height = 96, parent = parent
+			url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.easy.html",
+			alignment="_ctt", left=0, top= 0, width = 512, height = 180, parent = parent
 		});
-		window:SetUIScaling(1.5,1.5)
-		return 
+	else
+		local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+		if IsMobileUIEnabled then
+			window:Show({
+				name="EditModelTask", 
+				url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
+				alignment="_ctb", left=52, top= -110, width = 700, height = 96, parent = parent
+			});
+			window:SetUIScaling(1.5,1.5)
+		else
+			window:Show({
+				name="EditModelTask", 
+				url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
+				alignment="_ctb", left=0, top= -55, width = 420, height = 64, parent = parent
+			});
+		end
+		window:EnableSelfPaint(true);
 	end
-	local window = self:CreateGetToolWindow();
-	window:Show({
-		name="EditModelTask", 
-		url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
-		alignment="_ctb", left=0, top= -55, width = 420, height = 64, parent = parent
-	});
+end
+
+function EditModelTask.IsLiveAndPersistent()
+	local self = EditModelTask.GetInstance();
+	if(self and self.entityModel) then
+		if(self.entityModel:IsPersistent() and self.entityModel:isa(EntityManager.EntityLiveModel)) then
+			return true
+		end
+	end
+end
+
+function EditModelTask.OpenCodeEditor()
+	local self = EditModelTask.GetInstance();
+	if(self and self.entityModel) then
+		if(not self.entityModel:OpenCodeEditor() and self.entityModel:IsPersistent() and self.entityModel:isa(EntityManager.EntityLiveModel)) then
+			local name = self.entityModel:GetName() or ""
+			if(name:match("^%d+")) then
+				GameLogic.AddBBS(nil, L"请先给角色取个名字，不要以数字开头", 3000, "255 0 0")
+				EditModelTask.OnClickProperty();
+			else
+				_guihelper.MessageBox(format(L"%s 没有同名的代码方块，是否在当前位置创建代码方块?", name), function(res)
+					if(res and res == _guihelper.DialogResult.Yes) then
+						local codeEntity = self:CreateCodeBlockWithSameName()
+						if(self.entityModel) then
+							self.entityModel:OpenCodeEditor()
+						end
+					end
+				end, _guihelper.MessageBoxButtons.YesNo)
+			end
+		end
+	end
+end
+
+function EditModelTask:CreateCodeBlockWithSameName()
+	if(self.entityModel) then
+		local bx, by, bz = EntityManager.GetPlayer():GetBlockPos();
+		local block_id1 = BlockEngine:GetBlockId(bx, by, bz);
+		local block_id2 = BlockEngine:GetBlockId(bx-1, by, bz);
+		local block_id3 = BlockEngine:GetBlockId(bx+1, by, bz);
+		local block_id4 = BlockEngine:GetBlockId(bx, by, bz-1);
+		if(block_id1 == 0 and block_id2 == 0 and block_id3 == 0 and block_id4 == 0) then
+			local name = self.entityModel:GetName() or ""
+
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
+			local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blocks = {
+				{bx, by, bz, block_types.names.CodeBlock, nil, {attr={isDeferLoad=true, displayName=name, isBlocklyEditMode=false, isUseNplBlockly=true}, {name = "cmd", "-- TODO \n"}}},
+				{bx, by, bz-1, block_types.names.Sign_Post, 3, {attr = {}, {name = "cmd", name}}},
+				{bx+1, by, bz, block_types.names.CodeBlock, nil, {attr={isBlocklyEditMode=false, isUseNplBlockly=true}, {name = "cmd", string.format('becomeAgent(%q)\n', name)}}},
+				{bx-1, by, bz, block_types.names.Lever, 13}, -- data: 13 powered, 5 non-powered
+			}, liveEntities=nil})
+			task:Run();
+		else
+			GameLogic.AddBBS(nil, L"请在空旷的地方创建代码方块", 3000, "255 0 0")
+		end
+	end
 end
 
 -- @param result: can be nil
@@ -268,8 +363,8 @@ function EditModelTask:handleLeftClickScene(event, result)
 			-- alt + left click to get the block in hand without destroying it
 			if(result.block_id and result.block_id~=0 and result.blockX) then
 				GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ, result.side);
-			elseif(result.entity) then
-				GameLogic.GetPlayerController():PickItemByEntity(entity);
+			elseif(result.entity and not result.entity:IsLocked()) then
+				GameLogic.GetPlayerController():PickItemByEntity(result.entity);
 			end
 		end
 	end
@@ -455,6 +550,45 @@ function EditModelTask.GetMountPointCount()
 	return 0
 end
 
+function EditModelTask.OnMountPointCountEnter()
+	local self = EditModelTask.GetInstance();
+	if self and page then
+		local mountCountValue = page:GetUIValue("mountpointCount") 
+		mountCountValue = tonumber(mountCountValue) or 0
+		EditModelTask.OnMountPointCountChanged(mountCountValue)
+	end
+end
+
+function EditModelTask.OnRemoveMountPoint()
+	local self = EditModelTask.GetInstance();
+	if self and page then
+		local modelEntity = self:GetSelectedModel()
+		if modelEntity then
+			local mountCount = modelEntity:GetMountPointsCount() or 0
+			if mountCount > 0 then
+				mountCount = mountCount - 1
+				EditModelTask.OnMountPointCountChanged(mountCount)
+				page:SetUIValue("mountpointCount", tostring(mountCount));
+			end
+		end
+	end
+end
+
+function EditModelTask.OnAddMountPoint()
+	local self = EditModelTask.GetInstance();
+	if self and page then
+		local modelEntity = self:GetSelectedModel()
+		if modelEntity then
+			local mountCount = modelEntity:GetMountPointsCount() or 0
+			if mountCount < 999 then
+				mountCount = mountCount + 1
+				EditModelTask.OnMountPointCountChanged(mountCount)
+				page:SetUIValue("mountpointCount", tostring(maxCount));
+			end
+		end
+	end
+end
+
 function EditModelTask.OnMountPointCountChanged(text)
 	local self = EditModelTask.GetInstance();
 	if(self) then
@@ -466,7 +600,7 @@ function EditModelTask.OnMountPointCountChanged(text)
 					modelEntity:GetMountPoints():Clear()
 				end
 			elseif(text) then
-				local maxCount = 9;
+				local maxCount = 999;
 				if(text > 0 and text <= maxCount) then
 					modelEntity:CreateGetMountPoints():Resize(text)
 				elseif(page) then
@@ -483,11 +617,16 @@ function EditModelTask.OnClickDeleteModel()
 	if(self) then
 		local modelEntity = self:GetSelectedModel()
 		if(modelEntity) then
+			if modelEntity:IsLocked() then
+				GameLogic.AddBBS(nil, L'模型被锁定无法删除', 5000, '0 255 0')
+				return
+			end
+
 			self:SetTransformMode(false);
 			
-			if(GameLogic.GameMode:IsEditor()) then
+			if(GameLogic.GameMode:IsEditor() or self.add_to_history) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
-				local dragTask = MyCompany.Aries.Game.Tasks.DragEntity:new({})
+				local dragTask = MyCompany.Aries.Game.Tasks.DragEntity:new({addToHistory=self.add_to_history})
 				dragTask:DeleteEntity(modelEntity)
 			end
 			modelEntity:SetDead();
@@ -520,6 +659,7 @@ function EditModelTask.OnChangeModel()
 			OpenAssetFileDialog.ShowPage(L"请输入bmax, x或fbx文件的相对路径, <br/>你也可以随时将外部文件拖入窗口中", function(result)
 				if(result and result~="" and result~=old_value) then
 					entity:SetModelFile(commonlib.Encoding.DefaultToUtf8(result))
+					self:RefreshPage()
 				end
 			end, old_value, L"选择模型文件", "model")
 		end
@@ -531,46 +671,9 @@ function EditModelTask.OnChangeSkin()
 	if(self) then
 		local entity = self:GetSelectedModel()
 		if(entity) then
-			local assetFilename = entity:GetMainAssetPath();
-			if entity.GetSkin then
-				local old_value = entity:GetSkin();
-			end
-
-			if(entity.IsCustomModel and entity:IsCustomModel()) then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.lua");
-				local EditCCSTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCCSTask");
-				EditCCSTask:ShowPage(entity, function(ccsString)
-					if(ccsString ~= old_value) then
-						GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
-							if(isVip) then
-								entity:SetSkin(ccsString);
-							end
-						end)
-					end
-				end);
-			elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
-				local old_value = entity:GetSkin()
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
-				local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
-				CustomSkinPage.ShowPage(function(filename, skin)
-					if (filename and skin~=old_value) then
-						entity:SetSkin(skin);
-					end
-				end, old_value);
-			else
-				assetFilename = PlayerAssetFile:GetNameByFilename(assetFilename)
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
-				local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
-				EditSkinPage.ShowPage(function(result)
-					if(result and result~=old_value) then
-						GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
-							if(isVip) then
-								entity:SetSkin(result);
-							end
-						end)
-					end
-				end, old_value, "", assetFilename)
-			end
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+			local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
+			PlayerSkins:OpenEditor(entity)
 		end
 	end
 end
@@ -656,8 +759,9 @@ function EditModelTask.OnClickChangeDraggable()
 end
 
 -- @param sectionIndex: if nil, we will return full name, otherwise it will break into sections. 
--- if 1 it will resturn model file, if 2 it will return unique name
-function EditModelTask:GetLongDisplayName(sectionIndex)
+-- if 1 it will resturn model file, if 2 it will return unique name， if 3 it will return display name if exists
+-- @param bUseFilenameOnly: remove heading file path.
+function EditModelTask:GetLongDisplayName(sectionIndex, bUseFilenameOnly)
 	local model = self:GetSelectedModel()
 	local name;
 	if(model) then
@@ -665,9 +769,14 @@ function EditModelTask:GetLongDisplayName(sectionIndex)
 			name = model:GetModelFile() or ""
 		elseif(sectionIndex == 2) then
 			name = model:GetName() or ""
+		elseif(sectionIndex == 3) then
+			name = model.displayName or model:GetModelFile() or ""
 		else
 			name = model:GetDisplayName();
 		end
+	end
+	if(bUseFilenameOnly) then
+		name = string.match(name or "", "[^/\\]+$")
 	end
 	return name;
 end
@@ -696,5 +805,136 @@ function EditModelTask.OnClickToggleRotationMode()
 	local self = EditModelTask.GetInstance();
 	if(self and self.modelManip) then
 		self.modelManip:ToggleRotationMode()
+	end
+end
+
+function EditModelTask.OnClickRotateLeft()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity) then
+			local currentFacing = modelEntity:GetFacing();
+			local newFacing = currentFacing + math.pi/4; -- rotate 45 degrees left
+			-- Snap to grid of pi/4
+			newFacing = math.floor(newFacing / (math.pi/4) + 0.5) * (math.pi/4);
+			modelEntity:SetFacing(newFacing);
+			self:RefreshPage();
+		end
+	end
+end
+
+function EditModelTask.OnClickRotateRight()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity) then
+			local currentFacing = modelEntity:GetFacing();
+			local newFacing = currentFacing - math.pi/4; -- rotate 45 degrees right
+			-- Snap to grid of pi/4
+			newFacing = math.floor(newFacing / (math.pi/4) + 0.5) * (math.pi/4);
+			modelEntity:SetFacing(newFacing);
+			self:RefreshPage();
+		end
+	end
+end
+
+function EditModelTask.OnClickScaleDown()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity and modelEntity.setScale) then
+			local currentScale = modelEntity:GetScaling() or 1;
+			local newScale = currentScale * 0.9; -- scale down by 10%
+			local minScale = modelEntity.minScale or 0.1;
+			if(newScale >= minScale) then
+				modelEntity:setScale(newScale);
+				self:RefreshPage();
+			end
+		end
+	end
+end
+
+function EditModelTask.OnClickScaleUp()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity and modelEntity.setScale) then
+			local currentScale = modelEntity:GetScaling() or 1;
+			local newScale = currentScale * 1.1; -- scale up by 10%
+			local maxScale = modelEntity.maxScale or 10;
+			if(newScale <= maxScale) then
+				modelEntity:setScale(newScale);
+				self:RefreshPage();
+			end
+		end
+	end
+end
+
+function EditModelTask.OnClickToggleDraggable()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity and modelEntity.SetCanDrag) then
+			local isDraggable = modelEntity:GetCanDrag()
+			modelEntity:SetCanDrag(not isDraggable)
+			self:RefreshPage()
+		end
+	end
+end
+
+function EditModelTask.OnClickCloneModel()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity) then
+			-- Check if there is already a model at the focus position
+			local x, y, z = EntityManager.GetFocus():GetPosition()
+			local bx, by, bz = EntityManager.GetFocus():GetBlockPos()
+			local entities = EntityManager.GetEntitiesByMinMax(bx - 1, by - 1, bz - 1, bx + 1, by + 1, bz + 1, EntityManager.EntityLiveModel)
+			if(entities) then
+				local modelFile = modelEntity:GetModelFile()
+				for _, entity in ipairs(entities) do
+					if(entity:isa(EntityManager.EntityLiveModel) or entity:isa(EntityManager.EntityBlockModel)) then
+						if(entity:GetModelFile() == modelFile and not entity:HasFocus()) then
+							local ex, ey, ez = entity:GetPosition()
+							local distanceSq = (ex - x)*(ex - x) + (ey - y)*(ey - y) + (ez - z)*(ez - z)
+							if distanceSq < 0.5 * 0.5 then
+								GameLogic.AddBBS(nil, L"该位置附近已有相同模型,请选择其他位置", 3000, "255 0 0")
+								return
+							end
+						end
+					end
+				end
+			end
+			
+			local newModel = modelEntity:CloneMe()
+			newModel.isFromEditableWorld = modelEntity.isFromEditableWorld
+			newModel:SetPosition(x, y, z)
+			
+			-- add to history command
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
+			local task = MyCompany.Aries.Game.Tasks.DragEntity:new({addToHistory=self.add_to_history});
+			task:CreateEntity(newModel);
+			self:SelectModel(newModel);
+			-- EditModelTask.OnClickClose()
+		end
+	end
+end
+
+function EditModelTask.OnClickChangeColor()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.lua");
+			local SelectColor = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectColor");
+			local task = SelectColor:new();
+			task:ShowDialogPage(function(colorDWORD)
+				if(colorDWORD) then
+					modelEntity:SetColor(colorDWORD);
+					-- self:RefreshPage();
+				end
+			end);
+		end
 	end
 end

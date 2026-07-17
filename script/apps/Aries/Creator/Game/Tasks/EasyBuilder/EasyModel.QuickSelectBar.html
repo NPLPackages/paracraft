@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyModel.lua" refresh="true">
+<![CDATA[
+EasyModel = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyModel");
+EasyModel.InitQuickSelectBarPage(Page);
+function OnClickDummy() 
+end
+function GetSlotStyle(slotIndex)
+    local isSelected = EasyModel.quickSelectBarSelectedSlot == slotIndex;
+    if isSelected then
+        return "float:left;margin-right:5px;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12)";
+    else
+        return "float:left;margin-right:5px;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12)";
+    end
+end
+function GetSlotBlockId(slotIndex)
+    local itemStack = EasyModel.quickSelectBarSlots[slotIndex];
+    if itemStack then
+        return itemStack.id;
+    end
+    return 0;
+end
+]]>
+</script>
+<pe:container style="background:;width:800px;height:72px;">
+    <div style="float:left;">
+        <!-- Slots 1-7: User-defined picked blocks -->
+        <div name="1" style="<%=GetSlotStyle(1)%>">
+            <pe:mc_block name="1" uiname="EasyModel.block1" onclick="EasyModel.OnClickQuickSelectBarSlot" ondragend="EasyModel.OnDragEndQuickSlot" block_id='<%=GetSlotBlockId(1)%>' style="width:64px;height:64px;"/>
+        </div>
+        <div name="2" style="<%=GetSlotStyle(2)%>">
+            <pe:mc_block name="2" uiname="EasyModel.block2" onclick="EasyModel.OnClickQuickSelectBarSlot" ondragend="EasyModel.OnDragEndQuickSlot" block_id='<%=GetSlotBlockId(2)%>' style="width:64px;height:64px;"/>
+        </div>
+        <div name="3" style="<%=GetSlotStyle(3)%>">
+            <pe:mc_block name="3" uiname="EasyModel.block3" onclick="EasyModel.OnClickQuickSelectBarSlot" ondragend="EasyModel.OnDragEndQuickSlot" block_id='<%=GetSlotBlockId(3)%>' style="width:64px;height:64px;"/>
+        </div>
+        <div name="4" style="<%=GetSlotStyle(4)%>">
+            <pe:mc_block name="4" uiname="EasyModel.block4" onclick="EasyModel.OnClickQuickSelectBarSlot" ondragend="EasyModel.OnDragEndQuickSlot" block_id='<%=GetSlotBlockId(4)%>' style="width:64px;height:64px;"/>
+        </div>
+        <div name="5" style="<%=GetSlotStyle(5)%>">
+            <pe:mc_block name="5" uiname="EasyModel.block5" onclick="EasyModel.OnClickQuickSelectBarSlot" ondragend="EasyModel.OnDragEndQuickSlot" block_id='<%=GetSlotBlockId(5)%>' style="width:64px;height:64px;"/>
+        </div>
+        <div name="6" style="<%=GetSlotStyle(6)%>">
+            <pe:mc_block name="6" uiname="EasyModel.block6" onclick="EasyModel.OnClickQuickSelectBarSlot" ondragend="EasyModel.OnDragEndQuickSlot" block_id='<%=GetSlotBlockId(6)%>' style="width:64px;height:64px;"/>
+        </div>
+        <div name="7" style="<%=GetSlotStyle(7)%>">
+            <pe:mc_block name="7" uiname="EasyModel.block7" onclick="EasyModel.OnClickQuickSelectBarSlot" ondragend="EasyModel.OnDragEndQuickSlot" block_id='<%=GetSlotBlockId(7)%>' style="width:64px;height:64px;"/>
+        </div>
+        <div name="8" style="<%=GetSlotStyle(8)%>">
+            <pe:mc_block name="8" uiname="EasyModel.block8" onclick="EasyModel.OnClickQuickSelectBarSlot" ondragend="EasyModel.OnDragEndQuickSlot" block_id='<%=GetSlotBlockId(8)%>' style="width:64px;height:64px;"/>
+        </div>
+        <div name="9" style="<%=GetSlotStyle(9)%>">
+            <pe:mc_block name="9" uiname="EasyModel.block9" onclick="EasyModel.OnClickQuickSelectBarSlot" ondragend="EasyModel.OnDragEndQuickSlot" block_id='<%=GetSlotBlockId(9)%>' style="width:64px;height:64px;"/>
+        </div>
+    </div>
+    
+    <!-- Show All button -->
+    <div style="float:left;margin-left:8px;background:url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);padding:8px;margin-top:-6px;">
+        <input type="button" uiname="EasyModel.ShowAllBlocks" name="ShowAll" onclick="EasyModel.OnClickShowAllBlocks" tooltip="<%=L'更多'%>" style="width:64px;height:64px;background:url(Texture/3DMapSystem/AppIcons/Inventory_64.dds);"/>
+    </div>
+</pe:container>
+</pe:mcml>
+</html>

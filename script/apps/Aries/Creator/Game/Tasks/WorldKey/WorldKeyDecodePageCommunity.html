@@ -1,0 +1,68 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="WorldKeyDecodePage.lua"><![CDATA[
+local WorldKeyDecodePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePage.lua");
+WorldKeyDecodePage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    WorldKeyDecodePage.CloseView()
+end
+
+function Paste()
+    WorldKeyDecodePage.Paste()
+end
+
+function GetTitle()
+    return WorldKeyDecodePage.title_text
+end
+
+function GetDesc()
+    return WorldKeyDecodePage.desc
+end
+
+function DecodeWorld()
+    WorldKeyDecodePage.DecodeWorld()
+end
+
+function ToBuy()
+    WorldKeyDecodePage.ToBuy()
+end
+
+function OnTextChange()
+    WorldKeyDecodePage.OnTextChange()
+end
+]]></script>
+<pe:container width="500" height="250" style="background-color: #2e2e2e; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+    <div style="width: 500px;height: 200px;">
+        <div style="width: 500px;height: 54px;margin-top: 0px; background:url()">
+            <div style="float: left;margin-left: 20px;margin-top: 14px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;"><%=L"访问世界"%></div>
+            <div onclick="ClosePage()" style="float: left;margin-left: 470px;margin-top: -20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+        </div>
+        <div style="position: relative; width: 500px; height: 1px; margin-left: 0px; margin-top: -2px; background-color: #FFFFFF22"></div>
+        <div style="width: 500px;height: 160px;">
+            <div style="color: #d3d3d3; margin-left: 24px; font-size: 14px;base-font-size: 14px; font-weight: bold; margin-top: 18px;">
+                <%=L"访问密码"%>
+            </div>
+            <div style="float: left; margin-left:24px;margin-top:12px;width:452px;height:44px;background:url(Texture/Aries/Creator/keepwork/community_32bits.png#859 104 32 32:14 14 14 14);">
+                <input type="text" onchange="OnTextChange" EmptyTextColor="#ffd3d3d3" textcolor="#ffffffff" EmptyText='<%=L"请输入访问密码"%>' name="key_text" style="font-size: 14px; margin-top:12px;margin-left:12px;height:24px;background:;" />
+            </div>
+            <div style="margin-left: 24px; margin-top: 30px;">
+                <div style="float: left; width: 220px; height: 44px;background-color: #ffffff22; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                    <input type="button" value='<%=L"取消"%>' onclick="ClosePage"  style="color: #ffffff; margin-left: 1px; margin-top: 1px; width: 218px; height: 42px; background-color: #2E2E2E; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                </div>
+                <input type="button" value='<%=L"确定"%>' onclick="DecodeWorld"  style="float: left; color: #ffffff; margin-left: 12px; width: 220px; height: 44px; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+            </div>                     
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

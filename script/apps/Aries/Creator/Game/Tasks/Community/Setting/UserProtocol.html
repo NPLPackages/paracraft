@@ -1,0 +1,82 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Community/Setting/UserProtocol.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="UserProtocol.lua">
+    <![CDATA[
+        UserProtocol = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/UserProtocol.lua");
+        UserProtocol.OnInit()
+        function ClosePage()
+            Page:CloseWindow();
+        end
+        function GridDs(index)
+            if(index == nil) then    
+                return #UserProtocol.GridDs
+            else
+                return UserProtocol.GridDs[index];
+            end
+        end
+
+        function GetPageIndex()
+            return UserProtocol.index or 1
+        end
+
+        function GetData()
+            return UserProtocol.htmlData 
+        end
+        
+        function GetTitle()
+            local index = GetPageIndex()
+            if index == 1 then
+                return L"用户许可协议"
+            else
+                return L"用户隐私协议"
+            end
+        end
+    ]]>
+</script>
+<style type="text/mcss">
+    {
+        user_agreement = {
+            ["base-font-size"] = 16,
+            ["font-size"] = 16,
+            ["padding-right"] = 30,
+            ["padding-left"] = 30,
+            ["padding-top"] = 10,
+            ["padding-bottom"] = 20,
+            color = '#ffffff'
+            textcolor = '#ffffff'
+        }
+    }
+</style>
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #141414cc;">
+    <pe:container alignment="_ct" width="500" height="376" style="margin-left:-250px;margin-top:-188px;background-color: #2e2e2e; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+        <div style="width: 500px;height: 376;">
+            <div style="width: 500px;height: 54px;margin-top: 0px; background:url()">
+                <div style="float: left;margin-left: 20px;margin-top: 6px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;"><%=GetTitle()%></div>
+                <div onclick="ClosePage()" style="float: left;margin-left: 470px;margin-top: -20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+            </div>
+            <div style="position: relative; width: 500px; height: 1px; margin-left: 0px; margin-top: -2px; background-color: #FFFFFF22"></div>
+            <div style="width: 500px;height: 300px; margin-top: 16px">
+                <pe:treeview name='user_agreement'
+                    class='user_agreement'
+                    style='background:;'
+                    VerticalScrollBarOffsetX='10'
+                    VerticalScrollBarStep='20'>
+                    <div style="width: 476px;color: #B8B8C5 ; padding-bottom: 16px;">
+                        <%= GetData() %>
+                    </div>
+                </pe:treeview>               
+            </div>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

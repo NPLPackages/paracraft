@@ -180,24 +180,31 @@ function MobPropertyPage.GetAssetFileDS()
 	return asset_file_ds;
 end
 
-function MobPropertyPage.OnSelectItem(name)
+function MobPropertyPage.GetAssetAndSkinFromUI()
 	local assetfile = page:GetValue("assetfile")
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
 	local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems");
-	local skin = CustomCharItems:GetSkinByAsset(assetfile)
+	local skin, newAssetfile = CustomCharItems:GetSkinByAsset(assetfile)
 	if skin then
 		MobPropertyPage.skin = skin
+		assetfile = newAssetfile or CustomCharItems.defaultModelFile
 	end
+	return assetfile, skin;
+end
+
+function MobPropertyPage.OnSelectItem(name)
+	local assetfile, skin = MobPropertyPage.GetAssetAndSkinFromUI();
 	MobPropertyPage.UpdateAssetFile(nil, nil, assetfile, skin);
 end
 
 function MobPropertyPage.OnChangeAssetFile(skin)
-	MobPropertyPage.UpdateAssetFile(nil, nil, page:GetValue("assetfile"), skin);
+	local assetfile, skin2 = MobPropertyPage.GetAssetAndSkinFromUI();
+	MobPropertyPage.UpdateAssetFile(nil, nil, assetfile, skin or skin2);
 end
 
 function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile, skin)
 	if MobPropertyPage.form and MobPropertyPage.form == "movie" then
-		MobPropertyPage.assetfile = page:GetValue("assetfile")
+		MobPropertyPage.assetfile = MobPropertyPage.GetAssetAndSkinFromUI()
 		return
 	end
 	entity = entity or MobPropertyPage.GetEntity();
@@ -265,7 +272,8 @@ function MobPropertyPage.OnClickOK()
 			}));
 		end
 
-		MobPropertyPage.UpdateAssetFile(entity, obj, page:GetValue("assetfile"));
+		local assetfile, skin = MobPropertyPage.GetAssetAndSkinFromUI();
+		MobPropertyPage.UpdateAssetFile(entity, obj, assetfile, MobPropertyPage.skin or skin);
 	end
 
 	page:CloseWindow();
@@ -281,46 +289,48 @@ function MobPropertyPage.OnOpenAssetFile()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
 	local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
 
-	local custom_geoset_model = "character/CC/02human/CustomGeoset/actor.x";
 	OpenAssetFileDialog.ShowPage("", function(filename)
 		if(filename and page) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
 			local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 			local filepath = PlayerAssetFile:GetValidAssetByString(filename);
-			if(string.lower(filepath) == string.lower(custom_geoset_model))then
-				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
-
-				-- set default skin
-				local skin = CustomCharItems:ChangeSkinStringToItems(CustomCharItems.defaultSkinString)
-				MobPropertyPage.skin = skin
+			page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
+			local skin = CustomCharItems:GetSkinByAsset(filename)
+			if skin then
 				MobPropertyPage.OnChangeAssetFile(skin);
-			elseif(filepath) then
-				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
-				local skin = CustomCharItems:GetSkinByAsset(filename)
-				if skin then
-					MobPropertyPage.OnChangeAssetFile(skin);
-					MobPropertyPage.skin = skin
-				else
-					MobPropertyPage.OnChangeAssetFile();
-				end
+				MobPropertyPage.skin = skin
+			else
+				MobPropertyPage.OnChangeAssetFile();
 			end
 		end
 	end, commonlib.Encoding.Utf8ToDefault(lastFilename), L"选择模型文件", "model");
 end
 
+
+local function setSkin(filename, skin)
+	if (filename and skin) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+		local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+		local filepath = PlayerAssetFile:GetValidAssetByString(filename);
+		if(filepath) then
+			page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
+			MobPropertyPage.OnChangeAssetFile(skin);
+			MobPropertyPage.skin = skin
+		end
+	end
+end
+
 function MobPropertyPage.OnOpenCustomModel()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
 	local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
-	CustomSkinPage.ShowPage(function(filename, skin)
-		if (filename and skin) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
-			local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
-			local filepath = PlayerAssetFile:GetValidAssetByString(filename);
-			if(filepath) then
-				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
-				MobPropertyPage.OnChangeAssetFile(skin);
-				MobPropertyPage.skin = skin
-			end
-		end
-	end);
+	local assetfile = page:GetValue("assetfile")
+	if assetfile and assetfile ~= "" and ( string.find(assetfile,"actor_papa.x")  or string.find(assetfile,"actor_papa_01.x") or string.find(assetfile,"actor_xuepapa.x") ) then
+		CustomSkinPage.ShowPage(function(filename, skin)
+			setSkin(filename, skin)
+		end,nil,assetfile);
+	else
+		CustomSkinPage.ShowPage(function(filename, skin)
+			setSkin(filename, skin)
+		end);
+	end
 end

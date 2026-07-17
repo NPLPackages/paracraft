@@ -218,26 +218,23 @@ end
                         <div style="height:25px;margin-top:12px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"立体输出" %></div>
                             <div style="float:left;margin-left:20px;">
-                                <pe:if condition='<%= System.os.GetPlatform()=="win32" %>'>
-                                    <select name="stereomode" AllowUserEdit="false" DataSource="<%=GetStereoDS()%>" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="height:28px" onselect="SystemSettingsPage.OnChangeStereoMode"></select>
-                                </pe:if>
-                                <pe:if condition='<%= System.os.GetPlatform()~="win32" %>'>
-                                    <select name="stereomode" AllowUserEdit="false" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="width: 103px; height:28px" onselect="SystemSettingsPage.OnChangeStereoMode">
-                                        <option value="0" selected="true">Off</option>
-                                        <option value="2">Left/Right</option>
-                                        <option value="5">Red/Blue</option>
-                                    </select>
-                                </pe:if>
+                                <select name="stereomode" AllowUserEdit="false" DataSource="<%=GetStereoDS()%>" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="height:28px" onselect="SystemSettingsPage.OnChangeStereoMode"></select>
                             </div>
                         </div>
                         <pe:if condition='<%=GameLogic.options:IsStereoMode() %>' >
-                            <pe:if condition='<%=GameLogic.options.stereoMode==2 or GameLogic.options.stereoMode==5 %>' >
+                            <pe:if condition='<%=GameLogic.options.stereoMode==2 or GameLogic.options.stereoMode==5 or GameLogic.options.stereoMode==4%>' >
                                 <div style="height:25px;margin-top:12px;">
                                     <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"左右眼间距" %></div>
                                     <div style="float:left;margin-top:-2px;margin-left:20px;">
                                         <pe:sliderbar name="stereo_eye_dist" min="0.0" max="0.2" min_step="0.01" value="<%=GameLogic.options:GetStereoEyeSeparationDist()%>" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="height:22px;width:140px" onchange="SystemSettingsPage.OnChangeStereoEyeDist" />
                                     </div>
-                                </div>     
+                                </div>
+                                <div style="height:25px;margin-top:12px;">
+                                    <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"焦点前移" %></div>
+                                    <div style="float:left;margin-top:-2px;margin-left:20px;">
+                                        <pe:sliderbar name="stereo_convergence_offset" min="0.0" max="30" min_step="0.2" value="<%=GameLogic.options:GetStereoConvergenceOffset()%>" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="height:22px;width:140px" onchange="SystemSettingsPage.OnChangeStereoConvergenceOffset" />
+                                    </div>
+                                </div>
                             </pe:if>
                              
                             <pe:if condition='<%=GameLogic.options.stereoMode>=7 %>' >
@@ -272,14 +269,13 @@ end
                             <div style="float:left;margin-top:-1px;margin-left:-20px;">
                                 <input type="text" name="AudioDevice" style="position: relative; text-valign:center; line-height:28px;width:190px;height:28px; background: url(Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13);" />
                                 <input type="button" onclick="SystemSettingsPage.onClickShowDevice" style="margin-left: -33px; margin-top: -1px; width: 34px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32);"/>
-                                <pe:container uiname="device_container" style="width: 190px; margin-top: -2px; padding-top: 2px; padding-bottom: 2px;background-color: #ffffff;">
+                                <pe:container uiname="device_container" zorder="1" style="width: 190px; height:100px;margin-top: -2px; padding-top: 2px; padding-bottom: 2px; background-color: #ffffff; ">
                                     <pe:repeat DataSource="<%=SystemSettingsPage.GetAudioDevices()%>">
                                         <pe:repeatitem>
                                             <input type="button" tooltip='<%=Eval("value")%>' value='<%=GetLimitValue(Eval("value"))%>' name='<%=Eval("index")%>' onclick="onDeviceClick" style="background:;margin-left: 2px; text-align: left; width: 190px; height: 20px;" />
                                         </pe:repeatitem>
                                     </pe:repeat>   
                                 </pe:container>
-                                
                             </div>
                             <div style="float:left;margin-top:0px;margin-left:6px;">
                                 <input name="btn_ResetDevice"
@@ -289,16 +285,36 @@ end
                                               height: 18px;
                                               background: url(Texture/Aries/Creator/keepwork/worldshare/main_login_buttons2_32bits.png#9 104 18 18);"/>
                             </div>
+                            <div style="margin-top:5px;">
+                                <div style="float:left;margin-left:5px;width:70px;height:20px;text-align:left;font-size:14px; color: #ffffff;"><%=L"录音" %></div>
+                                <div style="float:left;margin-left:0px;">
+                                    <input type="text" name="AudioRecordDevice" style="position: relative; text-valign:center; line-height:28px;width:190px;height:28px; background: url(Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13);" />
+                                    <input type="button" onclick="SystemSettingsPage.onClickShowRecordDevice" style="margin-left: -33px; margin-top: -1px; width: 34px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32);"/>
+                                    <pe:container uiname="deviceRecord_container" zorder="1" style="width: 190px; height: 100px; margin-top: -2px; padding-top: 2px; padding-bottom: 2px; background-color: #ffffff; ">
+                                        <pe:repeat DataSource="<%=SystemSettingsPage.GetAudioRecordDevices()%>">
+                                            <pe:repeatitem>
+                                                <input type="button" tooltip='<%=Eval("value")%>' value='<%=GetLimitValue(Eval("value"))%>' name='<%=Eval("index")%>' onclick="SystemSettingsPage.onClickRecordDevice" style="background:;margin-left: 2px; text-align: left; width: 190px; height: 20px;" />
+                                            </pe:repeatitem>
+                                        </pe:repeat>   
+                                    </pe:container>
+                                </div>
+                            </div>
                         </div>
                     </pe:if>
                     <pe:if condition='<%=GetCategoryDSIndex() == 3 %>' >
-                        <div style="height:25px;margin-top:14px;">
+                        <div style="height:25px;margin-top:6px;">
+                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"触屏模式" %></div>
+                            <div style="float:left;margin-top:-2px;margin-left:6px;">
+                                <input name='btn_TouchToggle' value='' type="button" onclick='SystemSettingsPage.OnToggleTouchModel' style="width:108px;height:29px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
+                            </div>
+                        </div>
+                        <div style="height:25px;margin-top:12px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"反转鼠标" %></div>
                             <div style="float:left;margin-top:-2px;margin-left:6px;">
                                 <input name='btn_MouseInverse' value='' type="button" onclick='SystemSettingsPage.OnClickEnableMouseInverse' style="width:108px;height:29px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
                             </div>
                         </div>
-                        <div style="height:25px;margin-top:14px;">
+                        <div style="height:25px;margin-top:12px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"消除方块" %></div>
                             <div style="float:left;margin-top:-10px;margin-left:-40px;width:30px;height:42px;">
                                 <pe:if condition='<%=GetMouseSetting("DeleteBlock") == "left" %>' >
@@ -326,10 +342,10 @@ end
                                 </pe:if>
                             </div>
                         </div>
-                        <input type="checkbox" name="ChangeMouseLeftRight" style="margin-left:98px;margin-top:14px;" onclick="SystemSettingsPage.OnClickEnableMouseChange"/>
-                        <div style="float:left;margin-left:18px;margin-top: 11px;" for="ChangeMouseLeftRight"><%=L"鼠标左右互换"%></div>
+                        <input type="checkbox" name="ChangeMouseLeftRight" style="margin-left:98px;margin-top:8px;" onclick="SystemSettingsPage.OnClickEnableMouseChange"/>
+                        <div style="float:left;margin-left:18px;margin-top: 6px;" for="ChangeMouseLeftRight"><%=L"鼠标左右互换"%></div>
 
-                        <div style="height:25px;margin-top:14px;">
+                        <div style="height:25px;margin-top:16px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"选择方块"%></div>
                             <div style="float:left;margin-top:-10px;margin-left:-40px;width:100px;height:20px;" >
                                 <pe:if condition='<%=GetMouseSetting("ChooseBlock") == "left" %>' >
@@ -344,7 +360,7 @@ end
                             </div>
                         </div>
 
-                        <div style="height:25px;margin-top:18px;">
+                        <div style="height:25px;margin-top:16px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"向前" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:-20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/1_62X32_32bits.png#0 0 62 32);" ></div>
                         </div>
@@ -352,7 +368,7 @@ end
                             <div style="float:left;margin-left:150px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"向左" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:-20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/2_62X32_32bits.png#0 0 62 32);" ></div>
                         </div>
-                        <div style="height:25px;margin-top:18px;">
+                        <div style="height:25px;margin-top:16px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"后退" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:-20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/12_62X32_32bits.png#0 0 62 32);" ></div>
                         </div>
@@ -360,7 +376,7 @@ end
                             <div style="float:left;margin-left:150px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"向右" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:-20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/3_62X32_32bits.png#0 0 62 32);" ></div>
                         </div>
-                        <div style="height:25px;margin-top:18px;">
+                        <div style="height:25px;margin-top:16px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"跳跃" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:-20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/4_62X32_32bits.png#0 0 62 32);" ></div>
                         </div>
@@ -368,7 +384,7 @@ end
                             <div style="float:left;margin-left:150px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"潜行" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:-20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/5_62X32_32bits.png#0 0 62 32);" ></div>
                         </div>
-                        <div style="height:25px;margin-top:18px;">
+                        <div style="height:25px;margin-top:14px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"飞翔" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:-20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/6_62X32_32bits.png#0 0 62 32);" ></div>
                         </div>
@@ -376,13 +392,13 @@ end
                             <div style="float:left;margin-left:150px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"帮助" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:-20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/7_62X32_32bits.png#0 0 62 32);" ></div>
                         </div>
-                        <div style="height:25px;margin-top:18px;">
+                        <div style="height:25px;margin-top:16px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"撤销上步操作" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/8_62X32_32bits.png#0 0 62 32);" ></div>
                             <div style="float:left;margin-top:8px;margin-left:10px;width:7px;height:5px;background: url(Texture/Aries/Creator/keepwork/setting/11_7X5_32bits.png#0 0 7 5);" ></div>
                             <div style="float:left;margin-top:-5px;margin-left:10px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/9_62X32_32bits.png#0 0 62 32);" ></div>
                         </div>
-                        <div style="height:25px;margin-top:18px;">
+                        <div style="height:25px;margin-top:16px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"返回上步操作" %></div>
                             <div style="float:left;margin-top:-5px;margin-left:20px;width:62px;height:32px;background: url(Texture/Aries/Creator/keepwork/setting/8_62X32_32bits.png#0 0 62 32);" ></div>
                             <div style="float:left;margin-top:8px;margin-left:10px;width:7px;height:5px;background: url(Texture/Aries/Creator/keepwork/setting/11_7X5_32bits.png#0 0 7 5);" ></div>
@@ -395,7 +411,12 @@ end
                             <span style="margin-top: 16px; margin-left:5px;font-size: 14px; color: #ffffff;">temp/webcache/*</span>
                         </div>
                         <div style="margin-top:12px;">
-                            <input type="button" name="clearMemory" value='<%=L"整理内存" %>' style="font-weight: bold;font-size: 14px; width: 84px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);"  onclick="SystemSettingsPage.OnClearMemory()" />
+                            <pe:if condition="<%=Mod.WorldShare.Utils.IsEnglish()%>">
+                                <input type="button" name="clearMemory" value='<%=L"整理内存" %>' style="font-weight: bold;font-size: 14px; width: 134px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);"  onclick="SystemSettingsPage.OnClearMemory()" />
+                            </pe:if>
+                            <pe:if condition="<%=not Mod.WorldShare.Utils.IsEnglish()%>">
+                                <input type="button" name="clearMemory" value='<%=L"整理内存" %>' style="font-weight: bold;font-size: 14px; width: 84px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);"  onclick="SystemSettingsPage.OnClearMemory()" />
+                            </pe:if>
                         </div>
                         <div style="margin-top:12px;">
                             <input type="button" name="OpenBackupFolder" value='<%=L"打开世界备份目录" %>' style="font-weight: bold; font-size: 14px; width: 144px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);" onclick="SystemSettingsPage.OnOpenBackupFolder()" />

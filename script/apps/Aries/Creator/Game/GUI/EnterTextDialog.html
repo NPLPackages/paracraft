@@ -21,7 +21,7 @@ end
     </div>
     <div>
         <pe:if condition='<%=EnterTextDialog.IsSingleLine()%>'>
-            <input type="text" auto_virtual_keyboard="<%=EnterTextDialog.auto_virtual_keyboard == true%>" uiname="EnterTextDialog.text" name="text" style="height:24px;"/>
+            <input type="text" SkipAutoBadWordFilter="true" auto_virtual_keyboard="<%=EnterTextDialog.auto_virtual_keyboard == true%>" uiname="EnterTextDialog.text" name="text" style="height:24px;"/>
         </pe:if>
         <pe:if condition='<%=EnterTextDialog.IsMultiLine()%>'>
             <div class="mc_paper_panel" style="padding:5px;margin-bottom:5px;margin-right:5px;">

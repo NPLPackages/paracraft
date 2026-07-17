@@ -1,0 +1,49 @@
+<!-- "script/apps/Aries/Creator/Game/Login/ClientUpdate/ChangeCheckDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<html>
+<body>
+<pe:mcml>
+<script type='text/npl'>
+    <![CDATA[
+    ChangeVersion = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdate/ChangeVersion.lua")
+    --ChangeVersion.OnInit()
+    change_vesion = Page:GetRequestParam('version')
+    current_version = ChangeVersion.current_version
+    function OnClose()
+        Page:CloseWindow();
+    end
+
+    function update()
+        ChangeVersion.ChangeVersion(change_vesion)
+        OnClose()
+    end
+    
+    function cancel()
+        OnClose()
+    end
+    ]]>
+</script>
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+    <pe:container alignment="_ct" width="500" height="200" style="margin-left:-250px;margin-top:-100px;background: ;">
+        <div style="width: 500px;height: 200px;">
+            <div style="width: 500px;height: 40px;margin-top: 0px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdin_54x60_32bits.png#0 0 54 60:20 20 20 20;">
+                <div style="float: left;margin-left: 20px;margin-top: 6px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;"><%=L"提示"%></div>
+                <div onclick="OnClose()" style="float: left;margin-left: 470px;margin-top: -20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+            </div>
+            <div style="width: 500px;height: 160px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdi_54x60_32bits.png#0 0 54 54:25 25 25 25;">
+                <div style="position: relative; text-align: left; margin-left: 80px; font-size: 14px;base-font-size: 14px; margin-top: 15px;">
+                    <div><%=format(L"是否从当前版本：%s 切换到其他版本：%s", current_version,change_vesion)%></div>
+                </div>
+                <div style="margin-left: 80px; margin-top: 80px;">
+                    <input type="button" value='<%=L"确定"%>' onclick="update"  style="float: left; color: #404BF5; width: 140px; height: 36px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu_40x30_32bits.png#0 0 40 30:18 14 18 14);"/>
+                    <input type="button" value='<%=L"取消"%>' onclick="cancel"  style="float: left; color: #333333; margin-left: 60px; width: 140px; height: 36px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/input2_51x32_32bits.png#0 0 51 32:22 14 22 14);"/>
+                </div>                     
+            </div>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

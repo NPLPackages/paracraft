@@ -19,6 +19,7 @@ local FastRandom = commonlib.gettable("MyCompany.Aries.Game.Common.CustomGenerat
 local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
 -- create class
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
@@ -138,6 +139,7 @@ function WorldCommon.OpenWorld(worldpath, isNewVersion, force_nid)
 		WorldCommon.worldpath = ParaWorld.GetWorldDirectory();
 
 		CommandManager:Init();
+		CommandManager:RunCommand("/history -init")
 		--local pos = Map3DSystem.App.HomeLand.HomeLandConfig.DefaultBornPlace;
 		--local x,y,z = pos.x,pos.y,pos.z;
 		--Map3DSystem.SendMessage_game({type = Map3DSystem.msg.GAME_TELEPORT_PLAYER, x= tonumber(x) or 20000, z=tonumber(z) or 20000});
@@ -232,7 +234,7 @@ function WorldCommon.LeaveWorld(callbackFunc)
 			if(type(callbackFunc) == "function") then
 				callbackFunc(result);
 			end
-			
+			WorldCommon.CloseWorldAssetUrl()
 		end, _guihelper.MessageBoxButtons.YesNoCancel)
 		
 		return true;
@@ -269,27 +271,38 @@ function WorldCommon.SaveWorldAs()
 			break;
 		end	
 	end
+	local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
+	local currentEnterWorldUserId = currentEnterWorld and currentEnterWorld.user and currentEnterWorld.user.id or 0;
+	local userId = GameLogic.GetFilters():apply_filters('store_get', 'user/userId');
 	
-	if(GameLogic.options:HasCopyright()) then
+	local isMyWorld = userId and userId > 0 and currentEnterWorldUserId and currentEnterWorldUserId == userId;
+	if(GameLogic.options:HasCopyright()) and not isMyWorld then
 		_guihelper.MessageBox(L"这个世界的作者申请了版权保护，无法复制世界。")
 		return;
 	end
 
 	-- ban not institute student save as
 	local instituteVipSaveAsOnly = WorldCommon.GetWorldTag('instituteVipSaveAsOnly');
-    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
-	local currentEnterWorldUserId = currentEnterWorld and currentEnterWorld.user and currentEnterWorld.user.id or 0;
-    local userId = GameLogic.GetFilters():apply_filters('store_get', 'user/userId');
+	instituteVipSaveAsOnly = instituteVipSaveAsOnly == "true" or instituteVipSaveAsOnly == true
 	local userType = Mod.WorldShare.Store:Get('user/userType') or {};
     local isStudent = userType.student;
     local isTeacher = userType.teacher;
 
-	if instituteVipSaveAsOnly and
-	   currentEnterWorldUserId ~= userId and
-       not isStudent and
-	   not isTeacher then
+	if instituteVipSaveAsOnly and not isMyWorld and not isStudent and not isTeacher then
 		_guihelper.MessageBox(L"这个世界只有机构用户和老师才能另存为。");
 		return;
+	end
+
+	local function IsValidDirectory(dir)
+		if not dir or dir == "" then
+			return false
+		end
+		  local invalidCharsPattern = "[<>:\"/\\|?*]" 
+		  -- local invalidCharsPattern = "[/:*?\"<>|]"  -- Unix/Linux系统非法字符
+		  if string.find(dir, invalidCharsPattern) then
+			return false
+		  end
+		  return true
 	end
 
 	local function Handle()
@@ -297,12 +310,17 @@ function WorldCommon.SaveWorldAs()
 		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 		OpenFileDialog.ShowPage(L"输入新的世界名字".."<br/>"..L"如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意", function(result)
 			if(result and result~="") then
+				if not IsValidDirectory(result) then
+					_guihelper.MessageBox(L"当前输入的世界名包含非法字符，请重新输入。",function()
+						WorldCommon.SaveWorldAs()
+					end)
+					return
+				end
 				local function callback()
 					local targetFolder = baseFolder .. "/".. result.. "/";
-
-					local function SaveAsWorldCheckModified_(targetFolder)
+					local function StartSaveAs()
 						if(GameLogic.world_revision:IsModified()) then
-							_guihelper.MessageBox(format(L"世界%s刚刚被修改过。是否保留修改后的内容?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
+							_guihelper.MessageBox(format(L"世界《%s》刚刚被修改过。是否保留修改后的内容?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
 								if(res and res == _guihelper.DialogResult.Yes) then
 									WorldCommon.SaveWorldAsImp(targetFolder, nil, true);
 								else
@@ -313,8 +331,23 @@ function WorldCommon.SaveWorldAs()
 							WorldCommon.SaveWorldAsImp(targetFolder);
 						end
 					end
+
+					local function SaveAsWorldCheckModified_(targetFolder)
+						local KeepworkServiceWorld = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceWorld.lua')
+						KeepworkServiceWorld:CheckWorldExists(result, function(bExists)
+							if bExists then
+								_guihelper.MessageBox(format(L"服务器中已经存在世界《%s》, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
+									if(res and res == _guihelper.DialogResult.Yes) then
+										StartSaveAs()
+									end
+								end, _guihelper.MessageBoxButtons.YesNo);
+								return
+							end
+							StartSaveAs()
+						end)
+					end
 					if (ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
-						_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
+						_guihelper.MessageBox(format(L"世界《%s》已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
 							if(res and res == _guihelper.DialogResult.Yes) then
 								SaveAsWorldCheckModified_(targetFolder)
 							end
@@ -346,7 +379,7 @@ function WorldCommon.SaveWorldAs()
 	end)
 end
 
-function WorldCommon.SaveWorldAsImp(folderName, callbackFunc, bPreserveModified)
+function WorldCommon.SaveWorldAsImp(folderName, callbackFunc, bPreserveModified, bForceSave)
 	local function Handle()
 		if(WorldCommon.CopyWorldTo(folderName, bPreserveModified)) then
 			local save_world_handler = SaveWorldHandler:new():Init(folderName);
@@ -387,12 +420,20 @@ function WorldCommon.SaveWorldAsImp(folderName, callbackFunc, bPreserveModified)
 					ParaIO.DeleteFile(path)
 				end
 			end
+
+			if bForceSave then
+				if (callbackFunc and type(callbackFunc) == "function") then
+					callbackFunc(true);
+				end
+				return
+			end
 	
 			if (callbackFunc and type(callbackFunc) == "function") then
 				callbackFunc(true);
 			else
 				_guihelper.MessageBox(format(L"世界已经成功保存到: %s, 是否现在打开?", commonlib.Encoding.DefaultToUtf8(folderName)), function(res)
 					if(res and res == _guihelper.DialogResult.Yes) then
+						GameLogic.GetFilters():apply_filters("SaveWorldAsFinished",folderName)
 						WorldCommon.OpenWorld(folderName, true)
 					end
 				end, _guihelper.MessageBoxButtons.YesNo);
@@ -400,13 +441,61 @@ function WorldCommon.SaveWorldAsImp(folderName, callbackFunc, bPreserveModified)
 		end
 	end
 
-	if(not GameLogic.IsVip("WorldDataSaveAs", true, function(result)
-			if (result) then
-				Handle()
-			end
-		end)) then
+	if bForceSave then
+		Handle()
 		return
 	end
+
+	WorldCommon.CheckWorldAuth(function(result)
+		if result then
+			Handle()
+		else
+			_guihelper.MessageBox(L"你没有权限另存这个世界为自己的世界。")
+		end
+	end)
+end
+
+function WorldCommon.CheckWorldAuth(callbackFunc)
+	if not GameLogic.IsReadOnly() then
+		if (callbackFunc and type(callbackFunc) == "function") then
+			callbackFunc(true);
+		end
+		return;
+	end
+
+	local is_signed_in = GameLogic.GetFilters():apply_filters('is_signed_in')
+	if not is_signed_in then
+		GameLogic.GetFilters():apply_filters('check_signed_in', '请先登录', function(result)
+			if result == true then
+				commonlib.TimerManager.SetTimeout(function()
+					WorldCommon.CheckWorldAuth(callbackFunc)
+				end, 200)
+			end
+		end)
+		return;
+	end
+
+	local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+	local userId = Mod.WorldShare.Store:Get('user/userId')
+	local isWorldAuthor = currentEnterWorld and currentEnterWorld.user and userId and currentEnterWorld.user.id == userId
+	if isWorldAuthor then
+		if (callbackFunc and type(callbackFunc) == "function") then
+			callbackFunc(true);
+		end
+		return;
+	end
+
+	GameLogic.IsVip("WorldDataSaveAs", true, function(result)
+		if (result) then
+			if (callbackFunc and type(callbackFunc) == "function") then
+				callbackFunc(true);
+			end
+		else
+			if System.options.isHideVip then
+				GameLogic.ShowVipGuideTip("WorldDataSaveAs")
+			end
+		end
+	end)
 end
 
 -- @param bPreserveModified: true to preserve modified changes. 
@@ -449,9 +538,14 @@ function WorldCommon.CopyWorldTo(destinationFolder, bPreserveModified)
 					end
 				end
 
+				-- ParaIO.CreateDirectory(dest_path);
 				local re = ParaIO.CopyFile(source_path, dest_path, true);
 				LOG.std(nil, "info", "CopyWorldFile", "copy(%s) %s -> %s",tostring(re),source_path,dest_path);
 				fileCount = fileCount + 1
+
+				if(dest_path:match("/script/")) then
+					LOG.std(nil, "info", "CopyWorldFile", dest_path);
+				end
 			else
 				-- this is a folder
 				ParaIO.CreateDirectory(destinationFolder..filename.."/");
@@ -459,14 +553,15 @@ function WorldCommon.CopyWorldTo(destinationFolder, bPreserveModified)
 		end
 		LOG.std(nil, "info", "CopyWorldTo", "%s is unziped to %s ( %d files)", worldzipfile, destinationFolder, fileCount); 
 		bResult = true;
-	else
+	end
+	if(not worldzipfile or bPreserveModified) then
 		-- search just in disk file
 		local filesOut = {};
 		local parentDir = GameLogic.GetWorldDirectory();
 		commonlib.Files.Find(filesOut, parentDir, 10, 10000, "*");
 
 		local fileCount = 0;
-		-- print all files in zip file
+		-- copy all files on disk
 		for i = 1,#filesOut do
 			local item = filesOut[i];
 			local filename = item.filename
@@ -510,10 +605,12 @@ function WorldCommon.ReplaceWorldImp()
 
 	GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在使用当前世界替换原有的并行世界...', nil, nil, 450)
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
-	local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
-	local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. WorldCommon.sourceWorldFolderName.. "/";
-
+	local LocalServiceWorld = NPL.load('(gl)Mod/WorldShare/service/LocalService/LocalServiceWorld.lua')
+	local username = LocalServiceWorld:GetLocalUsername()
+	local targetFolder = LocalServiceWorld:GetDefaultSaveWorldPath() .. "/".. WorldCommon.sourceWorldFolderName.. "/"
+	if username and username ~= "" then
+		targetFolder = LocalServiceWorld:GetUserFolderPath() .. "/".. WorldCommon.sourceWorldFolderName.. "/"
+	end
 	if (ParaIO.DoesFileExist(targetFolder)) then
 		ParaIO.DeleteFile(targetFolder);
 	end
@@ -557,4 +654,72 @@ end
 
 function WorldCommon.GetParentProjectId()
 	return WorldCommon.parentProjectId
+end
+
+function WorldCommon.PrepareDiskZipFile(localFile)
+	WorldCommon.assetUrllocalFile = localFile;
+	local worldpath =  WorldCommon.assetUrllocalFile
+	ParaAsset.OpenArchive(worldpath, true)
+	local search_result = ParaIO.SearchFiles("","*", worldpath, 0, 10, 0);
+	local nCount = search_result:GetNumOfResult();
+	if(nCount == 1) then
+		-- just use the first directory in the world zip file as the world name.
+		local WorldName = search_result:GetItem(0);
+		WorldName = string.gsub(WorldName, "[/\\]$", "");
+		worldpath = string.gsub(worldpath, "([^/\\]+)%.%w%w%w$", WorldName); -- get rid of the zip file extension for display 
+	else
+		worldpath = worldpath:gsub("[^/\\]+$", "");
+	end
+	Files.AddWorldSearchPath(worldpath);
+
+	-- open zip and add to world search path
+	LOG.std(nil, "info", "WorldCommon", "world asset url prepared at %s", WorldCommon.assetUrllocalFile)
+end
+
+-- download asset url and add to search path
+-- @return true if already prepared. 
+function WorldCommon.PrepareAssetUrl(assetUrl, callbackFunc)
+	assetUrl = assetUrl or WorldCommon.GetWorldTag("assetUrl");
+	if(assetUrl and assetUrl:match("^https?://")) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");
+		local FileDownloader = commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader");
+		local downloader = FileDownloader:new();
+		downloader:SetSilent(true)
+		local filename = assetUrl:match("([^/]+)$");
+		local diskFilePath = ParaIO.GetWritablePath() .. "temp/prepareAssetUrl/"..filename;
+
+		if(ParaIO.DoesFileExist(diskFilePath, true)) then
+			LOG.std(nil, "info", "WorldCommon", "asset url %s already exist", assetUrl)
+			WorldCommon.PrepareDiskZipFile(diskFilePath)
+			if(callbackFunc) then
+				callbackFunc(true)
+			end
+			return true
+		else
+			ParaIO.CreateDirectory(prepareFolder);
+			downloader:Init(L"下载美术资源", assetUrl, diskFilePath, function(bSucceed, localFile)
+				if(bSucceed and localFile) then
+					WorldCommon.PrepareDiskZipFile(localFile)
+				else
+					LOG.std(nil, "warn", "WorldCommon", "failed to prepare asset url %s, because %s", assetUrl, tostring(localFile))
+				end
+				if(callbackFunc) then
+					callbackFunc(bSucceed)
+				end
+			end, "access plus 1 year");
+		end
+		return
+	end
+	if(callbackFunc) then
+		callbackFunc()
+	end
+	return true
+end
+
+function WorldCommon.CloseWorldAssetUrl()
+	if(WorldCommon.assetUrllocalFile) then
+		ParaAsset.CloseArchive(WorldCommon.assetUrllocalFile)
+		LOG.std(nil, "info", "WorldCommon", "asset url %s unloaded from zip", WorldCommon.assetUrllocalFile)
+		WorldCommon.assetUrllocalFile = nil;
+	end
 end

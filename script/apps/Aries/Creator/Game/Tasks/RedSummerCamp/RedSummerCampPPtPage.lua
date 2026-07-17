@@ -440,7 +440,7 @@ function RedSummerCampPPtPage.ShowPage(course_name, pptIndex, server_index)
 		GameLogic.GetFilters():add_filter("OnSaveWrold", RedSummerCampPPtPage.OnSaveWrold);
 		GameLogic.GetFilters():add_filter("SyncWorldFinish", RedSummerCampPPtPage.OnSyncWorldFinish);
 		GameLogic.GetFilters():add_filter("SyncWorldFinishBegin", RedSummerCampPPtPage.SyncWorldFinishBegin);
-		GameLogic.GetFilters():add_filter("lessonbox_change_region_blocks",RedSummerCampPPtPage.ReportCreateBlockInCourse)
+		GameLogic.GetFilters():add_filter("BatchModifyBlocks",RedSummerCampPPtPage.ReportCreateBlockInCourse)
 		GameLogic.GetFilters():add_filter("OnBeforeLoadWorld",RedSummerCampPPtPage.OnBeforeLoadWorld)
 
 		GameLogic.GetFilters():add_filter("File.MCMLWindowFrame",RedSummerCampPPtPage.OnPageOpen)
@@ -1712,7 +1712,7 @@ function RedSummerCampPPtPage.ReportCreateBlockInCourse(blocks, is_delete)
 		RedSummerCampPPtPage.ReportBlockTimer = commonlib.Timer:new({callbackFunc = function(timer)
 			if RedSummerCampPPtPage.CreateBlockNum > 0 and ClassSchedule._curCourse then
 				local sections = ClassSchedule._curCourse.scheduleSections
-				if sections and sections[1].sectionId then
+				if sections and sections[1] and sections[1].sectionId then
 					local data = {
 						scheduleId = ClassSchedule._curCourse.id,
 						sectionId = sections[1].sectionId,
@@ -1791,7 +1791,6 @@ function RedSummerCampPPtPage.OnClickAction(action_type, param1, param2, param3,
 			end
 		end
 	end
-
 	if action_type == "explore" or action_type == "button" then
 		local step_value
 		if action_type == "explore" then
@@ -1821,10 +1820,10 @@ function RedSummerCampPPtPage.OnClickAction(action_type, param1, param2, param3,
 
 	if action_type == "button" or action_type == "explore" then
 		local projectid = param1
-		local commandStr = string.format("/loadworld -s -auto %s", projectid)
+		local commandStr = string.format("/loadworld -s -auto -lesson %s", projectid)
 		local sendevent = param2
 		if sendevent and sendevent ~= "" then
-			commandStr = string.format("/loadworld -s -auto -inplace %s  | /sendevent %s", projectid,sendevent)
+			commandStr = string.format("/loadworld -s -auto -lesson -inplace %s  | /sendevent %s", projectid,sendevent)
 		end
 		if RedSummerCampPPtPage.last_course_data and type(RedSummerCampPPtPage.last_course_data) == "table" and action_type == "button" then
 			RedSummerCampPPtPage.last_course_data.ppt_to_projectid = projectid
@@ -1886,9 +1885,9 @@ end
 
 function RedSummerCampPPtPage.ToWorld(project_id, sendevent)
 	if project_id then
-		local commandStr = string.format("/loadworld -s -auto %s", project_id)
+		local commandStr = string.format("/loadworld -s -auto -lesson %s", project_id)
 		if sendevent then
-			commandStr = string.format("/loadworld -s -auto -inplace %s  | /sendevent %s", project_id, sendevent)
+			commandStr = string.format("/loadworld -s -auto -lesson -inplace %s  | /sendevent %s", project_id, sendevent)
 		end
 		GameLogic.RunCommand(commandStr)
 		if RedSummerCampPPtPage.last_course_data then
@@ -2361,8 +2360,8 @@ function RedSummerCampPPtPage.CreateWorld(node_name, mcml_node)
 		
 		local CreateWorldLoadingPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/CreateWorldLoadingPage.lua")
 		CreateWorldLoadingPage.ShowView(loading_end_callback, desc_list);
-		if not is_file_exist and fork_project_id then
-			GameLogic.RunCommand(string.format([[/createworld -name "%s" -update -fork %d]], project_name, fork_project_id))			
+		if not is_file_exist and fork_project_id and tonumber(fork_project_id) > 0 then
+			GameLogic.RunCommand(string.format([[/createworld -name "%s" -update -fork %d -mode admin]], project_name, tonumber(fork_project_id)))			
 			CreateWorldLoadingPage.SetSpecialFlag(false);
 		end
 	end, 50);
@@ -2479,15 +2478,6 @@ function RedSummerCampPPtPage.CheckVideo()
 							RedSummerCampPPtPage.forceUsingExternalWebview = true
 							RedSummerCampPPtPage.RefreshPage()
 		
-							-- 上报
-							NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ParacraftDebug.lua");
-							local ParacraftDebug = commonlib.gettable("MyCompany.Aries.Game.Common.ParacraftDebug");
-							ParacraftDebug:SendErrorLog("DevDebugLog", {
-								desc = "ppt video load failed",
-								errorMessage = "",
-								debugTag = "RedSummerCampPPtPage",
-								stackInfo = commonlib.debugstack()
-							})
 						end
 					end
 				end
@@ -2501,6 +2491,6 @@ end
 function RedSummerCampPPtPage.GetVideoParams()
 	local userId = Mod.WorldShare.Store:Get("user/userId")
 	if userId then
-		return string.format("&userId=%s&code=%s&courseIndex=%s",userId,RedSummerCampPPtPage.CurCourseName,RedSummerCampPPtPage.SelectLessonIndex)
+		return string.format("userId=%s&code=%s&courseIndex=%s",userId,RedSummerCampPPtPage.CurCourseName,RedSummerCampPPtPage.SelectLessonIndex)
 	end
 end

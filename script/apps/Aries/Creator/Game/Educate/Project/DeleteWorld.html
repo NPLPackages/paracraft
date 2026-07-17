@@ -5,6 +5,7 @@
 <script refresh="true" type="text/npl" src=".lua" ><![CDATA[
     local DeleteWorld = NPL.load('(gl)Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua')
     -- service
+    local EducateProject = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/EducateProject.lua")
     local KeepworkServiceSession = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceSession.lua')
     local KeepworkServiceProject = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceProject.lua')
 
@@ -40,39 +41,59 @@
         end
     end
 
+    function delete_silent()
+        DeleteWorld:DeleteRemoteWithoutPwd(function()
+            local selectedWorld = get_select_world()
+            local worldPath = selectedWorld.worldpath
+            if ParaIO.DoesFileExist(worldPath .. '/tag.xml', false) then
+                DeleteWorld:DeleteLocal(function()
+                    GameLogic.AddBBS(nil,"删除项目成功")
+                    Create:GetWorldList(Create.statusFilter)
+                    EducateProject.GetUserWorldUsedSize()
+                    close_page()
+                end,true)
+            else
+                GameLogic.AddBBS(nil,"删除项目成功")
+                Create:GetWorldList(Create.statusFilter)
+                EducateProject.GetUserWorldUsedSize()
+                close_page()
+            end
+        end)     
+    end
+
     function delete_all()
         if is_shared_world() then
             on_exit_shared_world()
             return
         end
-        if type(DeleteWorld.DeleteRemoteWithoutPwd) == "function" then
-            local selectedWorld = get_select_world()
-            if selectedWorld and selectedWorld.kpProjectId and selectedWorld.kpProjectId > 0 then
-                DeleteWorld:DeleteRemoteWithoutPwd(function()
-                    local worldPath = selectedWorld.worldpath
-                    if ParaIO.DoesFileExist(worldPath .. '/tag.xml', false) then
-                        DeleteWorld:DeleteLocal(function()
-                            GameLogic.AddBBS(nil,"删除项目成功")
-                            Create:GetWorldList(Create.statusFilter)
-                            close_page()
-                        end,true)
-                    else
-                        GameLogic.AddBBS(nil,"删除项目成功")
-                        Create:GetWorldList(Create.statusFilter)
-                        close_page()
-                    end
-
-                end)            
-            else
-                DeleteWorld:DeleteLocal(function()
-                    GameLogic.AddBBS(nil,"删除项目成功")
-                    Create:GetWorldList(Create.statusFilter)
-                    close_page()
-                end,true)
-            end
-           
+        if is_home_world() then
+            DeleteWorld:DeleteLocal(function()
+                GameLogic.AddBBS(nil,"删除项目成功")
+                Create:GetWorldList(Create.statusFilter)
+                close_page()
+            end,true)
+            return
         end
-        
+        local selectedWorld = get_select_world()
+        if selectedWorld and selectedWorld.kpProjectId and selectedWorld.kpProjectId > 0 then
+            local username = Mod.WorldShare.Store:Get('user/username') or ''
+            if username and username ~= "" and username:find("^official") then
+                DeleteWorld:PasswordAuthenticationOnDeletion(
+                    'all',
+                    function()
+                        DeleteWorld:DeleteAll()
+                    end
+                )
+                return
+            end
+            delete_silent()
+        else
+            DeleteWorld:DeleteLocal(function()
+                GameLogic.AddBBS(nil,"删除项目成功")
+                Create:GetWorldList(Create.statusFilter)
+                close_page()
+            end,true)
+        end
     end
 
     function close_page()
@@ -112,6 +133,21 @@
 
     function is_shared_world()
         return is_multiplayer_world() and not is_mine_world()
+    end
+
+    function is_home_world()
+        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+        if not currentWorld then
+            return
+        end
+        local username = Mod.WorldShare.Store:Get('user/username') or ''
+        local user = currentWorld.user
+        if user and user.username then
+            local myHomeWorldName = user.username .. "的家园"
+            local myHomeWorldName1 = user.username .. "_main"
+            local currentWorldName = currentWorld.name
+            return myHomeWorldName == currentWorldName or myHomeWorldName1 == currentWorldFloderName
+        end
     end
 
     function get_delete_tip()

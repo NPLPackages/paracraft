@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyLiveModel.lua" refresh="false">
+<![CDATA[
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/EasyLiveModel.lua");
+    EasyLiveModel = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyLiveModel");
+    EasyLiveModel.OnInit();
+
+    function OnSelectFile(treenode)
+        local node = treenode.mcmlNode:GetPreValue("this")
+        local filename = node.filename;
+        local displayname = node.text;
+        if(filename) then
+            EasyLiveModel.SetModelFilename(filename, displayname);
+            if(mouse_button == "right") then
+                local filesize = treenode.mcmlNode:GetPreValue("this").filesize;
+                EasyLiveModel.ShowFileContextMenu(filename, filesize);
+            end
+        end
+    end
+    function GetLocalDisplayText()
+        local filename = commonlib.Encoding.DefaultToUtf8(XPath("this|filename"));
+        filename = string.gsub(filename, "^.*/", ""); -- only show the file name instead of full path
+        local displayName = EasyLiveModel.GetDisplayNameForFile(filename);
+        local text = string.format("%s (%dKB)", displayName or filename, math.ceil(XPath("this|filesize")/1000))
+        return text;
+    end
+]]>
+</script>
+
+<!-- Main Container -->
+<div style="width:360px;height:550px;background-color:#000000e0;color:#ffffff;">
+    <!-- Category Tabs -->
+    <div style="margin-top:5px;">
+        <pe:repeat DataSource="<%=EasyLiveModel.GetCategoryButtons()%>">
+            <pe:repeatitem style="float:left;">
+                <pe:if condition='<%=EasyLiveModel.category_index == Eval("index") %>'>
+                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' 
+                        style="margin-left:5px;margin-top:5px;color:#ffffff;font-weight:bold;font-size:18px;min-width:65px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
+                </pe:if>
+                <pe:if condition='<%=EasyLiveModel.category_index ~= Eval("index") %>'>
+                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="EasyLiveModel.OnChangeCategory" 
+                        style="margin-left:5px;margin-top:5px;color:#ffffff;font-weight:bold;font-size:18px;min-width:65px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+    
+    <!-- File Tree View -->
+    <div style="background-color:#00000040;padding:5px;">
+        <pe:treeview ShowIcon="false" name="tvwFiles" VerticalScrollBarStep="30" 
+            DataSource='<%=EasyLiveModel.GetAllFilesWithFilters()%>'  RememberScrollPosition="true"
+            DefaultNodeHeight="30" 
+            style="background:;">
+            <NodeTemplates>
+                <NodeTemplate DataType="file">
+                    <pe:treenode style="height:30px;font-size:18px;color:#ffffff;" indent="15" OnClick="OnSelectFile" can_select="true" 
+                        text='<%=GetLocalDisplayText()%>'></pe:treenode>
+                </NodeTemplate>
+                <NodeTemplate DataType="commonfile">
+                    <pe:treenode style="height:30px;font-size:18px;color:#ffffff;" indent="15" OnClick="OnSelectFile" can_select="true" 
+                        text='<%=XPath("this|text")%>'></pe:treenode>
+                </NodeTemplate>
+                <NodeTemplate DataType="category">
+                    <pe:treenode style="height:30px;font-size:18px;color:#50FA7B;font-weight:bold;" expanded='<%=XPath("this|expanded")%>' 
+                        text='<%=format("%s (%d)", XPath("this|text"), XPath("this|count") or 0)%>'></pe:treenode>
+                </NodeTemplate>
+            </NodeTemplates>
+            <DataNodePlaceholder xpath="*" />
+        </pe:treeview>
+    </div>
+</div>
+<div>
+<pe:container ClickThrough="true" style="width:360px;height:56px;background:;">
+    <div name="ObjectList" tooltip="打开物品列表" onclick="EasyLiveModel.OnOpenObjectList" align="right" style="position: relative;width:64px;margin-right:80px;">
+        <div zorder="-2" style="width:60px;height:60px;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12)">
+            <img src="Texture/3DMapSystem/Creator/Objects/openMap.png" style="margin-left:16px;margin-bottom:0px;margin-top:5px;width:24px;height:24px;"/>
+            <input type="button" value="清单" style="width:56px;height:24px;color:#fff;background:;"/>
+        </div>
+    </div>
+    <input type="button" name="CloseBtn" onclick="EasyLiveModel.OnClickClose" 
+        align="right" style="position:relative; margin-right: 20px; margin-top:5px;width:56px;height:56px;background:url(Texture/player/close.png)" />
+</pe:container>
+</div>
+</pe:mcml>
+</html>

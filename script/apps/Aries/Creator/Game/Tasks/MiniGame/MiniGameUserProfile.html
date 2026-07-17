@@ -1,0 +1,102 @@
+<html>
+<body> 
+<pe:mcml>
+    <script type="text/npl">
+<![CDATA[
+local MiniGameUserProfile = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameUserProfile.lua")
+MiniGameUserProfile.OnInit()
+
+local radarDesc = {
+    {text = L"本人情况", color="#0000ff"},
+    {text = L"良好水平", color="#ffcc00"},
+    {text = L"优秀水平", color="#00cc00"}
+}
+function GetRadarDescs()
+    return radarDesc
+end
+
+function GetNickName()
+    local nickname = System.User.NickName
+    if(nickname == nil or nickname == "")then
+        nickname = System.User.username
+    end
+    if nickname ~= nil and nickname ~= "" then
+        local width = 0
+        local name = ""
+        for uchar in string.gmatch(nickname, '([%z\1-\127\194-\244][\128-\191]*)') do
+            local w = _guihelper.GetTextWidth(uchar, "System;32");
+            width = width + tonumber(w)
+            if width < 240 then
+                name = name.. uchar
+            else
+                name = name.. "..."
+                break
+            end
+        end
+        return name
+    end
+    return ""
+end
+
+function GetAccountStr()
+    if not System.User.username then
+        return L"暂无用户信息"
+    end
+    local username = System.User.username or ""
+    return L"账号：" .. username
+end
+
+function onClickClose()
+    MiniGameUserProfile.ClosePage()
+end
+
+function GetIframeUrl()
+    return MiniGameUserProfile.GetIframeUrl()
+end
+]]>
+</script>
+<pe:container alignment="_fi"  width="100%" height="100%" style="float: left; background-color: #ffffff;">
+    <pe:container ClickThrough="true" alignment="_mt" width="0" height="72" style="position:relative; background-color: #d1e5fb8a;"> 
+    </pe:container>
+    <pe:container ClickThrough="true" alignment="_rt" style="position:relative; background:url()"> 
+        <input type="button" onclick="onClickClose" style="width:64px;height:64px;background:url(Texture/Aries/Creator/Game/PapaAdventures/lesson_submit-close_64x64_32bits.png)"/>
+    </pe:container>
+    <pe:container alignment="_ct" ClickThrough="true" style="position:relative; margin-left: -640px; margin-top: -360px; width: 1280px; height: 720px; background: url();">
+        <div style="float: left; width: 320px; height: 720px;">
+            <div style="width: 320px; height: 42px; background-color: #799bf7;">
+                <div style="margin-left: 50px; margin-top: 6px; font-size: 20px; base-font-size: 20px; font-weight: bold; color: #c3dcf3;"><%=L"个人信息"%></div>
+            </div>
+            <div style="float:left;width:272px;height:254px;margin-top:10px;margin-left:24px; ">
+                <div align="center" style="margin-top:10px;width:128px;height:128px; background:url(Texture/Aries/Creator/keepwork/Mobile/esc/touxiang_128x128_32bits.png#0 0 128 128);">
+                    <pe:mc_player name="profile_user_player" miniscenegraphname="profile_user_player" style="width:128px;height:128px;margin-left: 0px; margin-top: -15px;" IsInteractive="false" fisrtFrameMove = "false" NoFrameMove="true" RenderTargetSize="256" DefaultCameraObjectDist="3.2" DefaultLiftupAngle = "0"/>
+                </div>
+                <div  style="margin-top:24px;font-size: 28px; base-font-size: 28px; font-weight: bold; color:#518ade;text-align:center;overflow-y: auto;margin-left:0px;font-weight:bold;">
+                    <%=_guihelper.AutoTrimTextByWidth(GetNickName(), 220, "System;28;bold")%>             
+                </div>
+                <div  style="margin-top:16px;font-size: 22px; base-font-size: 22px; color:#c7d5ea;text-align:left; margin-left: 30px;">
+                    <%=GetAccountStr()%>
+                </div>
+               
+            </div> 
+            <div style="width: 320px;height: 2px; background-color: #cccccc;"></div>
+            <div style="width: 290px; height: 30px; margin-top: 10px; margin-left: 30px;">
+                <pe:repeat DataSource='<%=GetRadarDescs()%>'>
+                    <pe:repeatitem style="float: left;">
+                        <div style="float: left; margin-left: 10px;">
+                            <div style="<%='float: left; margin-top: 3px; width: 16px; height: 16px; background-color: '..Eval('color')%>"></div>
+                            <div style="float: left; margin-left: 5px;"><%=Eval('text')%></div>
+                        </div>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </div>
+            <div style="text-align:center"></div>
+            <pe:container uiname="profile_radar_container" style="width: 310px; height: 310px; margin-left: 5px; margin-top: 12px; background:url()"></pe:container>
+        </div>
+        <div style="float: left; margin-left: 20px; width: 870px; height: 720px; margin-top: 30px;">
+            <iframe name="maisi_profile_frame" src="<%=GetIframeUrl()%>"></iframe> 
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

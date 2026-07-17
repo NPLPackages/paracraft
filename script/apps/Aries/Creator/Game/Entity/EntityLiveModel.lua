@@ -7,6 +7,8 @@ This class is almost identical to EntityBlockModel.
 - If model filename contains "_char", we will use auto turning
 - If model filename contains "_drag", we will enable dragging even if it has real physics
 
+Note: if GetCategory() == "staticblock", then right click can not edit the block. 
+
 A general event "__entity_onclick", "__entity_onhover", "__entity_onmount", "__entity_onbegindrag", "__entity_onenddrag" will be fired if no custom event is specified. 
 
 use the lib:
@@ -25,6 +27,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ModelMountPoints.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/BlockInEntityHand.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BonesVariable.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/API/ParaLifeAPI.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local Quaternion = commonlib.gettable("mathlib.Quaternion");
 local API = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.API")
 local BonesVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable");
@@ -45,6 +49,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local Event = commonlib.gettable("System.Core.Event");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
+local PlayerHeadController = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerHeadController");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 
@@ -73,7 +78,8 @@ Entity:Property({"canDrag", nil, "GetCanDrag", "SetCanDrag"});
 -- TODO: if the object can only be dragged along the given axis.
 Entity:Property({"dragDirection", nil, "GetDragDirection", "SetDragDirection"});
 Entity:Property({"idleAnim", 0, "GetIdleAnim", "SetIdleAnim", auto=true});
-
+Entity:Property({"animFrame", nil, "GetAnimFrame", "SetAnimFrame", auto=true});
+Entity:Property({"boneController", nil, "SetBoneController", "GetBoneController", auto=true});
 Entity:Property({"onclickEvent", nil, "GetOnClickEvent", "SetOnClickEvent", auto=true});
 Entity:Property({"onhoverEvent", nil, "GetOnHoverEvent", "SetOnHoverEvent", auto=true});
 Entity:Property({"onmountEvent", nil, "GetOnMountEvent", "SetOnMountEvent", auto=true});
@@ -81,12 +87,16 @@ Entity:Property({"onbeginDragEvent", nil, "GetOnBeginDragEvent", "SetOnBeginDrag
 Entity:Property({"onendDragEvent", nil, "GetOnEndDragEvent", "SetOnEndDragEvent", auto=true});
 Entity:Property({"onTickEvent", nil, "GetOnTickEvent", "SetOnTickEvent", auto=true});
 Entity:Property({"framemove_interval", 1, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
+-- if category == "staticblock", then right click can not edit the block
 Entity:Property({"category", nil, "GetCategory", "SetCategory", auto=true});
 Entity:Property({"yawOffset", 0, "GetYawOffset", "SetYawOffset", auto=true});
+Entity:Property({"isLocked", nil, "IsLocked", "SetLocked", auto=true});
 Entity:Property({"physicsShape", "box", "GetPhysicsShape", "SetPhysicsShape", auto=true});
 Entity:Signal("beforeDestroyed")
 Entity:Signal("clicked", function(mouse_button) end)
 Entity:Signal("assetfileChanged");
+Entity:Signal("dragBegun")
+Entity:Signal("dragEnded", function(dragLocation) end)
 
 Entity.default_file = "character/common/headquest/headquest.x";
 -- persistent object by default. 
@@ -188,6 +198,7 @@ function Entity:CloneMe()
 	xmlNode.attr.linkTo = nil;
 	local x, y, z = self:GetPosition()
 	local entity = self:Create({x=x, y=y, z=z, facing=self:GetFacing()}, xmlNode);
+	entity.is_persistent = self.is_persistent;
 	entity:Attach();
 	return entity
 end
@@ -241,6 +252,7 @@ end
 -- @return return true if focus is set
 function Entity:SetFocus()
 	EntityManager.SetFocus(self);
+	self:SetFollowTarget(nil);
 	return true;
 end
 
@@ -430,9 +442,12 @@ function Entity:LoadFromXMLNode(node)
 	if(attr) then
 		self:setScale(tonumber(attr.scale or 1));
 		
-		self.skin = node.attr.skin;
+		self.skin = attr.skin;
 		if(self.skin) then
 			self:FindSkinFiles(self.skin);
+		end
+		if(attr.color) then
+			self.color = tonumber(attr.color);
 		end
 		if(attr.useRealPhysics) then
 			self.useRealPhysics = (attr.useRealPhysics == "true") or (attr.useRealPhysics == true);
@@ -450,6 +465,9 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.isStackable) then
 			self.isStackable = (attr.isStackable == "true") or (attr.isStackable == true);
 		end
+		if(attr.isLocked) then
+			self.isLocked = (attr.isLocked == "true") or (attr.isLocked == true);
+		end
 		if(attr.stackHeight) then
 			self.stackHeight = tonumber(attr.stackHeight);
 		end
@@ -466,7 +484,7 @@ function Entity:LoadFromXMLNode(node)
 			self.opacity = tonumber(attr.opacity)
 		end
 		
-		if(attr.canDrag) then
+		if(attr.canDrag~=nil) then
 			self.canDrag = (attr.canDrag == "true") or (attr.canDrag == true);
 		end
 		if(attr.onclickEvent) then
@@ -504,9 +522,12 @@ function Entity:LoadFromXMLNode(node)
 		end
 		if(attr.linkTo) then
 			self:TryLinkToEntityByName(attr.linkTo)
-		end
+		end		
 		if(attr.idleAnim) then
 			self.idleAnim = tonumber(attr.idleAnim)
+		end
+		if(attr.animFrame) then
+			self.animFrame = tonumber(attr.animFrame)
 		end
 		if(attr.lastAnim) then
 			self.lastAnimId = tonumber(attr.lastAnim)
@@ -525,6 +546,12 @@ function Entity:LoadFromXMLNode(node)
 			self.bootHeight = tonumber(attr.bootHeight) or self.bootHeight;
 		else
 			self.bootHeight = nil
+		end
+		if(attr.actionRadius) then
+			self.actionRadius = tonumber(attr.actionRadius);
+		end
+		if(attr.aiCharConfig) then
+			self.aiCharConfig = NPL.LoadTableFromString(attr.aiCharConfig)
 		end
 	end
 end
@@ -563,6 +590,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.skin and self.skin~="") then
 		attr.skin = self.skin;
 	end
+	if(self.color) then
+		attr.color = self.color;
+	end
 	if(self.onclickEvent and self.onclickEvent~="") then
 		attr.onclickEvent = self.onclickEvent
 	end
@@ -592,9 +622,11 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 
 	attr.linkTo = self:ConvertLinkInfoToString(self.linkInfo)
-	
-	if(self.idleAnim ~= 0) then
+		if(self.idleAnim ~= 0) then
 		attr.idleAnim = self.idleAnim;
+	end
+	if(self.animFrame) then
+		attr.animFrame = self.animFrame;
 	end
 	if(self.pitch and self.pitch ~= 0) then
 		attr.pitch = self.pitch;
@@ -626,6 +658,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	attr.stackHeight = self.stackHeight;
 	attr.dragDisplayOffsetY = self.dragDisplayOffsetY;
 	attr.isStackable = self.isStackable;
+	if(self.isLocked) then
+		attr.isLocked = self.isLocked;
+	end
 	attr.bIsAutoTurning = self.bIsAutoTurning;
 	if(self.enableDropFall == false) then
 		attr.enableDropFall = false;
@@ -640,6 +675,15 @@ function Entity:SaveToXMLNode(node, bSort)
 	local lastAnim = self:GetLastAnimId();
 	if((lastAnim or 0) ~= (self.idleAnim or 0)) then
 		attr.lastAnim = lastAnim
+	end
+
+	if(self.actionRadius) then
+		attr.actionRadius = self.actionRadius;
+	end
+
+	if(self.aiCharConfig) then
+		-- Serialize AI character config to string
+		attr.aiCharConfig = commonlib.serialize_compact(self.aiCharConfig);
 	end
 
 	if(self:GetMountPoints()) then
@@ -966,6 +1010,9 @@ function Entity:CreateInnerObject()
 		if(self.materialId) then
 			obj:SetField("MaterialID", self.materialId);
 		end
+		if(self.color) then
+			self:SetColor(self.color, true);
+		end
 		self:Refresh(nil, obj)
 
 		self:UpdateBlockContainer();
@@ -974,6 +1021,11 @@ function Entity:CreateInnerObject()
 			self:SetVisible(false);
 		elseif((self.opacity or 1) ~= 1) then
 			self:SetOpacity(self.opacity or 1);
+		end
+		obj:SetField("Gravity", GameLogic.options.Gravity*2);
+		if(self.animFrame) then
+			obj:SetField("EnableAnim", false)
+			obj:SetField("AnimFrame", self.animFrame);
 		end
 	end
 	return obj;
@@ -1090,6 +1142,7 @@ end
 
 function Entity:Destroy()
 	self:beforeDestroyed(self);
+	self:PlayMovieFile(nil); -- stop any playing movie
 	self:DestroyInnerObject();
 	Entity._super.Destroy(self);
 end
@@ -1100,9 +1153,10 @@ function Entity:Refresh(bForceRefresh, playerObj)
 		-- refresh skin and base model, preserving all custom bone info
 		local assetPath = self:GetMainAssetPath()
 		if(playerObj:GetField("assetfile", "") ~= assetPath) then
-			local skin = CustomCharItems:GetSkinByAsset(assetPath);
+			local skin,default_assets = CustomCharItems:GetSkinByAsset(assetPath);
 			if (skin) then
-				self.mainAssetPath = CustomCharItems.defaultModelFile;
+				self.mainAssetPath = default_assets or CustomCharItems.defaultModelFile;
+				self.filename = self.mainAssetPath;
 				self.skin = skin;
 				assetPath = self.mainAssetPath;
 				self:GetDataWatcher():SetField(self.dataMainAsset, assetPath);
@@ -1123,7 +1177,6 @@ function Entity:Refresh(bForceRefresh, playerObj)
 		self:RefreshSkin(playerObj);
 	end
 end
-
 
 function Entity:EndEdit()
 	Entity._super.EndEdit(self);
@@ -1154,6 +1207,11 @@ function Entity:HasCustomGeosets()
 	return self.hasCustomGeosets
 end
 
+-- @param x, y, z: if nil, player faces front. 
+-- @param isAngle: if x, y, z is angle. 
+function Entity:FaceTarget(x,y,z, isAngle)
+	PlayerHeadController.FaceTarget(self, x, y, z, isAngle);
+end
 
 function Entity:RefreshSkin(player)
 	local player = player or self:GetInnerObject();
@@ -1161,7 +1219,7 @@ function Entity:RefreshSkin(player)
 		local skin = self:GetSkin();
 
 		if(self.isCustomModel) then
-			PlayerAssetFile:RefreshCustomModel(player, skin)
+			PlayerAssetFile:RefreshCustomModel(player, skin, self:GetMainAssetPath())
 			return 
 		end
 
@@ -1246,6 +1304,18 @@ function Entity:GetSkin()
 	return self.skin;
 end
 
+-- Set AI character configuration
+-- @param config: a table with character configuration fields
+function Entity:SetAICharConfig(config)
+	self.aiCharConfig = config;
+end
+
+-- Get AI character configuration
+-- @return a table with character configuration fields, or nil if not set
+function Entity:GetAICharConfig()
+	return self.copilot and self.copilot:GetAICharConfig() or self.aiCharConfig;
+end
+
 -- get mount points and create it if not exist
 function Entity:CreateGetMountPoints()
 	if(not self.mountpoints) then
@@ -1280,7 +1350,7 @@ end
 -- @param bUseCurrentLocation: if true, we will use the current entity's facing and position, instead of the target mount point's settings. 
 function Entity:MountTo(mountTarget, mountPointIndex, bUseCurrentLocation)
 	mountPointIndex = mountPointIndex or 1
-	if(mountTarget) then
+	if(mountTarget and mountTarget.GetMountPoints) then
 		if(not bUseCurrentLocation and mountTarget:GetMountPoints()) then
 			local x, y, z = mountTarget:GetMountPoints():GetMountPositionInWorldSpace(mountPointIndex)
 			local facing = mountTarget:GetMountPoints():GetMountFacingInWorldSpace(mountPointIndex)
@@ -1317,9 +1387,9 @@ end
 
 function Entity:GetMountedEntityAt(mountPointIndex)
 	mountPointIndex = mountPointIndex or 1;
-	if(self:GetMountPoints()) then
+	if(self:GetMountPoints() and self.childLinks) then
 		local x, y, z = self:GetMountPoints():GetMountPositionInWorldSpace(mountPointIndex)
-		if(x and self.childLinks) then
+		if(x) then
 			for _, child in ipairs(self.childLinks) do
 				local x1, y1, z1 = child:GetPosition()
 				if((math.abs(x-x1)+math.abs(z-z1)) < 0.05 and math.abs(y-y1) < 0.3) then
@@ -1342,9 +1412,59 @@ function Entity:OnMount(mountPointName, mountpointIndex, mountedEntity)
 	end
 end
 
+function Entity:LinkAllMatchingAnchorEntities(linkParent, excludedEntities, theLowestEntityInfo)
+	linkParent = linkParent or self;
+	excludedEntities = excludedEntities or {};
+	theLowestEntityInfo = theLowestEntityInfo or {};
+	excludedEntities[self.name] = true;
+	local mountPoints = self:GetMountPoints();
+	if(mountPoints) then
+		mountPoints:ForEachAnchorPoint(function(mp)
+			local matchedAnchor = mp:GetMatchedAnchor();
+			if(matchedAnchor) then
+				local entity = matchedAnchor:GetEntity();
+				if(not excludedEntities[entity.name]) then
+					if(not theLowestEntityInfo.position) then
+						local x, y, z = self:GetPosition();
+						theLowestEntityInfo.position = { x = x, y = y,  z = z };
+						theLowestEntityInfo.entity = self;
+					else
+						local x, y, z = self:GetPosition();
+						if(y < theLowestEntityInfo.position.y) then
+							theLowestEntityInfo.position = { x = x, y = y,  z = z };
+							theLowestEntityInfo.entity = self;
+						end
+					end
+					entity:LinkTo(linkParent);
+					entity:LinkAllMatchingAnchorEntities(linkParent, excludedEntities, theLowestEntityInfo);
+				end
+			end
+		end)
+		return theLowestEntityInfo;
+	end
+end
+
+function Entity:UnLinkAllMatchingAnchorEntities(excludedEntities)
+	excludedEntities = excludedEntities or {};
+	excludedEntities[self.name] = true;
+	local mountPoints = self:GetMountPoints();
+	if(mountPoints) then
+		mountPoints:ForEachAnchorPoint(function(mp)
+			local matchedAnchor = mp:GetMatchedAnchor();
+			if(matchedAnchor) then
+				local entity = matchedAnchor:GetEntity();
+				if(not excludedEntities[entity.name]) then
+					entity:UnLink();
+					entity:UnLinkAllMatchingAnchorEntities(excludedEntities);
+				end
+			end
+		end)
+	end
+end
+
 -- called every 1500 milliseconds
 function Entity:OnHover(hoverEntity)
-	local event = Event:new():init("onhover");	
+	local event = Event:new():init("onhover");
 	if(hoverEntity) then
 		event.name = self.name;
 		event.hoverEntityName = hoverEntity.name or "";
@@ -1415,10 +1535,14 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 		end
 	end
 
+	local continuousClick = false
 	local curTime = commonlib.TimerManager.GetCurrentTime()
 	if(self.lastClickTime == curTime) then
 		return
 	else
+		if(self.lastClickTime and curTime - self.lastClickTime < 500) then
+			continuousClick = true
+		end
 		self.lastClickTime = curTime
 	end
 
@@ -1426,7 +1550,9 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 		if(mouse_button=="left" or self.onclickEvent) then
 			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
 		elseif(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-			self:OpenEditor("entity", entity);
+			if((self:GetCategory() ~= "staticblock")) then
+				self:OpenEditor("entity", entity);
+			end
 			return true;
 		end
 	else
@@ -1435,7 +1561,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			event.button = mouse_button;
 			self:event(event);
 			-- signal
-			self:clicked(mouse_button);
+			self:clicked(mouse_button, self);
 
 			-- send a general event or user defined one
 			local onclickEvent = self.onclickEvent or "__entity_onclick"
@@ -1447,14 +1573,50 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 					return true;
 				end
 			end
+			if(self:HasMountPoints()) then
+				local curPlayer = EntityManager.GetFocus()
+				if(curPlayer and curPlayer.MountTo) then
+					local mps = self:GetMountPoints()
+					for i = 1, mps:GetCount() do
+						local mp = mps:GetMountPoint(i)
+						if mp and mp.name then
+							if(mp.name == "sit" or mp.name == "lie") then
+								local mountedEntity = self:GetMountedEntityAt(i);
+								if(not mountedEntity) then
+									curPlayer:MountTo(self, i);
+									GameLogic.RunCommand("/camera -mode ThirdPersonLookAhead");
+									curPlayer:UnLink()
+									return true;
+								end
+							end
+						end
+					end
+				end
+			end
 			local IsAltKeyPressed = System.Windows.Keyboard:IsAltKeyPressed(); 
-			if IsMobileUIEnabled and GameLogic.GameMode:CanEditBlock() and not IsAltKeyPressed and not event:isAccepted() and not GameLogic.Macros:IsPlaying() then
-				self:OpenEditor("entity", entity);
+			if not self:IsLocked() and IsMobileUIEnabled and GameLogic.GameMode:CanEditBlock() and not IsAltKeyPressed and not event:isAccepted() and not GameLogic.Macros:IsPlaying() then
+				if((self:GetCategory() ~= "staticblock")) then
+					self:OpenEditor("entity", entity);
+				elseif(continuousClick) then
+					local currentFacing = self:GetFacing()
+					local increment = math.rad(45)
+					local newFacing = currentFacing + increment
+					local newFacingMultiple = math.floor(newFacing / increment) * increment
+					if(newFacingMultiple == currentFacing) then
+						newFacingMultiple = newFacingMultiple + increment
+					end
+					if(newFacingMultiple >= math.rad(360)) then
+						newFacingMultiple = newFacingMultiple - math.rad(360)
+					end
+					self:SetFacing(newFacingMultiple)
+				end
 				return true
 			end
 		else
-			if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-				self:OpenEditor("entity", entity);
+			if(mouse_button=="right" and not self:IsLocked() and GameLogic.GameMode:CanEditBlock()) then
+				if((self:GetCategory() ~= "staticblock")) then
+					self:OpenEditor("entity", entity);
+				end
 				return true;
 			elseif(mouse_button=="left") then
 				self:OnActivated(entity);
@@ -1621,6 +1783,9 @@ function Entity:ComputeBoneWorldPosAndRot(boneName, localPos, localRot, bUsePare
 	end 
 	if(bFoundTarget) then
 		local parentObj = self:GetInnerObject();
+		if(not parentObj) then
+			return 
+		end
 		local parentScale = parentObj:GetScale() or 1;
 		local dx,dy,dz = 0,0,0;
 		if(not bUseParentRotation and localPos) then
@@ -1833,6 +1998,9 @@ function Entity:BeginDrag()
 	self:OnBeginDrag()
 	self:BeginModify()
 	self.isDragging = true;
+	if(self:IsPersistent()) then
+		GameLogic.SetModified();
+	end
 end
 
 -- return true if entity is being dragged. 
@@ -1861,8 +2029,14 @@ function Entity:EndDrag(dragLocation)
 end
 
 function Entity:OnBeginDrag()
+	self:PlayMovieFile(nil); -- stop any playing movie
+	self:SetFollowTarget(nil); -- stop any following target
+	
 	local event = Event:new():init("onbegindrag");	
 	self:event(event);
+	-- signal
+	self:dragBegun();
+	
 	-- send a general event or user defined one
 	local onbeginDragEvent = self.onbeginDragEvent or "__entity_onbegindrag"
 	if(onbeginDragEvent) then
@@ -1901,6 +2075,19 @@ function Entity:OnEndDrag(dragLocation)
 	local event = Event:new():init("onenddrag");
 	self:event(event);
 
+	-- signal
+	local isProcessed = self:dragEnded(dragLocation);
+	if(isProcessed) then
+		return true;
+	end
+
+	-- Call copilot OnDragEnd if it exists
+	if self.copilot and self.copilot.OnDragEnd then
+		if self.copilot:OnDragEnd(dragLocation) then
+			return true
+		end
+	end
+		
 	-- send a general event or user defined one
 	local onendDragEvent = self.onendDragEvent or "__entity_onenddrag"
 	if(onendDragEvent) then
@@ -1967,9 +2154,17 @@ function Entity:CanHighlight()
 	return self:GetCanDrag();
 end
 
+-- this is a temporary override for GetCanDrag
+function Entity:SetTempCanDrag(bCanDrag)
+	self.tempCanDrag = bCanDrag;
+end
+
 -- @param bCheckLinkParent: if true, we will also check link parent. 
 -- @return bCanDrag, draggableParent: the second parameter is the parent draggable entity if any. 
 function Entity:GetCanDrag(bCheckLinkParent)
+	if(self.tempCanDrag ~= nil) then
+		return self.tempCanDrag;
+	end
 	if(not bCheckLinkParent) then
 		if(self.canDrag== nil) then
 			-- some default value
@@ -2033,18 +2228,24 @@ end
 -- if self:isCaptureMouse() is true, all subsequent mouse move and mouse release are also invoked on the entity. 
 function Entity:mousePressEvent(event)
 	local item = self:GetItemClass()
-	item:mousePressEvent(event)
-	self:setCaptureMouse(event:isAccepted())
+	if(item) then
+		item:mousePressEvent(event)
+	end
+	self:setCaptureMouse(event and event.isAccepted and event:isAccepted())
 end
 
 function Entity:mouseMoveEvent(event)
 	local item = self:GetItemClass()
-	item:mouseMoveEvent(event)
+	if(item) then
+		item:mouseMoveEvent(event)
+	end
 end
 
 function Entity:mouseReleaseEvent(event)
 	local item = self:GetItemClass()
-	item:mouseReleaseEvent(event)
+	if(item) then
+		item:mouseReleaseEvent(event)
+	end
 	self:setCaptureMouse(false)
 end
 
@@ -2060,18 +2261,6 @@ function Entity:FrameMove(deltaTime)
 			if(obj and obj:GetField("render_tech", 0) > 0) then
 				self.asset_rendertech = nil;
 				self:OnMainAssetLoaded()
-			end
-		end
-		if(self:IsPersistent()) then
-			if(GameLogic.GameMode:IsEditor()) then
-				if(not self:IsVisible()) then
-					self:SetOpacity(0.5)
-					self:SetVisible(true)
-				end
-			else
-				if(self:IsVisible() ~= self:IsDisplayModel()) then
-					self:SetVisible(self:IsDisplayModel())
-				end
 			end
 		end
 	end
@@ -2090,6 +2279,9 @@ function Entity:FrameMove(deltaTime)
 	end
 	if(self.isDynamicPhysicsEnabled) then
 		self:UpdateDynamicPhysics()
+	end
+	if(self.controller) then
+		self.controller:FrameMove(deltaTime);
 	end
 end
 
@@ -2557,6 +2749,30 @@ function Entity:GetPhysicsShape()
 	return self.physicsShape;
 end
 
+-- set speed decay. percentage of motion lost per tick. 
+-- @param surface_decay:  [0,1]. 0 means no speed lost, 1 will lost all speed.  default to 0.5
+function Entity:SetSurfaceDecay(surface_decay)
+	if(self.isDynamicPhysicsEnabled) then
+		if(self.physicsShape == "sphere") then
+			self:SetPhysicalProperty("RollingFriction", surface_decay)
+		else
+			self:SetPhysicalProperty("Friction", surface_decay)
+		end
+	end
+	Entity._super.SetSurfaceDecay(self, surface_decay)
+end
+
+function Entity:GetSurfaceDecay()
+	if(self.isDynamicPhysicsEnabled) then
+		if(self.physicsShape == "sphere") then
+			return self:GetPhysicalProperty("RollingFriction") or 0.5;
+		else
+			return self:GetPhysicalProperty("Friction") or 0.5;
+		end
+	end
+	return Entity._super.GetSurfaceDecay(self)
+end
+
 -- properties that are preserved during saving
 local staticPhysicsProperties = {"Mass", "LinearDamping", "AngularDamping", "GravityX", "GravityY", "GravityZ", "Friction", "RollingFriction", "SpinningFriction"}
 -- @param name: it can be name like "Mass" or a table containing name, value pairs like {LinearVelocityX=1, LinearVelocityY=0, LinearVelocityZ=0}. 
@@ -2666,4 +2882,219 @@ function Entity:SetPhysicsKinematic()
 		self:EnableDynamicPhysics(false)
 		self:EnableDynamicPhysics(true)
 	end
+end
+
+-- stores custom properties for the staticblock, such as tooltip and icon.
+function Entity:SetStaticBlockProperty(key, value)
+	if(self:GetCategory() == "staticblock") then
+		self.staticblockProperties = self.staticblockProperties or {}
+		self.staticblockProperties[key] = value
+	end
+end
+
+function Entity:GetStaticBlockProperty(key)
+	if(self:GetCategory() == "staticblock") then
+		return self.staticblockProperties and self.staticblockProperties[key]
+	end
+end
+
+local mountPointWithActionNames = {
+	["sit"] = L"坐下",
+	["lie"] = L"躺下",
+	-- ["eat"] = L"吃",
+}
+
+-- return the action name of the entity. if there are multiple action names, they are separated by "|" or ",".
+-- use "|" for shared action point and "," for separate action points.
+-- @param index: if given, it will return the index-th action name only, otherwise it will return all names separated by | or ,
+-- @return: nil or string
+function Entity:GetActionName(index)
+	if(self:HasFollowTarget()) then
+		return nil;
+	end
+	local name = self:GetStaticTag("actionname")
+	if(not name or name=="") then
+		if(self:HasMountPoints()) then
+			local player = EntityManager.GetFocus();
+			
+			local mps = self:GetMountPoints()
+			local actionCount = 0
+			for i = 1, mps:GetCount() do
+				local mp = mps:GetMountPoint(i)
+				if mp and mountPointWithActionNames[mp.name] then
+					local mountedEntity = self:GetMountedEntityAt(i);
+					if(not mountedEntity) then
+						actionCount = actionCount + 1
+						if(index) then
+							-- if index is specified, return only that action name
+							if(actionCount == index) then
+								return mountPointWithActionNames[mp.name]
+							end
+						else
+							-- if no index, collect all action names
+							if(not name) then
+								name = mountPointWithActionNames[mp.name]
+							else
+								name = format("%s,%s", name, mountPointWithActionNames[mp.name])
+								-- name = format("%s|%s", name, mountPointWithActionNames[mp.name])
+							end
+						end
+					end
+				end
+			end
+		end
+	elseif(index) then
+		-- if name exists from static tag and index is specified, split and return the index-th item
+		local names = {}
+		for actionName in name:gmatch("[^,|]+") do
+			table.insert(names, actionName:match("^%s*(.-)%s*$")) -- trim whitespace
+		end
+		return names[index]
+	end
+	return name;
+end
+
+-- if there is an action point, return its world position.
+-- if there are multiple action points, return the first one as x,y,z, and return all points in the 4th return value.
+-- @param index: if nil it will return the first one with all remaining ones as points. if index is given, it will return the index-th action point only.
+-- return x, y, z, {{x,y,z}, ...} 
+function Entity:GetActionPoint(index)
+	local name = self:GetStaticTag("actionname")
+	local x, y, z, points;
+	if(not name or name=="") then
+		if(self:HasMountPoints()) then
+			local mps = self:GetMountPoints()
+			local actionCount = 0
+			for i = 1, mps:GetCount() do
+				local mp = mps:GetMountPoint(i)
+				if mp and mountPointWithActionNames[mp.name] then
+					actionCount = actionCount + 1
+					local px, py, pz = mps:GetMountPositionInWorldSpace(i);
+					
+					if(index) then
+						-- if index is specified, only return that action point
+						if(actionCount == index) then
+							return px, py, pz;
+						end
+					else
+						-- if no index, collect all points
+						if(not x) then
+							x, y, z = px, py, pz;
+						else
+							if(not points) then
+								points = {{x,y,z}};
+							end
+							table.insert(points, {px, py, pz});
+						end
+					end
+				end
+			end
+		end
+	end
+	if(not x) then
+		x, y, z = self:GetPosition();
+	end
+	return x, y, z, points;
+end
+
+function Entity:GetActionRadius(index)
+	local name = self:GetStaticTag("actionname")
+	if(name and name~="") then
+		return self.actionRadius or 5;
+	else
+		return math.max(1, self:GetBoundRadius());
+	end
+end
+
+function Entity:SetActionRadius(radius, index)
+	self.actionRadius = radius
+end
+
+function Entity:DoAction(actionIndex)
+	if(not actionIndex or actionIndex == 1) then
+		Entity._super.DoAction(self, actionIndex);
+	else
+		if(self:HasMountPoints()) then
+			local curPlayer = EntityManager.GetFocus()
+			if(curPlayer and curPlayer.MountTo) then
+				local mps = self:GetMountPoints()
+				local actionCount = 0
+				for i = 1, mps:GetCount() do
+					local mp = mps:GetMountPoint(i)
+					if mp and mp.name and mountPointWithActionNames[mp.name] then
+						actionCount = actionCount + 1
+						if actionCount == actionIndex then
+							if(mp.name == "sit" or mp.name == "lie") then
+								local mountedEntity = self:GetMountedEntityAt(i);
+								if(not mountedEntity) then
+									curPlayer:MountTo(self, i);
+									GameLogic.RunCommand("/camera -mode ThirdPersonLookAhead");
+									curPlayer:UnLink()
+									return true;
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function Entity:SetAnimFrame(frame)
+	if(self.animFrame ~= frame) then
+		self.animFrame = frame;
+		local obj = self:GetInnerObject();
+		if(obj) then
+			if(frame) then
+				obj:SetField("AnimFrame", frame or 0);
+				obj:SetField("EnableAnim", false);
+			else
+				obj:SetField("EnableAnim", true);
+			end
+		end
+	end
+end
+
+-- Find file in this entity for FindBlockTask
+-- @param text: search text
+-- @param bExactMatch: if for exact match
+-- @return true, filename: if the file text is found. filename contains the full filename
+function Entity:FindFile(text, bExactMatch)
+	if(text) then
+		local filename = self:GetModelFile();
+		if(filename and ((bExactMatch and filename == text) or (not bExactMatch and filename:find(text, 1, true)))) then
+			return true, filename;
+		end
+	end
+end
+
+
+function Entity:SetFollowTarget(entity)
+	if not entity or entity == self then
+		if self.followController then
+			self.followController:SetFollowTarget(nil)
+			if(self.controller == self.followController) then
+				self.controller = nil
+			end
+		end
+	else
+		-- create follow controller on demand
+		if not self.followController then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/Controllers/FollowController.lua");
+			local FollowController = commonlib.gettable("MyCompany.Aries.Game.EntityManager.Controllers.FollowController");
+			self.followController = FollowController:new():Init(self)
+			self.followController:SetMode("FollowCurrent");
+		end
+		self.followController:SetFollowTarget(entity)
+		self.controller = self.followController;
+	end
+end
+
+function Entity:GetFollowTarget()
+	return self.followController and self.followController:GetFollowTarget()
+end
+
+function Entity:HasFollowTarget()
+	return self.followController and self.followController:HasFollowTarget()
 end

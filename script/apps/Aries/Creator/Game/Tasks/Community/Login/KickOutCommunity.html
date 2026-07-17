@@ -1,0 +1,76 @@
+<!-- script/apps/Aries/Creator/Game/Tasks/Community/Login/KickOutCommunity.html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body> 
+<pe:mcml>
+<script type="text/npl" refresh="false"><![CDATA[
+    local KickOut = NPL.load('(gl)Mod/WorldShare/cellar/Common/KickOut/KickOut.lua')
+    local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+    local ForgetPassword = NPL.load("(gl)Mod/WorldShare/cellar/ForgetPassword/ForgetPassword.lua")
+    local SyncWorld = NPL.load("(gl)Mod/WorldShare/cellar/Sync/SyncWorld.lua")
+    local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop")
+
+    local page = document:GetPageCtrl()
+
+    reason = page:GetRequestParam("reason")
+
+    function get_window_style()
+        return Mod.WorldShare.Utils.FixCenter(400, 445)
+    end
+
+    function reset_password()
+        KickOut.isKickOutPageOpened = false
+        page:CloseWindow()
+
+        ForgetPassword:ShowPage(true)
+    end
+
+    function logout()
+        Desktop.ForceExit(false)
+    end
+
+    function re_login()
+        page:CloseWindow()
+
+        LoginModal:Init(function(bIsSucceed)
+            if not bIsSucceed then
+                logout()
+            end
+
+            KickOut.isKickOutPageOpened = false
+        end,true)
+    end
+
+    function GetTextStyle()
+        if Mod.WorldShare.Utils.IsEnglish() then
+            return "float: left;color: #FFFFFF; width: 380px; font-size: 15px;base-font-size: 15px;margin-top: 16px; text-align: center;"
+        end
+        return "float: left;color: #FFFFFF; width: 340px; font-size: 15px;base-font-size: 15px;margin-top: 16px; text-align: center;"
+    end
+]]></script>
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #141414cc;">
+    <pe:container alignment="_ct" width="500" height="<%=Mod.WorldShare.Utils.IsEnglish() and 300 or 270%>" style="margin-left:-250px;margin-top:-135px;background-color: #2e2e2e; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+        <div style="width: 500px;height: 200px;">
+            <div style="width: 500px;height: 54px;margin-top: 0px; background:url()">
+                <div style="float: left;margin-left: 20px;margin-top: 6px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;"><%=L"提示"%></div>
+                <div onclick="logout()" style="float: left;margin-left: 470px;margin-top: -20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+            </div>
+            <div style="position: relative; width: 500px; height: 1px; margin-left: 0px; margin-top: -2px; background-color: #FFFFFF22"></div>
+            <div style="width: 500px;height: 220px;">
+                <div align="center" style="margin-top: 24px; width: 44px; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#810 4 44 44)"></div>
+                <div align="center" style="<%=GetTextStyle()%>">
+                    <%= L"您的账号在其他地方登录，您已被迫下线，如不是您本人操作，请立即修改密码。"%>
+                </div>
+                <div style="margin-left: 24px; margin-top: 30px;">
+                    <input type="button" value='<%=L"修改密码"%>' onclick="reset_password"  style="color: #ffffff; width: 142px; height: 36px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#818 104 32 32:14 14 14 14)"/>
+                    <input type="button" value='<%=L"直接退出"%>' onclick="logout"  style="float: left; color: #ffffff; margin-left: 12px; width: 142px; height: 36px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#818 104 32 32:14 14 14 14)"/>
+                    <input type="button" value='<%=L"重新登录"%>' onclick="re_login"  style="float: left; color: #ffffff; margin-left: 12px; width: 142px; height: 36px; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"/>
+                </div>                     
+            </div>
+        </div>
+    </pe:container>
+</pe:container>  
+    
+</pe:mcml>
+</body>
+</html>

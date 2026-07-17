@@ -132,9 +132,6 @@ local function block_flow(block_id)
 	if(not block_flow_ids) then
 		block_flow_ids = {
 			[block_types.names.Ladder] = true,
-			--[block_types.names.doorIron] = true,
-			--[block_types.names.signPost] = true,
-			--[block_types.names.reed] = true,
 		};
 	end
 	return block_flow_ids[block_id];

@@ -14,6 +14,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TouchSession.lua");
 NPL.load("(gl)script/ide/System/Core/Color.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
+NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+local Screen = commonlib.gettable("System.Windows.Screen");
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon")
 local Color = commonlib.gettable("System.Core.Color");
@@ -26,6 +28,8 @@ local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local MobileMainPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileMainPage");
+local ActionNameDetector = commonlib.gettable("MyCompany.Aries.Game.Common.ActionNameDetector");
+
 MobileMainPage.DirectionKey = {
 	Up = {"W"},
 	Down ={"S"},
@@ -52,6 +56,7 @@ local key_maps = {
 MobileMainPage.progress_angle = 0
 MobileMainPage.IsRecording = false
 MobileMainPage.IsShowCodeWindow = false
+MobileMainPage.walk_mode = nil -- nil | "slow" | "run" | "normal"
 
 
 local page
@@ -78,6 +83,11 @@ function MobileMainPage.ShowPage(bShow)
         GameLogic.options:SetEnableMouseLeftDrag(false)
         return 
     end
+    local AriesMobilePage = commonlib.gettable("MyCompany.Aries.Dock.AriesMobilePage");
+	if(AriesMobilePage.ShowPage) then
+        AriesMobilePage.ShowPage(false)
+    end
+
     MobileMainPage.bIsShow = true
     MobileMainPage.progress_angle = 0
     MobileMainPage.IsRecording = false
@@ -122,7 +132,22 @@ function MobileMainPage.ShowPage(bShow)
         GameLogic.GetFilters():add_filter("Macro_EndPlay", function()
             MobileMainPage.ShowOperatePanel(true)
         end);
+        GameLogic.GetFilters():add_filter("OnPlayerToggleFly", function(bFly)
+            MobileMainPage.UpdateFlyPanel(bFly)
+        end);
         MobileMainPage.RegisterCodeWindowEvent(true)
+        NPL.load("(gl)script/ide/timer.lua");
+        local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+            if(Screen:GetWidth() > 0) then
+                timer:Change();
+
+                Screen:Connect("sizeChanged", function(width, height)
+                    LOG.std(nil, "info", "MobileMainPage", "adjust position %d, %d", width, height);
+                    MobileMainPage.InitRockerData(true)
+                end);
+            end
+        end})
+	    mytimer:Change(100,300);
         MobileMainPage.BindEvent = true
     end
 end
@@ -158,7 +183,7 @@ end
 
 function MobileMainPage.RegisterCodeWindowEvent(bRegister)
     if bRegister then
-        GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow",MobileMainPage.ShowCodeBlockWindow,MobileMainPage);
+        GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow",MobileMainPage.ShowCodeBlockWindow,MobileMainPage,"MobileMainPage");
         return 
     end
     GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow",MobileMainPage.ShowCodeBlockWindow,MobileMainPage)
@@ -178,19 +203,12 @@ end
 local preX,preY,bUpdate
 function MobileMainPage.UpdateRockerArea(bShow)
     -- mobile_move_button_touch
-    local normalW = 300
-    local normalH = 270
+    local normalW = 230
+    local normalH = 230
     local scaleW = 0.5
 
     local objMoveBtn = ParaUI.GetUIObject("mobile_move_button_touch")
     if objMoveBtn and objMoveBtn:IsValid() then
-        -- if bShow then
-        --     objMoveBtn.scalingx = scaleW
-		-- 	objMoveBtn.scalingy = scaleW
-        -- else
-        --     objMoveBtn.scalingx = 1
-		-- 	objMoveBtn.scalingy = 1
-        -- end
         if bShow then
             objMoveBtn.width = normalW*scaleW
 			objMoveBtn.height = normalH*scaleW
@@ -199,8 +217,8 @@ function MobileMainPage.UpdateRockerArea(bShow)
                 preY = objMoveBtn.y
             end
             bUpdate = true
-            objMoveBtn.x = preX + 75
-            objMoveBtn.y = preY  + 67.5
+            objMoveBtn.x = preX + 58
+            objMoveBtn.y = preY  + 58
         else
             objMoveBtn.width = normalW
 			objMoveBtn.height = normalH
@@ -237,7 +255,31 @@ function MobileMainPage.UpdateQuickBar(bShow)
 end
 
 function MobileMainPage.OnWorldLoaded()
+    commonlib.TimerManager.SetTimeout(function()
+        MobileMainPage.UpdatePage()
+    end,100)
+end
 
+function MobileMainPage.UpdatePage()
+    if (not System.options.isPapaAdventure) then
+        return
+    end
+    local PapaUtils = NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaUtils.lua");
+    local IsPapaWorkWorld = PapaUtils.IsPapaCreate()
+    local pnlOperate = ParaUI.GetUIObject("mobile_operate_right")
+    if pnlOperate and pnlOperate:IsValid() then
+        pnlOperate.visible = true
+        if IsPapaWorkWorld then --(MobileMainPage.IsHomeWorkWorld() and not GameLogic.IsReadOnly()) or
+            pnlOperate.visible = false
+        end
+    end
+end
+
+function MobileMainPage.IsHomeWorkWorld()
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+    local isHomeWorkWorld = WorldCommon.GetWorldTag('isHomeWorkWorld')
+    return isHomeWorkWorld == true or isHomeWorkWorld == "true"
 end
 
 function MobileMainPage.OnWorldUnloaded()
@@ -281,8 +323,6 @@ local function getRect(node)
 end
 
 function MobileMainPage.RefreshByScreenWidth()
-    NPL.load("(gl)script/ide/System/Windows/Screen.lua");
-	local Screen = commonlib.gettable("System.Windows.Screen");
 	local width ,height = Screen:GetWidth(),Screen:GetHeight()
     if width/height > 2 then
         local ui_name_list = {"mobile_operate_panel", "btn_operate_panel", "mobile_move_button_bg", "mobile_move_button_touch","mobile_operate_tip"}
@@ -300,6 +340,16 @@ function MobileMainPage.OnCreated()
     MobileMainPage.InitRocker()
     MobileMainPage.btnCnfs = {}
     local btnCnfs = {}
+
+    local objAction =  ParaUI.GetUIObject("btn_action")
+    if objAction and objAction:IsValid() then
+        objAction.visible = false
+        -- btnCnfs[#btnCnfs + 1] = {name="btn_action",node = objAction,rect = getRect(objAction)}
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ActionNameDetector.lua");
+        local ActionNameDetector = commonlib.gettable("MyCompany.Aries.Game.Common.ActionNameDetector");
+        ActionNameDetector:Connect("actionChanged", MobileMainPage, MobileMainPage.UpdateActionBtn, "UniqueConnection");
+    end
+
     local objJump = ParaUI.GetUIObject("btn_jump")
     if objJump and objJump:IsValid() then
         btnCnfs[#btnCnfs + 1] = {name="btn_jump",node = objJump,rect = getRect(objJump)}
@@ -375,7 +425,7 @@ function MobileMainPage.OnCreated()
     end
     MobileMainPage.RefreshByScreenWidth()
     MobileMainPage.btnCnfs = btnCnfs
-    MobileMainPage.DrawProgressView(objRecord)
+    -- MobileMainPage.DrawProgressView(objRecord)
     if MobileMainPage.IsRecording then
         MobileMainPage.HideCamera(true)
     end
@@ -418,8 +468,12 @@ end
 function MobileMainPage.IsFlying()
     local entityPlayer = GameLogic.EntityManager.GetFocus();
     local isFly = entityPlayer and entityPlayer:IsFlying() 
-    -- print("isFly ======",isFly)
     return isFly == true or isFly == "true"
+end
+
+function MobileMainPage.OnClickUserInfo()
+    GameLogic.RunCommand("/show window.role")
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.mobile.skin");
 end
 
 function MobileMainPage.OnClickChangeGameMode()
@@ -454,6 +508,15 @@ function MobileMainPage.OnClickGameSetting()
 end
 
 function MobileMainPage.OnClickSaveGame()
+    if System.options.isPapaAdventure then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/Lessons/Creation.lua");
+        local Creation = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Lessons.Creation");
+        GameLogic.QuickSave()
+        Creation.submitType = 2
+        Creation:ShowOpusSubmitPage()
+        return
+    end
+
     local dockKey = GameLogic.DockManager:GetDockKey()
     local key = dockKey == "E_DOCK_TUTORIAR" and "commit_work" or "save_world"
     local MobileSaveWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileSaveWorldPage.lua")
@@ -505,14 +568,14 @@ function MobileMainPage.OnClickToggleJump()
     end
 end
 
-function MobileMainPage.UpdateFlyPanel()
+function MobileMainPage.UpdateFlyPanel(isFly)
     local panel_fly = ParaUI.GetUIObject("mobile_fly_back")
     local panel_jump = ParaUI.GetUIObject("mobile_jump_back")
     if panel_fly and panel_fly:IsValid() then
-        panel_fly.visible = MobileMainPage.IsFlying()
+        panel_fly.visible = isFly == nil and MobileMainPage.IsFlying() or isFly == true
     end
     if panel_jump and panel_jump:IsValid() then
-        panel_jump.visible = not MobileMainPage.IsFlying()
+        panel_jump.visible = isFly == nil and not MobileMainPage.IsFlying() or isFly == false
     end
 end
 
@@ -690,9 +753,10 @@ function MobileMainPage.UpdateButonState(touch,name)
         end
     end
 end
--- 移动端处理过touch失效逻辑，不需要检测
+
 function MobileMainPage.StartCheckMouse(btnName)
-    if System.os.GetPlatform() ~="win32" then
+    -- touch mode does not need to check mouse out of range. 
+    if System.os.IsLastTouchMode() then
         return 
     end
     local objNode = ParaUI.GetUIObject(btnName)
@@ -857,8 +921,8 @@ end
     from:TouchMiniKeyboard.lua
 ]]
 
-function MobileMainPage.InitRockerData()
-    if not MobileMainPage.isInitRocker then
+function MobileMainPage.InitRockerData(bRefresh)
+    if not MobileMainPage.isInitRocker or bRefresh then
         local rocker_item_bg = ParaUI.GetUIObject("mobile_move_button_bg")
         local rocker_item = ParaUI.GetUIObject("mobile_move_button")
         if rocker_item and rocker_item:IsValid() then
@@ -869,7 +933,7 @@ function MobileMainPage.InitRockerData()
         end
         if rocker_item_bg and rocker_item_bg:IsValid() then
             MobileMainPage.rock_operate_point_bg = rocker_item_bg
-            MobileMainPage.start_x,MobileMainPage.start_y,MobileMainPage.radius = rocker_item_bg:GetAbsPosition()
+            MobileMainPage.start_x,MobileMainPage.start_y,MobileMainPage.padSize = rocker_item_bg:GetAbsPosition()
         end
         MobileMainPage.isInitRocker = true
     end
@@ -952,6 +1016,9 @@ function MobileMainPage.OnClickRocker(click_x,click_y)
                 end,doubleKeyTime)
             else
                 MobileMainPage.IsClickRocker = false
+                if System.os.GetPlatform()=="win32" then
+                    return
+                end
 				TouchVirtualKeyboardIcon = TouchVirtualKeyboardIcon.GetSingleton()
 				if TouchVirtualKeyboardIcon then
 					local keyboard = TouchVirtualKeyboardIcon:GetKeyBoard()
@@ -1033,6 +1100,7 @@ function MobileMainPage.CheckTouchPoint(x,y)
     
 end
 
+local center_pos = {}
 function MobileMainPage.RefreshRocker(x,y,isDown)
     if not x then
         if MobileMainPage.rock_operate_point then
@@ -1044,13 +1112,18 @@ function MobileMainPage.RefreshRocker(x,y,isDown)
     -- and not MobileMainPage.IsShowCodeWindow
     if isDown and (not MobileMainPage.CheckTouchDirectArea(x,y) or (MobileMainPage.IsShowCodeWindow and MobileMainPage.CheckTouchDirectArea(x,y)))then
         return
+    end    
+    center_pos[1] = MobileMainPage.rocker_real_point.x
+    center_pos[2] = MobileMainPage.rocker_real_point.y
+    MobileMainPage.ChangeMoveState(x, y, center_pos)
+    
+    -- Update running mode based on joystick distance (should be called on every position change)
+    if GameLogic.options.AllowRunning then
+        MobileMainPage.UpdateRunningModeByDistance(x, y, center_pos)
     end
 
-    local center_pos = {MobileMainPage.rocker_real_point.x,MobileMainPage.rocker_real_point.y}
-    MobileMainPage.ChangeMoveState(x, y, center_pos)
-
     local distance = (center_pos[1] - x)*(center_pos[1] - x) + (center_pos[2] - y)*(center_pos[2] - y)
-    local radius = math.floor(MobileMainPage.radius*0.5 + 0.5)
+    local radius = math.floor(MobileMainPage.padSize*0.5 + 0.5)
     local max_distance = radius * radius
     
     if MobileMainPage.rock_operate_point then
@@ -1114,6 +1187,14 @@ function MobileMainPage.StopMoveState()
 		MobileMainPage.SetKeyListState(last_key_name_list, false)
 		MobileMainPage.cur_move_state = nil
 	end
+		-- Restore original speed scale when movement stops
+    if GameLogic.options.AllowRunning then
+        local entity = GameLogic.EntityManager.GetFocus()
+        if entity then
+            entity:SetSpeedScale(GameLogic.options.WalkSpeedScale or 1.0)
+        end
+    end
+    MobileMainPage.walk_mode = nil
 end
 
 function MobileMainPage.SetKeyListState(key_name_list, state)
@@ -1125,6 +1206,48 @@ function MobileMainPage.SetKeyListState(key_name_list, state)
 	end
 end
 
+function MobileMainPage.UpdateRunningModeByDistance(x, y, center_pos)
+    if not GameLogic.options.AllowRunning then
+        return
+    end
+    
+    local entity = GameLogic.EntityManager.GetFocus();
+    if not entity then
+        return
+    end
+    
+    -- Calculate distance from joystick center
+    local distance = math.sqrt((center_pos[1] - x)^2 + (center_pos[2] - y)^2)
+    
+    -- Get joystick radius for distance comparison
+    local radius = math.floor(MobileMainPage.padSize*0.5)
+    
+    -- Calculate distance ratio (0 to 1, where 1 is at the edge of joystick)    
+    local distance_ratio = math.min(distance / radius, 1.0)
+    
+    -- Speed scale calculation and walk mode setting:
+    -- ratio 0-0.2: half speed (0.5x) - slow mode
+    -- ratio 0.2-0.5: normal speed (1.0x) - normal mode  
+    -- ratio 0.5-1.0: linear from 1.0x to 2.0x - run mode
+    local speed_scale
+    local walk_mode
+    if distance_ratio < 0.2 then
+        speed_scale = 0.5
+        walk_mode = "slow"
+    elseif distance_ratio < 0.5 then
+        speed_scale = 1.0
+        walk_mode = "normal"
+    else
+        -- Linear interpolation from 1.0 to 2.0 when ratio goes from 0.5 to 1.0
+        local normalized_ratio = (distance_ratio - 0.5) / 0.5
+        speed_scale = 1.0 + normalized_ratio * 1.0
+        walk_mode = "run"
+    end
+    
+    entity:SetSpeedScale(speed_scale)
+    MobileMainPage.walk_mode = walk_mode
+end
+
 -------------------------
 -- Camera Recorder 
 -------------------------
@@ -1134,7 +1257,7 @@ local touch_timer = nil
 local progressName = "timePrgress"
 local normal = 1.0
 local maxScale = 1.25
-local max_touch_time = 150
+local max_touch_time = 1100
 local touch_delta = 10
 local curR,curG,curB = 255,251,210
 local penColor = "#def2ff"
@@ -1190,7 +1313,7 @@ function MobileMainPage.ShowCameraTip(bShow)
 end
 
 function MobileMainPage.HideCamera(bHide)
-    local pnlOperate = ParaUI.GetUIObject("mobiel_operate_right")
+    local pnlOperate = ParaUI.GetUIObject("mobile_operate_right")
 	local btnCamera = ParaUI.GetUIObject("btn_record_game")
 	if btnCamera then
 		_guihelper.SetUIColor(btnCamera,"#ffffff")
@@ -1204,8 +1327,10 @@ function MobileMainPage.HideCamera(bHide)
 			penColor = "#fffbd2"
             MobileMainPage.ShowCameraTip(false)
 		end
-
 	end
+    if not bHide then
+        MobileMainPage.UpdatePage()
+    end
 end
 
 function MobileMainPage.SetRecord(isRecord)
@@ -1282,7 +1407,7 @@ function MobileMainPage.TouchCamera(bTouch)
 		touch_time = touch_time + touch_delta
 		MobileMainPage.progress_angle = MobileMainPage.progress_angle + angle_delta
 		MobileMainPage.UpdatePenColor(timer)
-		if touch_time > max_touch_time then
+		if touch_time - max_touch_time > touch_delta then
 			MobileMainPage.HideCamera(true)
 			local RecordAnimation = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/RecordAnimation.lua") 
     		RecordAnimation.ShowView(function()
@@ -1323,16 +1448,77 @@ end
 local nodeCnf = {
     _lt = "MobileMainPage.operate_lt",
     _lb = "mobile_move_node",
-    _rt = "mobiel_operate_right",
+    _rt = {"mobile_operate_right","mobiel_operate_record"},
     _rb = "MobileMainPage.operate_rb"
 }
 function MobileMainPage.ShowButtonsByAlign(align,bShow)
     if align and align ~= "" and nodeCnf[align] then
         local name = nodeCnf[align]
-        local align_node = ParaUI.GetUIObject(name)
-        if not align_node:IsValid() then
+        if type(name) == "string" then
+            local align_node = ParaUI.GetUIObject(name)
+            if not align_node:IsValid() then
+                return
+            end
+            align_node.visible = bShow == true
             return
         end
-        align_node.visible = bShow == true
+        if type(name) == "table" then
+            for k,v in pairs(name) do
+                local align_node = ParaUI.GetUIObject(v)
+                if not align_node:IsValid() then
+                    return
+                end
+                align_node.visible = bShow == true
+            end
+            
+            return
+        end 
+    else
+        for _,value in pairs(nodeCnf) do
+            if type(value) == "string" then
+                local align_node = ParaUI.GetUIObject(value)
+                if not align_node:IsValid() then
+                    return
+                end
+                align_node.visible = bShow == true
+            elseif type(value) == "table" then
+                for _,value2 in pairs(value) do
+                    local align_node = ParaUI.GetUIObject(value2)
+                    if not align_node:IsValid() then
+                        return
+                    end
+                    align_node.visible = bShow == true
+                end
+            end
+        end
+    end
+end
+
+function MobileMainPage.SetRokerVisible(visible)
+    local mobile_move_node = ParaUI.GetUIObject("mobile_move_node")
+    if not mobile_move_node:IsValid() then
+        return
+    end
+    mobile_move_node.visible = visible == true
+end
+
+function MobileMainPage.OnClickAction()
+    if(ActionNameDetector.IsEnabled) then
+        ActionNameDetector:UpdateDetection();
+        ActionNameDetector:TriggerCurrentAction();
+    end
+end
+
+function MobileMainPage:UpdateActionBtn(actionname, entity)
+    local objAction = ParaUI.GetUIObject("btn_action")
+    if objAction and objAction:IsValid() then
+        if actionname and actionname ~= "" then
+            -- Split by | and take the first part
+            local firstAction = string.match(actionname, "([^|]*)")
+            objAction.text = firstAction or actionname
+            objAction.visible = true
+        else
+            objAction.visible = false
+        end
     end
 end

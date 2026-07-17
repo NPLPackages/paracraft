@@ -36,6 +36,7 @@ function GUIChat:PrintChatMessage(chatMsg)
 	if(chatMsg) then
 		-- TODO: print with more styles
 		local text = chatMsg:ToString();
+		text = MyCompany.Aries.Chat.BadWordFilter.FilterString(text);
 		BroadcastHelper.PushLabel({id="GUIChat"..tostring(self:GetCycledId()), label = text, max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 		ChatChannel.AppendChat({ChannelIndex=ChatChannel.EnumChannels.NearBy, from=nil, words=text});
 	end

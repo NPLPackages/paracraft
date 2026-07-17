@@ -169,7 +169,7 @@ function Desktop.OnActivateDesktop(mode)
 
 	Desktop.SelectSceneContext();
 	GameLogic.GetPlayerController():InitMainPlayerHandTool();
-
+	
 	if(not System.options.mc and type(commonlib.getfield("MyCompany.Aries.Pet.EnterIndoorMode")) == "function") then
 		MyCompany.Aries.Pet.EnterIndoorMode(System.User.nid);
 	end
@@ -184,14 +184,13 @@ function Desktop.OnActivateDesktop(mode)
 	if(bIgnoreDefaultDesktop) then
 		return;
 	end
-	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
 	if(not Desktop.bSkipDefaultDesktop) then
 		Desktop.ShowAllAreas();
 		if(isToggleMode) then
 			if(Desktop.mode == "editor") then
 				GameLogic.AddBBS("desktop", L"进入编辑模式", 3000, "0 255 0");
 			else
-				GameLogic.AddBBS("desktop", IsMobileUIEnabled and L"进入游戏模式" or L"进入播放模式", 3000, "255 255 0");
+				GameLogic.AddBBS("desktop", L"进入播放模式", 3000, "255 255 0");
 			end
 		end
 		Desktop.mode = mode;
@@ -358,6 +357,18 @@ function Desktop.OnLeaveWorld(bForceExit, bRestart)
 	end
 end
 
+--double click to exit app in 2 min
+function Desktop.ResetExitValue()
+	if Desktop.delayTimer then
+		Desktop.delayTimer:Change()
+		Desktop.delayTimer = nil
+	end
+	local delaytime = 5*1000
+	Desktop.delayTimer = commonlib.TimerManager.SetTimeout(function()
+		Desktop.is_exiting = false
+	end,delaytime)
+end
+
 -- when the user clicks the close button on the window title. 
 function Desktop.OnExit(bForceExit, bRestart)
 	bForceExit = bForceExit == true;
@@ -387,7 +398,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 			end
 
 			Desktop.is_exiting = true;
-
+			Desktop.ResetExitValue()
 			local dialog = {
 				text = L"确定要退出当前世界么？", 
 				callback = function(res)
@@ -407,22 +418,35 @@ function Desktop.OnExit(bForceExit, bRestart)
 					end
 				end
 			};
-			local func = function()
-				local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog, bRestart);			
-				if(dialog and dialog.callback and dialog.text) then
-					_guihelper.MessageBox(dialog.text, 
-						dialog.callback,dialog.messageBoxButton or _guihelper.MessageBoxButtons.YesNoCancel);
-				end
-			end
 
-			local CourseEvaluation = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/CourseEvaluation/CourseEvaluation.lua") 
-			if CourseEvaluation then
-				CourseEvaluation.ShowView(function()
-					func()
-				end)
+			if not Game.is_started and System.options.isEducatePlatform then
 				return
 			end
-			func()
+			local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog, bRestart);			
+			if(dialog and dialog.callback and dialog.text) then
+				_guihelper.MessageBox(dialog.text, 
+					dialog.callback,dialog.messageBoxButton or _guihelper.MessageBoxButtons.YesNoCancel);
+			end
+			--暂时去掉课程评价
+			-- local func = function()
+			-- 	if not Game.is_started and System.options.isEducatePlatform then
+			-- 		return
+			-- 	end
+			-- 	local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog, bRestart);			
+			-- 	if(dialog and dialog.callback and dialog.text) then
+			-- 		_guihelper.MessageBox(dialog.text, 
+			-- 			dialog.callback,dialog.messageBoxButton or _guihelper.MessageBoxButtons.YesNoCancel);
+			-- 	end
+			-- end
+
+			-- local CourseEvaluation = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/CourseEvaluation/CourseEvaluation.lua") 
+			-- if CourseEvaluation then
+			-- 	CourseEvaluation.ShowView(function()
+			-- 		func()
+			-- 	end)
+			-- 	return
+			-- end
+			-- func()
 		end
 	else
 		if(bForceExit or Desktop.is_exiting) then
@@ -442,7 +466,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 				return
 			end
 			Desktop.is_exiting = true;
-
+			Desktop.ResetExitValue()
 			local dialog = {
 				text = string.format(L"%d秒内您没有保存过世界. <br/>退出前, 是否保存世界？", GameLogic.options:GetElapsedUnSavedTime()/1000), 
 				callback = function(res)
@@ -485,7 +509,11 @@ function Desktop.OnExit(bForceExit, bRestart)
 				MobileSaveWorldPage.ShowPage("exit_world", dialog.callback)
 				dialog = nil
 			else
-				dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog);
+				if not Game.is_started and System.options.isEducatePlatform then
+					dialog = nil
+				else
+					dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog);
+				end
 			end
 
 			if(dialog and dialog.callback and dialog.text) then
@@ -504,7 +532,9 @@ function Desktop.ForceExit(bRestart)
 
 	if (platform == "android" or platform == "ios" ) then
 		local function Restart()
-			GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
+			if (GameLogic.events) then
+				GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
+			end
 			-- disable close on these platform. 
 			MyCompany.Aries.Game.Exit();
 			-- soft restart the NPL runtime state to login screen. 
@@ -522,7 +552,9 @@ function Desktop.ForceExit(bRestart)
 			Restart();
 		end
 	elseif (System.options.IsMobilePlatform) then
-		GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
+		if (GameLogic.events) then
+			GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
+		end	
 		MyCompany.Aries.Game.Exit();
 		-- soft restart the NPL runtime state to login screen. 
 		Map3DSystem.App.Commands.Call("Profile.Aries.MobileRestart");

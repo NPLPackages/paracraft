@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="UserBirthDate.lua" ><![CDATA[
+    local UserBirthDate = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/Setting/UserBirthDate.lua")
+    UserBirthDate.OnInit()
+
+    function close()
+        UserBirthDate.OnClose()
+    end
+
+    function getAllYears()
+        local years = {}
+        for i = 1924, 2024 do
+            table.insert(years, {text=tostring(i), value=tostring(i)})
+        end
+        return years
+    end
+
+    function getAllMonths()
+        local months = {}
+        for i = 1, 12 do
+            table.insert(months, {text=tostring(i), value=tostring(i)})
+        end
+        return months
+    end
+
+    function getAllDays()
+        return UserBirthDate.GetDays()
+    end
+
+    function onSelectYear(name,value)
+        UserBirthDate.OnSelectYear(name,value)
+    end
+
+    function onSelectMonth(name,value)
+        UserBirthDate.OnSelectMonth(name,value)
+    end
+
+    function onSelectDay(name,value)
+        UserBirthDate.OnSelectDay(name,value)
+    end
+
+    function setbirthdate()
+        UserBirthDate.SetBirthDate()
+    end
+
+    function getCurYear()
+        return tostring(UserBirthDate.GetCurYear()) or ""
+    end
+
+    function getCurMonth()
+        return tostring(UserBirthDate.GetCurMonth()) or ""
+    end
+
+    function getCurDay()
+        return tostring(UserBirthDate.GetCurDay()) or ""
+    end
+
+
+
+]]></script>
+    <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000000;">
+        <pe:container alignment="_ct" width="540" height="310" style="margin-left:-320px;margin-top:-210px;background: ;">
+            <div style="position: relative; width: 540px; height: 310;">
+                <div zorder="-1" style="position: relative; width: 540px; height: 48px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/wtitle_32x32_32bits.png:14 14 14 14);">
+                    <div style="position: relative; font-size: 16px; base-font-size: 16px; font-weight: bold; color: #ffffff; margin-left: 16px; margin-top: 10px;"><%=L"生日设定"%></div>
+                    <input type="button" value="" onclick="close()" style="position: relative; margin-left: 504px; margin-top: 12px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/Mobile/server/guanbi_44x44_32bits.png#0 0 44 44);" />
+                </div>
+                <div zorder="-2" style="position: relative; width: 540px; height: 310; background: url(Texture/Aries/Creator/keepwork/Mobile/server/wbg_32x32_32bits.png:14 14 14 14);"></div>
+            </div>
+            <!--  -->
+            <div align="center" style="margin-top: 48px; width: 500px; height: 300px; background: url();">
+                <div style="color: #D3D3D3; font-size: 14px; base-font-size: 14px; margin-top: 32px; margin-left: 70px;">
+                    <%=L"请选择您的生日，以验证您的年龄符合产品要求："%><br/><%=L"* 本生日一经设定，无法修改。"%>
+                </div>
+                <div style="width: 430px; height: 40px; margin-top: 24px; margin-left: 70px;">
+                    <div style="float: left; width: 122px; height:40px ; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#859 104 32 32:14 14 14 14);">
+                        <select name = "years" 
+                            AllowUserEdit="false" 
+                            onselect="onSelectYear" 
+                            DataSource="<%=getAllYears()%>" 
+                            value="<%=getCurYear()%>"
+                            fontcolor="#D9D9D9" 
+                            dropX="-20" 
+                            dropY="8" 
+                            dropWidth="12" 
+                            dropHeight="12" 
+                            dropBg="Texture/Aries/Creator/keepwork/community_32bits.png#434 106 8 8" 
+                            contentBg="" 
+                            style="float: left; margin-top: 8px; margin-left: 12px; width: 110px; height:34px ;">
+                        </select>
+                    </div>
+                    
+                    <div style="float: left;color: #D3D3D3; font-size: 14px; base-font-size: 14px; margin-top: 10px; margin-left: 12px;"><%=L"年"%></div>
+                    <div style="float: left; margin-left: 20px; width: 80px; height:40px ; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#859 104 32 32:14 14 14 14);">
+                        <select name = "months" 
+                            AllowUserEdit="false" 
+                            value="<%=getCurMonth()%>"
+                            onselect="onSelectMonth" 
+                            DataSource="<%=getAllMonths()%>" 
+                            fontcolor="#D9D9D9" 
+                            dropX="-20" 
+                            dropY="8" 
+                            dropWidth="12" 
+                            dropHeight="12" 
+                            dropBg="Texture/Aries/Creator/keepwork/community_32bits.png#434 106 8 8" 
+                            contentBg="" 
+                            style="float: left; margin-top: 8px; margin-left: 12px; width: 68px; height:34px ;">
+                        </select>
+                    </div>
+                    <div style="float: left;color: #D3D3D3; font-size: 14px; base-font-size: 14px; margin-top: 10px; margin-left: 12px;"><%=L"月"%></div>
+                    <div style="float: left; margin-left: 20px; width: 80px; height:40px ; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#859 104 32 32:14 14 14 14);">
+                        <select name = "days" 
+                            AllowUserEdit="false" 
+                            onselect="onSelectDay" 
+                            value="<%=getCurDay()%>"
+                            DataSource="<%=getAllDays()%>" 
+                            fontcolor="#D9D9D9" 
+                            dropX="-20" 
+                            dropY="8" 
+                            dropWidth="12" 
+                            dropHeight="12" 
+                            dropBg="Texture/Aries/Creator/keepwork/community_32bits.png#434 106 8 8" 
+                            contentBg="" 
+                            style="float: left; margin-top: 8px; margin-left: 12px; width: 68px; height:34px ;">
+                        </select>
+                    </div>
+                    <div style="float: left;color: #D3D3D3; font-size: 14px; base-font-size: 14px; margin-top: 10px; margin-left: 12px;"><%=L"日"%></div>
+                </div>
+                <div align='center'
+                        style='margin-top: 32px;
+                            width: 198px'>
+                    <input type='button'
+                            style='width: 92px;
+                                    height: 40px;
+                                    float: left;
+                                    color: #ffffff;
+                                    background-color: #404BF5; 
+                                    background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);'
+                            value='<%= L"确定" %>'
+                        onclick='setbirthdate()' />
+                    <input type='button'
+                        style='margin-left: 12px;
+                                width: 92px;
+                                height: 40px;
+                                float: left;
+                                color: #ffffff;
+                                background: url(Texture/Aries/Creator/keepwork/community_32bits.png#842 146 32 32:14 14 14 14);'
+                        value='<%= L"取消" %>'
+                        onclick='close()' />
+                </div>
+            </div>
+        </pe:container>
+    </pe:container> 
+</pe:mcml>
+</body>
+</html>

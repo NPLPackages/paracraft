@@ -17,6 +17,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
+local band = mathlib.bit.band;
 
 local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block"), commonlib.gettable("MyCompany.Aries.Game.blocks.BlockArrow"));
 
@@ -73,6 +74,8 @@ end
 -- @param axis: "x|y|z", if nil, it should default to "y" axis
 -- @return the rotated block data. 
 function block:RotateBlockData(blockData, angle, axis)
+	local highColorData = band(blockData, 0xff00)
+	blockData = band(blockData, 0xff);
 	axis = axis or "y"
 	-- rotation around axis
 	if(axis == "y") then
@@ -84,5 +87,5 @@ function block:RotateBlockData(blockData, angle, axis)
 	else
 		-- TODO: for other axis;
 	end
-	return blockData;
+	return blockData + highColorData;
 end

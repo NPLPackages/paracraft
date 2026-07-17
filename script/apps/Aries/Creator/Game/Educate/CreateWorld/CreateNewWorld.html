@@ -170,6 +170,11 @@
                     end
 
                     function OnWorldTerrainChange()
+                        local isMini = CreateNewWorld:IsMiniWorldScope()
+                        if isMini then
+                            page:Refresh(0);
+                            return
+                        end
                         local isNormal = CreateNewWorld:IsNormalTerrain()
                         if isNormal then
                             CreateNewWorld:SetWorldTerrain("random")
@@ -199,7 +204,11 @@
                         local isMini = CreateNewWorld:IsMiniWorldScope()
                         local isNormal = CreateNewWorld:IsNormalTerrain()
                         CreateNewWorld.HideMiniCreateModul = isMini
+                        --print("ddddd===",isMini,isNormal)
                         CreateNewWorld.OnClickCreateWorld()
+                        NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Competition/CompetitionManager.lua")
+                        local CompetitionManager = commonlib.gettable("MyCompany.Aries.Game.Educate.Competete.Manager")
+                        CompetitionManager:ClearCompeteData()
                     end
 
                     local isMini = CreateNewWorld:IsMiniWorldScope()
@@ -219,6 +228,7 @@
                         if ctrl then
                             ctrl.visible = false
                         end
+                        CreateNewWorld.LastWorldName = Page:GetUIValue("new_world_name", "");
                     end
                 ]]>
             </script>
@@ -267,7 +277,7 @@
                                 <div style="float: left;width: 2px;height:25px;margin-left: 32px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/fengexian_2x25_32bits.png#0 0 2 25)"/>
                                 <div style="float: left;margin-left:32px;margin-top:-11px;width:303px;height:46px;">
                                     <div style = "width:303px;height:46px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/shurukuang_46x46_32bits.png#0 0 46 46:16 16 16 16);">
-                                        <input type="text" SkipAutoBadWordFilter="true" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" EmptyText='<%= L"给你的世界取个名字吧" %>' onchange='update_status' onkeyup="OnWorldNameChange" style="margin-top:11px;margin-left:14px;width:300px;height:25px;font-size: 16px;font-weight: bold;color:#0e1627;background: url()"/>
+                                        <input type="text" SkipAutoBadWordFilter="true" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" EmptyText='<%= L"给你的世界取个名字吧" %>' onchange='update_status'  style="margin-top:11px;margin-left:14px;width:300px;height:25px;font-size: 16px;font-weight: bold;color:#0e1627;background: url()"/>
                                     </div>
                                     <pe:container name = "world_name_error_tip" visible = "false" style="margin-top: 5px;
                                                 color: #ff0000;
@@ -289,14 +299,14 @@
                                 <div style="float: left;width: 2px;height:25px;margin-left: 32px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/fengexian_2x25_32bits.png#0 0 2 25)"/>
                                 <div style = "float: left;margin-left:32px;margin-top:-11px;width:303px;height:46px;background-color: #0e162700;">
                                     <input type="checkbox" checked="<%=IsMiniWorldScope()%>" onclick="OnWorldScopeChange" 
-                                    style="float: left;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
-                                    <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                        name="checkbox_smallworld" style="float: left;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24"/>
+                                    <div for="checkbox_smallworld" style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
                                         <%= L"小型" %>
                                     </div>
 
                                     <input type="checkbox" checked="<%=not IsMiniWorldScope()%>" onclick="OnWorldScopeChange" 
-                                    style="float: left;margin-left: 70px;;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
-                                    <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                        name="checkbox_bigworld" style="float: left;margin-left: 70px;;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24"/>
+                                    <div for="checkbox_bigworld" style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
                                         <%= L"大型" %>
                                     </div>
                                 </div>
@@ -313,8 +323,8 @@
                                 <pe:if condition = "<%=IsMiniWorldScope()%>">
                                     <div style = "float: left;margin-top: -11px;margin-left:32px;margin-top:-11px;width:303px;height:46px;background-color: #0e162700;">
                                         <input type="checkbox" checked="true" onclick="OnWorldTerrainChange" 
-                                        style="float: left;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
-                                        <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                            name="checkbox_flat" style="float: left;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24"/>
+                                        <div for="checkbox_flat" style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
                                             <%= L"平坦" %>
                                         </div>
                                     </div>
@@ -322,20 +332,21 @@
                                 <pe:if condition = "<%=not IsMiniWorldScope()%>">
                                     <div style = "float: left;margin-top: -11px;margin-left:32px;margin-top:-11px;width:303px;height:46px;background-color: #0e162700;">
                                         <input type="checkbox" checked="<%=IsNormalTerrain()%>" onclick="OnWorldTerrainChange" 
-                                        style="float: left;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
-                                        <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                            name="checkbox_flat" style="float: left;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24"/>
+                                        <div for="checkbox_flat" style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
                                             <%= L"平坦" %>
                                         </div>
 
                                         <input type="checkbox" checked="<%=not IsNormalTerrain()%>" onclick="OnWorldTerrainChange" 
-                                        style="float: left;margin-top: 11px;margin-left: 70px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
-                                        <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                            name="checkbox_random" style="float: left;margin-top: 11px;margin-left: 70px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24"/>
+                                        <div for="checkbox_random" style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
                                             <%= L"随机" %>
                                         </div>
                                     </div>
                                 </pe:if>
                             </div>
-                            <div style="margin-left: 78px;margin-top: 118px;">
+                            
+                            <div style="margin-left: 78px;margin-top: 88px;">
                                 <input type="button"
                                 uiname="CreateNewWorld.OnClickCreateWorld"
                                 value='<%= L"确 定" %>'
@@ -351,51 +362,8 @@
                                         text-shadow:true;
                                         background:url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/daquedin_46x46_32bits.png#0 0 46 46:16 16 16 16)"
                                 onclick="OnClickCreateWorld"/>
-                            </div>
-                            <!-- <div style="margin-top:30px;">
-                                <div style="float: left;
-                                            margin-top: 2px;
-                                            color: #FFFFFF;
-                                            font-weight: bold;
-                                            font-size: 14px;">
-                                    <%=L"初始地形" %>
-                                </div>
-                                <input type="button" uiname="CreateNewWorld.terrain_1" value='<%=L"超平坦" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",1) %>' onclick="OnClickModify" param1="terrain" param2="1"/>
-                                <input type="button" uiname="CreateNewWorld.terrain_2" value='<%=L"随机地形" %>' style="float:left;margin-left:10px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",2) %>' onclick="OnClickModify" param1="terrain" param2="2"/>
-                                <input type="button" uiname="CreateNewWorld.terrain_3" value='<%=L"空" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",3) %>' onclick="OnClickModify" param1="terrain" param2="3"/>
-                                <input type="button" uiname="CreateNewWorld.terrain_5" value='<%=L"迷你地块" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",5) %>' onclick="OnClickModify" param1="terrain" param2="5"/>
-                                <input type="button" uiname="CreateNewWorld.terrain_4" value='<%=L"并行世界" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",4) %>' onclick="OnClickModify" param1="terrain" param2="4"/> -->
-                            </div>
+                            </div>                           
                         </div>
-                        <!-- <div style="height: 45px;
-                                    margin-top: 8px;
-                                    margin-bottom: 10px;">
-                            <input type="button"
-                                uiname="CreateNewWorld.OnClickCreateWorld"
-                                value='<%= L"创建新世界" %>'
-                                style="spacing: 20px;
-                                        margin-left: 180px;
-                                        height: 40px;
-                                        min-width: 120px;
-                                        font-size: 18px;
-                                        font-weight: bold;
-                                        color: #ffffff;
-                                        shadow-quality: 8;
-                                        shadow-color: #80133f48;
-                                        text-shadow:true;"
-                                class="mc_light_orange_button_with_fillet"
-                                onclick="MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnClickCreateWorld"/>
-                            <input type="button"
-                                uiname="CreateNewWorld.ReturnLastStep"
-                                value='<%=L"返回" %>'
-                                spacing="10"
-                                style="margin-left: 160px;
-                                        margin-top: 6px;
-                                        height: 32px;
-                                        min-width: 100px;"
-                                class="mc_light_grey_button_with_fillet"
-                                onclick="ReturnLastStep"/>
-                        </div> -->
                     </div>
                 </div>
             </pe:container>

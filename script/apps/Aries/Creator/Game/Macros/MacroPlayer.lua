@@ -1870,7 +1870,7 @@ function MacroPlayer.OnSoundStartsPlaying()
     end
     
     local sound_icon = page:FindControl("soundIcon")
-    if sound_icon:IsValid() then
+    if sound_icon and sound_icon:IsValid() then
         if sound_icon.visible then
             return
         end
@@ -1887,13 +1887,13 @@ function MacroPlayer.OnSoundStartsPlaying()
             local sound_icon = page:FindControl("soundIcon")
             if not SoundManager:IsPlayTextSoundPlaying() then
                 MacroPlayer.SoundIconTimer:Change();			
-                if sound_icon:IsValid() then
+                if sound_icon and sound_icon:IsValid() then
                     sound_icon.visible = false
                 end
                 return
             end
     
-            if sound_icon:IsValid() then
+            if sound_icon and sound_icon:IsValid() then
                 change_index = change_index == 1 and 2 or 1
                 local background = string.format("Texture/Aries/Quest/laba%s_48x46_32bits.png;0 0 48 46", change_index)
                 sound_icon.visible = true

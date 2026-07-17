@@ -69,6 +69,22 @@ function SelectBlocksManipContainer:createChildren()
 	self.axisManip = AxisManip:new():init(self);
 end
 
+-- mouseButton: "right" or "left"
+function SelectBlocksManipContainer:doSelectObj(mouseButton)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ScreenRectSelector.lua");
+	local ScreenRectSelector = commonlib.gettable("MyCompany.Aries.Game.GUI.Selectors.ScreenRectSelector");
+	self.selector = ScreenRectSelector:new():Init(5, 5, mouseButton);
+	self.selector:BeginSelect(function(mode, left, top, width, height)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ObjectSelectPage.lua");
+		local ObjectSelectPage = commonlib.gettable("MyCompany.Aries.Game.GUI.ObjectSelectPage");
+		if(mode == "selected") then
+			ObjectSelectPage.SelectByScreenRect(left, top, width, height);
+		else
+			ObjectSelectPage.CloseWindow();
+		end
+	end)
+end
+
 function SelectBlocksManipContainer:mousePressEvent(event)
 	self.isFaceMode = false;
 	self.op_mode = nil;
@@ -94,24 +110,16 @@ function SelectBlocksManipContainer:mousePressEvent(event)
 			self.op_mode = "create";
 		elseif(Keyboard:IsCtrlKeyPressed())  then
 			self.op_mode = "selectobj";
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ScreenRectSelector.lua");
-			local ScreenRectSelector = commonlib.gettable("MyCompany.Aries.Game.GUI.Selectors.ScreenRectSelector");
-			self.selector = ScreenRectSelector:new():Init(5,5,"right");
-			self.selector:BeginSelect(function(mode, left, top, width, height)
-				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ObjectSelectPage.lua");
-				local ObjectSelectPage = commonlib.gettable("MyCompany.Aries.Game.GUI.ObjectSelectPage");
-				if(mode == "selected") then
-					ObjectSelectPage.SelectByScreenRect(left, top, width, height);
-				else
-					ObjectSelectPage.CloseWindow();
-				end
-			end)
+			self:doSelectObj("right");
 		end
 	elseif(setting == "DeleteBlock") then
 		if(Keyboard:IsShiftKeyPressed())  then
 			self.op_mode = "delete";
 		elseif(Keyboard:IsCtrlKeyPressed())  then
 			self.op_mode = "select";
+		elseif(self.enableLeftButtonSelectObjects) then
+			self.op_mode = "selectobj";
+			self:doSelectObj("left");
 		end
 	end
 
@@ -119,8 +127,14 @@ function SelectBlocksManipContainer:mousePressEvent(event)
 		local result = SelectionManager:MousePickBlock();
 		if(result.blockX and (not result.entity or result.entity:IsBlockEntity())) then
 			local x, y, z = result.blockX, result.blockY, result.blockZ;
+
+			if( not GameLogic.CreateGetEditableWorld():IsEditableBlock(x, y, z)) then
+				return
+			end
+
 			self.block_id = result.block_id;
 			self.block_data = BlockEngine:GetBlockData(x,y,z);
+			self.entity_data = BlockEngine:GetBlockEntityData(x,y,z);
 			if(self.isFaceMode) then
 				x,y,z = BlockEngine:GetBlockIndexBySide(x, y, z, result.side)
 			end
@@ -149,11 +163,12 @@ function SelectBlocksManipContainer:mouseReleaseEvent(event)
 		for i, b in ipairs(selected_blocks) do
 			b[4] = self.block_id;
 			b[5] = self.block_data;
+			b[6] = self.entity_data;
 		end
 		local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blocks = selected_blocks})
 		task:Run();
 		event:accept();
-		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",selected_blocks)
+		GameLogic.GetFilters():apply_filters("BatchModifyBlocks",selected_blocks)
 	elseif(self.op_mode == "select") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 		local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");

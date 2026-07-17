@@ -200,15 +200,17 @@ end
 
 local function activate()
 	local msg = msg;
-	local id = msg.nid or msg.tid;
+	if msg then
+		local id = msg.nid or msg.tid;
 
-	if(id) then
-		local connection = Connections:GetConnection(id);
-		if(connection) then
-			connection:OnNetReceive(msg);
-		elseif(msg.tid) then
-			-- this is an incoming connection. let the server listener to handle it. 
-			ServerListener:OnAcceptIncomingConnection(msg);
+		if(id) then
+			local connection = Connections:GetConnection(id);
+			if(connection) then
+				connection:OnNetReceive(msg);
+			elseif(msg.tid) then
+				-- this is an incoming connection. let the server listener to handle it. 
+				ServerListener:OnAcceptIncomingConnection(msg);
+			end
 		end
 	end
 end

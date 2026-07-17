@@ -10,6 +10,8 @@ local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
 local api = CodeAPI:new(codeBlock);
 -------------------------------------------------------
 ]]
+NPL.PostLoad(function()
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Events.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_MotionLooks.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sensing.lua");
@@ -17,6 +19,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Sound.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Data.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Control.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI_Microbit.lua");
+end)
 
 -- all public environment methods. 
 local s_env_methods = {
@@ -129,6 +132,8 @@ local s_env_methods = {
 	"delete",
 	"run",
 	"runForActor",
+	"runTask",
+	"runTaskOn",
 	"becomeAgent",
 	"setOutput",
 
@@ -184,7 +189,30 @@ local s_env_methods = {
     "microbit_display_show",
     "microbit_display_scroll",
 	"microbit_display_clear",
+
+	-- mqtt
+	"mqtt_connect",
+	"mqtt_subscribe",
+	"mqtt_publish",
+
+	-- serial port
+	"serialport_send",
+
+	-- udp
+	"udp_open",
+	"udp_broadcast",
+	"udp_send",
+	"udp_recv",
+
+	-- personal page data
+	"loadPersonalPageData",
+	"savePersonalPageData",
+	"deletePersonalPageData",
+	"savePersonalPageDataTimeSeries",
+
+	"saveDataToFile",
 }
+
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");

@@ -16,6 +16,8 @@ local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.P
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
+local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+
 local KeepWorkSingleItem = NPL.export()
 
 local startX,startY
@@ -35,7 +37,7 @@ function KeepWorkSingleItem.ShowNotification(item_data,posParams)
 		_notification:AttachToRoot();
 	end
 	
-	_notification.visible = true;
+	_notification.visible = false;
 	
 	local _ownerDrawCanvas = _notification:GetChild("OwnerDrawCanvas");
 	if(_ownerDrawCanvas:IsValid() == true) then
@@ -49,7 +51,12 @@ function KeepWorkSingleItem.ShowNotification(item_data,posParams)
     end
     _ownerDrawCanvas:RemoveAll();
     
-    local NotificationPage = System.mcml.PageCtrl:new({url = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkSingleItem.html"});
+    local notificationUrl = "script/apps/Aries/Creator/Game/KeepWork/KeepWorkSingleItem.html";
+    local http_env = HttpWrapper.GetDevVersion()
+    if true then
+        notificationUrl = "script/apps/Aries/Creator/Game/KeepWorkMall/KeepWorkSingleItem.html"
+    end
+    local NotificationPage = System.mcml.PageCtrl:new({url = notificationUrl});
     NotificationPage:Create("AriesNotificationPage", _ownerDrawCanvas, "_fi", 0, 0, 0, 0);
 	
 	if _notification:IsValid() then
@@ -91,6 +98,10 @@ function KeepWorkSingleItem.DoNotificationTimer()
             _notification.visible = false;
             KeepWorkSingleItem.item_data = nil
         end); 
+        commonlib.TimerManager.SetTimeout(function()
+            _notification.visible = true;
+        end, 100)
+        
         UIAnimManager.PlayDirectUIAnimation(block);
     end
 end
@@ -130,10 +141,22 @@ function KeepWorkSingleItem.GetModelFile()
 		else
 			return nil
 		end
-		local filepath = PlayerAssetFile:GetValidAssetByString(filename)
-		if not filepath and filename then
-			filepath = Files.GetTempPath()..filename
-		end
+
+        local filepath 
+        if not GameLogic.isRemote then
+            filepath = PlayerAssetFile:GetValidAssetByString(filename)
+        end
+        if item_data.id > 0 and item_data.userId and item_data.userId > 0 then
+            filepath = nil
+        end
+        if (not filepath and filename) or (GameLogic.isRemote and filename) then
+            if not filename:match("character/") then
+                filepath = Files.GetTempPath()..filename
+            else
+                filepath = filename
+            end
+            ParaAsset.LoadParaX("", filepath):UnloadAsset();
+        end
 	
 		local ReplaceableTextures, CCSInfoStr, CustomGeosets;
 	
@@ -141,7 +164,7 @@ function KeepWorkSingleItem.GetModelFile()
 		if skin then
 			CustomGeosets = skin
 		elseif(PlayerAssetFile:IsCustomModel(filepath)) then
-			CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
+			CCSInfoStr = PlayerAssetFile:GetDefaultCCSString(filepath)
 		elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 			-- TODO:  hard code worker skin here
 			ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};

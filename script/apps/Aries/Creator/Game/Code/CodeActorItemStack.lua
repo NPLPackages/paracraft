@@ -115,7 +115,7 @@ function CodeActorItemStack:CreateMovieActor()
 	local movieEntity = self:GetMovieEntity();
 	if(movieEntity) then
 		local itemStack = movieEntity:GetFirstActorStack();
-		local item = itemStack:GetItem();
+		local item = itemStack and itemStack:GetItem();
 		if(item and item.CreateActorFromItemStack) then
 			local actor = item:CreateActorFromItemStack(itemStack, movieEntity, false, "ActorForEditor_");
 			if(actor) then
@@ -137,6 +137,9 @@ end
 -- apply this inventory item data to the given movie actor. Usually called automatically when item stack is changed by an editor. 
 function CodeActorItemStack:ApplyInitParams(actor)
 	actor:SetTime(self:GetField("startTime") or 0);
+	if(actor:IsAgent()) then
+		return
+	end
 	actor:FrameMove(0);
 	local entity = actor:GetEntity();
 	if(not entity) then

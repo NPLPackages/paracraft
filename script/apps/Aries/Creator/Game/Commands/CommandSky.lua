@@ -1,56 +1,107 @@
 --[[
 Title: Commands
-Author(s): LiXizhi
+Author(s): LiXizhi, big
 Date: 2013/2/9
+ModifyDate: 2025/3/6
 Desc: slash command 
 use the lib:
 ------------------------------------------------------------
+NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSky.lua")
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
-local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 
+local worldunloaded = function()
+	if (skyboxTimer) then
+		skyboxTimer:Change();
+		skyboxTimer = nil;
+	end
+	if (skyboxEntity) then
+		skyboxEntity:Destroy();
+		skyboxEntity = nil;
+	end
+
+	GameLogic:Disconnect("WorldUnloaded", nil, worldunloaded, "UniqueConnection");
+end
+
+local skyboxTimer;
+local skyboxEntity;
+local defaultTexture = "Texture/Aries/Creator/paracraft/skybox/skybox360/tk01.jpg";
+local defaultModel = "model/skybox/skybox360/tk01.x";
 
 Commands["sky"] = {
 	name="sky", 
-	quick_ref="/sky [-tex filename] [-add filename] [-clear] [-none] [-sim] [-sun sun_size sun_glow] [-moon moon_size moon_glow] [-cloud thickness]  [sim|white|black|green|filename]", 
-	desc=[[change sky model or its textures
--- changing to simulated sky
+	quick_ref="/sky [-tex filename] [-add filename] [-clear] [-none] [-sim] [-sun sun_size sun_glow] [-moon moon_size moon_glow] [-cloud thickness] [-model XXXX] [-modeltexture YYY] [-hide] [-mode [half|full]] [sim|white|black|green|filename]", 
+	desc=[[Change sky model or its textures, or hide the skybox.
+Parameters:
+-tex filename: Set the sky's replaceable texture.
+-add filename: Add a sub animated mesh to the sky entity.
+-clear: Clear all child meshes.
+-none: Do not show primary sky box, use submeshes only.
+-sim: Change to simulated sky.
+-sun sun_size sun_glow: Set sun size and glow size.
+-moon moon_size moon_glow: Set moon size and glow size.
+-cloud thickness: Set cloud density.
+-model XXXX: Set the model file for the skybox.
+-modeltexture YYY: Set the texture file for the skybox model.
+-hide: Hide the skybox by stopping the timer and destroying the entity.
+-mode: half or full, default is half.
+Example:
 /sky sim
--- changing to a given model
-/sky model/skybox/skybox6/skybox6.x  
--- setting sky's replaceable texture, file can be relative to world dir.
 /sky -tex Texture/blocks/cake_top.png
--- use empty white texture
-/sky -tex
--- sun size and glow size defaults to 500, 12
-/sky -sun sun_size[10-1000] sun_glow
 /sky -sun 500 12
--- moon size and glow size defaults to 500, 100
-/sky -moon moon_size[10-1000] moon_glow
 /sky -moon 500 100
--- cloud density
-/sky -cloud density[0-1]
 /sky -cloud 0.1
--- add a sub animated mesh to the sky entity. Mesh center should be 0,0,0. radius is 0.5.
 /sky -add animated_sun.fbx
--- clear all child meshes
 /sky -clear
--- do not show primary sky box. use submeshes only. 
 /sky -none
-]], 
-	handler = function(cmd_name, cmd_text, cmd_params)
+/sky -height 0
+/sky -mode full
+/sky -hide
+/sky -mode full -model model/skybox/skybox360/tk01.x -modeltexture Texture/Aries/Creator/paracraft/skybox/skybox360/tk01.jpg]], 
+	handler=function(cmd_name, cmd_text, cmd_params)
 		local option = "";
-		local filename;
+		local mode = "half";
+
 		while option do
-			option, cmd_text = CmdParser.ParseOption(cmd_text)
-			if(option == "sun") then
+			option, cmd_text = CmdParser.ParseOption(cmd_text);
+			if (option == "hide") then
+				if (skyboxTimer) then
+					skyboxTimer:Change();
+					skyboxTimer = nil;
+				end
+				if (skyboxEntity) then
+					skyboxEntity:Destroy();
+					skyboxEntity = nil;
+				end
+				-- Set the default sky
+				CommandManager:Run("/sky -clear");
+				CommandManager:Run("/sky -sim");
+				return;
+			elseif (option == "model") then
+				local model;
+				model, cmd_text = CmdParser.ParseString(cmd_text);
+				if (model) then
+					defaultModel = model;
+				end
+			elseif (option == "modeltexture") then
+				local texture;
+				texture, cmd_text = CmdParser.ParseString(cmd_text);
+				if (texture) then
+					defaultTexture = texture;
+				end
+			elseif (option == "mode") then
+				mode, cmd_text = CmdParser.ParseString(cmd_text);
+			elseif(option == "sun") then
 				local sun_size, sun_glow;
 				sun_size, cmd_text = CmdParser.ParseInt(cmd_text);
 				sun_glow, cmd_text = CmdParser.ParseInt(cmd_text);
@@ -64,7 +115,14 @@ Commands["sky"] = {
 				local cloud;
 				cloud, cmd_text = CmdParser.ParseInt(cmd_text);
 				GameLogic.options:SetCloudThickness(cloud);
+			elseif(option == "height") then
+				local height;
+				height, cmd_text = CmdParser.ParseInt(cmd_text);
+				if(height) then
+					GameLogic.BlockEngine:SetSkyHeight(height)
+				end
 			elseif(option == "tex") then
+				local filename;
 				filename, cmd_text = CmdParser.ParseString(cmd_text);
 				if(filename) then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Materials/LocalTextures.lua");
@@ -77,10 +135,12 @@ Commands["sky"] = {
 					GameLogic.GetSkyEntity():SetSkyTexture("Texture/whitedot.png");
 				end
 			elseif(option == "add") then
+				local filename;
 				filename, cmd_text = CmdParser.ParseString(cmd_text);
 				local filepath = Files.GetWorldFilePath(filename);
 				if(filepath) then
-					GameLogic.GetSkyEntity():AddSubMesh(filepath);	
+					filename, cmd_text = CmdParser.ParseString(cmd_text);
+					GameLogic.GetSkyEntity():AddSubMesh(filepath, filename);
 				else
 					GameLogic.AddBBS("skycmd", format(L"文件不存在:%s", filename));
 				end
@@ -93,44 +153,79 @@ Commands["sky"] = {
 			end
 		end
 
-		filename, cmd_text = CmdParser.ParseString(cmd_text);
-
-		if(filename == "sim") then
-			GameLogic.GetSkyEntity():UseSimulatedSky();
-		elseif(filename == "none") then
-			GameLogic.GetSkyEntity():UseNoneSky();
-		elseif(filename == "white" or filename=="green" or filename=="black") then
-			GameLogic.GetSkyEntity():UseSkybox("");
-			if(filename == "green") then
-				CommandManager:Run("/fog -skycolor 0 1 0");
-				CommandManager:Run("/fog -color 0 1 0");
-			elseif(filename == "black") then
-				CommandManager:Run("/fog -skycolor 0 0 0");
-				CommandManager:Run("/fog -color 0 0 0");
-			else
-				CommandManager:Run("/fog -skycolor 1 1 1");
-				CommandManager:Run("/fog -color 1 1 1");
+		if mode == "full" then
+			-- Full mode
+			if (not skyboxEntity) then
+				skyboxEntity = EntityManager.EntityLiveModel:Create({bx=0,by=0,bz=0,});
 			end
-		elseif(filename) then
-			local filepath;
-			if(not GameLogic.GetSkyEntity():GetSkyTemplate(filename)) then
-				filepath = Files.GetWorldFilePath(filename);
-				if(not filepath) then
-					if(System.options.IsMobilePlatform) then
-						-- for mobile version
-						LOG.std(nil, "warn", "SkyCommand", "skybox filename:%s is ignored in mobile version", filename);
-						filepath = "model/blockworld/Sky/sky.x";
-					else
-						GameLogic.AddBBS("skycmd", format(L"文件不存在:%s", filename));
-						return;
+
+			skyboxEntity:SetModelFile(defaultModel);
+			skyboxEntity:Attach();
+			skyboxEntity:SetSkin(defaultTexture);
+			skyboxEntity:SetPersistent(false);
+			skyboxEntity:SetScaling(80);
+
+			if (not skyboxTimer) then
+				skyboxTimer = commonlib.Timer:new({ callbackFunc = function(timer)
+					local eyePos = {}
+					ParaCamera.GetAttributeObject():GetField("Eye position", eyePos);
+					local x, y, z = eyePos[1], eyePos[2], eyePos[3];
+					skyboxEntity:SetPosition(x, y, z); -- Update position
+				end});
+				skyboxTimer:Change(0, 10); -- Trigger every 10ms
+			end
+
+			GameLogic:Connect("WorldUnloaded", nil, worldunloaded, "UniqueConnection");
+		elseif mode == "half" then
+			-- Half mode				
+			if (skyboxTimer) then
+				skyboxTimer:Change();
+				skyboxTimer = nil;
+			end
+			if (skyboxEntity) then
+				skyboxEntity:Destroy();
+				skyboxEntity = nil;
+			end
+
+			local filename;
+			filename, cmd_text = CmdParser.ParseString(cmd_text);
+
+			if(filename == "sim") then
+				GameLogic.GetSkyEntity():UseSimulatedSky();
+			elseif(filename == "none") then
+				GameLogic.GetSkyEntity():UseNoneSky();
+			elseif(filename == "white" or filename=="green" or filename=="black") then
+				GameLogic.GetSkyEntity():UseSkybox("");
+				if(filename == "green") then
+					CommandManager:Run("/fog -skycolor 0 1 0");
+					CommandManager:Run("/fog -color 0 1 0");
+				elseif(filename == "black") then
+					CommandManager:Run("/fog -skycolor 0 0 0");
+					CommandManager:Run("/fog -color 0 0 0");
+				else
+					CommandManager:Run("/fog -skycolor 1 1 1");
+					CommandManager:Run("/fog -color 1 1 1");
+				end
+			elseif(filename) then
+				local filepath;
+				if(not GameLogic.GetSkyEntity():GetSkyTemplate(filename)) then
+					filepath = Files.GetWorldFilePath(filename);
+					if(not filepath) then
+						if(System.options.IsMobilePlatform) then
+							-- for mobile version
+							LOG.std(nil, "warn", "SkyCommand", "skybox filename:%s is ignored in mobile version", filename);
+							filepath = "model/blockworld/Sky/sky.x";
+						else
+							GameLogic.AddBBS("skycmd", format(L"文件不存在:%s", filename));
+							return;
+						end
 					end
 				end
+				GameLogic.GetSkyEntity():UseSkybox(filepath or filename);
 			end
-			GameLogic.GetSkyEntity():UseSkybox(filepath or filename);
 		end
 	end,
 };
-
 
 Commands["fog"] = {
 	name="fog", 
@@ -290,7 +385,7 @@ Commands["time"] = {
 	desc=[[set current time of day. 0 or nil means noon, -0.5 is dawn, 0.5 is twilight. 1,-1 is midnight
 @return: the current time in range [-1, 1]. 
 Example:
-/time 0		set time to mid noon
+/time 0  set time to mid noon
 /tip $(/time now)   return current time
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)

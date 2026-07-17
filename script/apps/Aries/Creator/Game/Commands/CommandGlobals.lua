@@ -237,7 +237,7 @@ Commands["add"] = {
 			local name, value = cmd_text:match("^(%S+)%s+(%S+)");
 
 			if(name and value) then
-				name = item_name_map[name];
+				name = item_name_map[name] or name;
 				NPL.load("(gl)script/apps/Aries/Creator/Game/API/UserProfile.lua");
 				local UserProfile = commonlib.gettable("MyCompany.Aries.Creator.Game.API.UserProfile");
 
@@ -897,5 +897,41 @@ e.g.
 			LocalVideoTaskSetting.CheckShow()
 		end
 
+	end,
+};
+
+Commands["cleanup"] = {
+	name="cleanup", 
+	quick_ref="/cleanup [-s] [-ext fileext1,fileext2,...] [-exclude path1,path2,...]", 
+	desc=[[清理本地世界文件
+e.g.
+/cleanup --清理所有文件
+/cleanup -s --强制清理所有文件，不提示
+/cleanup -ext bmax,x,stl --清理指定格式文件
+/cleanup -exclude temp,backup --过滤指定文件
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		-- local option, cmd_text = CmdParser.ParseString(cmd_text);
+		local options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		local pageParams = {}
+		if options.s then
+			pageParams.silient = true
+			pageParams.exts = ".*"
+		end
+		if options.ext then
+			local option, cmd_text = CmdParser.ParseString(cmd_text);
+			pageParams.exts = option
+		end
+		if options.exclude then
+			local option, cmd_text = CmdParser.ParseString(cmd_text);
+			pageParams.excludes = option
+		end
+
+		if GameLogic.IsReadOnly() and not pageParams.silient then
+			GameLogic.AddBBS(nil, "当前为只读模式，无法执行清理操作")
+			return
+		end
+		local ClearWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ClearWorldPage.lua");
+		ClearWorldPage.ShowPage(pageParams)
 	end,
 };

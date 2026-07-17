@@ -65,3 +65,18 @@ HttpWrapper.Create("keepwork.schedule.scheduleReports", "%MAIN%/accounting/users
 
 -- http://yapi.kp-para.cn/project/655/interface/api/5822
 HttpWrapper.Create("keepwork.classrooms.query", "%MAIN%/edu/v0/clients/classrooms/query", "POST", true)
+
+--学生加入课堂
+--http://yapi.kp-para.cn/project/655/interface/api/5615
+HttpWrapper.Create("keepwork.classrooms.signin", "%MAIN%/edu/v0/classroomStudents/signIn", "POST", true)
+
+--校验用户无权限课包
+--http://yapi.kp-para.cn/project/655/interface/api/7167
+HttpWrapper.Create("keepwork.lessonPackage.checkLessonNoAuth", "%MAIN%/edu/v0/lessonPackages/:id/checkNoAuthPackages", "POST", true)
+
+-- 查询课堂学生
+-- http://yapi.kp-para.cn/project/655/interface/api/7631
+HttpWrapper.Create("keepwork.classrooms.students", "%MAIN%/edu/v0/classrooms/student/search", "GET", true)
+
+
+

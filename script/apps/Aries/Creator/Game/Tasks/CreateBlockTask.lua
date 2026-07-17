@@ -90,8 +90,19 @@ function CreateBlock:Run()
 		self.last_block_data = BlockEngine:GetBlockData(self.blockX,self.blockY,self.blockZ);
 		self.last_entity_data = BlockEngine:GetBlockEntityData(self.blockX,self.blockY,self.blockZ);
 
-		if(self:TryCreateSingleBlock()) then
-
+		local addToHistory = not self.nohistory and (GameLogic.GameMode:CanAddToHistory() or self.add_to_history);
+		local otherUpdatedBlocks;
+		if(addToHistory) then
+			GameLogic.GetSim():SetTempBlockUpdateCallback(function(x,y,z)
+				if(self.blockX~=x or self.blockY~=y or self.blockZ~=z) then
+					otherUpdatedBlocks = otherUpdatedBlocks or {};
+					local b_id, b_data, e_data = BlockEngine:GetBlockFull(x,y,z);
+					otherUpdatedBlocks[#otherUpdatedBlocks + 1] = {x,y,z, b_id, b_data, e_data};
+				end
+			end);
+		end
+		local bCreated = self:TryCreateSingleBlock();
+		if(bCreated) then
 			local block_id, block_data, entity_data = BlockEngine:GetBlockFull(self.blockX, self.blockY, self.blockZ);
 			if(block_id == self.block_id) then
 				self.data = block_data;
@@ -107,14 +118,37 @@ function CreateBlock:Run()
 				GameLogic.events:DispatchEvent({type = "CreateDiffIdBlockTask" , block_id = self.block_id, block_data = block_data, x = self.blockX, y = self.blockY, z = self.blockZ,
 				last_block_id = self.last_block_id, last_block_data = self.last_block_data});				
 			end
-			if(not self.nohistory) then
-				if(GameLogic.GameMode:CanAddToHistory()) then
+			if(addToHistory) then
+				if(self.block_id < 4096) then
 					add_to_history = true;
 					self.add_to_history = true;
+
+					if(otherUpdatedBlocks) then
+						-- multiple blocks were updated, we need to record them all.
+						for _, pos in ipairs(otherUpdatedBlocks) do
+							local x,y,z = pos[1], pos[2], pos[3];
+							local b_id, b_data, e_data = BlockEngine:GetBlockFull(x,y,z);
+							self.history[#(self.history)+1] = {x,y,z, b_id, pos[4], pos[5], b_data, e_data, pos[6]};
+
+							if(not self.isSilent) then
+								GameLogic.events:DispatchEvent({
+									type = "CreateBlockTask",
+									block_id = b_id, block_data = b_data,
+									x = x, y = y, z = z,
+									last_block_id = 0, last_block_data = 0,
+								});
+							end
+						end
+					end
+				elseif(not self.liveEntities) then
+					add_to_history = false;
+					self.add_to_history = false;
 				end
 			end
-		else
-			return
+		end
+		GameLogic.GetSim():SetTempBlockUpdateCallback(nil);
+		if(not bCreated) then
+			return;
 		end
 	elseif(self.blocks) then
 		-- create a chunk of blocks
@@ -123,7 +157,7 @@ function CreateBlock:Run()
 		local dz = self.blockZ or 0;
 
 		if(not self.nohistory) then
-			if(GameLogic.GameMode:CanAddToHistory()) then
+			if(GameLogic.GameMode:CanAddToHistory() or self.add_to_history) then
 				add_to_history = true;
 				self.add_to_history = true;
 			end
@@ -142,6 +176,8 @@ function CreateBlock:Run()
 				end
 			end
 		end
+		GameLogic.GetFilters():apply_filters("BatchModifyBlocks",blocks)
+
 		BlockEngine:EndUpdate()
 	end
 	if(self.liveEntities) then
@@ -178,9 +214,10 @@ function CreateBlock:Run()
 			end
 		end
 	end
-	if(add_to_history) then
+	if(self.add_to_history) then
 		UndoManager.PushCommand(self);
 		GameLogic.SetModified();
+		GameLogic.GetFilters():apply_filters("SchoolCenter.AddEvent", "create.world.block");
 	end
 
 	if(self.blockX and not self.isSilent) then
@@ -217,9 +254,16 @@ function CreateBlock:AddEntity(xmlNode, renameMap)
 		entityClass = entityClass or EntityManager.EntityLiveModel
 		local entity = entityClass:Create({x=attr.x,y=attr.y,z=attr.z}, xmlNode);
 		entity:Attach();
+
+		GameLogic.GetFilters():apply_filters("CreateEntityTask", entity)
+
 		if(self.add_to_history) then
 			attr.name = entity.name
 			self.history_entity[#(self.history_entity)+1] = xmlNode
+		end
+		if(self.keepEntityReferences) then
+			self.entity_references = self.entity_references or {};
+			self.entity_references[#self.entity_references+1] = entity;
 		end
 	end
 end
@@ -240,7 +284,8 @@ end
 function CreateBlock:Redo()
 	if(self.blockX and self.block_id) then
 		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.block_id, self.data, 3, self.entity_data);
-	elseif((#self.history)>0) then
+	end
+	if((#self.history)>0) then
 		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.history) do
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0, b[7], nil, b[8]);
@@ -264,7 +309,8 @@ end
 function CreateBlock:Undo()
 	if(self.blockX and self.block_id) then
 		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.last_block_id or 0, self.last_block_data,3, self.last_entity_data);
-	elseif((#self.history)>0) then
+	end
+	if((#self.history)>0) then
 		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.history) do
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[5] or 0, b[6], nil, b[9]);

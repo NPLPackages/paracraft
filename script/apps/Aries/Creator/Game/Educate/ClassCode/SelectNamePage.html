@@ -1,0 +1,253 @@
+<!-- "script/apps/Aries/Creator/Game/Educate/Project/SelectNamePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="SelectNamePage.lua"><![CDATA[
+
+    local SelectNamePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/ClassCode/SelectNamePage.lua")
+    SelectNamePage.OnInit()
+    local class_data = SelectNamePage.class_data or {}
+    local page = document:GetPageCtrl()
+
+
+    function IsSeparator(index)
+        if(index == 1) then
+            return true
+        else
+            return class_data[index].key ~= class_data[index-1].key
+        end
+    end
+
+    function GetAllKeys()
+        return SelectNamePage.class_data_keys or {key="A", key="B", key="C" ,key="#"}
+    end
+    
+    function GetAllStudents()
+        return class_data
+    end
+
+    function OnSearch()
+        local search_key = page:GetValue("SearchName")
+        SelectNamePage.OnClickSearch(search_key)
+    end
+
+    function OnSearchKey()
+        if(virtual_key and virtual_key == Event_Mapping.EM_KEY_RETURN) then
+            local search_key = page:GetValue("SearchName")
+            SelectNamePage.OnClickSearch(search_key)
+        end 
+    end
+
+    function OnTextChange()
+        local search_key = page:GetValue("SearchName")
+        SelectNamePage.OnClickSearch(search_key)
+    end
+
+
+    function IsSelectName(index)
+        return index and SelectNamePage.select_index == tonumber(index)
+    end
+
+    function IsPlaceHolder(index)
+        return class_data and class_data[index].placeholder == true
+    end
+
+    function GetName(name)
+        if not name or name == "" then
+            return L"未命名"
+        else
+            local nameWidth = _guihelper.GetTextWidth(name,"System;14;bold")
+            if nameWidth <= 45 then
+                return name
+            end
+            local limitName = commonlib.GetLimitLabel(name, 3,true)
+            return limitName == name and name or limitName.. "..."
+        end
+    end
+
+    function IsNameEmpty(name)
+        return not name or name == ""
+    end
+
+    function GetUserName(username)
+        if not username or username == "" then
+            return username
+        else
+            local accountWidth = _guihelper.GetTextWidth(username,"System;10;normal")
+            if accountWidth <= 41 then
+                return username
+            end
+            return commonlib.GetLimitLabel(username, 10)
+        end
+    end
+
+    function OnSelectName(index)
+        SelectNamePage.OnSelectName(index)
+    end
+
+    function IsSelectKey(index)
+        return index and SelectNamePage.select_key_index == tonumber(index)
+    end
+
+    function OnSelectKey(index)
+        SelectNamePage.OnSelectKey(index)
+    end
+
+    function OnClickNext()
+        SelectNamePage.OnClickNext()
+    end
+
+    function OnClickBack()
+        SelectNamePage.OnClickBack()
+    end
+
+    function onclickBackground()
+
+    end
+
+    function IsEmpty()
+        return not SelectNamePage.class_data or #SelectNamePage.class_data == 0
+    end
+
+    function IsSearching()
+        return  SelectNamePage.IsSearching
+    end
+     
+    function GetToolTip(index)
+        local index = tonumber(index) or -1
+        local data = SelectNamePage.class_data[index]
+        if data then
+            local name = data.name or ""
+            local username = data.username or ""
+            local nameWidth = _guihelper.GetTextWidth(name,"System;14;bold")
+            local accountWidth = _guihelper.GetTextWidth(username,"System;10;normal")
+            if nameWidth <= 45 and accountWidth <= 41 then
+                return ""
+            end
+            return "page://script/apps/Aries/Creator/Game/Educate/ClassCode/SelectToolTip.html?s=" ..name .."<br/>" ..username
+        end
+    end
+]]></script>
+<pe:container alignment="_fi" zorder='-2' onclick = "onclickBackground" width="100%" height="100%" style="background-color:#B4BBC29F; ">
+</pe:container>
+<pe:container alignment="_ct"  width="640" height="600" style="margin-left: -320px; margin-top: -300px background: url();">
+    <div style="width: 640px;height: 600px;">
+        <div style="width:640px; height: 600px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/dialog_256x256_32bits.png#0 0 256 256:100 100 100 100);">
+            <div style="position: relative; margin-left: 23px; margin-top: 23px; color: #38374D; font-size: 28px; base-font-size: 28px; font-weight: bold;"><%=L"请选择姓名"%></div>
+            <pe:if condition="<%=not IsEmpty() or (IsEmpty() and IsSearching())%>">
+                <div style="position: relative; margin-left: 400px; margin-top: 23px; width: 200px; height: 38px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/search_51x32_32bits.png#0 0 51 32:20 14 20 14);">
+                    <input type="button" onclick="OnSearch()" style="margin-top: 9px; margin-left: 15px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/search_25x25_32bits.png#0 0 25 25);" />
+                    <input type="text" uiname="SelectNamePage.SearchName" name="SearchName" onkeyup="OnSearchKey()" onchange="OnTextChange"  EmptyText="<%=L'请输入姓名/帐号搜索'%>" style="margin-left: 4px; margin-top: 9px; width: 157px; height: 22px; background: url();"/>
+                </div>
+            </pe:if>
+            <div style="position: relative; width: 590px; height: 442px; margin-top: 84px; margin-left: 20px; ">
+                <div style="position: relative; width: 22px; height: 440px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/select_20x133_32bits.png#0 0 20 133:8 60 8 60);">
+                    <pe:repeat DataSource='<%=GetAllKeys()%>'>
+                        <pe:repeatitem>
+                            <div style="float: left; width: 20px; height: 12px; margin-top: 4px; margin-left: 2px;">
+                                <pe:if condition='<%=IsSelectKey(Eval("index")) %>'>
+                                    <div style = "position: relative; font-size: 10px; base-font-size: 10px; color: #404BF5; text-valign: center; text-align: center; width: 20; height: 12px;"><%= Eval("key") %></div>
+                                </pe:if>
+                                <pe:if condition='<%=not IsSelectKey(Eval("index")) %>'>
+                                    <div style = "position: relative; font-size: 10px; base-font-size: 10px; color: #A8A7B0; text-valign: center; text-align: center; width: 20; height: 12px;"><%= Eval("key") %></div>
+                                </pe:if>
+                                <input type="button" name="<%=Eval('index')%>" onclick="OnSelectKey()" style="width: 20px; height: 12px; background: url();" />
+                            </div>
+                        </pe:repeatitem>
+                    </pe:repeat>
+                </div>
+                <div style="width: 546px; height: 442px; margin-left: 22px; ">
+                    <pe:if condition="<%=not IsEmpty()%>">
+                        <pe:treeview name="index_gridview" RememberScrollPos="true" VerticalScrollBarStep="30" VerticalScrollBarOffsetX="-20" style="position: relative; width: 546px;  height: 442px; color:#ffffff;background:url();"  >
+                        <pe:repeat DataSource='<%=GetAllStudents()%>'>
+                            <pe:repeatitem>
+                                <pe:if condition='<%=IsSeparator(Eval("index")) %>'>
+                                    <div style="float: left; width: 546px; height: 24px; margin-top: 5px;">
+                                        <div style="color: #7B7A8A; font-size: 22px; base-font-size: 22px; font-weight: bold; "><%=Eval("key")%></div>
+                                        <div style="margin-left: 32px; margin-top: -14px; width: 516px; height: 2px;  background-color: #A8A7B022;"></div>
+                                    </div>
+                                </pe:if>
+    
+                                <pe:if condition='<%=IsPlaceHolder(Eval("index")) %>'>
+                                    <div style="float: left; margin-top: 12px; width: 88px; height: 45px; " >
+                                        <div style="float: left; width: 74px; height: 45px; background-color: #00ffff00;" ></div>
+                                    </div>
+                                </pe:if>
+                                <pe:if condition='<%=not IsPlaceHolder(Eval("index")) %>'>
+                                    <pe:if condition='<%=IsSelectName(Eval("index")) %>'>
+                                        <div style="float: left; margin-top: 12px; width: 88px; height: 45px;" >
+                                            <div style="float: left; width: 74px; height: 45px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/name_sel_58x36_32bits.png#0 0 58 36:26 14 26 14);" >
+                                                <div style="position: relative; margin-left: 10px; margin-top: 4px; color: #404BF5;">
+                                                    <pe:if condition="<%=IsNameEmpty(Eval('name'))%>">
+                                                        <div style="font-size: 14px; "><%=GetName(Eval("name"))%></div>
+                                                    </pe:if>
+                                                    <pe:if condition="<%=not IsNameEmpty(Eval('name'))%>">
+                                                        <div style="font-size: 14px; font-weight: bold;"><%=GetName(Eval("name"))%></div>
+                                                    </pe:if>
+                                                    <div style="font-size: 10px;"><%=GetUserName(Eval("username"))%></div>
+                                                </div>
+                                                <input type="button" tooltip="<%=GetToolTip(Eval('index'))%>" name="<%=Eval('index')%>" onclick="OnSelectName()" style="width: 74px; height: 45px; background: url();" />
+                                            </div>
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition='<%=not IsSelectName(Eval("index"))  %>'>
+                                        <div style="float: left; margin-top: 12px; width: 88px; height: 45px; " >
+                                            <div style="float: left; width: 74px; height: 45px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/name_58x36_32bits.png#0 0 58 36:26 14 26 14)" >
+                                                <div   style="position: relative; margin-left: 10px; margin-top: 4px;">
+                                                    <pe:if condition="<%=IsNameEmpty(Eval('name'))%>">
+                                                        <div style="font-size: 14px; color: #38374D;"><%=GetName(Eval("name"))%></div>
+                                                    </pe:if>
+                                                    <pe:if condition="<%=not IsNameEmpty(Eval('name'))%>">
+                                                        <div style="font-size: 14px; color: #38374D; font-weight: bold;"><%=GetName(Eval("name"))%></div>
+                                                    </pe:if>
+                                                    <div style="font-size: 10px;"><%=GetUserName(Eval("username"))%></div>
+                                                </div>
+                                                <input type="button" tooltip="<%=GetToolTip(Eval('index'))%>" name="<%=Eval('index')%>" onclick="OnSelectName()" style="width: 74px; height: 45px; background: url();" />
+                                            </div>
+                                        </div>
+                                    </pe:if>
+                                </pe:if>
+                            </pe:repeatitem>
+                        </pe:repeat>
+                    </pe:treeview>
+                    </pe:if>
+                    <pe:if condition="<%=IsEmpty()%>">
+                        <pe:if condition="<%=not IsSearching()%>">
+                            <div align="center" style=" width: 260px; height: 150px; margin-top: 140px;" >
+                                <div align="center" style=" width: 100px; height: 100px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/icon_128x128_32bits.png#0 0 128 128);">
+                                </div>
+                                <div style="margin-top: 16px; text-align: center; color: #38374D; font-size: 18px; base-font-size: 18px; "><%=L"当前班级没有录入学生信息"%></div>
+                                <input type="button" value="<%=L'返回上一步'%>" onclick="OnClickBack" style="margin-top: 16px; color: #404BF5;font-size: 14px; font-weight: bold; width: 267px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu_40x30_32bits.png#0 0 40 30:18 14 18 14);"/>
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%=IsSearching()%>">
+                            <div align="center" style=" width: 260px; height: 150px; margin-top: 140px;" >
+                                <div align="center" style="width: 100px; height: 100px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/icon_empty_32bits.png#0 0 128 128);">
+                                </div>
+                                <div style="margin-top: 16px; position: relative; margin-left: 0px; color: #38374D; font-size: 18px; base-font-size: 18px; "><%=L"未搜索到姓名，请举手联系老师"%></div>
+                            </div>
+                        </pe:if>
+                    </pe:if>
+                    
+                </div>
+            </div>
+    
+            <pe:if condition="<%=not IsEmpty()%>">
+                <div style="margin-top: 535px; margin-left: 23px;">
+                    <input type="button" value="<%=L'返回上一步'%>" onclick="OnClickBack" style="color: #404BF5;font-size: 14px; font-weight: bold; width: 267px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu_40x30_32bits.png#0 0 40 30:18 14 18 14);"/>
+                    <input type="button" value="<%=L'下一步'%>" onclick="OnClickNext" style="color: #FFFFFF; font-size: 14px; font-weight: bold; width: 267px; height: 40px; margin-left: 38px; background: url(Texture/Aries/Creator/paracraft/Educate/Login1/anniu2_200x30_32bits.png# 0 0 200 30:98 14 98 14);"/>
+                </div>
+            </pe:if>
+        </div>
+    </div>
+</pe:container>
+
+</pe:mcml>
+</body>
+</html>
+

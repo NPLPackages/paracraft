@@ -16,11 +16,13 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-local AnimBlock = commonlib.gettable("AnimBlock");
+local AnimBlock = commonlib.gettable("commonlib.AnimBlock");
 
 local type = type;
 
 local TimeSeries = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Common.TimeSeries"));
+
+TimeSeries.name = "TimeSeries"
 
 function TimeSeries:ctor()
 	self.data = {};
@@ -104,12 +106,22 @@ function TimeSeries:GetData()
 	return self.data;
 end
 
+-- container based child time series
+function TimeSeries:GetChildren()
+	return self.children;
+end
+
 -- Applies to all variables: trim end, so that there are no time value that is smaller than time.
 function TimeSeries:TrimEnd(time)
 	for k,v in pairs(self.data) do
-		if(type(v) == "table" and v.tableType == "AnimBlock") then
+		if(type(v) == "table" and v.TrimEnd) then
 			v:TrimEnd(time);
 		end	
+	end
+	if(self.children) then
+		for k,v in pairs(self.children) do
+			v:TrimEnd(time);
+		end
 	end
 end
 

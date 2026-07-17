@@ -44,9 +44,96 @@ function Entity:ctor()
 	self:SetBagSize(16);
 end
 
+function Entity:SetAgentExternalFiles(agentExternalFiles)
+	self.agentExternalFiles = agentExternalFiles;
+	self:LoadAgentAssetManifestFile();
+end
+
 function Entity:OnBlockAdded(x,y,z, data)
 	self:CheckUpdateAgent();
 	Entity._super.OnBlockAdded(self, x,y,z, data)
+
+	self:CheckDuplicates();
+end
+
+function Entity:EndEdit()
+	Entity._super.EndEdit(self);
+	self:CheckDuplicates();
+end
+
+local checkAgentTimer;
+local pendingEntities = {};
+
+-- we will search for entities with the same agent name that is added before this one, if so, we will make current entity dummy.
+-- @param nRefreshTime: default to 10ms. 
+function Entity:CheckDuplicates(nRefreshTime)
+	local name = self:GetAgentName() or "";
+	if(name == "") then
+		return;
+	end
+	pendingEntities[name] = self;
+
+	checkAgentTimer = checkAgentTimer or commonlib.Timer:new({callbackFunc = function(timer)
+		-- search onces for all pendingEntities to improve performance. 
+		local allEntities = EntityManager.FindEntitiesByClassName(Entity.class_name);
+		if(allEntities) then
+			for i, entity in ipairs(allEntities) do
+				local name = entity:GetAgentName()
+				if(name and name ~= "") then
+					local newEntity = pendingEntities[name];
+					if(newEntity and newEntity ~= entity) then
+						pendingEntities[name] = nil;
+						newEntity:BecomeDummyAgent();
+					end
+				end
+			end
+		end
+		pendingEntities = {};
+	end})
+	checkAgentTimer:Change(nRefreshTime or 10);
+end
+
+-- turn agent sign into a normal sign block. and all connected code blocks into normal blue blocks.
+function Entity:BecomeDummyAgent()
+	local x, y, z = self:GetBlockPos();
+	if(BlockEngine:GetBlockId(x, y, z) ~= self:GetBlockId()) then
+		return
+	end
+	local data = BlockEngine:GetBlockData(x, y, z)
+
+	-- turn powered code blocks into 131 blue block
+	local activeCodes = {}
+	local blocks = self:GetConnectedBlocks(true);
+	if(blocks) then
+		for _, b in ipairs(blocks) do
+			local  blockEntity = EntityManager.GetBlockEntity(b[1],b[2],b[3]);
+			if blockEntity then
+				if blockEntity.class_name == "EntityCode" then
+					local isPowered = mathlib.bit.band(BlockEngine:GetBlockData(b[1],b[2],b[3]), 0xff) > 0;
+					if isPowered then
+						table.insert(activeCodes,b)
+					end
+				end
+			end
+		end
+	end
+	for k, b in pairs(activeCodes) do
+		BlockEngine:SetBlock(b[1],b[2],b[3], 131)
+	end
+	local agentName = self:GetAgentName();
+	local version = self:GetVersion();
+	-- turn agent sign blocks into normal 211 sign block. 
+	BlockEngine:SetBlock(x,y,z, 211, data)
+	local entity_sign = EntityManager.GetBlockEntity(x,y,z);
+	if entity_sign then
+		local html_text = string.format([[<div style = "width:100px;height:80px;margin-top:0px;margin-left:-50px;text-align:center;background-color:#D2535E">
+			<div style="margin-top:10px;font-weight:bold;font-size:14px;color:#ffffff">%s</div>
+			<div style="margin-top:5px;font-weight:bold;font-size:12px;color:#ffffff">%s</div>
+			<div style="margin-top:5px;font-weight:bold;font-size:12px;color:#ffffff">%s</div>
+		</div>]],agentName:match("[^%.]+$"),"v"..version, L"重复已禁用")
+		entity_sign:SetCommand(html_text)
+		entity_sign:Refresh()
+	end
 end
 
 function Entity:OnBlockLoaded(x,y,z, data)
@@ -126,8 +213,30 @@ function Entity:GetExistingAgentFilename()
 	return filename;
 end
 
+-- load external asset files from self.agentExternalFiles
+-- external url (usually on a public CDN network), separated by a comma. 
+-- following is an example: 
+--   img/filename.jpg,https://cdn.keepwork.com/username/img/filename.jpg?ver=1
+--   img/filename.bmax,https://cdn.keepwork.com/username/img/filename.bmax?ver=1
+-- These external asset files are automatically when this block is loaded. 
+function Entity:LoadAgentAssetManifestFile()
+	if(self.agentExternalFiles and self.agentExternalFiles~="") then
+		local count = 0;
+		for line in self.agentExternalFiles:gmatch("[^\r\n]+") do
+			local localFilename, externalFilename = line:match("^([^,]+),([^,]+)$");
+			if(localFilename and externalFilename) then
+				Files:AddWorldAssetItem(localFilename, externalFilename)
+				count = count + 1;
+			end
+		end
+	end
+end
+
 -- @param bAskPermission: true to ask for user permission
 function Entity:UpdateFromRemoteSource(bAskPermission)
+	if(self.wasDeleted) then
+		return
+	end
 	local function DoUpdate_(filename, deployFiles) 
 		local function DoUpdateImp_()
 			if(deployFiles and not GameLogic.IsReadOnly()) then
@@ -167,7 +276,10 @@ function Entity:UpdateFromRemoteSource(bAskPermission)
 				files[#files+1] = subpath;
 				if(self.agentExternalFiles) then
 					for file in self.agentExternalFiles:gmatch("[^\r\n]+") do
-						files[#files+1] = file;
+						local localFilename, externalFilename = file:match("^([^,]+),([^,]+)$");
+						if(not externalFilename) then
+							files[#files+1] = file;
+						end
 					end
 				end
 				local function DownloadNextFile_(index)
@@ -181,7 +293,7 @@ function Entity:UpdateFromRemoteSource(bAskPermission)
 							local tmpFolder = ParaIO.GetWritablePath()..format("temp/agents/@%d/", projectId);
 							local filepath
 							if(index == 1) then
-								filepath = tmpFolder..self:GetAgentName()..".xml";
+								filepath = tmpFolder..(self:GetAgentName() or "")..".xml";
 								deployFiles[#deployFiles+1] = {localfile = self:GetAgentFilename(true), filepath = filepath};
 							else
 								filepath = tmpFolder..filename;
@@ -374,6 +486,8 @@ end
 function Entity:GetDisplayName()
 	local agentName = self:GetAgentName();
 	if(agentName and agentName~="") then
+		-- only show what is behind last dot. 
+		agentName = agentName:match("[^%.]+$") or agentName;
 		return format("%s\nv%s\n%s", agentName, self:GetVersion() or "1.0", (self.cmd or ""));
 	else
 		return self.cmd or "";
@@ -429,6 +543,9 @@ function Entity:GetAgentWorld()
 end
 
 function Entity:LoadFromAgentFile(filename, bAddToUndoHistory)
+	if(self.wasDeleted) then
+		return
+	end
 	filename = filename or self:GetAgentFilename()
 	local bx, by, bz = self:GetBlockPos();
 	if(filename and ParaIO.DoesFileExist(filename, true)) then
@@ -524,7 +641,6 @@ function Entity:Refresh()
 	else
 		self.text_color = "0 0 128";
 	end
-
 	return Entity._super.Refresh(self);
 end
 

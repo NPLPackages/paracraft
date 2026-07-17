@@ -23,6 +23,8 @@ virtual or redirected functions:
 	OnLeftMouseHold(fDelta)
 	OnRightMouseHold(fDelta)
 	OnLeftLongHoldBreakBlock()
+	CanReachBlockAt(x,y,z)
+	CanDestroyBlockAt(x,y,z)
 	UpdateManipulators()
 	DeleteManipulators()
 	OnUnselect()
@@ -121,7 +123,6 @@ end
 
 --virtual:
 function RedirectContext:DeleteManipulators()
-	self:RedirectEvent("DeleteManipulators");
 	RedirectContext._super.DeleteManipulators(self);
 end
 
@@ -175,8 +176,20 @@ function RedirectContext:handleMiddleClickScene(event, result)
 	return RedirectContext._super.handleMiddleClickScene(self, event);
 end
 
+function RedirectContext:CanDestroyBlockAt(bx, by, bz)
+	if(self.redirect_cmd and self.redirect_cmd.CanDestroyBlockAt) then
+		return self.redirect_cmd:CanDestroyBlockAt(bx, by, bz);
+	end
+end
+
+function RedirectContext:CanReachBlockAt(bx, by, bz)
+	if(self.redirect_cmd and self.redirect_cmd.CanReachBlockAt) then
+		return self.redirect_cmd:CanReachBlockAt(bx, by, bz);
+	end
+end
+
 function RedirectContext:OnLeftMouseHold(fDelta)
-	if(self:RedirectEvent("OnLeftMouseHold", event)) then
+	if(self:RedirectEvent("OnLeftMouseHold", fDelta)) then
 		return;
 	end
 	local click_data = self:GetClickData();
@@ -195,7 +208,7 @@ function RedirectContext:OnLeftMouseHold(fDelta)
 				click_data.left_holding_time = click_data.left_holding_time + fDelta;
 
 				if(click_data.strength and click_data.strength > self.max_break_time) then
-					self:OnLeftLongHoldBreakBlock();
+					self:OnLeftLongHoldBreakBlock(fDelta, result);
 					click_data.left_holding_time = 0;
 				end
 			end
@@ -207,15 +220,15 @@ function RedirectContext:OnLeftMouseHold(fDelta)
 end
 
 function RedirectContext:OnRightMouseHold(fDelta)
-	if(self:RedirectEvent("OnRightMouseHold", event)) then
+	if(self:RedirectEvent("OnRightMouseHold", fDelta)) then
 		return;
 	end
 	local click_data = self:GetClickData();
 	click_data.right_holding_time = click_data.right_holding_time + fDelta;
 end
 
-function RedirectContext:OnLeftLongHoldBreakBlock(fDelta)
-	if(self:RedirectEvent("OnLeftLongHoldBreakBlock", event)) then
+function RedirectContext:OnLeftLongHoldBreakBlock(fDelta, result)
+	if(self:RedirectEvent("OnLeftLongHoldBreakBlock", fDelta, result)) then
 		return;
 	end
 end

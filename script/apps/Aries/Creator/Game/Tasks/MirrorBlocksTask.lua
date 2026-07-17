@@ -112,6 +112,9 @@ function MirrorBlocks:MirrorWithAxis(pivot_x, pivot_y,pivot_z, mirror_axis)
 			end
 		end
 	end
+	if(self.history) then
+		GameLogic.GetFilters():apply_filters("BatchModifyBlocks", self.history)
+	end
 end
 
 function MirrorBlocks:Mirror()

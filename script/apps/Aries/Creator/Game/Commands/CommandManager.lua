@@ -62,6 +62,7 @@ function CommandManager:Init(bRefresh)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandBlockTransform.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandEntity.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandPublishSourceScript.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandAi.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandActor.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandRecord.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandConvert.lua");
@@ -93,6 +94,7 @@ function CommandManager:Init(bRefresh)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMake430App.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandEnvironment.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSubtitles.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandHistory.lua");
 		
 		-- TODO: add more system command here
 	end
@@ -116,7 +118,10 @@ function CommandManager:RunCommand(cmd_name, cmd_text, ...)
 	local cmd_class = SlashCommand.GetSingleton():GetSlashCommand(cmd_name);
 	if(cmd_class) then
 		if(GameLogic.isRemote and not cmd_class:IsLocal()) then
-			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClientCommand:new():Init(format("/%s %s", cmd_name, cmd_text)));
+			local player = GameLogic.GetPlayer()
+			if player and type(player.AddToSendQueue) == "function" then
+				player:AddToSendQueue(GameLogic.Packets.PacketClientCommand:new():Init(format("/%s %s", cmd_name, cmd_text)));
+			end
 		elseif(not GameLogic.isRemote or cmd_class:IsLocal()) then
 			cmd_text = self:RunInlineCommand(cmd_text, ...);
 			return SlashCommand.GetSingleton():RunCommand(cmd_name, cmd_text, ...);
@@ -193,9 +198,9 @@ function CommandManager:RunWithVariables(variables, cmd, ...)
 		cmd_text = self:RunInlineCommand(cmd_text, ...);
 		if(variables) then
 			cmd_class:SetCompiler(variables);
-			local p1, p2 = cmd_class:Run(cmd_name, cmd_text, ...);
+			local p1, p2, p3 = cmd_class:Run(cmd_name, cmd_text, ...);
 			cmd_class:SetCompiler(nil);
-			return p1, p2;
+			return p1, p2, p3;
 		else
 			return cmd_class:Run(cmd_name, cmd_text, ...);
 		end
@@ -212,7 +217,10 @@ function CommandManager:RunFromConsole(cmd, player)
 
 	if(cmd_class) then
 		if(GameLogic.isRemote and not cmd_class:IsLocal()) then
-			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClientCommand:new():Init(cmd));
+			local player = GameLogic.GetPlayer()
+			if player and type(player.AddToSendQueue) == 'function' then
+				player:AddToSendQueue(GameLogic.Packets.PacketClientCommand:new():Init(cmd));
+			end
 		elseif(not GameLogic.isRemote or cmd_class:IsLocal()) then
 			local variables;
 			if(not player) then
@@ -322,7 +330,7 @@ end
 -- @param fromLine: default to 1
 -- @param toLine: default to #cmd_list
 function CommandManager:RunCmdSegment(cmd_list, fromLine, toLine, variables, fromEntity)
-	local last_result, goto_label;
+	local last_result, goto_label, param1;
 	local line_index = fromLine or 1;
 	local line_count = toLine or #cmd_list;
 	self.cmd_list = cmd_list;
@@ -336,7 +344,7 @@ function CommandManager:RunCmdSegment(cmd_list, fromLine, toLine, variables, fro
 			line_index = line_index + 1;
 		elseif(cmd~="") then
 			-- ordinary command
-			last_result, goto_label = self:RunWithVariables(variables, cmd, fromEntity);
+			last_result, goto_label, param1 = self:RunWithVariables(variables, cmd, fromEntity);
 			if( last_result == false) then
 				if(goto_label) then
 					if(type(goto_label) == "number") then
@@ -421,6 +429,15 @@ function CommandManager:RunCmdSegment(cmd_list, fromLine, toLine, variables, fro
 									end
 								end
 								line_index = line_index + 1;
+							end
+						elseif(goto_label == "wait") then
+							line_index = line_index + 1;
+							if(fromEntity) then
+								local time = fromEntity:GetTime() + (tonumber(param1) or 1);
+								fromEntity:AddTimeEvent(time, nil, function(entity, timedEvent)
+									CommandManager:RunCmdSegment(cmd_list, line_index, line_count, variables, fromEntity)
+								end);
+								break;
 							end
 						else
 							-- TODO: jump to a labeled line that starts with ":"

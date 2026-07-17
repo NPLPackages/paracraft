@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EasyAction.lua" refresh="true">
+<![CDATA[
+EasyAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyAction");
+EasyAction.InitPage(Page);
+]]>
+</script>
+<div style="padding:8px;background-color:#000000a0;color:#ffffff;width:360px;height:520px;">
+    <!-- Camera mode buttons -->
+    <div style="margin:6px 0 10px 0;">
+        <input type="button" name="ThirdPerson" value="看鼠标" style="color:#ffffff;margin-right:6px;width:106px;height:36px;" onclick="EasyAction.OnClickSetCameraMode" />
+        <input type="button" name="ThirdPersonLookCamera" value="看镜头" style="color:#ffffff;margin-right:6px;width:106px;height:36px;" onclick="EasyAction.OnClickSetCameraMode" />
+        <input type="button" name="ThirdPersonLookAhead" value="看固定" style="color:#ffffff;width:106px;height:36px;" onclick="EasyAction.OnClickSetCameraMode" />
+    </div>
+    <div style="float:left;padding-top:3px;padding-bottom:3px;width:140px">
+        <div style="height:40px;">
+            <div style="float:left;margin-top:5px;font-size:16px;color:#5af05a">表情</div>
+        </div>
+        <pe:gridview uiname="EasyAction.tvwFaces" name="tvwFaces" 
+            ScrollBarTrackWidth="32" 
+            CustomScrollBar="true"
+            UpLeftBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_upleft.png"
+            DownRightBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_downright.png"
+            TrackBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_track.png"
+            ThumbBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_thumb.png"
+            VerticalScrollBarStep="100"
+            DataSource='<%=EasyAction.GetFaceDs()%>' ItemsPerLine="2" DefaultNodeHeight="48" AllowPaging="false" style="background:;">
+            <Columns>
+                <div style="margin-bottom:3px;">
+                    <input type="button" name='<%=Eval("index")%>' candrag="true" ondragend="EasyAction.OnDragFacialIconEnd" background='<%=Eval("icon")%>' style="width:45px;height:45px;" onclick="EasyAction.OnSelectFace" />
+                </div>
+            </Columns>
+        </pe:gridview>
+    </div>
+    <div style="float:left;padding-top:3px;padding-bottom:3px;width:200px">
+        <div style="height:40px;">
+            <div style="float:left;margin-top:5px;font-size:16px;color:#5af05a">动作</div>
+            <input type="button" name="0" candrag="true" ondragend="EasyAction.OnDragAnimButtonEnd" align="right" value="停止动作" style="float:right;color:#ff3333;min-width:80px;height:32px;" onclick="EasyAction.OnStopAnimation" />
+        </div>
+        <pe:treeview ShowIcon="false" uiname="EasyAction.tvwAnimIds" name="tvwAnimIds" 
+            ScrollBarTrackWidth="32" 
+            CustomScrollBar="true"
+            UpLeftBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_upleft.png"
+            DownRightBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_downright.png"
+            TrackBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_track.png"
+            ThumbBg="Texture/3DMapSystem/common/ThemeLightBlue/scroll_thumb.png"
+            VerticalScrollBarStep="100" DataSource='<%=EasyAction.GetModelAnimDs()%>' DefaultNodeHeight="45" style="background:;">
+            <NodeTemplates>
+                <NodeTemplate DataType="anim">
+                    <div style="margin-bottom:3px;">
+                        <input type="button" name='<%=XPath("this|id")%>' candrag="true" ondragend="EasyAction.OnDragAnimButtonEnd"  value='<%=" "..(XPath("this|text") or tostring(XPath("this|id")))%>' style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#182 92 8 8);font-size:14px;text-align:left;width:150px;height:42px;color:#ffffff;" onclick="EasyAction.OnSelectAnimId" />
+                    </div>
+                </NodeTemplate>
+            </NodeTemplates>
+            <DataNodePlaceholder xpath="*" />
+        </pe:treeview>
+    </div>
+</div>
+<pe:container ClickThrough="true" style="width:360px;height:56px;background:;">
+    <input type="button" name="CloseBtn" onclick="EasyAction.OnClickClose" align="right" style="position:relative; margin-right: 20px; width:56px;height:56px;background:url(Texture/player/close.png)" />
+    <div style="color:#ffffff;font-size:14px;text-shadow:true;margin-top:10px;max-width:230px;background-color: #00000080;padding:5px;">
+        <%=L"点击或拖动图标到其它角色"%>
+    </div>
+</pe:container>
+</pe:mcml>
+</html>

@@ -150,7 +150,7 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 		
 	local cur_music = BackgroundMusic:GetCurrentMusic();
 	local audio_src = BackgroundMusic:GetMusic(filename);
-	if(audio_src) then
+	if(audio_src and audio_src:IsValid()) then
 		local activeMovieClip = MovieManager:GetActiveMovieClip();
 		if( (math.abs(curTime - (self.last_music_time or 0)) > 500) or
 			(self.last_audio_src ~= audio_src or self.last_start_time~=start_time) or 

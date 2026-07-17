@@ -20,6 +20,7 @@ local SentientGroupIDs = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Sent
 local Screen = commonlib.gettable("System.Windows.Screen");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileUIRegister.lua")
 local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister");
+local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 
 local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", {
 	jump_up_speed = 5,
@@ -66,8 +67,8 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	AllowRunning = true,
 	-- player walk speed scale
 	WalkSpeedScale = 1,
-	RunSpeedScale = 1.6,
-	FlySpeedScale = 1.6,
+	RunSpeedScale = 2,
+	FlySpeedScale = 3,
 	-- player picking distance
 	player_picking_dist_sq = 7*7,
 	-- field of view when walking
@@ -144,6 +145,12 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	isAutoMovieFPS = true,
 	-- show chat wondow
 	bIsShowChatWnd = true,
+	-- can drop file
+	CanDropFile = true,
+	-- can paste block
+	CanPasteBlock = true,
+	--can paste blockly
+	CanPasteBlockly = true,
 });
 
 -- load default setting on application start. 
@@ -206,6 +213,8 @@ function options:LoadDefaultTransientOptions()
 	self.CanJumpInAir = true;
 	self.CanJumpInWater = true;
 	self.AllowRunning = true;
+	self.CanDropFile = true;
+	self.CanPasteBlock = true;
 end
 
 -- usually the left drag is enabled only in touch mode.
@@ -311,11 +320,17 @@ function options:SetCameraObjectDistance(value)
 end
 
 function options:IsShowMainPlayer()
-	return ParaScene.GetAttributeObject():GetField("ShowMainPlayer", false);
+	local player = EntityManager.GetPlayer()
+	if(player) then
+		return player:IsVisible();
+	end
 end
 
 function options:SetShowMainPlayer(bShow)
-	return ParaScene.GetAttributeObject():SetField("ShowMainPlayer", bShow == true);
+	local player = EntityManager.GetPlayer()
+	if(player) then
+		return player:SetVisible(bShow == true);
+	end
 end
 
 -- enable internel mesh level of details if any. 
@@ -369,6 +384,9 @@ function options:OnLoadWorld()
 	self.isAutoMovieFPS = true;
 	self:SetViewBobbing(nil);
 	self:SetPickingDist(self.defaultPickingDist);
+	if(SelectionManager.SetBlockFilters) then
+		SelectionManager:SetBlockFilters(nil)
+	end
 	self:SetEnableVibration(nil);
 	self:SetDisableShaderCommand(nil);
 	-- fixed: mobile version's file operation is not thread safe, I need to change cocos code in order to re-enable this. 
@@ -379,11 +397,17 @@ function options:OnLoadWorld()
 
 	if(System.options.mc) then
 		local mainAssetFilename = self:GetMainPlayerAssetName();
+		if System.options.isEducatePlatform then
+			mainAssetFilename = "character/CC/02human/CustomGeoset/actor_kaka.x"
+		end
 		if(mainAssetFilename) then
 			EntityManager.GetPlayer():SetMainAssetPath(mainAssetFilename)
 		end
 		
 		local mainSkins = self:GetMainPlayerSkins();
+		if System.options.isEducatePlatform then
+			mainSkins = "80001;84129;81112;88042;"
+		end
 		if(mainSkins and mainSkins ~= "") then
 			EntityManager.GetPlayer():SetSkin(mainSkins);
 		end
@@ -447,7 +471,6 @@ function options:OnLoadWorld()
 	end
 	self:SetEnableAutoUIScaling();
 	player:SetField("AccelerationDist", self.WalkAccelerationDist or 0);
-	player:SetField("SkipPicking", true);
 	
 	-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
 	player:SetAttribute(128, true);
@@ -461,16 +484,7 @@ function options:OnLoadWorld()
 	self.world_start_time = commonlib.TimerManager.GetCurrentTime();
 	self:SetLastSaveTime();
 	self:ShowMenuPage();
-	if MobileUIRegister.GetIsDevMode() then
-		local IsTouchDevice = self:HasTouchDevice()
-		if IsTouchDevice then
-			MobileUIRegister.SetMobileUIEnable(true)
-		else
-			MobileUIRegister.SetMobileUIEnable(false)
-		end
-	else
-		self:ShowTouchPad();
-	end
+	self:ShowMobileUI(true)
 	GameLogic.RunCommand("/hide playertouch");
 	
 	self:ShowSkyBox();
@@ -508,18 +522,18 @@ function options:OnLoadWorld()
 	
 	local hide_player = WorldCommon.GetWorldTag("hide_player")
 	self:SetShowMainPlayer(hide_player~="true")
+	local player = EntityManager.GetPlayer()
+	if(player) then
+		player:SetSkipPicking(true);
+	end
 
 	local stereoMode = WorldCommon.GetWorldTag("stereoMode")
 	-- self:EnableStereoMode(tonumber(stereoMode))
 
 	-- options:SetWeather(WorldCommon.GetWorldTag("weather"))
-	local timesAutoGo = WorldCommon.GetWorldTag("timesAutoGo")~="false"
-	options:SetTimesAutoGo(timesAutoGo)
-	if not timesAutoGo then
-		options:SetFrozenDayTime(WorldCommon.GetWorldTag("frozendaytime"))
-	else
-		options:RecoverLastTime(WorldCommon.GetWorldTag("lastdaytime"))--关闭的时候保存的世界时间
-	end
+	local autoDayTime = WorldCommon.GetWorldTag("autoDayTime")=="true"
+	options:SetTimesAutoGo(autoDayTime)
+	options:RecoverLastTime(WorldCommon.GetWorldTag("lastdaytime"))--关闭的时候保存的世界时间
 
 	local lightcolor = WorldCommon.GetWorldTag("lightcolor")
 	local cmd_light_color = string.format("/worldenv -lightcolor=%s",lightcolor)
@@ -589,8 +603,6 @@ function options:SetFramePerSecond(fps)
 	end
 end
 
-
---/shader命令
 function options:SetRenderMethod(shaderIdx,bSave)
 	local res = GameLogic.RunCommand("/shader "..shaderIdx);
     if(res==false) then
@@ -614,22 +626,25 @@ function options:IsTimesAutoGo()
 	return self.isTimesAutoGo~=false
 end
 
-function options:SetTimesAutoGo(bool,bSave)
-	self.isTimesAutoGo = bool~=false
-	if bSave and WorldCommon.GetWorldTag("timesAutoGo") ~=tostring(bool) then
-		WorldCommon.SetWorldTag("timesAutoGo",tostring(bool))
-		-- WorldCommon.SaveWorldTag()
+function options:SetTimesAutoGo(bEnabled, bSave)
+	self.isTimesAutoGo = bEnabled==true
+	if(self.isTimesAutoGo) then
+		GameLogic.RunCommand("/day 10000")
+	else
+		GameLogic.RunCommand("/day")
+	end
+	if bSave and WorldCommon.GetWorldTag("autoDayTime") ~=tostring(bEnabled) then
+		WorldCommon.SetWorldTag("autoDayTime",tostring(bEnabled))
 	end
 end
 
---停止昼夜交替后(self.isTimesAutoGo=false),时间冻结在哪个时间
+--obsoleted: 停止昼夜交替后(self.isTimesAutoGo=false),时间冻结在哪个时间
 function options:SetFrozenDayTime(time,bSave)
-	self.frozendaytime = tonumber(time) or 0
-	GameLogic.RunCommand(string.format("/time %s",self.frozendaytime))
-	if bSave and WorldCommon.GetWorldTag("frozendaytime")~=time then
-		WorldCommon.SetWorldTag("frozendaytime",time)
-		-- WorldCommon.SaveWorldTag()
-	end
+end
+
+-- obsoleted
+function options:GetFrozenDayTime()
+	return 0
 end
 
 --启动世界时恢复上次的时间
@@ -638,10 +653,6 @@ function options:RecoverLastTime(time)
 	if time then
 		GameLogic.RunCommand(string.format("/time %s",time))
 	end
-end
-
-function options:GetFrozenDayTime()
-	return self.frozendaytime or 0
 end
 
 function options:SetLightColor(r,g,b,block_light_scale)
@@ -683,6 +694,10 @@ function options:ResetWindowTitle()
 			if not Game.is_started and System.options.isPapaAdventure then
 				return
 			end
+			if (System.options.isEducatePlatform or System.options.isCommunity) and System.options.isOffline then
+				ParaEngine.SetWindowText(windowTitle .. L" (离线模式)");
+				return
+			end
 			ParaEngine.SetWindowText(windowTitle);
 		end
 	end
@@ -709,7 +724,36 @@ end
 -- toggle touch mode when user clicks a mouse button or touches the screen. 
 -- we can detect the changes via self:HasTouchDevice() method
 function options:CheckTouchMouse2in1PC()
+	if(System.options.IsMobilePlatform) then
+		return
+	end
+	-- TODO: for paralife who handles touch events in a different way, we need to disable this.
+	if(self.isTouchPadShown ~= System.os.IsLastTouchMode()) then
+		if(System.os.IsLastTouchMode()) then
+			self:ShowTouchPad(true)
+		else
+			self:ShowTouchPad(false)
+		end
+	end
 end
+
+function options:ShowMobileUI(bShow)
+	if bShow == true then
+		local IsTouchDevice = self:HasTouchDevice()
+		if IsTouchDevice or System.options.IsTouchDevice then
+			MobileUIRegister.SetMobileUIEnable(true)
+		else
+			MobileUIRegister.SetMobileUIEnable(false)
+		end
+	else
+		MobileUIRegister.SetMobileUIEnable(false)
+	end
+end
+
+function options:IsTouchUIShown()
+	return MobileUIRegister._mobileUIEnabled or System.options.isTouchPadShown or System.options.IsMobilePlatform
+end
+
 
 -- @param bShow: if nil, it will automatically show if on mobile platform.
 function options:ShowTouchPad(bShow)
@@ -726,9 +770,11 @@ function options:ShowTouchPad(bShow)
 		TouchMiniKeyboard.CheckShow(true);
 		-- enable touch mode
 		self:SetEnableMouseLeftDrag(true);
+		self.isTouchPadShown = true;
 	else
 		TouchMiniKeyboard.CheckShow(false);
 		self:SetEnableMouseLeftDrag(false);
+		self.isTouchPadShown = false;
 	end
 end
 
@@ -758,6 +804,9 @@ function options:OnLeaveWorld()
 	Screen:Disconnect("sizeChanged", options, options.OnResize, "UniqueConnection")
 
 	self:SetShowChatWnd(true)
+
+	self:SetCanDropFile(true)
+	self:SetCanPasteBlock(true)
 end
 
 function options:SetLastSaveTime()
@@ -911,9 +960,8 @@ end
 function options:SetWalkSpeedScale(speed_scale)
 	speed_scale = speed_scale or 1;
 	self.WalkSpeedScale = speed_scale;
-	self.RunSpeedScale = speed_scale*1.3;
+	self.RunSpeedScale = speed_scale*2;
 	self.FlySpeedScale = speed_scale*3;
-	ParaScene.GetPlayer():ToCharacter():SetSpeedScale(self.WalkSpeedScale);
 end
 
 function options:GetWalkSpeedScale()
@@ -934,6 +982,10 @@ end
 -- whenever we receive a mouse down click, this function return false, whenever we receive a touch down event, it return true. 
 -- call this function periodically to check if the most recent click is coming from click or touch. 
 function options:HasTouchDevice()
+	if (System.os.GetWebOS() == "pico") then
+		return false;
+	end
+
 	-- mobile platform or windows 2in1 devices have touch devices. 
 	if(System.options.IsMobilePlatform) then
 		return true;
@@ -1194,7 +1246,7 @@ local MOVIE_CAPTURE_MODE = {
 };
 
 options._stereoLockWindowSize = nil
--- @param value: 0 or false is disable, 2 or true is left/right, 5 is red/blue, 8 for ODS single eye. 
+-- @param value: 0 or false is disable, 2 or true is left/right, 4 is frame interlaced, 5 is red/blue, 8 for ODS single eye. 
 function options:EnableStereoMode(value)
 	if(value == true) then
 		value = 2; -- default to left/right
@@ -1217,17 +1269,28 @@ function options:EnableStereoMode(value)
 		
 		local attr = ParaMovie.GetAttributeObject();
 		if(self.stereoMode~=0) then
-			attr:SetField("StereoCaptureMode", self.stereoMode);
+			if(self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_FRAME_INTERLACED) then
+				attr:SetField("StereoCaptureMode", MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_RED_BLUE);
+			else
+				attr:SetField("StereoCaptureMode", self.stereoMode);
+			end
 			viewport:SetAlignment("_lt");
 		else
 			attr:SetField("StereoCaptureMode", 0);
 			viewport:SetAlignment("_fi");
 		end
-		if(self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_RED_BLUE) then
+		if(self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_RED_BLUE or self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_FRAME_INTERLACED) then
 			local effect = GameLogic.GetShaderManager():GetEffect("RedBlueStereo");
 			if(effect) then
 				effect:SetEnabled(true);
+				if(self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_RED_BLUE) then
+					effect:SetRedBlueMode();
+				end
+				if(self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_FRAME_INTERLACED) then
+					effect:SetInterfacedMode();
+				end
 			end
+			
 		elseif(self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_ODS_SINGLE_EYE_1) then
 			local effect = GameLogic.GetShaderManager():GetEffect("ODSStereo");
 			if(effect) then
@@ -1259,7 +1322,7 @@ function options:IsDisableShaderCommand()
 	return self.shaderCmdDisabled == true;
 end
 
-function options:GetStereoEyeSeparationDist(value)
+function options:GetStereoEyeSeparationDist()
 	if(ParaMovie and ParaMovie.GetAttributeObject) then
 		local attr = ParaMovie.GetAttributeObject();
 		return attr:GetField("StereoEyeSeparation", 0);
@@ -1290,6 +1353,25 @@ function options:SetStereoEyeSeparationDist(value)
 	end
 end
 
+
+function options:GetStereoConvergenceOffset()
+	if(ParaMovie and ParaMovie.GetAttributeObject) then
+		local attr = ParaMovie.GetAttributeObject();
+		return attr:GetField("StereoConvergenceOffset", 0);
+	else
+		return 0;
+	end
+end
+
+-- offset along the eye look at position. this will make the stereo scene pop out of 
+-- paralex convergence plane
+function options:SetStereoConvergenceOffset(value)
+	if(ParaMovie and ParaMovie.GetAttributeObject) then
+		local attr = ParaMovie.GetAttributeObject();
+		attr:SetField("StereoConvergenceOffset", value);
+	end
+end
+
 function options:SetStereoControllerEnabled(value)
 	return StereoVisionController:SetEnabled(value);
 end
@@ -1311,12 +1393,37 @@ function options:SetUIScaling(value)
 	local key = "Paracraft_System_SetUIScaling";
 
 	if (value == nil) then
-		value = GameLogic.GetPlayerController():LoadLocalData(key, self:GetUIScaling(), true);
+		local ui_scaling = self:GetUIScaling();
+		value = GameLogic.GetPlayerController():LoadLocalData(key, nil, true);
+
+		if value == nil then
+			-- if (System.os.GetPlatform() == "mac" or System.os.GetPlatform() == "Emscripten") then
+			-- end
+
+			local winWidth, winHeight = Screen:GetWindowSolution();
+			local minWidth, minHeight = Screen:GetMinimumScreenSize();
+
+			if (winWidth >= minWidth * 2 and
+				winHeight >= minHeight * 2) then
+				-- user is using 2K or 4K monitor, we will scale by 2 or 4. 
+				local ultraDisplayFactor = math.min(winWidth / minWidth, winHeight / minHeight);
+	
+				if (ultraDisplayFactor > 2.2 and ultraDisplayFactor < 4.4) then
+					ultraDisplayFactor = 2; -- 2k monitor
+				else
+					ultraDisplayFactor = 4; -- 4k monitor
+				end
+	
+				ui_scaling = ultraDisplayFactor;
+			end
+
+			value = ui_scaling;
+		end
 	else
 		GameLogic.GetPlayerController():SaveLocalData(key, value, true, true);
 	end
 
-	if (value and value ~= 0) then
+	if (type(value) == "number" and value ~= 0) then
 		userUIScaling = value;
 
 		local frame_width, frame_height = Screen:GetWindowSolution()
@@ -1335,9 +1442,7 @@ function options:GetUIScaling()
 end
 
 function options:OnResize()
-	if (System.os.GetPlatform() ~= "mac") then
-		self:SetUIScaling(nil)
-	end
+	self:SetUIScaling(nil)
 end
 
 -- async asset loader
@@ -1462,8 +1567,8 @@ end
 -- @param dist: if 0, it will disable super rendering
 function options:SetSuperRenderDist(dist,bSave)
 	dist = dist and tonumber(dist)
+	local attr = ParaTerrain.GetBlockAttributeObject():GetChild("CMultiFrameBlockWorldRenderer");
 	if(dist and dist>=0 and dist <= 5000) then
-		local attr = ParaTerrain.GetBlockAttributeObject():GetChild("CMultiFrameBlockWorldRenderer");
 		attr:SetField("RenderDistance", dist);
 		if(dist == 0) then
 			attr:SetField("Enabled", false);
@@ -1471,6 +1576,8 @@ function options:SetSuperRenderDist(dist,bSave)
 			attr:SetField("Enabled", true);
 			attr:SetField("Dirty", true);
 		end
+	else
+		attr:SetField("Enabled", false);
 	end
 	if bSave then
 		WorldCommon.SetWorldTag("superrenderdist",tostring(dist));
@@ -1582,28 +1689,28 @@ function options:ShowSystemTips(bShow)
 end
 
 function options:SetMouseSettingList(list)
-	self.moust_setting_list = list
+	self.mouse_setting_list = list
 end
 
 function options:GetMouseSettingList(list)
-	if self.moust_setting_list == nil then
+	if self.mouse_setting_list == nil then
 		local mouse_select_list = Game.PlayerController:LoadRemoteData("SystemSettingsPage.mouse_select_list", nil)
 		if mouse_select_list then
-			self.moust_setting_list = {}
+			self.mouse_setting_list = {}
 			for k, v in pairs(mouse_select_list) do
-				self.moust_setting_list[v] = k
+				self.mouse_setting_list[v] = k
 			end
-			return self.moust_setting_list
+			return self.mouse_setting_list
 		end
 
-		self.moust_setting_list = {
+		self.mouse_setting_list = {
 			["left"] = "DeleteBlock",
 			["right"] = "CreateBlock",
 			["middle"] = "ChooseBlock",
 		}
 	end
 
-	return self.moust_setting_list
+	return self.mouse_setting_list
 end
 
 function options:GetWorldOption(option)
@@ -1659,4 +1766,51 @@ end
 
 function options:SetShowChatWnd(bShow)
 	self.bIsShowChatWnd = bShow == true
+end
+
+-- change screen size without changing window size, using black color to fill window
+-- @param width, height: if nil, it will fit entire window
+-- @param bFitWindow: if true, it will fit window size
+function options:SetScreenSize(width, height, bFitWindow)
+	NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+	local Screen = commonlib.gettable("System.Windows.Screen");
+	local ui_scaling = Screen:GetUIScaling(true)
+
+	local function SetMargin_(left, top, right, bottom)
+		local viewportScene = ViewportManager:GetSceneViewport();
+		local viewportUI = ViewportManager:GetGUIViewport();
+		viewportUI:SetMargins(left, top, right, bottom)
+		viewportScene:SetMargins(left, top, right, bottom)
+	end
+
+	if(width and height) then
+		local screenWidth, screenHeight = Screen:GetWindowSolution()
+		local newWidth, newHeight = width, height;
+		if(screenWidth / screenHeight > width / height) then
+			newWidth = math.floor(screenHeight * width / height);
+			local halfWidth = math.floor((screenWidth - newWidth)*0.5);
+			SetMargin_(halfWidth, 0, halfWidth, 0)
+		else
+			newHeight = math.floor(screenWidth / width * height);
+			local halfHeight = math.floor((screenHeight - newHeight)*0.5)
+			SetMargin_(0, halfHeight, 0, halfHeight)
+		end
+	else
+		-- fit entire window 
+		SetMargin_(0, 0, 0, 0)
+	end
+end
+
+function options:SetCanDropFile(bValue)
+	self.CanDropFile = bValue;
+end
+
+function options:SetCanPasteBlock(bValue)
+	self.CanPasteBlock = bValue;
+end
+
+function options:SetCanPasteBlockly(bValue)
+	self.CanPasteBlockly = bValue;
 end

@@ -317,17 +317,20 @@ function ParaWorldList.LoadAllWorlds(callback)
 				end
 			end
 
-			for i = 1, #(data.rows) do
-				if (data.rows[i].topNo == 0) then
-					local exist = false;
-					for j = 1, #ParaWorldList.Current_Item_DS do
-						if (ParaWorldList.Current_Item_DS[j].projectId == data.rows[i].projectId and ParaWorldList.Current_Item_DS[j].name == data.rows[i].name) then
-							exist = true;
-							break;
+			if data and data.rows then
+				local num = #(data.rows)
+				for i = 1,num  do
+					if (data.rows[i].topNo == 0) then
+						local exist = false;
+						for j = 1, #ParaWorldList.Current_Item_DS do
+							if (ParaWorldList.Current_Item_DS[j].projectId == data.rows[i].projectId and ParaWorldList.Current_Item_DS[j].name == data.rows[i].name) then
+								exist = true;
+								break;
+							end
 						end
-					end
-					if (not exist) then
-						ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data.rows[i];
+						if (not exist) then
+							ParaWorldList.Current_Item_DS[#ParaWorldList.Current_Item_DS+1] = data.rows[i];
+						end
 					end
 				end
 			end

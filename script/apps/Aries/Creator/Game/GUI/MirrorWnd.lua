@@ -39,7 +39,9 @@ end
 -- @param blocks: block list 
 function MirrorWnd.ShowPage(blocks, pivot_x, pivot_y, pivot_z, callbackFunc)
 	MirrorWnd.LoadBlocks(blocks, pivot_x, pivot_y, pivot_z);
-	MirrorWnd.axis_xyz = "x"
+	settings.xyz = "x";
+	MirrorWnd.axis_xyz = settings.xyz
+	
 
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/MirrorWnd.html", 

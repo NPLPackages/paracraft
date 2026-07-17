@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="MobilePermissionPage.lua" ><![CDATA[
+    local MobilePermissionPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobilePermissionPage.lua")
+    MobilePermissionPage.OnInit()
+
+    function OnAgree()
+        MobilePermissionPage.OnAgree()
+    end
+
+    function OnNoAgree()
+        MobilePermissionPage.OnNoAgree()
+    end
+
+]]></script>
+<mb:window ClickThrough="false" width="800" height="480" title='<%= L"获取权限提醒"%>'>
+    <div style="margin-top: 100px; height: 60px; text-align: center; font-size: 30px; base-font-size: 30px; font-weight: bold;"><%=L"帕帕奇遇记需要获取手机以下权限"%></div>
+    <div style="margin-top: 20px; width: 660px; margin-left: 75px; font-size: 20px; base-font-size: 20px;">
+        1、手机存储权限，以用于保存您在帕帕奇遇记上录制的视频、音频、图片等内容。<br/>
+        <br/>
+        2、麦克风权限，以用于您在使用帕帕奇遇记录制做作品视频时录制音频内容。<br/>
+        <br/>
+        3、录制/投射屏幕权限，以用于录制作品画面内容。<br/>
+    </div>
+    <div align="center" style="margin-top: 50px; width: 580px;">
+        <input type="button" value='<%=L"允许"%>' onclick="OnAgree" style="margin-left: 13px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt1_244x76_32bits.png#0 0 244 76)" />
+        <input type="button" value='<%=L"不允许"%>' onclick="OnNoAgree" style="margin-left: 70px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt3_244x76_32bits.png#0 0 244 76)" />
+    </div>
+    
+</mb:window>
+</pe:mcml>
+</body>
+</html>

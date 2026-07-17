@@ -64,7 +64,7 @@ function Keepwork:FirstLoginCallback()
     local userinfo = self:GetUserInfo();
     userinfo.extra = userinfo.extra or {};
     userinfo.extra.ParacraftPlayerEntityInfo = userinfo.extra.ParacraftPlayerEntityInfo or {};
-    userinfo.extra.ParacraftPlayerEntityInfo.asset = userinfo.extra.ParacraftPlayerEntityInfo.asset or "character/CC/02human/paperman/boy01.x";
+    userinfo.extra.ParacraftPlayerEntityInfo.asset = userinfo.extra.ParacraftPlayerEntityInfo.asset or "character/CC/02human/CustomGeoset/actor.x";
     -- 本地化主角模型 
     GameLogic.options:SetMainPlayerAssetName(userinfo.extra.ParacraftPlayerEntityInfo.asset);    
     -- 将默认模型提交至服务器
@@ -152,16 +152,26 @@ function Keepwork:OnLogin()
     LOG.std(nil, 'info', 'new_skin', self:GetUserSkin());
     
     if (old_skin ~= new_skin and new_skin == "" and userinfo.extra.ParacraftPlayerEntityInfo.asset == CustomCharItems.defaultModelFile) then  
-        userinfo.extra.ParacraftPlayerEntityInfo.asset = "character/CC/02human/paperman/boy01.x" 
+        userinfo.extra.ParacraftPlayerEntityInfo.asset = "character/CC/02human/CustomGeoset/actor.x" 
     end 
+
+    if userinfo.extra.ParacraftPlayerEntityInfo.scale and userinfo.extra.ParacraftPlayerEntityInfo.scale > 1 then
+        userinfo.extra.ParacraftPlayerEntityInfo.scale = 1;
+    end
     
     GameLogic.options:SetMainPlayerAssetName(userinfo.extra.ParacraftPlayerEntityInfo.asset);  
     GameLogic.options:SetMainPlayerSkins(userinfo.extra.ParacraftPlayerEntityInfo.skin or "");  
 
     local player = EntityManager.GetPlayer();
     if (player) then 
-        player:SetSkin(userinfo.extra.ParacraftPlayerEntityInfo.skin);
-        player:SetMainAssetPath(userinfo.extra.ParacraftPlayerEntityInfo.asset);
+        local skin = userinfo.extra.ParacraftPlayerEntityInfo.skin
+        local assetfile = userinfo.extra.ParacraftPlayerEntityInfo.asset
+        if System.options.isEducatePlatform then
+            skin = "80001;84129;81112;88042;"
+            assetfile = "character/CC/02human/CustomGeoset/actor_kaka.x"
+        end
+        player:SetMainAssetPath(assetfile);
+        player:SetSkin(skin);
     end
 
     if (old_skin ~= new_skin) then

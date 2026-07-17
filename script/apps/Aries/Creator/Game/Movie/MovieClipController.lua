@@ -15,6 +15,7 @@ NPL.load("(gl)script/ide/DateTime.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieUISound.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GameRules/GameMode.lua");
+local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
 local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local MovieUISound = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieUISound");
@@ -105,7 +106,7 @@ end
 -- @param state: "activated", "deactivated", "recording", "not_recording", "playmodeChange", "replay"
 function MovieClipController:OnChangeMovieClipState(state)
 	if(state == "activated" or state == "playmodeChange") then
-		if(GameMode:CanShowTimeLine() and (MovieManager:IsLastModeEditor() and not MovieManager:IsCapturing())) then
+		if(AllContext:GetContext("movie"):IsForceEditorMode() or (GameMode:CanShowTimeLine() and (MovieManager:IsLastModeEditor() and not MovieManager:IsCapturing()))) then
 			self:ShowAllGUI(true);
 		else
 			self:ShowAllGUI(false);
@@ -174,10 +175,14 @@ function MovieClipController:OnActiveMovieClipChange(clip)
 	end
 end
 
-function MovieClipController:OnMovieClipRemotelyUpdated()
+function MovieClipController:RefreshPage()
 	if(page and page:IsVisible()) then
 		page:Refresh(0.1);
 	end
+end
+
+function MovieClipController:OnMovieClipRemotelyUpdated()
+	MovieClipController:RefreshPage()
 end
 
 function MovieClipController.OnClosePage()
@@ -192,7 +197,8 @@ function MovieClipController.OnClosePage()
 	GameLogic.GetFilters():apply_filters("OnCloseMovieController",MovieClipController.GetMovieClip())	
 	MovieClipController:OnActiveMovieClipChange(nil);
 	MovieClipController.ClearUiAnim()
-	
+	MovieClipController.UpdateCameraViewport(false)
+	MovieClipController.ShowCameraViewPage(false)
 end
 
 function MovieClipController:OnSelectedActorChange(actor)
@@ -430,6 +436,7 @@ function MovieClipController.ShowPage(bShow, OnClose)
 				style = CommonCtrl.WindowFrame.ContainerStyle,
 				allowDrag = true,
 				enable_esc_key = false,
+				SelfPaint = true, SelfPaintTextureName = "MovieClipController",
 				bShow = bShow,
 				click_through = false, 
 				zorder = -1,
@@ -444,6 +451,17 @@ function MovieClipController.ShowPage(bShow, OnClose)
 		params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"MovieClipController");
 		System.App.Commands.Call("File.MCMLWindowFrame", params);
 		if(params._page) then
+			if(params._page.SelfPaint) then
+				local Item = commonlib.gettable("MyCompany.Aries.Game.Items.Item");
+				local textureAtlas = Item:GetIconAtlas();
+				if(textureAtlas) then
+					textureAtlas:Connect("TextureUpdated", MovieClipController, MovieClipController.MarkDirty, "UniqueConnection");
+				end
+				local ModelTextureAtlas = commonlib.gettable("MyCompany.Aries.Game.Common.ModelTextureAtlas");
+				if(ModelTextureAtlas and ModelTextureAtlas.Connect) then
+					ModelTextureAtlas:Connect("TextureUpdated", MovieClipController, MovieClipController.MarkDirty, "UniqueConnection");
+				end
+			end
 			params._page.OnClose = function()
 				MovieClipController:SetForceEditorMode(false);
 				MovieClipController.OnClosePage();
@@ -455,12 +473,14 @@ function MovieClipController.ShowPage(bShow, OnClose)
 				MovieClipController.mytimer:Change();
 			end
 		end
+		MovieClipController.UpdateCameraViewport(MovieClipController.isShowCameraView)
 	else
 		if(page) then
 			page:Refresh(0.1);
 		end
 		if(bShow == false) then
 			page:CloseWindow();
+			MovieClipController.UpdateCameraViewport(false)
 		end
 		MovieClipController:SetForceEditorMode(false);
 	end
@@ -478,6 +498,11 @@ function MovieClipController.ShowPage(bShow, OnClose)
 	end
 end
 
+function MovieClipController:MarkDirty()
+	if(page and page.SelfPaint) then
+		page:InvalidateRect();
+	end
+end
 
 function MovieClipController.IsVisible()
 	if(page) then
@@ -860,13 +885,41 @@ function MovieClipController.OnCaptureVideo()
 	MovieManager:ToggleCapture();
 end
 
+function MovieClipController.GetTitle()
+	local movieClip = MovieClipController.GetMovieClip();
+	if(movieClip) then
+		local entity = movieClip:GetEntity();
+		if(entity) then
+			local name = entity:GetDisplayName()
+			if(name == "") then
+				name = nil;
+			end
+			return name or L"电影片段";
+		end
+	end
+	return L"电影片段";
+end
+
 function MovieClipController.OnSettings()
 	local movieClip = MovieClipController.GetMovieClip();
 	if(movieClip) then
 		local selectedActor = movieClip:GetSelectedActor();
 		if(selectedActor) then
 			-- select me to edit. 
-			selectedActor:SelectMe();
+			if(not selectedActor:SelectMe()) then
+				-- show editor for current movie block intead of actor.
+				local entity = movieClip:GetEntity();
+				if(entity and entity.SetDisplayName) then
+					local oldValue = entity:GetDisplayName() or "";
+					NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
+					local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
+					EnterTextDialog.ShowPage(L"输入电影方块新名字", function(result)
+						if(result and result ~= oldValue) then
+							entity:SetDisplayName(result);
+						end
+					end, oldValue, nil, nil, {auto_virtual_keyboard=false})
+				end
+			end
 		else
 			local entity = movieClip:GetEntity();
 			if(entity and entity.OpenBagEditor) then
@@ -1046,4 +1099,151 @@ function MovieClipController.GetCurSelectSlotIndex()
 	end
 
 	return 0
+end
+
+function MovieClipController.UpdateCameraViewport(bVisible)
+	NPL.load("(gl)script/ide/System/Scene/Viewports/Viewport.lua");
+	local Viewport = commonlib.gettable("System.Scene.Viewports.Viewport");
+	if(bVisible) then
+		-- create custom viewport. 
+		if(not MovieClipController.cameraViewport) then
+			local viewport = Viewport:new():init("movieclipCamera")
+			viewport:SetRenderTargetName("_miniscenegraph_movieclipCamera", 200, 112)
+			viewport:SetEnabled(true)
+			MovieClipController.cameraViewport = viewport;
+		end
+		local x, y, z = ParaScene.GetPlayer():GetPosition()
+		MovieClipController.cameraViewport:SetCameraViewParams({x, y, z}, {x+10, y+10, z}, {0,1,0});
+
+		MovieClipController.viewportTimer = MovieClipController.viewportTimer or commonlib.Timer:new({callbackFunc = function(timer)
+			if(not MovieClipController.cameraViewport) then
+				timer:Change()
+				return
+			end
+			local movieClip = MovieManager:GetActiveMovieClip()
+			local entity = movieClip and movieClip:GetEntity();
+			if(entity) then
+				local cameraItem = entity:GetCameraItemStack();
+				if(cameraItem) then
+					local actor = movieClip:GetActorFromItemStack(cameraItem);
+					if(actor) then
+						local entity = actor:GetEntity()
+						if(entity) then
+							local x, y, z = actor:ComputePosition()
+							if(not x) then
+								x, y, z = entity:GetPosition()
+							end
+							y = y + 0.5 * 0.875; -- adjust to eye height
+							local eye_dist = entity.eye_dist;
+							local eye_liftup = entity.eye_liftup;
+							local eye_rot_y = entity.eye_rot_y;
+							local eye_roll = entity.eye_roll;
+							if(eye_dist) then
+								local dir = mathlib.vector3d:new({1, 0, 0})
+								dir:rotateZYX(eye_liftup, eye_rot_y+math.pi, 0)
+								local vUp = mathlib.vector3d.unit_y;
+								if(eye_roll~=0) then
+									local quatRot = mathlib.Quaternion:new():FromAngleAxis(-eye_roll, dir)
+									vUp = quatRot * vUp
+								end
+								MovieClipController.cameraViewport:SetCameraViewParams({x, y, z}, {x + dir[1]*eye_dist, y + dir[2]*eye_dist, z + dir[3]*eye_dist}, vUp);
+							end
+						end
+					end
+				end	
+			end
+		end})
+		MovieClipController.viewportTimer:Change(0,50)
+	else
+		if(MovieClipController.cameraViewport) then
+			MovieClipController.cameraViewport:Destroy();
+			MovieClipController.cameraViewport = nil;
+		end
+		if(MovieClipController.viewportTimer) then
+			MovieClipController.viewportTimer:Change()
+		end
+	end
+end
+
+function MovieClipController.OnClickCameraView()
+	MovieClipController.isShowCameraView = not MovieClipController.isShowCameraView;
+
+	MovieClipController.UpdateCameraViewport(MovieClipController.isShowCameraView)
+	MovieClipController.ShowCameraViewPage(MovieClipController.isShowCameraView)
+end
+
+function MovieClipController.OnClickGlobalConfig()
+	MovieClipController.ShowGlobalConfigPage(true)
+end
+
+function MovieClipController.ShowGlobalConfigPage(bShow)
+	local _page = MovieClipController.globalConfigPage;
+	if(bShow) then
+		if(not _page) then
+			local width, height = 300, 300;
+			local params = {
+				url = "script/apps/Aries/Creator/Game/Movie/MovieClipGlobalConfig.html", 
+				name = "MovieClipGlobalConfig.ShowPage", 
+				isShowTitleBar = false,
+				DestroyOnClose = true,
+				bToggleShowHide = false, 
+				style = CommonCtrl.WindowFrame.ContainerStyle,
+				allowDrag = true,
+				enable_esc_key = false,
+				bShow = true,
+				click_through = false, 
+				zorder = -1,
+				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+				directPosition = true,
+				align = "_ct",
+				x = -width / 2,
+				y = -height / 2,
+				width = width,
+				height = height,
+			};
+			System.App.Commands.Call("File.MCMLWindowFrame", params);
+			MovieClipController.globalConfigPage = params._page;
+		end
+	else
+		if(_page) then
+			_page:CloseWindow();
+			MovieClipController.globalConfigPage = nil;
+		end
+	end
+end
+
+function MovieClipController.ShowCameraViewPage(bShow)
+	local _page = MovieClipController.cameraViewPage;
+	if(bShow) then
+		if(not _page) then
+			local width, height = 220, 180;
+			local params = {
+				url = "script/apps/Aries/Creator/Game/Movie/MovieClipCameraView.html", 
+				name = "MovieClipCameraView.ShowPage", 
+				isShowTitleBar = false,
+				DestroyOnClose = true,
+				bToggleShowHide = false, 
+				style = CommonCtrl.WindowFrame.ContainerStyle,
+				allowDrag = true,
+				enable_esc_key = false,
+				bShow = true,
+				click_through = false, 
+				zorder = -1,
+				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+				directPosition = true,
+				align = "_rb",
+				x = -width - 28,
+				y = -height - 287 - 52,
+				width = width,
+				height = height,
+			};
+			System.App.Commands.Call("File.MCMLWindowFrame", params);
+			MovieClipController.cameraViewPage = params._page;
+		end
+	else
+		if(_page) then
+			_page:CloseWindow();
+			MovieClipController.cameraViewPage = nil;
+		end
+	end
 end

@@ -216,12 +216,17 @@ end
 -- it will replace the last added mesh if child count exceeded self.maxSubMeshCount.
 -- all sub mesh model are assumed to be centered at 0,0,0 and with height +/-0.5
 -- @param file: must be parax model file. (x or fbx files)
-function Entity:AddSubMesh(filename)
+function Entity:AddSubMesh(filename, texture)
 	local sky = self:GetSkyAttr();
 	local childCount = sky:GetChildCount();
 	if(childCount < self.maxSubMeshCount) then
 		local submesh = ParaScene.CreateObject("BMaxObject", filename, 0,0,0);
 		submesh:SetField("assetfile", filename);
+
+		if texture then
+			submesh:SetReplaceableTexture(2, ParaAsset.LoadTexture("", texture, 1));
+		end
+
 		sky:AddChild(submesh:GetAttributeObject());
 	elseif(childCount >0) then
 		local submesh = sky:GetChildAt(childCount-1);

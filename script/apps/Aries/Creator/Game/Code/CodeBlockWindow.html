@@ -26,9 +26,15 @@ end
         <input type="button" uiname="CodeBlockWindow.settings" name="settings" tooltip='<%=L"左键查看设置，右键传送到代码方块"%>' style="margin-left: 0px;margin-top:4px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="CodeBlockWindow.OnClickSettings()"/>
         <div style="position:relative;float:left;width:82px;" align="right">
             <input type="button" uiname="CodeBlockWindow.tutorial" tooltip='<%=L"教程"%>' onclick="CodeBlockWindow.OnOpenTutorials" style="margin-top:7px;color:#ffffff;font-size:12px;width:25px;height:25px;background:url(Texture/Aries/Combat/Battle/teen/help_32bits.png)" />
-            <input type="button" uiname="CodeBlockWindow.resizeBtn" name="resizeBtn" tooltip='<%=L"放缩窗口"%>' onclick="CodeBlockWindow.ToggleSize()" style="margin-left:2px;margin-top:5px;width:28px;height:28px;background:url(Texture/3DMapSystem/Creator/Objects/Tool_Move.png);" />
+            <input type="button" uiname="CodeBlockWindow.resizeBtn" name="resizeBtn" tooltip='<%=L"放缩窗口"%>' onclick="CodeBlockWindow.ToggleSize()" style="margin-left:7px;margin-top:10px;width:18px;height:18px;background:url(Texture/Aries/Creator/player/codeblockwindow/quanping_29x29_32bits.png#0 0 29 29);" />
             <input type="button" uiname="CodeBlockWindow.saveAndClose" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" class="mc_close_button" style="margin-left:2px;margin-top:10px;" />
         </div>
+        <pe:if condition="<%=CodeBlockWindow.IsShowMqttUI()%>">
+            <div style="position:relative;float:left;width:176px;" align="right">
+                <input type="button" uiname="CodeBlockWindow.mqtt" tooltip='<%=L"mqtt管理器"%>' onclick="CodeBlockWindow.OnOpenMqttPage" style="float: left; margin-top:12px;color:#ffffff;font-size:12px;width:80px;height:25px;background:url(Texture/Aries/Creator/keepwork/Window/mqtt_80x20_32bits.png#0 0 80 25)" />
+                <div style="float: left; margin-left: 2px; margin-top: 12px; width: 1px; height: 15px; background-color: #ffffffd8;"></div>
+            </div>
+        </pe:if>
     </div>
     <pe:if condition='<%=CodeBlockWindow.temp_nplbrowser_reload%>'>
         <pe:container alignment="_fi" style="position:relative;margin-bottom:54px;background:url();">

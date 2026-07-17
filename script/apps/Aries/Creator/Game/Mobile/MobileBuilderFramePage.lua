@@ -65,7 +65,7 @@ end
 
 function MobileBuilderFramePage.RefreshPage()
 	if(page) then
-		page:Refresh(0.01)
+		page:Refresh(0.1)
 	end
 end
 
@@ -127,9 +127,20 @@ function MobileBuilderFramePage.OnChangeCategory(index, bRefreshPage)
 		-- if not GameLogic.Macros:IsRecording() and not GameLogic.Macros:IsPlaying() then
 		-- 	MobileBuilderFramePage.UpdateItemsData(category.name)
 		-- end
+		MobileBuilderFramePage.Current_Item_DS = commonlib.filter(MobileBuilderFramePage.Current_Item_DS,function (block)
+			return block.block_id ~= 10516 
+				and block.block_id ~= 10517 
+				and block.block_id ~= 10518 
+				and block.block_id ~= 10519 
+				and block.block_id ~= 10073
+				and block.block_id ~= 10030
+				and block.block_id ~= 271
+				and block.block_id ~= 275
+		end)
 		MobileBuilderFramePage.category_name = category.name;
 	end
 	if category.name == "template" then
+		MobileBuilderFramePage.select_template_index = -1
 		MobileBuilderFramePage.OnChangeTempCategory(1,true)
 	end
 	if bRefreshPage == false then
@@ -157,7 +168,11 @@ function MobileBuilderFramePage.UpdateItemsData(category_name)
 end
 
 function MobileBuilderFramePage.CheckHasItem(index)
-	local inventory = GameLogic.EntityManager.GetPlayer().inventory
+	local player = GameLogic.EntityManager.GetPlayer()
+	if not player then
+		return false
+	end
+	local inventory = player.inventory
 	if inventory then
 		local block_id, block_count = inventory:GetItemByBagPos(tonumber(index))
 		return block_id and block_id > 0
@@ -223,7 +238,7 @@ end
 
 function MobileBuilderFramePage.OnClickActorContextMenuItem(node)
 	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-	local filename = BuilderFramePage.rightCtxValue
+	local filename = MobileBuilderFramePage.rightCtxValue
 	local isBmax = filename:match("%.bmax$")
 	if(node.Name == "take") then
 		BuilderFramePage._TakeBmax(filename)
@@ -236,10 +251,10 @@ function MobileBuilderFramePage.OnClickActorContextMenuItem(node)
 			path = string.gsub(path,ParaIO.GetWritablePath(),"")
 			GameLogic.AddBBS(nil, L"成功删除文件并备份为："..commonlib.Encoding.DefaultToUtf8(path))
 		end
-		BlockTemplatePage.GetAllTemplatesDS(true)
-		if page then
-			page:Refresh(0)
-		end
+		MobileBuilderFramePage.GetAllTemplatesDS(true)
+		local pre_template_index = MobileBuilderFramePage.select_template_index
+		MobileBuilderFramePage.select_template_index = -1
+		MobileBuilderFramePage.OnChangeTempCategory(pre_template_index ~= -1 and pre_template_index or 1,true)
 	end
 end
 

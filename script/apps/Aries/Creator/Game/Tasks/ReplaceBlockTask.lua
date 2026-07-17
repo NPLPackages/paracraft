@@ -7,7 +7,7 @@ Support undo/redo
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
-local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX, blockY, blockZ, from_id, [from_data,] to_id, to_data=nil, max_radius = 20, preserveRotation = true})
+local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX, blockY, blockZ, from_id, [from_data,] to_id, to_data=nil, max_radius = 20, preserveRotation = true, add_to_history=nil})
 -- if max_radius=0, it just replace the one clicked
 local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blocks={}, to_id=number})
 task:Run();
@@ -57,25 +57,30 @@ function ReplaceBlock:Run()
 			GameLogic.SetModified();
 		end
 	elseif(next(self.blocks) and self.to_id) then
-		local _, block
+		local count = 0;
 		for _, block in ipairs(self.blocks) do
-			self:ReplaceBlock(block[1], block[2], block[3]);
+			count = count + (self:ReplaceBlock(block[1], block[2], block[3]) or 0);
 		end
 		TaskManager.AddTask(self);
 		GameLogic.SetModified();
+		return count;
 	elseif(self.blockX and self.to_id) then
 		if(not self.from_id) then
 			self.from_id, self.from_data = BlockEngine:GetBlockFull(self.blockX, self.blockY, self.blockZ);
 			if(self.from_id and self.from_id>0 and 
 				(self.from_id ~= self.to_id or self.from_data~=self.to_data) ) then
 				
-				self:ReplaceBlock(self.blockX, self.blockY, self.blockZ);
+				
+				local count = self:ReplaceBlock(self.blockX, self.blockY, self.blockZ);
 				self.blocks[#(self.blocks)+1] = {self.blockX, self.blockY, self.blockZ};
 
 				local tx, ty, tz = BlockEngine:real(self.blockX,self.blockY,self.blockZ);
 				GameLogic.PlayAnimation({animationName = "Create",facingTarget = {x=tx, y=ty, z=tz},});
 				TaskManager.AddTask(self);
 				GameLogic.SetModified();
+				return count;
+			else
+				return 0;
 			end
 		end
 	end
@@ -110,15 +115,25 @@ end
 
 function ReplaceBlock:ReplaceBlock(x, y, z)
 	local from_id, from_data, from_entity_data = BlockEngine:GetBlockFull(x,y,z)
+	local bCanReplace = GameLogic.EditableWorld:GetBlockCanDestroy(x, y, z)
 	if(not self.from_id) then
+		if not bCanReplace then
+			GameLogic.AddBBS(nil, L'方块不可替换', 5000, '0 255 0')
+			return 
+		end
 		if(from_id ~= self.to_id or (self.to_data or 0) ~= from_data) then
 			BlockEngine:SetBlock(x,y,z, self.to_id, self.to_data or 0, 3);
 			ReplaceBlock.replace_num = ReplaceBlock.replace_num + 1
-			if(GameLogic.GameMode:CanAddToHistory()) then
+			if(self.add_to_history or GameLogic.GameMode:CanAddToHistory()) then
 				self.history[#(self.history)+1] = {x,y,z, from_id, from_data, from_entity_data};
 			end
+			return ReplaceBlock.replace_num
 		end
 	elseif( from_id == self.from_id) then
+		if not bCanReplace then
+			GameLogic.AddBBS(nil, L'方块不可替换', 5000, '0 255 0')
+			return 
+		end
 		local fromBlock = block_types.get(from_id);
 		if( (fromBlock and fromBlock.color_data and from_data == self.from_data) or 
 			(fromBlock and fromBlock.color8_data and band(from_data, 0xff00)==band(self.from_data, 0xff00)) or 
@@ -144,10 +159,14 @@ function ReplaceBlock:ReplaceBlock(x, y, z)
 				end
 				BlockEngine:SetBlock(x,y,z, self.to_id, to_data or 0, 3);
 				ReplaceBlock.replace_num = ReplaceBlock.replace_num + 1
-				if(GameLogic.GameMode:CanAddToHistory()) then
+				if(self.add_to_history or GameLogic.GameMode:CanAddToHistory()) then
 					self.history[#(self.history)+1] = {x,y,z, from_id, from_data, from_entity_data};
 				end
+				return ReplaceBlock.replace_num
 			end
+		else
+			-- same block
+			return 0;
 		end
 	end
 end
@@ -173,12 +192,12 @@ function ReplaceBlock:FrameMove()
 		self.blocks = self.new_blocks;
 	else
 		self.finished = true;
-		if(GameLogic.GameMode:CanAddToHistory()) then
+		if(self.add_to_history or GameLogic.GameMode:CanAddToHistory()) then
 			if(#(self.history) > 0) then
 				UndoManager.PushCommand(self);
 			end
 		end
-		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",ReplaceBlock.replace_num)
+		GameLogic.GetFilters():apply_filters("BatchModifyBlocks",ReplaceBlock.replace_num)
 		ReplaceBlock.replace_num = 0
 	end
 end

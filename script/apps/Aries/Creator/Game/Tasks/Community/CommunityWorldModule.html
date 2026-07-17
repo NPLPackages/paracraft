@@ -1,0 +1,146 @@
+<!-- script/apps/Aries/Creator/Game/Tasks/Community/CommunityWorldModule.html -->
+<body>
+    <pe:mcml>
+        <script type='text/npl'>
+            <![CDATA[
+                local CommunityWorldModule = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityWorldModule.lua")
+                CommunityWorldModule.OnInit()
+                local page = document:GetPageCtrl()
+
+                function close_page()
+                    page:CloseWindow()
+                end
+
+                function GetTreeDatas()
+                    return CommunityWorldModule.category_datas
+                end
+
+                function OnSelectMenu(node)
+                    local data = node.mcmlNode:GetPreValue("this")
+                    CommunityWorldModule.OnSelectMenu(data)
+                end
+
+                function OnClickCategory(name,mcmlNode)
+                    local data = mcmlNode:GetAttribute("param1");
+                    CommunityWorldModule.OnClickCategory(data)
+                end
+
+                function IsMenuSelected(data)
+                    return CommunityWorldModule.IsMenuSelected(data)
+                end
+
+                function GetProjectData(index)
+                    if index == nil then
+                        return #CommunityWorldModule.project_datas
+                    else
+                        return CommunityWorldModule.project_datas[index]
+                    end
+                end
+
+                function GetVipIcon(vipType)
+                    if vipType == 1 then
+                        return "Texture/Aries/Creator/keepwork/community_32bits.png#142 214 36 16"
+                    elseif vipType == 2 then
+                        return "Texture/Aries/Creator/keepwork/community_32bits.png#76 214 36 16"
+                    end
+                end
+
+                function OnClickProject(name,mcmlNode)
+                    local data = mcmlNode:GetAttribute("param1");
+                    CommunityWorldModule.OnClickProject(data)
+                end
+            ]]>
+        </script>
+        <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+            <pe:container alignment="_ct" width="1000" height="550" style="margin-left:-480px;margin-top:-275px;background-color: #2e2e2e; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+                <div style="width: 1000;height: 550px;">
+                    <div style="width: 1000;height: 40px;margin-top: 0px;">
+                        <div style="float: left;margin-left: 12px;margin-top: 12px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;"><%=L"新建项目"%></div>
+                        <div onclick="close_page()" style="float: left;margin-left: 960px;margin-top: -20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+                    </div>
+                    <div style="position: relative; width: 1000px; height: 1px; margin-top: 10px; background-color: #313131ff"></div>
+                    
+                    <div style="float:left;width:140px; margin-top: 15px; margin-left: 5px;">
+                        <div style="padding-top:3px;padding-bottom:3px;">
+                            <pe:treeview ItemToggleSize="0" uiname="CommunityWorldModule.tvwMenus" name="tvwMenus" VerticalScrollBarStep="20" DataSource='<%=GetTreeDatas()%>' RememberScrollPos="true" DefaultNodeHeight="35" style="height:480px;background:;">
+                                <NodeTemplates>
+                                    <NodeTemplate DataType="children">
+                                        <div style="float: left; width: 90px; height: 30px;">
+                                            <pe:if condition='<%=IsMenuSelected(XPath("this")) %>'>
+                                                <input type="button" value='<%=XPath("this|text")%>' param1="<%=XPath('this')%>" onclick="OnClickCategory" style="text-align: left; text-offset-x:12; width: 90px; height: 30px; color: #ffffff; background: url(); "/>
+                                            </pe:if>
+
+                                            <pe:if condition='<%=not IsMenuSelected(XPath("this")) %>'>
+                                                <input type="button" value='<%=XPath("this|text")%>' param1="<%=XPath('this')%>" onclick="OnClickCategory" style="text-align: left; text-offset-x:12; width: 90px; height: 30px; color: #7B7A8A; background: url(); "/>
+                                            </pe:if>
+                                        </div>
+                                    </NodeTemplate>
+                                    
+                                    <NodeTemplate DataType="category" >
+                                        <pe:treenode RenderTemplate="category_template" OnClick="OnSelectMenu" can_select="true" MouseOverBG="" expanded='<%=XPath("this|expanded")%>'></pe:treenode>
+                                    </NodeTemplate>
+                                    <NodeTemplate DataType="category_template" >
+                                        <div style="float: left; width: 122px; height: 30px;">
+                                            <pe:if condition='<%=IsMenuSelected(XPath("this")) %>'>
+                                                <pe:if condition='<%=XPath("this|expanded") == true %>'>
+                                                    <input type="button" value='<%=XPath("this|text")%>' param1="<%=XPath('this')%>" icon="Texture/Aries/Creator/keepwork/community_32bits.png#32 215 16 16" icon_width="12" icon_height="12" icon_off_x="-42"  style="text-align: left; text-offset-x:28; width: 122px; height: 30px; background-color: #6761C7; color: #ffffff;  background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"/>
+                                                </pe:if>
+
+                                                <pe:if condition='<%=XPath("this|expanded") == false %>'>
+                                                    <input type="button" value='<%=XPath("this|text")%>' param1="<%=XPath('this')%>" icon="Texture/Aries/Creator/keepwork/community_32bits.png#6 214 16 16" icon_width="12" icon_height="12" icon_off_x="-42"  style="text-align: left; text-offset-x:28; width: 122px; height: 30px; background-color: #6761C7; color: #ffffff;  background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"/>
+                                                </pe:if>
+                                            </pe:if>
+
+                                            <pe:if condition='<%=not IsMenuSelected(XPath("this")) %>'>
+                                                <pe:if condition='<%=XPath("this|expanded") == true %>'>
+                                                    <input type="button" value='<%=XPath("this|text")%>' param1="<%=XPath('this')%>" icon="Texture/Aries/Creator/keepwork/community_32bits.png#32 215 16 16" icon_width="12" icon_height="12" icon_off_x="-42"  style="text-align: left; text-offset-x:28; width: 122px; height: 30px; background-color: #454545; color: #ffffff;  background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"/>
+                                                </pe:if>
+
+                                                <pe:if condition='<%=XPath("this|expanded") == false %>'>
+                                                    <input type="button" value='<%=XPath("this|text")%>' param1="<%=XPath('this')%>" icon="Texture/Aries/Creator/keepwork/community_32bits.png#6 214 16 16" icon_width="12" icon_height="12" icon_off_x="-42"  style="text-align: left; text-offset-x:28; width: 122px; height: 30px; background-color: #454545; color: #ffffff;  background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"/>
+                                                </pe:if>
+                                            </pe:if>
+                                            
+                                        </div>
+                                    </NodeTemplate>
+                                </NodeTemplates>
+                            </pe:treeview>
+                        </div>
+                    </div>
+                    <!-- <div style='float:left;'tooltip='<%= L"观看：" .. get_project_views() %>'>
+                                    <img src='Texture/Aries/Creator/keepwork/community_32bits.png#226 238 16 16' style='width: 16px;height: 16px;margin-top: 4px;' />
+                                    <div style='float:left;margin-left: 2px; margin-top: 2px;'><%= get_project_views() %></div>
+                                </div> -->
+                    <div style="float: left; width: 1px; height: 500px; margin-top: 10px; margin-left: -3px; background-color: #313131ff"></div>
+                    <div style="float: left; width: 840px; margin-left: 3px; height: 500px; margin-top: 10px;" >
+                        <div style="width: 870px; height: 500px;">
+                            <pe:gridview RememberScrollPos="true" AllowPaging="false" name="CommunityWorldModule.slot_gridview1" CellPadding="8" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="14" ItemsPerLine="4" DefaultNodeHeight = "180" 
+                                DataSource='<%=GetProjectData%>'>
+                                <Columns>
+                                    <div zorder="-3"  style=" width: 200px; height: 180px; background-color: #2E2E2E; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                        <img zorder="-2" src="<%=Eval('img_bg')%>" style="position: relative; margin-left: 0px; margin-top: 0px; width: 200px; height: 150px;"/>
+                                        <img zorder="-1" src="<%=GetVipIcon(Eval('vipType'))%>" style="position: relative; margin-left: 8px; margin-top: 8px; width: 36px; height: 16px;"/>
+                                        <!-- <pe:container zorder="1" style="position: relative; height:16px; margin-left: 8px; margin-top: 124px; padding-left: 4px; padding-right: 4px; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#486 153 16 16:6 6 6 6)">
+                                            <div style='width: 16px;height: 16px; margin-top: 0px; background-color: #38374D; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#226 238 16 16);' ></div>
+                                            <div style='margin-left: 18px; margin-top: -19px; color: #38374D;'>666</div>
+                                        </pe:container>  -->
+                                        <div style="position: relative; margin-top: 156px; color: #ffffff; font-size: 16px; base-font-size: 16px; font-weight: bold; width: 200px; height: 24px; text-align: center;"><%=Eval("name")%></div>
+                                        <input type="button" value="" param1="<%=XPath('this')%>" onclick="OnClickProject" style="width: 200px; height: 180px; background: url();" />
+                                    </div>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <div style='font-weight: bold;'>
+                                        <div align='center'style='width: 160px;height: 128px; margin-top: 160px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#2 2 160 128)'>
+                                        </div>
+                                        <div style="text-align: center; font-size: 14px; base-font-size: 14px; margin-top: -10px; color: #A8A7B0;" ><%=L"世界模板为空"%></div>
+                                    </div>
+                                </EmptyDataTemplate>
+                            </pe:gridview>
+                        </div>
+                    </div>
+                </div>
+            </pe:container>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

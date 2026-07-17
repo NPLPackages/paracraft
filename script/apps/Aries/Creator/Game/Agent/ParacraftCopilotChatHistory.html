@@ -1,0 +1,335 @@
+<template class="container">
+    <TemplateList
+        ref="tpl-list"
+        onscroll="OnScroll"
+        style="position: absolute;
+               left: 0px;
+               top: 0px;
+               width: 100%;
+               height: 100%;
+               padding-left: 16px;
+               padding-right: 16px;
+               background:;
+               overflow-y: scroll;">
+    </TemplateList>
+</template>
+
+<script type="text/lua">
+NPL.load("script/apps/Aries/Creator/Game/Agent/ParacraftCopilot.lua");
+local ParacraftCopilot = commonlib.gettable("MyCompany.Aries.Game.Agent.ParacraftCopilot");
+-- RegisterComponent("WindowTitleBar", "%vue%/Components/WindowTitleBar.html");
+
+local TemplateList = nil;
+
+local chatBarAvatarAgent = [[
+<div style="float: left;
+            width: 28px;
+            height: 28px;
+            background: url(Texture/Aries/Paracraft/ParacraftCopilot/avatar_28x28_x2_32bits.png#0 0 56 56)"></div>
+<div style="float: left;
+            margin-left: 2px;
+            margin-top: 4px;">{roleName}</div>
+]];
+
+local chatBarAvatarMe = [[
+<div style="float: left;
+            margin-top: 4px;">{roleName}</div>
+<div style="float: left;
+            width: 28px;
+            height: 28px;
+            margin-left: 2px;
+            background: url(Texture/Aries/Paracraft/ParacraftCopilot/user_26x26_32bits.png#0 0 26 26)"></div>
+]]
+
+local chatBar = [[
+    <div style="margin-bottom: 4px;
+                height: 30px;
+                width: 100%;
+                color: #2B4A6B;
+                position: relative;">
+        <div style="{avatarStyle}">
+            {avatar}
+        </div>
+    </div>
+    <div style="{lineStyle}">
+        {content}
+    </div>
+]];
+
+local lastChatBarCtl = nil;
+
+local useSeparatedRendering = false;
+
+function OnScroll()
+    if TemplateList.m_auto_scroll then
+        return
+    end
+
+    local top = TemplateList:GetVerticalScrollBar().thumb.top
+    local maxTop = TemplateList:GetVerticalScrollBar().thumb.maxTop
+
+    if top == maxTop then
+        TemplateList.m_auto_scroll = true
+    end
+end
+
+ParacraftCopilot.GoToArtifact = function(id)
+    TemplateList = GetRef("tpl-list");
+    local artifactCtl = TemplateList:GetElementById(id or "artifact_1");
+    if not artifactCtl then return end
+    local aLeft, aTop, aWidth, aHeight = artifactCtl:GetGeometry();
+    local chatBarCtl = artifactCtl:GetParentElement():GetParentElement();
+    if not chatBarCtl then return end
+    local cLeft, cTop, cWidth, cHeight = chatBarCtl:GetGeometry();
+
+    local top = cTop + aTop + 30;
+    TemplateList:GetVerticalScrollBar():ScrollTo(top or 0);
+end;
+
+function OnReady()
+    TemplateList = GetRef("tpl-list");
+    TemplateList:SetMouseWheelScaleDelta(1.5);
+end
+
+ParacraftCopilot.artifactStarted = false;
+ParacraftCopilot.isAddedArtifact = false;
+ParacraftCopilot.artifactEnded = false;
+local currentArtifactIndex = 0;
+function ResolveArtifacts(content)
+    local html_start, html_end = content:find("```html");
+
+    if (not html_start or not html_end) then
+        html_start, html_end = content:find("```python");
+    end
+
+    if (not html_start or not html_end) then
+        html_start, html_end = content:find("```javascript");
+    end
+
+    if (not html_start or not html_end) then
+        html_start, html_end = content:find("```lua");
+    end
+
+    if not html_start or not html_end then
+        html_start = nil;
+        html_end = nil;
+    end
+
+    local code_end = content:find("```", html_end);
+
+    if not html_start and not html_end and not code_end then return content end
+
+    local pre_content, artifact_content, post_content = "", "", "";
+    if (html_start) then
+        pre_content = string.sub(content, 1, html_start - 1);
+        ParacraftCopilot.artifactStarted = true;
+    end
+    if (html_end and code_end) then
+        artifact_content = string.sub(content, html_end + 1, code_end - 1);
+        post_content = string.sub(content, code_end + 3);
+        ParacraftCopilot.artifactEnded = true;
+    elseif (html_end and not code_end) then
+        artifact_content = string.sub(content, html_end + 1);
+        -- TODO: support multi-artifacts.
+    end
+
+    if (ParacraftCopilot.artifactStarted and not ParacraftCopilot.isAddedArtifact) then
+        ParacraftCopilot.AddArtifacts({});
+        ParacraftCopilot.isAddedArtifact = true;
+        currentArtifactIndex = currentArtifactIndex + 1;
+    end
+
+    local template = [[
+{pre_content}
+<div id="{id}" style="background-color:#d5d5d5;">
+{artifact_content}
+</div>
+{post_content}
+]];
+    template = template:gsub("{pre_content}", pre_content or "");
+    template = template:gsub("{artifact_content}", artifact_content or "");
+    template = template:gsub("{post_content}", post_content or "");
+    template = template:gsub("{id}", "artifact_" .. currentArtifactIndex);
+
+    content = template;
+    return content;
+end
+
+ParacraftCopilot.RefreshAllMessages = function(toEnd)
+    if (not TemplateList) then return end
+    local messages = ParacraftCopilot.GetMessages() or {};
+    local count = #messages;
+
+    TemplateList:ClearChildElement();
+    useSeparatedRendering = false;
+
+    currentArtifactIndex = 0;
+    ParacraftCopilot.SetArtifacts({});
+    for index, item in ipairs(messages) do
+        ParacraftCopilot.artifactStarted = false;
+        ParacraftCopilot.isAddedArtifact = false;
+        ParacraftCopilot.artifactEnded = false;
+
+        local roleName = ParacraftCopilot.GetRoleName(item.role);
+        local lineStyle = ParacraftCopilot.GetLineStyle(index);
+        local avatarStyle = ParacraftCopilot.GetAvatarStyle(item.role);
+        local content = ParacraftCopilot.GetContent(item.content or "");
+
+        -- local totalChars = _guihelper.GetTextWidth(content, "Tahoma;18")
+        -- local lineWidth = 290
+        -- local charHeight = 18
+        -- if item.role == "assistant" then
+        --     -- Calculate the number of lines needed
+        --     local lines = math.ceil(totalChars / lineWidth)
+        --     -- Calculate the total height
+        --     local totalHeight = lines * charHeight + 40
+        --     lineStyle = lineStyle .. ";height: " .. totalHeight .. "px;";
+        -- end
+
+        content = ResolveArtifacts(content);
+        local curChatBar = chatBar;
+
+        if (item.role == "assistant") then
+            curChatBar = curChatBar:gsub("{avatar}", chatBarAvatarAgent);
+        else
+            curChatBar = curChatBar:gsub("{avatar}", chatBarAvatarMe);
+        end
+
+        curChatBar = curChatBar:gsub("{roleName}", roleName);
+        curChatBar = curChatBar:gsub("{lineStyle}", lineStyle);
+        curChatBar = curChatBar:gsub("{avatarStyle}", avatarStyle);
+        curChatBar = curChatBar:gsub("{content}", content);
+
+        if index == count then
+            lastChatBarCtl = {
+                templistCtl = TemplateList:AppendTemplate(curChatBar),
+                roleName = roleName,
+                avatarStyle = avatarStyle,
+                index = index,
+                role = item.role,
+            };
+        else
+            TemplateList:AppendTemplate(curChatBar);
+        end
+    end
+end;
+
+local searchIndex = 300;
+local cutStartIndex = 1;
+local wrappedContent = {};
+local testIndex = 1;
+ParacraftCopilot.RefreshLastMessage = function(content)
+    testIndex = testIndex + 1
+    if not lastChatBarCtl then return end
+    local length = #content;
+    
+    while (length >= searchIndex) do
+        local newlinePos = content:find("\n", searchIndex, true);
+
+        if newlinePos then
+            if (not useSeparatedRendering) then
+                useSeparatedRendering = true;
+                local subContent = content:sub(cutStartIndex, newlinePos);
+                wrappedContent[#wrappedContent + 1] = subContent;
+            else
+                local subContent = content:sub(cutStartIndex, newlinePos);
+                wrappedContent[#wrappedContent] = subContent;
+            end
+
+            cutStartIndex = newlinePos + 1;
+            searchIndex = newlinePos + 300; -- next search index is +300
+
+            -- leave a placeholder. 
+            wrappedContent[#wrappedContent + 1] = "";
+        else
+            break;
+        end
+    end
+
+    if not useSeparatedRendering then
+        content = ParacraftCopilot.GetContent(content or "");
+        content = ResolveArtifacts(content);
+    else
+        wrappedContent[#wrappedContent] = content:sub(cutStartIndex);
+    end
+
+    if useSeparatedRendering and separatedRenderingStart then
+        local childElements = lastChatBarCtl.templistCtl:GetChildElementList();
+        local contentElement = childElements[2]; -- expect div.
+
+        local contentChildElements = contentElement:GetChildElementList();
+        local lastContentElement = contentChildElements[#contentChildElements]; -- expect div.
+
+        local lastContentChildElement = lastContentElement:GetChildElementList(); -- expect text element, tag name is emtpy string.
+        local textElement = lastContentChildElement[#lastContentChildElement];
+
+        if not textElement then
+            return;
+        end
+
+        if (#contentChildElements == #wrappedContent) then
+            textElement:SetText(wrappedContent[#wrappedContent]);
+        else
+            textElement:SetText(wrappedContent[#wrappedContent - 1]);
+
+            local newDivElement = contentElement:CreateFromXmlNode(
+                ParaXML.LuaXML_ParseString("<div>...</div>")[1],
+                contentElement:GetWindow(),
+                contentElement
+            );
+            contentElement:InsertChildElement(newDivElement);
+
+            -- 更新布局
+            contentElement:UpdateLayout(true);
+        end
+    else
+        local curChatBar = chatBar;
+
+        if (lastChatBarCtl.role == "assistant") then
+            curChatBar = curChatBar:gsub("{avatar}", chatBarAvatarAgent);
+        else
+            curChatBar = curChatBar:gsub("{avatar}", chatBarAvatarMe);
+        end
+
+        curChatBar = curChatBar:gsub("{roleName}", lastChatBarCtl.roleName or "");
+        curChatBar = curChatBar:gsub("{lineStyle}", ParacraftCopilot.GetLineStyle(lastChatBarCtl.index) or "");
+        curChatBar = curChatBar:gsub("{avatarStyle}", lastChatBarCtl.avatarStyle or "");
+        
+        if useSeparatedRendering then
+            -- Use wrappedContent table for rendering
+            separatedRenderingStart = true;
+
+            local wrappedDivs = "";
+            for _, subContent in ipairs(wrappedContent) do
+                subContent = ParacraftCopilot.GetContent(subContent or "");
+                if subContent == "" then
+                    subContent = "...";
+                end
+
+                wrappedDivs = wrappedDivs .. '<div>' .. subContent .. '</div>';
+            end
+
+            curChatBar = curChatBar:gsub("{content}", wrappedDivs);
+        else
+            curChatBar = curChatBar:gsub("{content}", content or "");
+        end
+
+        lastChatBarCtl.templistCtl:Load(curChatBar);
+    end
+
+    TemplateList:ScrollToEnd()
+end;
+
+</script>
+
+<style>
+.container {
+    height: 100%; 
+    width: 100%; 
+    "background-color": "#ff0000";
+}
+
+.code {
+    "background-color": "#ff0000";
+}
+</style>

@@ -446,6 +446,9 @@ end
 local function GetImageFilename(filename)
 	if(filename and filename~="") then
 		local filepath, params = filename:match("^([^:;]+)(.*)$");
+		if(filepath:match("^_miniscenegraph")) then
+			return filepath
+		end
 		-- repeated calls are cached
 		filename = Files.FindFile(filepath);
 		if(params and params~="") then

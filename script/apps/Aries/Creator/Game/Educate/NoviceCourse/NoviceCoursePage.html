@@ -13,22 +13,14 @@
         local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
         local EducateMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/EducateMainPage.lua")
         local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-        local courses = {
-            { id = 29477, label = L"基础操作",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/xinrenzhiyin_210x140_32bits.png;0 0 210 140",  },
-            { id = 42701, label = L"建模入门",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/lala_210x140_32bits.png;0 0 210 140",  },
-            { id = 42457, label = L"编程入门",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/papa_210x140_32bits.png;0 0 210 140",  },
-        
-            { id = 42670, label = L"动画入门",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/kaka_210x140_32bits.png;0 0 210 140",  },
-            -- { id = 455, label = L"有了想法怎么做",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/idea_32bits.png;0 0 195 100",  },
-            -- { id = 113, label = L"肇庆市第一中学",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/ke1_195x100_32bits.png;0 0 195 100",  },
-        
-            
-            -- { id = 2769, label = L"象形之美",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/ke2_195x100_32bits.png;0 0 195 100",  },
-            -- { id = 1082, label = L"火星探险",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/ke3_195x100_32bits.png;0 0 195 100",  },
-            -- { id = 475, label = L"男孩与苹果树",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/ke4_195x100_32bits.png;0 0 195 100",  },
-        }
         local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
         local pageCtrl = document:GetPageCtrl();
+        local courses = {
+            { id = 29477, label = L"基础操作",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/xinren_400x265_32bits.png;0 0 400 265",  },
+            { id = 42701, label = L"建模入门",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/jianzhu_400x265_32bits.png;0 0 400 265",  },
+            { id = 42457, label = L"编程入门",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/biancheng_400x265_32bits.png;0 0 400 265",  },
+            { id = 42670, label = L"动画入门",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/donghua_400x265_32bits.png;0 0 400 265",  },
+        }
         local total_papge = math.ceil(#courses / 4)
         
         function ClosePage()
@@ -127,6 +119,10 @@
             return tonumber(EducateMainPage.curr_course_page) < tonumber(total_papge)
         end
 
+        function OpenAbount()
+            GameLogic.RunCommand("/menu help.about");
+        end
+
         ]]>
         </script>
         <style type="text/mcss">
@@ -144,11 +140,11 @@
                 <div style="margin-left:56px;margin-top:144px;width:302;height:39px;background: url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/tishidi_54x30_32bits.png#0 0 54 30:12 12 12 12);">
                     <div style="float:left;margin-left:13px;margin-top:5px;width:30px;height:38px;background: url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/tishi_30x38_32bits.png#0 0 30 38);"/>
                     <div style="float:left;margin-top:10px;font-weight: bold;text-align:left;font-size:14px;color: #82B0FF;">
-                        开启学习探索之旅吧！
+                        <%=L"开启学习探索之旅吧！"%>
                     </div>
                 </div>
                 <div style = "width:1132px;background-color:#fff60000">
-                    <div style = "float:left;margin-left:56px;height:377px;margin-top:25px;background-color:#00000000;">
+                    <div style = "position: relative; margin-left:56px;height:377px;margin-top:25px;background-color:#00000000;">
                         <pe:repeat DataSource="<%=GetItemListData()%>">
                             <pe:repeatitem>
                                 <div style="float:left;width: 260px;margin-left: 0px;margin-top: 0px; background:url()">
@@ -160,13 +156,16 @@
                                             <div style="margin-top:26px;width:240px;height:24px;font-weight:bold;text-align:center;font-size:16px;color:#0E1627">
                                                 <%= GetLabel_courses(Eval("index"))%>
                                             </div>
-                                            <input type="button" style="font-size:16px;color:#ffffff;;margin-left:45px;margin-top:70px;font-weight:bold;width:150px;height:44px;background:url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/anniu_80x44_32bits.png#0 0 80 44:28 28 28 44);" tooltip="点击打开"  value = "进入教学" name='<%= Eval("index")%>' onclick="OnOpenCourse"  onmouseenter='on_mouse_enter' onmouseleave='on_mouse_leave'/>
+                                            <input type="button" style="font-size: 16px; color: #ffffff;; margin-left: 45px; margin-top: 70px; font-weight: bold; width: 150px; height: 44px; background: url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/anniu_80x44_32bits.png#0 0 80 44:28 16 28 16);" tooltip="<%=L'点击打开'%>"  value = "<%=L'进入教学'%>" name='<%= Eval("index")%>' onclick="OnOpenCourse"  onmouseenter='on_mouse_enter' onmouseleave='on_mouse_leave'/>
                                         </pe:container>
                                     </div>
                                 </div>
                             </pe:repeatitem>
                         </pe:repeat>
                     </div>
+                    <pe:if condition="<%=System.os.IsTouchMode()%>">
+                        <input zorder="10" type="button" value="关于" icon="Texture/Aries/Creator/paracraft/Educate/about_32bits.png" icon_width="16" icon_height="16" icon_off_x="-16" icon_off_y="0" onclick="OpenAbount" style="margin-top: 430px; color: #ffffff; font-size: 10px; base-font-size: 10px; font-weight: bold; text-offset-x:10; margin-left: 60px; width: 50px; height: 20px; background: url();"/>
+                    </pe:if>
                 </div>
                 <div valign = "bottom" style="width:1132px;height:252px;background: url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/tupian_1132x252_32bits.png#0 0 1132 252);">
                     <pe:if condition ="<%=GetShowLeft()%>">

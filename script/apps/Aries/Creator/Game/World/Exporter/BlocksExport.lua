@@ -186,6 +186,11 @@ local function activate()
 			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 			_guihelper.MessageBox(string.format(L"导出成功, 是否打开所在目录"), function(res)
 				if(res and res == _guihelper.DialogResult.Yes) then
+					if (System.os.GetPlatform() == "emscripten") then
+						_guihelper.MessageBox(L"Web端暂时不支持此功能，请安装客户端");
+						return;
+					end
+
 					local info = Files.ResolveFilePath(worlddir.."blocktemplates/")
 					if(info and info.relativeToRootPath) then
 						local absPath = ParaIO.GetWritablePath()..info.relativeToRootPath;

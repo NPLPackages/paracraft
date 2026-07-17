@@ -465,9 +465,9 @@ function TexturePacker:RebuildScene(bClearAll)
 				end
 			elseif(region:GetModelFilename()) then
 				local model_filename;
-				local skin = CustomCharItems:GetSkinByAsset(region:GetModelFilename());
+				local skin ,default_assets = CustomCharItems:GetSkinByAsset(region:GetModelFilename());
 				if (skin) then
-					model_filename = CustomCharItems.defaultModelFile;
+					model_filename = default_assets or CustomCharItems.defaultModelFile;
 					skin = region:GetModelSkin() or skin;
 				else
 					skin = region:GetModelSkin()
@@ -503,7 +503,7 @@ function TexturePacker:RebuildScene(bClearAll)
 							local hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(model_filename);
 						
 							if(isCustomModel) then
-								PlayerAssetFile:RefreshCustomModel(obj, skin)
+								PlayerAssetFile:RefreshCustomModel(obj, skin, model_filename)
 							elseif(hasCustomGeosets) then
 								PlayerAssetFile:RefreshCustomGeosets(obj, skin);
 							elseif(skin and skin~="") then
@@ -608,6 +608,8 @@ TextureAtlas:Property({"RenderToFile", false, "IsRenderToFile", "SetRenderToFile
 
 TextureAtlas:Signal("RegionAdded", function(region) end);
 TextureAtlas:Signal("RegionRemoved", function(region) end);
+-- called whenever any texturepacker is updated. 
+TextureAtlas:Signal("TextureUpdated");
 
 function TextureAtlas:ctor()
 	self.textures = commonlib.UnorderedArray:new();
@@ -684,9 +686,19 @@ function TextureAtlas:CreateNewTexturePacker()
 	texture_packer:SetUnitSize(self:GetUnitSize());
 	self.textures:add(texture_packer);
 	self.Connect(texture_packer, texture_packer.Changed, self, self.OnChange);
+	self.Connect(texture_packer, texture_packer.TextureUpdated, self, self.OnTextureUpdate);
 	self.Connect(self, self.RegionAdded, texture_packer, texture_packer.AddRegion);
 	self.Connect(self, self.RegionRemoved, texture_packer, texture_packer.RemoveRegion);
 	return texture_packer;
+end
+
+function TextureAtlas:OnTextureUpdate()
+	self.textureUpdateTimer = self.textureUpdateTimer or commonlib.Timer:new({callbackFunc = function(timer)
+		self:TextureUpdated();
+	end})
+	if(self.textureUpdateTimer) then
+		self.textureUpdateTimer:Change(200, nil);
+	end
 end
 
 -- private: 

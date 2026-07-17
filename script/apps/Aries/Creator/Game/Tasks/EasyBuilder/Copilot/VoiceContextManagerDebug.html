@@ -1,0 +1,410 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/VoiceContextManagerDebug.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Voice Context Debug</title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="VoiceContextManager.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/VoiceContextManager.lua");
+VoiceContextManager = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.VoiceContextManager");
+
+function OnClose()
+    VoiceContextManager:ShowDebugUI(false);
+end
+
+function OnStart()
+    VoiceContextManager:Start();
+    RefreshPage();
+end
+
+function OnStop()
+    VoiceContextManager:Stop();
+    RefreshPage();
+end
+
+function OnPause()
+    VoiceContextManager:Pause();
+    RefreshPage();
+end
+
+function OnResume()
+    VoiceContextManager:Resume();
+    RefreshPage();
+end
+
+function OnRecordManual()
+    VoiceContextManager:RecordManual(5000, function(transcript)
+        RefreshPage();
+    end);
+    RefreshPage();
+end
+
+function OnClearHistory()
+    VoiceContextManager:ClearHistory();
+    RefreshPage();
+end
+
+function OnSetLanguageChinese()
+    VoiceContextManager:SetLanguage("zh");
+    RefreshPage();
+end
+
+function OnSetLanguageEnglish()
+    VoiceContextManager:SetLanguage("en");
+    RefreshPage();
+end
+
+function OnSetLanguageLLM()
+    VoiceContextManager:SetLanguage("LLM");
+    RefreshPage();
+end
+
+function GetLanguageDisplay()
+    local lang = GetLanguage();
+    if lang == "LLM" then
+        return "LLM (All)";
+    elseif lang == "zh" then
+        return "中文";
+    elseif lang == "en" then
+        return "English";
+    end
+    return lang;
+end
+
+function RefreshPage()
+    if Page then
+        Page:Refresh(0.1);
+    end
+end
+
+function GetState()
+    return VoiceContextManager:GetState();
+end
+
+function GetStateColor()
+    local state = GetState();
+    if state == "monitoring" then
+        return "#00ff66";
+    elseif state == "recording" then
+        return "#ff6644";
+    elseif state == "paused" then
+        return "#ffaa00";
+    else
+        return "#888888";
+    end
+end
+
+function GetStateText()
+    local state = GetState();
+    if state == "monitoring" then
+        return L"Monitoring";
+    elseif state == "recording" then
+        return L"Recording...";
+    elseif state == "paused" then
+        return L"Paused";
+    else
+        return L"Stopped";
+    end
+end
+
+function IsActive()
+    return VoiceContextManager:IsActive();
+end
+
+function GetHistoryCount()
+    return #VoiceContextManager:GetVoiceHistory();
+end
+
+function GetVoiceEntry(index)
+    local history = VoiceContextManager:GetVoiceHistory();
+    local reversedIndex = #history - index + 1;
+    return history[reversedIndex];
+end
+
+function HasVoiceEntry(index)
+    return GetVoiceEntry(index) ~= nil;
+end
+
+function GetEntryTimestamp(index)
+    local entry = GetVoiceEntry(index);
+    if entry and entry.startTime then
+        return os.date("%H:%M:%S", entry.startTime);
+    end
+    return "";
+end
+
+function GetEntryDuration(index)
+    local entry = GetVoiceEntry(index);
+    if entry and entry.duration then
+        return string.format("%.1fs", entry.duration / 1000);
+    end
+    return "";
+end
+
+function GetEntryTranscript(index)
+    local entry = GetVoiceEntry(index);
+    if entry and entry.transcript then
+        return entry.transcript;
+    end
+    return "";
+end
+
+function HasEntryTranscript(index)
+    local entry = GetVoiceEntry(index);
+    return entry and entry.transcript ~= nil;
+end
+
+function IsEntryProcessing(index)
+    local entry = GetVoiceEntry(index);
+    return entry and entry.isProcessing == true;
+end
+
+function HasEntryError(index)
+    local entry = GetVoiceEntry(index);
+    return entry and entry.error ~= nil;
+end
+
+function GetEntryError(index)
+    local entry = GetVoiceEntry(index);
+    if entry and entry.error then
+        return entry.error;
+    end
+    return "";
+end
+
+function GetEntryBorderColor(index)
+    local entry = GetVoiceEntry(index);
+    if not entry then return "#444444"; end
+    if entry.transcript then return "#00cc55"; end
+    if entry.isProcessing then return "#ffaa00"; end
+    return "#ff4444";
+end
+
+function FormatTimestamp(timestamp)
+    if timestamp then
+        return os.date("%H:%M:%S", timestamp);
+    end
+    return "";
+end
+
+function FormatDuration(entry)
+    if entry and entry.duration then
+        return string.format("%.1fs", entry.duration / 1000);
+    end
+    return "";
+end
+
+function GetLanguage()
+    return VoiceContextManager.language or "zh";
+end
+
+function GetSilenceThreshold()
+    return VoiceContextManager.silenceThreshold or 0.1;
+end
+
+function GetSilenceDuration()
+    return (VoiceContextManager.silenceDurationMs or 1500) / 1000;
+end
+
+function GetMaxSegmentDuration()
+    return (VoiceContextManager.maxSegmentDurationMs or 30000) / 1000;
+end
+
+function TruncateText(text, maxLen)
+    maxLen = maxLen or 50;
+    if not text then return ""; end
+    if #text <= maxLen then return text; end
+    return string.sub(text, 1, maxLen - 3) .. "...";
+end
+
+function GetAudioLevel()
+    return VoiceContextManager.energy or 0;
+end
+
+function GetAudioLevelWidth()
+    local level = GetAudioLevel();
+    -- Scale for display (energy typically ranges 0-1 after normalization)
+    return math.min(150, math.floor(level * 300));
+end
+
+function GetMinEnergy()
+    local minE = VoiceContextManager.minEnergy or 0;
+    if minE == math.huge then return 0; end
+    return minE;
+end
+
+function GetDynamicThreshold()
+    local minE = GetMinEnergy();
+    local offset = VoiceContextManager.energyOffset or 0.05;
+    return minE + offset;
+end
+
+function IsSpeaking()
+    return VoiceContextManager.isSpeaking or false;
+end
+
+function GetSensitivity()
+    return VoiceContextManager.sensitivity or 1000;
+end
+
+function GetEnergyOffset()
+    return VoiceContextManager.energyOffset or 0.05;
+end
+
+-- Update UI values without full page refresh
+function UpdateUI()
+    if not Page then return; end
+    
+    -- Update state text
+    Page:SetValue("stateText", GetStateText());
+    
+    -- Update speaking status
+    Page:SetValue("speakingStatus", IsSpeaking() and L"Speaking" or L"Silent");
+    
+    -- Update energy values
+    Page:SetValue("energyLevel", string.format("%.4f", GetAudioLevel()));
+    Page:SetValue("threshold", string.format("%.4f", GetDynamicThreshold()));
+    Page:SetValue("minEnergy", string.format("%.4f", GetMinEnergy()));
+    
+    -- Update history count
+    Page:SetValue("historyCount", tostring(GetHistoryCount()));
+    
+    -- Update transcript entries
+    for i = 1, 10 do
+        local entry = GetVoiceEntry(i);
+        if entry then
+            local text = "";
+            if entry.isProcessing then
+                text = L"[transcribing...]";
+            elseif entry.transcript then
+                text = os.date("%H:%M:%S", entry.startTime) .. " " .. entry.transcript;
+            elseif entry.error then
+                text = os.date("%H:%M:%S", entry.startTime) .. " [Error: " .. entry.error .. "]";
+            end
+            Page:SetValue("transcript" .. i, text);
+        else
+            Page:SetValue("transcript" .. i, "");
+        end
+    end
+end
+
+-- Auto-refresh timer for live updates
+local refreshTimer = nil;
+function StartAutoRefresh()
+    if not refreshTimer then
+        refreshTimer = commonlib.Timer:new({
+            callbackFunc = function()
+                if Page and VoiceContextManager:IsActive() then
+                    UpdateUI();
+                end
+            end
+        });
+        refreshTimer:Change(100, 100);
+    end
+end
+
+function StopAutoRefresh()
+    if refreshTimer then
+        refreshTimer:Change();
+        refreshTimer = nil;
+    end
+end
+
+-- Start auto-refresh when page loads
+StartAutoRefresh();
+]]></script>
+
+<aries:window mode="thin" style="width:440px;" title='<%=L"Voice Context Debug"%>' onclose="OnClose">
+    <div style="margin:5px;">
+        <!-- Status Section -->
+        <div style="margin-bottom:10px;">
+            <div style="font-weight:bold;margin-bottom:5px;color:#ffffff;"><%=L"Voice Monitor Status"%></div>
+            <div style="float:left;width:200px;">
+                <div style="margin-bottom:5px;">
+                    <span style="color:#cccccc;"><%=L"State: "%></span>
+                    <pe:label name="stateText" style="color:#00ff66;font-weight:bold;"><%=GetStateText()%></pe:label>
+                </div>
+                <div style="margin-bottom:5px;">
+                    <span style="color:#cccccc;"><%=L"Language: "%></span>
+                    <span style="color:#ffffff;"><%=GetLanguageDisplay()%></span>
+                </div>
+                <div style="margin-bottom:5px;">
+                    <span style="color:#cccccc;"><%=L"History: "%></span>
+                    <div style="float:left;">
+                        <pe:label name="historyCount" style="color:#ffffff;width:30px"><%=GetHistoryCount()%></pe:label>
+                    </div>
+                    <span style="color:#ffffff;"> / <%=VoiceContextManager.maxHistorySize%></span>
+                </div>
+                <!-- Audio Level Bar -->
+                <div style="margin-top:8px;">
+                    <span style="color:#cccccc;"><%=L"Energy:"%></span>
+                    <pe:label name="speakingStatus" style="color:#888888;font-weight:bold;margin-left:5px;"><%=IsSpeaking() and L"Speaking" or L"Silent"%></pe:label>
+                    <div style="margin-top:2px;font-size:10px;">
+                        <span style="color:#888888;"><%=L"Level: "%></span>
+                        <pe:label name="energyLevel" style="color:#ffffff;width:60px;"><%=string.format("%.4f", GetAudioLevel())%></pe:label>
+                        <span style="color:#888888;"><%=L"Threshold: "%></span>
+                        <pe:label name="threshold" style="color:#ff8888;width:60px;"><%=string.format("%.4f", GetDynamicThreshold())%></pe:label>
+                    </div>
+                    <div style="margin-top:2px;font-size:10px;">
+                        <span style="color:#888888;"><%=L"Min: "%></span>
+                        <pe:label name="minEnergy" style="color:#aaaaaa;"><%=string.format("%.4f", GetMinEnergy())%></pe:label>
+                    </div>
+                </div>
+            </div>
+            <div style="float:left;margin-left:10px;width:200px;">
+                <div style="margin-bottom:5px;">
+                    <span style="color:#cccccc;"><%=L"Sensitivity: "%></span>
+                    <span style="color:#ffffff;"><%=GetSensitivity()%></span>
+                </div>
+                <div style="margin-bottom:5px;">
+                    <span style="color:#cccccc;"><%=L"Energy Offset: "%></span>
+                    <span style="color:#ffffff;"><%=string.format("%.3f", GetEnergyOffset())%></span>
+                </div>
+                <div style="margin-bottom:5px;">
+                    <span style="color:#cccccc;"><%=L"Max Segment: "%></span>
+                    <span style="color:#ffffff;"><%=string.format("%.0fs", GetMaxSegmentDuration())%></span>
+                </div>
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+        
+        <!-- Control Buttons -->
+        <div style="margin-bottom:10px;padding:8px;background-color:#333333;">
+            <input type="button" value="<%=L'Start'%>" style="width:70px;height:26px;margin-right:5px;background-color:#00aa44;color:#ffffff;" onclick="OnStart"/>
+            <input type="button" value="<%=L'Stop'%>" style="width:70px;height:26px;margin-right:5px;background-color:#cc4444;color:#ffffff;" onclick="OnStop"/>
+            <input type="button" value="<%=L'Record 5s'%>" style="width:75px;height:26px;margin-right:5px;background-color:#4488ff;color:#ffffff;" onclick="OnRecordManual"/>
+            <input type="button" value="<%=L'Clear'%>" style="width:60px;height:26px;background-color:#666666;color:#ffffff;" onclick="OnClearHistory"/>
+        </div>
+        
+        <!-- Language Selection -->
+        <div style="margin-bottom:10px;">
+            <span style="color:#cccccc;margin-right:10px;"><%=L"Language:"%></span>
+            <input type="button" value="LLM" style="width:50px;height:24px;margin-right:5px;background-color:<%=GetLanguage() == 'LLM' and '#00aa44' or '#555555'%>;color:#ffffff;" onclick="OnSetLanguageLLM"/>
+            <input type="button" value="中文" style="width:50px;height:24px;margin-right:5px;background-color:<%=GetLanguage() == 'zh' and '#00aa44' or '#555555'%>;color:#ffffff;" onclick="OnSetLanguageChinese"/>
+            <input type="button" value="EN" style="width:40px;height:24px;margin-right:5px;background-color:<%=GetLanguage() == 'en' and '#00aa44' or '#555555'%>;color:#ffffff;" onclick="OnSetLanguageEnglish"/>
+        </div>
+        
+        <!-- Voice History Section -->
+        <div style="border-top:1px solid #666;padding-top:10px;">
+            <div style="font-weight:bold;margin-bottom:5px;color:#ffffff;"><%=L"Recent Transcripts"%></div>
+            <div style="height:220px;overflow-y:auto;background-color:#1a1a1a;padding:8px;border:1px solid #444;">
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript1" style="color:#ffffff;font-size:12px;"></pe:label></div>
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript2" style="color:#ffffff;font-size:12px;"></pe:label></div>
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript3" style="color:#ffffff;font-size:12px;"></pe:label></div>
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript4" style="color:#ffffff;font-size:12px;"></pe:label></div>
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript5" style="color:#ffffff;font-size:12px;"></pe:label></div>
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript6" style="color:#ffffff;font-size:12px;"></pe:label></div>
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript7" style="color:#ffffff;font-size:12px;"></pe:label></div>
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript8" style="color:#ffffff;font-size:12px;"></pe:label></div>
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript9" style="color:#ffffff;font-size:12px;"></pe:label></div>
+                <div style="height:18px;margin-bottom:2px;"><pe:label name="transcript10" style="color:#ffffff;font-size:12px;"></pe:label></div>
+            </div>
+        </div>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

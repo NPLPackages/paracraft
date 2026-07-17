@@ -19,7 +19,7 @@ CodeHelpWindow.OnInit();
         </pe:repeat>
     </div>
     <div class="mc_paper_panel" style="margin-top:5px;padding-top:10px;color:#4a6cd4">
-        <pe:if condition='<%=CodeHelpWindow.category_name == "Data"%>'>
+        <pe:if condition='<%=CodeHelpWindow.category_name == "Data" or CodeHelpWindow.show_create_global_variable%>'>
             <div style="margin-bottom:5px;margin-left:10px;">
                 <input type="button" uiname="CodeHelpWindow.OnCreateVariable" value='<%=L"创建全局变量"%>' tooltip='<%=L"左键创建全局变量,右键刷新"%>' onclick="CodeHelpWindow.OnCreateVariable" style="color:#ffffff;font-size:12px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
             </div>

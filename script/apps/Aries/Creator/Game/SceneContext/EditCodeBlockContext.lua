@@ -150,15 +150,17 @@ function EditCodeBlockContext:CreateGetActor()
 			if(itemStack) then
 				local item = itemStack:GetItem();
 				if(item and item.CreateActorFromItemStack) then
-					local actor = item:CreateActorFromItemStack(itemStack, movieEntity, false, "ActorForEditor_");
+					local actor = item:CreateActorFromItemStack(itemStack, movieEntity, nil, "ActorForEditor_");
 					if(actor) then
 						self.actor = actor;
 						self.actor:Connect("keyChanged", self, EditCodeBlockContext.UpdateActor);
 						self.actor:SetTime(0);
-						self.actor:FrameMove(0);
-						local entity = self.actor:GetEntity();
-						if(entity) then
-							entity:SetSkipPicking(true)
+						if(not self.actor:IsAgent()) then
+							self.actor:FrameMove(0);
+							local entity = self.actor:GetEntity();
+							if(entity) then
+								entity:SetSkipPicking(true)
+							end
 						end
 					end
 				end

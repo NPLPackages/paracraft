@@ -32,46 +32,50 @@ function OnOpen(index)
 end
 
 ]]></script>
-
-<div style="width: 640px;height: 393px;">
-    <div style="width: 640px;height: 60px;margin-top: 0px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdin_54x60_32bits.png#0 0 54 60:20 20 20 20;">
-        <div style="float: left;margin-left: 20px;margin-top: 15px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;">当前课堂</div>
-        <div onclick="ClosePage" style="float: left;margin-left: 502px;margin-top: 20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
-    </div>
-    <div style="width: 640px;height: 333px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdi_54x60_32bits.png#0 0 54 54:25 25 25 25;">
-        <div style="color: #000000;margin-top: 30px;margin-left: 20px;font-size: 12px;">
-            <div style="base-font-size: 12px;font-size: 12px;">请选择进入的课堂：</div>
-        </div>
-
-        <div type ="box" style="width:615px;height:220px;margin-left:10px;margin-top: 10px;">
-            <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="10" VerticalScrollBarStep="68" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" 
-                DataSource='<%=ClassesData %>'>
-                <Columns>
-                    <div style="width: 563px; height: 68px;">
-                        <div style="position: relative;">
-                            <div style="position: relative;padding-left:3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 563px; height: 68px; 
-                                background:url(Texture/Aries/Creator/paracraft/Educate/shurukuang_46x46_32bits.png#0 0 46 46:10 10 10 10);background2:url(Texture/Aries/Creator/paracraft/Educate/xiaoquedin_46x46_32bits.png#0 0 46 46:10 10 10 10)">
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #000000cc;">
+    <pe:container alignment="_ct" width="640" height="400" style="margin-left:-320px;margin-top:-200px;background: ;">
+        <div style="width: 640px;height: 393px;">
+            <div style="width: 640px;height: 60px;margin-top: 0px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdin_54x60_32bits.png#0 0 54 60:20 20 20 20;">
+                <div style="float: left;margin-left: 20px;margin-top: 15px;color: #ffffff;font-size: 18px;base-font-size: 18px;font-weight: bold;">当前课堂</div>
+                <div onclick="ClosePage" style="float: left;margin-left: 502px;margin-top: 20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+            </div>
+            <div style="width: 640px;height: 333px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdi_54x60_32bits.png#0 0 54 54:25 25 25 25;">
+                <div style="color: #000000;margin-top: 30px;margin-left: 20px;font-size: 12px;">
+                    <div style="base-font-size: 12px;font-size: 12px;">请选择进入的课堂：</div>
+                </div>
+        
+                <div type ="box" style="width:615px;height:220px;margin-left:10px;margin-top: 10px;">
+                    <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="10" VerticalScrollBarStep="68" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" 
+                        DataSource='<%=ClassesData %>'>
+                        <Columns>
+                            <div style="width: 563px; height: 68px;">
+                                <div style="position: relative;">
+                                    <div style="position: relative;padding-left:3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 563px; height: 68px; 
+                                        background:url(Texture/Aries/Creator/paracraft/Educate/shurukuang_46x46_32bits.png#0 0 46 46:10 10 10 10);background2:url(Texture/Aries/Creator/paracraft/Educate/xiaoquedin_46x46_32bits.png#0 0 46 46:10 10 10 10)">
+                                    </div>
+                                    <div onclick="OnOpen" name='<%=Eval("index")%>' style="position: relative;padding-left:3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 563px; height: 68px; 
+                                        background:;background2:url(Texture/Aries/Creator/paracraft/Educate/xiaoquedin_46x46_32bits.png#0 0 46 46:10 10 10 10)">
+                                    </div>
+                                </div>
+                                <div style="position: relative;">
+                                    <div style="margin-left: 12px; margin-top: 11px; base-font-size:12px;font-size: 12px;color: #000000;"><%=Eval("package_name")%></div>
+                                    <div style="margin-left: 12px; margin-top: 9px; base-font-size:12px;font-size: 12px;color: #000000;"><%=Eval("lesson_name")%></div>
+                                </div>
+                                <div style="position: relative;margin-left: 120px;margin-top: 40px;">
+                                    <div style="float: left;margin-right: 10px; margin-top: 0px; base-font-size:12px;font-size: 12px;color: #000000;text-align: right;"><%=Eval("org_name") .. "   " .. Eval("class_name")%></div>
+                                    <!-- <div style="float: left;margin-left: 0px; margin-top: 11px; base-font-size:12px;font-size: 12px;color: #000000;text-align: right"><%=Eval("class_name")%></div> -->
+                                </div>
                             </div>
-                            <div onclick="OnOpen" name='<%=Eval("index")%>' style="position: relative;padding-left:3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 563px; height: 68px; 
-                                background:;background2:url(Texture/Aries/Creator/paracraft/Educate/xiaoquedin_46x46_32bits.png#0 0 46 46:10 10 10 10)">
-                            </div>
-                        </div>
-                        <div style="position: relative;">
-                            <div style="margin-left: 12px; margin-top: 11px; base-font-size:12px;font-size: 12px;color: #000000;"><%=Eval("package_name")%></div>
-                            <div style="margin-left: 12px; margin-top: 9px; base-font-size:12px;font-size: 12px;color: #000000;"><%=Eval("lesson_name")%></div>
-                        </div>
-                        <div style="position: relative;margin-left: 120px;margin-top: 40px;">
-                            <div style="float: left;margin-right: 10px; margin-top: 0px; base-font-size:12px;font-size: 12px;color: #000000;text-align: right;"><%=Eval("org_name") .. "   " .. Eval("class_name")%></div>
-                            <!-- <div style="float: left;margin-left: 0px; margin-top: 11px; base-font-size:12px;font-size: 12px;color: #000000;text-align: right"><%=Eval("class_name")%></div> -->
-                        </div>
-                    </div>
-                </Columns>
-                <EmptyDataTemplate>
-                </EmptyDataTemplate>
-            </pe:gridview>
+                        </Columns>
+                        <EmptyDataTemplate>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+    </pe:container>
+</pe:container>
+
 
     
 </pe:mcml>

@@ -66,13 +66,14 @@ function OpenAssetFileDialog.GetFilters(filterName)
 		return {
 			-- {L"全部文件(*.fbx,*.x,*.bmax,*.xml)",  "*.fbx;*.x;*.bmax;*.xml", exclude="*.blocks.xml"},
 			-- {L"全部文件(*.fbx,*.FBX,*.x,*.bmax,*.gltf,*.glb)",  "*.fbx;*.FBX;*.x;*.bmax;*.gltf;*.glb", exclude="*.blocks.xml"},
-			{L"全部文件(*.fbx,*.FBX,*.x,*.bmax,*.glb,*.gltf)",  "*.fbx;*.FBX;*.x;*.bmax;*.glb;*.gltf", exclude="*.blocks.xml"},
+			{L"全部文件(*.fbx,*.FBX,*.x,*.bmax,*.glb,*.gltf,*.ply)",  "*.fbx;*.FBX;*.x;*.bmax;*.glb;*.gltf;*.ply", exclude="*.blocks.xml"},
 			{L"FBX模型(*.fbx)",  "*.fbx"},
 			-- {L"GLTF模型(*.gltf, *.glb)",  "*.gltf;*.glb"},
 			{L"bmax模型(*.bmax)",  "*.bmax"},
 			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml", exclude="*.blocks.xml"},
 			{L"block模版(*.blocks.xml)",  "*.blocks.xml"},
 			{L"GLTF模型(*.glb,*.gltf)",  "*.glb;*.gltf"},
+			{L"ply点云(*.ply)",  "*.ply"},
 		};
 	elseif(filterName == "modelStrict") then
 		return {
@@ -140,8 +141,15 @@ function OpenAssetFileDialog.ShowPage(text, OnClose, default_text, title, filter
 	OpenAssetFileDialog.UpdateExistingFiles();
 	OpenAssetFileDialog.SetSearchText()
 
+	local pageUrl = "script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.html"
+	local view_width,view_height = 680,450
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if IsMobileUIEnabled then
+		pageUrl = "script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.mobile.html"
+		view_width,view_height = 1020,680
+	end
 	local params = {
-			url = "script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.html", 
+			url = pageUrl, 
 			name = "OpenAssetFileDialog.ShowPage", 
 			isShowTitleBar = false,
 			DestroyOnClose = true,
@@ -155,10 +163,10 @@ function OpenAssetFileDialog.ShowPage(text, OnClose, default_text, title, filter
 			---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
 				align = "_ct",
-				x = -680/2,
-				y = -450/2,
-				width = 680,
-				height = 470,
+				x = -view_width/2,
+				y = -view_height/2,
+				width = view_width,
+				height = view_height + 20,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
@@ -224,12 +232,11 @@ function OpenAssetFileDialog.OnOK()
 	if(page) then
 		local text = commonlib.Encoding.Utf8ToDefault(page:GetValue("text"))
 		local filepath = PlayerAssetFile:GetValidAssetByString(text);
-		if(filepath) then
-			local fileItem = Files.ResolveFilePath(filepath);
-			if(fileItem and fileItem.relativeToWorldPath) then
-				filepath = fileItem.relativeToWorldPath;
-			end
+		local fileItem = Files.ResolveFilePath(filepath or text);
+		if(fileItem and fileItem.relativeToWorldPath) then
+			filepath = fileItem.relativeToWorldPath;
 		end
+		
 		if(not filepath and OpenAssetFileDialog.IsSaveMode) then
 			filepath = text;
 		end
@@ -344,6 +351,11 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 			files[#files + 1] = {name="file", attr=result[i]};
 		end
 	end
+	if not GameLogic.IsReadOnly() then
+		table.sort(files, function(a, b)
+			return a.attr and b.attr and a.attr.writedate and b.attr.writedate and a.attr.writedate > b.attr.writedate;
+		end)
+	end
 	OpenAssetFileDialog.GetAllFiles()[OpenAssetFileDialog.IndexLocal].attr.count = #files;
 	return files;
 end
@@ -410,17 +422,17 @@ function OpenAssetFileDialog.UpdateModel(modelName)
 		if(ctl) then
 			local ReplaceableTextures, CCSInfoStr, CustomGeosets;
 			if(PlayerAssetFile:IsCustomModel(filepath)) then
-				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
+				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString(filepath)
 			elseif(PlayerAssetFile:HasCustomGeosets(filepath)) then
-				CustomGeosets = PlayerAssetFile:GetDefaultCustomGeosets();
+				CustomGeosets = PlayerAssetFile:GetDefaultCustomGeosets(filepath);
 			elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 				-- TODO:  hard code worker skin here
 				ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
 			end
 
-			local skin = CustomCharItems:GetSkinByAsset(filepath);
+			local skin,default_assets = CustomCharItems:GetSkinByAsset(filepath);
 			if (skin) then
-				filepath = CustomCharItems.defaultModelFile;
+				filepath = default_assets or CustomCharItems.defaultModelFile;
 				CustomGeosets = skin;
 			end
 

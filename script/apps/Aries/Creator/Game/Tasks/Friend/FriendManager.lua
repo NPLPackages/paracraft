@@ -26,6 +26,7 @@ FriendManager.connections = {};
 FriendManager.unread_msgs = {};
 FriendManager.unread_msgs_loaded = false;
 FriendManager.lastChatMsg = nil -- 各个好友最后的聊天信息 包括已读的和未读的
+FriendManager.unread_msgs_num = 0
 --[[
 {
   data={
@@ -86,6 +87,9 @@ function FriendManager:InitUserData(user_data)
 end
 
 function FriendManager:LoadAllUnReadMsgs(callback, forced_load)
+    if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+      return
+    end
     if(FriendManager.unread_msgs_loaded and not forced_load)then
         if(callback)then
             callback();
@@ -93,22 +97,68 @@ function FriendManager:LoadAllUnReadMsgs(callback, forced_load)
         return
     end
     FriendManager.unread_msgs = {};
-    keepwork.friends.getUnReadMsgCnt({
-        },function(err, msg, data)
-            -- commonlib.echo("==========LoadAllUnReadMsgs");
-            -- commonlib.echo(err);
-            -- commonlib.echo(msg);
-            -- commonlib.echo(data,true);
-            if(err ~= 200)then
-                return
-            end
-            FriendManager.unread_msgs = data or {};
-            FriendManager.unread_msgs_loaded = true;
+    FriendManager.unread_msgs_num = 0
+    
+    -- Track completion of both API calls
+    local api_completed = {unread_msgs = false, friend_applys = false}
+    local function checkBothCompleted()
+        if api_completed.unread_msgs and api_completed.friend_applys then
             if(callback)then
                 callback();
             end
-        end)
+            GameLogic.GetFilters():apply_filters("update_friend_unread_num",  FriendManager.unread_msgs_num);
+        end
+    end
+    
+    keepwork.friends.getUnReadMsgCnt({},function(err, msg, data)
+        if(err ~= 200)then
+            return
+        end
+        FriendManager.unread_msgs = data or {};
+        FriendManager.unread_msgs_loaded = true;
+        FriendManager.unread_msgs_num = 0
+        if FriendManager.unread_msgs and FriendManager.unread_msgs.data then
+            for k, v in pairs(FriendManager.unread_msgs.data) do
+                if v.unReadCnt and v.unReadCnt > 0 then
+                    FriendManager.unread_msgs_num = FriendManager.unread_msgs_num + v.unReadCnt
+                end
+            end
+        end
+        api_completed.unread_msgs = true
+        checkBothCompleted()
+    end)
+    keepwork.friend.getFriendApplys({
+      headers = {
+        ["x-per-page"] = 500,
+        ["x-page"] = 1,
+      }
+    },function(err, msg, data)
+      if(err ~= 200 or not data)then
+        return
+      end
+      local data = data or {};
+      local applylists = data.rows or {};
+      for k, v in ipairs(applylists) do
+        if v.status == 1 then
+          self.friend_apply = v
+          self.friend_apply.is_friend_apply = true
+          FriendManager.unread_msgs_num = FriendManager.unread_msgs_num + 1
+          break
+        end
+      end
+      api_completed.friend_applys = true
+      checkBothCompleted()
+    end)
 end
+
+function FriendManager:RequestPosition(msg)
+	FriendsPage.OnRecvTeleportMsg(msg)
+end
+
+function FriendManager:SetFriendApply(payload)
+    self.friend_apply = payload
+end
+
 function FriendManager:Connect(userId,callback)
     local conn = FriendManager:CreateOrGetConnection(userId);
     conn:Connect(callback);
@@ -195,14 +245,19 @@ function FriendManager:OnMsg(payload, full_msg)
     -- commonlib.echo("=============FriendManager:OnMsg full_msg");
     -- commonlib.echo(full_msg,true);
     if UserData == nil then
-      UserData = {}
-      KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
-        if(err ~= 200)then
-            return
-        end
-        UserData = data
-      end)
+        UserData = {}
+        KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
+            if(err ~= 200)then
+                return
+            end
+            UserData = data
+        end)
     end
+	--ask for pos
+	if payload and payload.contentType and payload.contentType == 3 then
+		self:RequestPosition(payload)
+		return
+	end
 
     local last_msg_data = {}
     last_msg_data.unReadCnt = 0
@@ -215,17 +270,17 @@ function FriendManager:OnMsg(payload, full_msg)
 
     -- 聊天界面 有收到消息就把消息加上去
     if FriendChatPage.IsOpen then
-      FriendChatPage.OnMsg(payload, full_msg)
+        FriendChatPage.OnMsg(payload, full_msg)
     end
 
     -- 好友列表界面 如果当前聊天的对象不是收到消息的对象 要给小红点
     if FriendsPage.GetIsOpen() then
-      FriendsPage.OnMsg(payload, full_msg)
+        FriendsPage.OnMsg(payload, full_msg)
     end
 
-    -- if DockPage.is_show and not FriendsPage.GetIsOpen() then
-    --   DockPage.LoadFriendsMess()
-    -- end
+    if not FriendsPage.GetIsOpen() and not FriendChatPage.IsOpen then
+        GameLogic.GetFilters():apply_filters('friend_chat_msg', payload)
+    end
 end
 -- send a message to user
 -- @param {number} userId
@@ -350,18 +405,12 @@ function FriendManager.ChatWithFriend(chat_uid)
 end
 
 function FriendManager.CloseAllFriendPage()
-  local FriendsProjectPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsProjectPage.lua");
-  FriendsProjectPage.CloseView();
-
   local AddFriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/AddFriendsPage.lua");
   AddFriendsPage.CloseView();
 
   local FriendsApplyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsApplyPage.lua");
   FriendsApplyPage.CloseView();
 
-  local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
   FriendsPage.CloseView();
-
-  local FriendChatPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendChatPage.lua");
   FriendChatPage.CloseView();
 end

@@ -1,0 +1,1255 @@
+<html>
+    <body> 
+        <pe:mcml>
+            <script type='text/npl' src='MainLoginLogin.script.lua'>
+                <![CDATA[
+                    -- bottles
+                    local MainLogin = NPL.load('(gl)Mod/WorldShare/cellar/MainLogin/MainLogin.lua')
+                    local ForgetPassword = NPL.load('(gl)Mod/WorldShare/cellar/ForgetPassword/ForgetPassword.lua')
+                    local MySchool = NPL.load('(gl)Mod/WorldShare/cellar/MySchool/MySchool.lua')
+                    local RegisterModal = NPL.load('(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua')
+                    local LoginModal = NPL.load('(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua')
+                    KickOut = NPL.load('(gl)Mod/WorldShare/cellar/Common/KickOut/KickOut.lua')
+
+                    -- service
+                    local KeepworkServiceSession = NPL.load('(gl)Mod/WorldShare/service/KeepWorkService/KeepworkServiceSession.lua')
+                    local EventTrackingService = NPL.load('(gl)Mod/WorldShare/service/EventTracking.lua')
+
+                    -- helper
+                    local Validated = NPL.load('(gl)Mod/WorldShare/helper/Validated.lua')
+
+                    -- database
+                    local SessionsData = NPL.load('(gl)Mod/WorldShare/database/SessionsData.lua')
+
+                    local account_list_data = MainLogin:GetHistoryUsers()
+                    local page = document:GetPageCtrl()
+
+                    local paramWorld = ParaEngine.GetAppCommandLineByParam('world', nil) 
+                    hideExtra = paramWorld ~= nil and paramWorld ~= ""
+
+                    if account_list_data and
+                       type(account_list_data) == 'table' and
+                       #account_list_data > 0 then
+                        local tmp = {}
+
+                        for i = 1, #account_list_data - 1 do
+                            for j = 1, #account_list_data - i do
+                                local curItemModifyTime = 0
+                                local nextItemModifyTime = 0
+
+                                if account_list_data[j] and
+                                    account_list_data[j].session and
+                                    account_list_data[j].session.loginTime then
+                                    curItemModifyTime = account_list_data[j].session.loginTime
+                                end
+
+                                if account_list_data[j + 1] and
+                                    account_list_data[j + 1].session and
+                                    account_list_data[j + 1].session.loginTime then
+                                    nextItemModifyTime = account_list_data[j + 1].session.loginTime
+                                end
+
+                                if curItemModifyTime < nextItemModifyTime then
+                                    tmp = account_list_data[j]
+                                    account_list_data[j] = account_list_data[j + 1]
+                                    account_list_data[j + 1] = tmp
+                                end
+                            end
+                        end
+                    else
+                        account_list_data = {}
+                    end
+
+                    Mod.WorldShare.Utils.SetTimeOut(function()
+                        local val = page:GetValue('password_show')
+                        page:SetValue('password_hide', val)
+                        page:SetValue('password', val)
+
+                        page:FindControl('password_show').visible = false
+                        page:FindControl('password_hide').visible = true
+                    
+                        local current_selected_user = KeepworkServiceSession:LoadSigninInfo()
+                        local signed_in_node = page:FindControl('auto_login_mode')
+                        local login_node = page:FindControl('account_mode')
+                        echo(current_selected_user,true)
+                        if current_selected_user and
+                            current_selected_user.autoLogin and
+                            current_selected_user.rememberMe and
+                            current_selected_user.token then
+                                Mod.WorldShare.Utils.SetTimeOut(function()
+                                    MainLogin:LoginWithToken(current_selected_user.token, function(b_succeed, reason, message)
+                                        if b_succeed then
+                                            --page:Refresh(0.01)
+                                            signed_in_node.visible = true
+                                            login_node.visible = false
+                                            get_page():SetUIValue('auto_username', current_selected_user.account or '')
+                                        else
+                                            local session = SessionsData:GetSessionByUsername(current_selected_user.account)
+
+                                            if session and type(session) == 'table' then
+                                                session.autoLogin = false
+                                                session.token = ''
+
+                                                SessionsData:SaveSession(session)
+                                            end
+
+                                            signed_in_node.visible = false
+                                            login_node.visible = true
+                                        end
+                                    end)
+                                end, 0)
+                            else
+                                signed_in_node.visible = false
+                                login_node.visible = true
+                            end
+                    end, 0)
+
+                    function get_page()
+                        return page
+                    end
+
+                    function get_is_modal()
+                        if not get_page() then
+                            return
+                        end
+
+                        return get_page():GetRequestParam('is_modal') == 'true' and true or false
+                    end
+
+                    function get_history_users()
+                        return MainLogin:GetHistoryUsers()
+                    end
+
+                    function is_support_third_party_login()
+                        if System.os.GetPlatform() == 'win32' or System.os.GetPlatform() == 'mac' then
+                            return true
+                        else
+                            return false
+                        end
+                    end
+
+                    function register()
+                        close()
+
+                        if get_is_modal() then
+                            RegisterModal:ShowPage()
+                        else
+                            MainLogin:ShowRegister()
+                        end
+                    end
+
+                    -- @param name: 'local', 'internet'
+                    function use_offline()
+                        MainLogin:Next(true)
+                        EventTrackingService:Send(1, 'click.main_login.offline_enter', { machineId = GameLogic.GetMachineID(ParaEngine.GetAttributeObject():GetField('MachineID','')) }, true)
+                    end
+
+                    function close()
+                        local MainLoginLoginPage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.cellar.MainLogin.Login')
+
+                        if MainLoginLoginPage then
+                            MainLoginLoginPage:CloseWindow()
+                        end
+
+                        MainLogin.isSetted = false
+                    end
+
+                    function forget_password()
+                        EventTrackingService:Send(1, 'click.main_login.find_password', nil, true)
+                        ForgetPassword:ShowPage()
+                    end
+
+                    function login()
+                        if not get_page() then
+                            return
+                        end
+
+                        if is_login then
+                            return
+                        end
+
+                        is_login = true
+                        GameLogic.GetPlayerController():SaveLocalData("lastLoginMode","account")
+                        GameLogic.GetFilters():apply_filters('on_start_login')
+
+                        local account = get_page():GetValue('account')
+                        local password = get_page():GetValue('password')
+
+                        MainLogin:MobileLoginAction(
+                            account,
+                            password,
+                            function(be_succeed, reason, message)
+                                if not be_succeed then
+                                    _guihelper.MessageBox(message)
+                                    return
+                                end
+
+                                local account = get_page():GetValue('account')
+                                get_page():SetUIValue('auto_username', account or '')
+                                set_mode('auto_login')
+
+                                commonlib.TimerManager.SetTimeout(function()  
+                                    MainLogin:Next()
+                                end,0)
+                            end
+                        )
+                    end
+
+                    function update_login_button_status()
+                        if not get_page() then
+                            return
+                        end
+
+                        local account = get_page():GetValue('account')
+                        local password = get_page():GetValue('password')
+
+                        local beSuccess = true
+
+                        if not Validated:AccountCompatible(account) then
+                        beSuccess = false
+                        else
+                            get_page():FindControl('account_field_error').visible = false
+                        end
+
+                        local password
+
+                        if be_show_password then
+                            password = get_page():GetValue('password_show')
+                        else
+                            password = get_page():GetValue('password_hide')
+                        end
+
+                        if string.find(password, 'pa') == 1 and not has_click_change_show_password then
+                            local check_str = {'p','a','r','a'} 
+                            local is_macth = true
+
+                            for i = 1, #check_str do
+                                local char = string.sub(password, i, i)
+                                if char and char ~= '' and check_str[i] ~= char then
+                                    is_macth = false
+                                    break
+                                end
+                            end
+
+                            if not is_macth then
+                                if auto_show_password then
+                                    get_page():SetValue('eye_show_password', false)
+                                    auto_show_password = false
+                                    be_show_password = true
+                                    set_show_password()
+
+                                    local node = get_page():FindControl('password_hide')
+                                    if node then
+                                        node:Focus()
+                                        node:SetCaretPosition(#password)
+                                    end
+                                end
+                            elseif not be_show_password then
+                                get_page():SetValue('eye_show_password', true)
+                                set_show_password()
+                                auto_show_password = true
+                                local node = get_page():FindControl('password_show')
+                                if node then
+                                    node:Focus()
+                                    node:SetCaretPosition(#password)
+                                end
+                            end
+                        end
+
+                        if string.find(password, 'paracraft.cn') == 1 then
+                            -- 不允许自动登录
+                            get_page():SetUIValue('auto_login_name', false)
+                        end
+
+                        get_page():SetValue('password', password)
+
+                        if not Validated:Password(password) then
+                            beSuccess = false
+                        else
+                            get_page():FindControl('password_field_error').visible = false
+                        end
+
+                        if beSuccess then
+                            --get_page():SetUIBackground('login_button', 'Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#271 98 258 44')
+                        else
+                            --get_page():SetUIBackground('login_button', 'Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#271 197 258 44')
+                        end
+                    end
+
+                    function click_set_show_password()
+                        has_click_change_show_password = true
+                        set_show_password()
+                    end
+
+                    function set_show_password()
+                        if be_show_password then
+                            be_show_password = false
+
+                            local val = get_page():GetValue('password_show')
+                            get_page():SetValue('password_hide', val)
+                            get_page():SetValue('password', val)
+
+                            get_page():FindControl('password_show').visible = false
+                            get_page():FindControl('password_hide').visible = true
+                        else
+                            be_show_password = true
+
+                            local val = get_page():GetValue('password_hide')
+                            get_page():SetValue('password_show', val)
+                            get_page():SetValue('password', val)
+
+                            get_page():FindControl('password_show').visible = true
+                            get_page():FindControl('password_hide').visible = false
+                        end
+                    end
+
+                    function set_auto_login()
+                        if not get_page() then
+                            return
+                        end
+
+                        local password
+
+                        if be_show_password then
+                            password = get_page():GetValue('password_show')
+                        else
+                            password = get_page():GetValue('password_hide')
+                        end
+                    end
+
+                    function get_account_list()
+                        return account_list_data
+                    end
+
+                    function get_account_list_style()
+                        local count = #account_list_data
+
+                        if count > 4 then
+                            count = 4
+                        end
+
+                        return 'width: 260px;padding-left: 15px;height: ' .. (count * 40) .. 'px;background-color: #25282e;'
+                    end
+
+                    local is_show_account_list = false
+
+                    function show_account_list()
+                        if not get_page() then
+                            return
+                        end
+
+                        if is_show_account_list then
+                            is_show_account_list = false
+                            get_page():FindControl('account_list').visible = false
+                        else
+                            is_show_account_list = true
+                            get_page():FindControl('account_list').visible = true
+                        end
+                    end
+
+                    function hide_account_list()
+                        is_show_account_list = false
+                        get_page():FindControl('account_list').visible = false
+                    end
+
+                    function select_account(index)
+                        if not get_page() then
+                            return
+                        end
+
+                        local account_data = account_list_data[index]
+                        local value = account_data.value
+                        get_page():SetValue('account', value);
+                        local password = account_data.session.rememberMe and account_data.session.password or ''
+                        get_page():SetUIValue('password_show', password or '')
+                        get_page():SetUIValue('password_hide', password or '')
+                        get_page():SetUIValue('password', password or '')
+
+                        local session = SessionsData:GetSessionByUsername(value) or {}
+
+                        if session.autoLogin then
+                            get_page():SetUIValue('auto_login_name', true)
+                            --get_page():SetUIBackground('login_button', 'Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#271 98 258 44')
+                        else
+                            get_page():SetUIValue('auto_login_name', false)
+                            --get_page():SetUIBackground('login_button', 'Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#271 197 258 44')
+                        end
+
+                        get_page():SetUIValue('account_field_error_msg', '')
+                        get_page():FindControl('account_field_error').visible = true
+                        get_page():SetUIValue('password_field_error_msg', '')
+                        get_page():FindControl('password_field_error').visible = true
+
+                        hide_account_list()
+                        update_login_button_status()
+                    end
+
+                    function remove_account(index)
+                        if not get_page() then
+                            return
+                        end
+
+                        local value = account_list_data[index].value
+                        SessionsData:RemoveSession(value)
+
+                        local username = get_page():GetValue('account')
+
+                        if value == username then
+                            get_page():SetValue('account', '')
+                        end
+
+                        hide_account_list()
+                        get_page():Rebuild()
+                    end
+
+                    function set_account_mode()
+                        set_mode('account')
+                    end
+
+                    function set_phone_mode()
+                        set_mode('phone')
+                    end
+
+                    function set_mode(mode)
+                        if not get_page() then
+                            return
+                        end
+                        print('set_mode-------------->', mode)
+                        local login_with_phone_number = get_page():FindControl('phone_mode')
+                        local login_with_account = get_page():FindControl('account_mode')
+                        local auto_login_mode = get_page():FindControl('auto_login_mode')
+
+                        if mode == 'account' then
+                            if get_page() and get_page():FindControl('login_button') then
+                                get_page():FindControl('login_button'):SetDefault(true)
+                            end
+
+                            if login_with_phone_number then
+                                login_with_phone_number.visible = false
+                            end
+
+                            if login_with_account then
+                                login_with_account.visible = true
+                            end
+
+                            if auto_login_mode then
+                                auto_login_mode.visible = false
+                            end
+
+                        elseif mode == 'phone' then
+                            if get_page():FindControl('phone_login_button') then
+                                get_page():FindControl('phone_login_button'):SetDefault(true)
+                            end
+
+                            if login_with_phone_number then
+                                login_with_phone_number.visible = true
+                            end
+
+                            if login_with_account then
+                                login_with_account.visible = false
+                            end
+
+                            if auto_login_mode then
+                                auto_login_mode.visible = false
+                            end
+
+                        elseif mode == 'auto_login' then
+                            if get_page():FindControl('login_button') then
+                                get_page():FindControl('login_button'):SetDefault(false)
+                            end
+
+                            if login_with_phone_number then
+                                login_with_phone_number.visible = false
+                            end
+
+                            if login_with_account then
+                                login_with_account.visible = false
+                            end
+
+                            if auto_login_mode then
+                                auto_login_mode.visible = true
+                            end
+
+                            if get_page() then
+                                if get_page():FindControl('start_button') then
+                                    get_page():FindControl('start_button'):SetDefault(true)
+                                end
+                            end
+                        end
+                    end
+
+                    function login_with_phone()
+                        if not get_page() then
+                            return
+                        end
+
+                        GameLogic.GetPlayerController():SaveLocalData("lastLoginMode","phone")
+                        local phone_number = get_page():GetValue('phone_number')
+                        local phone_captcha = get_page():GetValue('phone_captcha')
+
+                        if not phone_captcha or phone_captcha == '' then
+                            get_page():SetUIValue('captcha_field_error_msg', L'*手机验证码不能为空')
+                            get_page():FindControl('captcha_field_error').visible = true
+                            return
+                        end
+
+                        KeepworkServiceSession:CellphoneCaptchaVerify(
+                            phone_number,
+                            phone_captcha,
+                            function(result)
+                                if not result or type(result) ~= 'table' then
+                                    return
+                                end
+
+                                if result.verify ~= true then
+                                    get_page():SetUIValue('phone_field_error_msg', format(L'%s(%d)', result.message, result.code))
+                                    get_page():FindControl('phone_field_error').visible = true
+                                    return
+                                end
+
+                                KeepworkServiceSession:CheckPhonenumberExist(phone_number, function(be_exist)
+                                    if be_exist then
+                                        MainLogin:MobileLoginWithPhoneNumber(phone_number, phone_captcha, function(be_succeed, reason, message)
+                                            if not be_succeed then
+                                                get_page():SetUIValue('phone_field_error_msg', message)
+                                                get_page():FindControl('phone_field_error').visible = true
+                                                return
+                                            end
+
+                                            local account = Mod.WorldShare.Store:Get('user/username')
+                                            get_page():SetUIValue('auto_username', account or '')
+                                            set_mode('auto_login')
+                                            commonlib.TimerManager.SetTimeout(function()  
+                                                MainLogin:Next()
+                                            end,0)
+
+                                           
+                                        end)
+                                    else
+                                        register()
+
+                                        Mod.WorldShare.Utils.SetTimeOut(function()
+                                            local register_page = Mod.WorldShare.Store:Get('page/Mod.WorldShare.cellar.MainLogin.Register')
+
+                                            register_page:SetUIValue('phonenumber', phone_number)
+                                            register_page:SetUIValue('phonecaptcha', phone_captcha)
+                                            if register_page:FindControl('account_register_mode') then
+                                                register_page:FindControl('account_register_mode').visible = false
+                                            end
+                                            if register_page:FindControl('phone_register_mode') then
+                                                register_page:FindControl('phone_register_mode').visible = true
+                                            end
+                                            
+                                            register_page:SetUIBackground('account_button', '')
+                                            register_page:SetUIBackground('phone_button', 'Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#5 378 128 26')
+
+                                            _guihelper.SetFontColor(register_page:FindControl('account_button'), '#d3d3d3')
+                                            _guihelper.SetFontColor(register_page:FindControl('phone_button'), '#25282E')
+
+                                            if register_page:FindControl('account_register_mode') then
+                                                register_page:FindControl('account_register_mode').visible = false
+                                            end
+                                            if register_page:FindControl('phone_register_mode') then
+                                                register_page:FindControl('phone_register_mode').visible = true
+                                            end
+                                        end, 100)
+                                    end
+                                end)
+                            end
+                        )
+                    end
+
+                    function update_phone_login_button_status()
+                        if not get_page() then
+                            return
+                        end
+
+                        local phone_number = get_page():GetValue('phone_number')
+                        local phone_captcha = get_page():GetValue('phone_captcha')
+
+                        local be_success = true
+
+                        if not Validated:Phone(phone_number) then
+                            be_success = false
+                        else
+                            get_page():FindControl('phone_field_error').visible = false
+                        end
+
+                        if not phone_captcha or #phone_captcha == 0 then
+                            be_success = false
+                        else
+                            get_page():FindControl('captcha_field_error').visible = false
+                        end
+
+                        if be_success then
+                            --get_page():SetUIBackground('phone_login_button', 'Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#271 98 258 44')
+                        else
+                            --get_page():SetUIBackground('phone_login_button', 'Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#271 197 258 44')
+                        end
+                    end
+
+                    function get_phone_captcha()
+                        if not get_page() then
+                            return
+                        end
+
+                        local phone_number = get_page():GetValue('phone_number')
+
+                        if not Validated:Phone(phone_number) then
+                            _guihelper.MessageBox(L'*手机号格式错误')
+                            return
+                        end
+
+                        if is_clicked_get_phone_captcha then
+                            return false
+                        end
+
+                        is_clicked_get_phone_captcha = true
+
+                        local times = 60
+
+                        local timer = commonlib.Timer:new({
+                            callbackFunc = function(timer)
+                                get_page():SetValue('get_phone_captcha', format('%s(%ds)', L'重新发送', times))
+
+                                if times == 0 then
+                                    is_clicked_get_phone_captcha = false
+                                    get_page():SetValue('get_phone_captcha', L'获取验证码')
+                                    timer:Change(nil, nil)
+                                end
+
+                                times = times - 1
+                            end
+                        })
+
+                        KeepworkServiceSession:GetPhoneCaptcha(phone_number, function(data, err)
+                            if err == 400 and data and data.code and data.message then
+                                is_clicked_get_phone_captcha = false
+                                get_page():SetValue('get_phone_captcha', L'获取验证码')
+                                GameLogic.AddBBS(nil, format('%s%s(%d)', L'获取验证码失败，错误信息：', data.message, data.code), 3000, '255 0 0')
+                                timer:Change(nil, nil)
+                            end
+                        end)
+
+                        timer:Change(1000, 1000)
+                    end
+
+                    function change()
+                        Mod.WorldShare.MsgBox:Show(L'正在退出，请稍后...')
+                        KeepworkServiceSession:Logout(nil, function()
+                            Mod.WorldShare.MsgBox:Close()
+                            close()
+                            
+                            MainLogin:ShowLogin()
+                        end)
+                    end
+
+                    function start()
+                        MainLogin:Next()
+                    end
+
+                    function parent()
+                        EventTrackingService:Send(1, 'click.main_login.select_parents', nil, true)
+                        MainLogin:ShowParent()
+                    end
+
+                    function on_click_exit()
+                        MainLogin:Exit()
+                    end
+
+                    function update_password()
+                        if not KeepworkServiceSession:IsRealName() then
+                            _guihelper.MessageBox(L'*修改密码前请先完成实名认证。', function()
+                                local Certificate = NPL.load('(gl)Mod/WorldShare/cellar/Certificate/Certificate.lua')
+                                Certificate:ShowMyHomePage(function(result)
+                                    if KeepworkServiceSession:IsRealName() then
+                                        MainLogin:UpdatePasswordRemindVisible(false)
+                                        close()
+                                        MainLogin:ShowUpdatePassword()
+                                    end
+                                end)
+                            end)
+                            return
+                        end
+
+                        MainLogin:UpdatePasswordRemindVisible(false)
+                        close()
+                        MainLogin:ShowUpdatePassword()
+                    end
+
+                    -- don't remove
+                    Mod.WorldShare.Utils.SetTimeOut(function()
+                        if not get_page() then
+                            return
+                        end
+
+                        local val = get_page():GetValue('password_show')
+                        get_page():SetValue('password_hide', val)
+                        get_page():SetValue('password', val)
+
+                        local password_show_ctl = get_page():FindControl('password_show')
+                        local password_hide_ctl = get_page():FindControl('password_hide')
+
+                        if password_show_ctl then
+                            password_show_ctl.visible = false
+                        end
+
+                        if password_hide_ctl then
+                            password_hide_ctl.visible = true
+                        end
+
+                        update_login_button_status()
+                        local isLogin = KeepworkServiceSession:IsSignedIn()
+                        local lastLoginMode = GameLogic.GetPlayerController():LoadLocalData("lastLoginMode","")
+
+                        if not isLogin then
+                            if lastLoginMode == "account" then
+                                set_account_mode()
+                            else
+                                set_phone_mode()
+                            end
+                        end
+                    end, 0)
+                    
+                ]]>
+            </script>
+            <style type='text/mcss' src='Mod/WorldShare/cellar/Theme/Mcss/MainLoginMcss.mcss'>
+                {
+                    container_size = {
+                        ['margin-left'] = -225,
+                        ['margin-top'] = -275,
+                    },
+                    main_area = {
+                        width = 450,
+                        height = 550,
+                        ['base-font-size'] = 16,
+                        ['font-size'] = 16,
+                        color = '#d3d3d3',
+                        ['padding-top'] = 0,
+                        ['padding-left'] = 75,
+                        ['padding-right'] = 75,
+                    },
+                }
+            </style>
+            <pe:container
+                alignment='_rt'
+                zorder='-1'
+                width='305px'
+                height='100px'
+                style='position: relative;
+                    background:;
+                    margin-top: 20px;
+                    margin-right: -10px;'>
+                <!-- exit -->
+                <div style='float: left;
+                            width: 80px;
+                            margin-left: 210px;'>
+                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                        <input type='button'
+                                onclick='on_click_exit'
+                                style='text-align: center; color: #d3d3d3; width: 67px; height: 52px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                value='<%= L"QUIT" %>' />
+                    </pe:if>
+                    <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                        <input type='button'
+                                onclick='on_click_exit'
+                                style='text-align: center; color: #d3d3d3; width: 67px; height: 52px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                value='<%= L"退出" %>' />
+                    </pe:if>
+                    
+                </div>
+            </pe:container>
+            <pe:container alignment='_ct' class='container_size' style="background-color: #353536; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                <div class='main_area'>
+                    <div align="center" style="width: 100px; height: 54px; margin-top: 30px;">
+                        <!-- logo -->
+                        <div style="width: 100px; height: 54px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#842 188 100 54);"></div>
+                    </div>
+                    <pe:container name='account_mode' visible='true' style='position: relative;background:;'>
+                        <pe:container name="account_field_error"
+                                      visible='false'
+                                      style='position: relative; margin-left: 74px; margin-top: 85px; height: 16px;
+                                             line-height: 5px;
+                                             background:;'>
+                            <label style='font-size: 12px;
+                                          base-font-size: 12px;
+                                          line-height: 5px;
+                                          text-align: right;
+                                          color: #FC3632;'
+                                   name='account_field_error_msg' />
+                        </pe:container>
+                        <pe:container name='password_field_error'
+                                      visible='false'
+                                      style='position: relative; margin-left: 74px; margin-top: 173px; height: 16px;
+                                             height: 16px;
+                                             line-height: 5px;
+                                             background:;'>
+                            <label style='font-size: 12px;
+                                          base-font-size: 12px;
+                                          line-height: 5px;
+                                          color: #FC3632;
+                                          text-align: right;'
+                                   name='password_field_error_msg' />
+                        </pe:container>
+                        <div style="margin-top: 20px;
+                                    height: 44px;
+                                    width: 300px;
+                                    background-color: #2b2b2b; 
+                                    background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                            <div style="float: left;
+                                        width: 150px;
+                                        height: 36px;
+                                        margin-top: 4px;
+                                        margin-left: 4px;
+                                        background-color: #353535 
+                                        background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                <div style='font-size: 14px;
+                                        base-font-size: 14px;
+                                        text-align: center;
+                                        margin-top: 8px;
+                                        height: 36px;
+                                        line-height: 5px;
+                                        color: #d3d3d3; 
+                                        width: 150px;
+                                        font-weight: bold;'>
+                                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        Account
+                                    </pe:if>
+                                    <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        <%= L'账号登录' %>
+                                    </pe:if>
+                                </div>
+                            </div>
+                            <div onclick='set_phone_mode'
+                                    style='float:left;
+                                        font-size: 14px;
+                                        base-font-size: 14px;
+                                        text-align: center;
+                                        margin-top: 4px;
+                                        color: #d3d3d3;
+                                        height: 36px;
+                                        line-height: 5px;
+                                        width: 140px;'>
+                                <div style="margin-top: 8px; margin-left: 10px;">
+                                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        Phone
+                                    </pe:if>
+                                    <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        <%= L'手机号登录' %>
+                                    </pe:if>
+                                </div>
+                            </div>
+                        </div>
+                        <div style='width: 300px;height: 165px; margin-top: 20px;'>
+                            <pe:container name='account_list'
+                                          visible='false'
+                                          zorder='1'
+                                          style='background:;
+                                                 position: relative;
+                                                 margin-top: 75px;
+                                                 margin-left: 0px;'>
+                                <div style='<%= get_account_list_style() %>'>
+                                    <pe:gridview name='account_list_view'
+                                                 DataSource='<%= get_account_list() %>'
+                                                 DefaultNodeHeight='40'
+                                                 pagesize='100'
+                                                 ItemsPerLine='1'
+                                                 AllowPaging='false'>
+                                        <Columns>
+                                            <div style='width: 215px;
+                                                        height: 39px;
+                                                        padding-left: 4px;
+                                                        background-color: #25282e'>
+                                                <input type='button'
+                                                       value='<%= text %>'
+                                                       name='<%= Eval("index") %>'
+                                                       onclick='select_account'
+                                                       style='width: 175px;
+                                                              height: 39px;
+                                                              text-align: left;
+                                                              color: #d3d3d3;
+                                                              background:;' />
+                                                <input type='button'
+                                                       name='<%= Eval("index") %>'
+                                                       style='background: url(Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#639 407 10 12);
+                                                              width: 10px;
+                                                              height: 12px;
+                                                              margin-top: 16px;
+                                                              margin-left: 15px;'
+                                                       onclick='remove_account'/>
+                                            </div>
+                                            <div style='width: 260px;height: 1px;background-color: #3d4047'></div>
+                                        </Columns>
+                                    </pe:gridview>
+                                </div>
+                            </pe:container>
+                            <div>
+                                <div style="width: 120px; height: 20px;">
+                                    <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#414 106 16 16);"></div>
+                                    <div style="float: left; margin-top: -2px; margin-left: 10px; color: #d3d3d3;"><%=L"账号"%></div>
+                                </div>
+                                <div style='position: relative;
+                                            background: url(Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#674 408 18 10);
+                                            width: 18px;
+                                            height: 10px;
+                                            margin-left: 270px;
+                                            margin-top: 26px;'
+                                        onclick='show_account_list'
+                                        zorder='1'>
+                                </div>
+                                <div style="margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <input type='text'
+                                        name='account'
+                                        onchange='update_login_button_status'
+                                        onfocusin='hide_account_list'
+                                        style='background:;
+                                                margin-left: 10px;
+                                                textcolor: #d3d3d3;
+                                                height: 30px;
+                                                width: 260px;
+                                                margin-top: 6px;
+                                                font-size: 16px;'
+                                        EmptyText='<%= L"请输入您的账号/手机号" %>'
+                                        RemoveSpaces='true'
+                                        MoveViewWhenAttachWithIME='true' />
+                                </div>
+                               
+                            </div>
+                            <div style='margin-top: 20px;'>
+                                <div style="width: 100px; height: 20px;">
+                                    <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#346 238 16 16);"></div>
+                                    <div style="float: left; margin-top: -2px; margin-left: 10px; color: #d3d3d3;"><%=L"密码"%></div>
+                                </div>
+                                <div style="float: left; margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <input type='text'
+                                           name='password_show'
+                                           style='background:;
+                                                  textcolor: #d3d3d3;
+                                                  height: 30px;
+                                                  width: 260px;
+                                                  margin-top: 6px;
+                                                  margin-left: 12px;
+                                                  font-size: 16px;'
+                                           onchange='update_login_button_status'
+                                           SkipAutoBadWordFilter='true'
+                                           RemoveSpaces='true'
+                                           EmptyText='<%= L"请输入密码" %>'
+                                           MoveViewWhenAttachWithIME='true' />
+                                    <input type='password'
+                                           name='password_hide'
+                                           PasswordChar="*"
+                                           style='background:;textcolor: #d3d3d3;height: 30px;margin-left: -260px;width: 260px;margin-top: 6px;font-size: 16px;'
+                                           onchange='update_login_button_status'
+                                           SkipAutoBadWordFilter='true'
+                                           RemoveSpaces='true'
+                                           EmptyText='<%= L"请输入密码" %>'
+                                           enable_ime="true"
+                                           MoveViewWhenAttachWithIME='true' />
+                                    <input type="hidden" name="password" value="" />
+                                </div>
+                                <input type="checkbox"
+                                       name="eye_show_password"
+                                       checked="false"
+                                       iconsize="20"
+                                       CheckedBG="Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#272 52 20 20"
+                                       UncheckedBG="Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#297 52 20 20"
+                                       style="position: relative;margin-left: -30px;margin-top: 20px;"
+                                       onclick="click_set_show_password"/>
+                            </div>
+                        </div>
+                        <div style="margin-top: 5px;">
+                            <div style='float:left;
+                                        color: #9A9DA2;
+                                        base-font-size: 13px;
+                                        font-size: 13px;'>
+                                <pe:if condition='<%= not System.options.IgnoreRememberAccount %>'>
+                                    <input type="checkbox"
+                                            iconsize="16"
+                                            CheckedBG="Texture/Aries/Creator/keepwork/community_32bits.png#446 238 16 16"
+                                            UncheckedBG="Texture/Aries/Creator/keepwork/community_32bits.png#426 238 16 16"
+                                            style="float:left;margin-top:3px;min-width:90px;"
+                                            name='auto_login_name'
+                                            checked="false"
+                                            onclick="set_auto_login"/>
+                                    <div style='float: left;
+                                                margin-left: 3px;
+                                                margin-top: 2px;
+                                                color: #d3d3d3' for='auto_login_name'>
+                                        <%= L"自动登录" %>
+                                    </div>
+                                </pe:if>
+                                <pe:if condition='<%= System.options.IgnoreRememberAccount %>'>
+                                    <div width="77"></div>
+                                </pe:if>
+                            </div>
+                            <pe:if condition='<%= System.os.GetPlatform() == "win32" %>'>
+                                <pe:if condition="<%= Mod.WorldShare.Utils.IsEnglish() %>">
+                                    <div style='float: left;
+                                         base-font-size: 13px;
+                                         font-size: 13px;
+                                         color: #d3d3d3;
+                                         width: 110px;
+                                         margin-left: 106px;'
+                                         onclick='forget_password()'>
+                                         Forgot password?
+                                    </div>
+                                </pe:if>
+                                <pe:if condition="<%= not Mod.WorldShare.Utils.IsEnglish() %>">
+                                    <div style='float:left;
+                                            base-font-size: 13px;
+                                            font-size: 13px;
+                                            color: #d3d3d3;margin-left: 155px;'
+                                     onclick='forget_password()'>
+                                        <%= "忘记密码 " %>
+                                    </div>
+                                </pe:if>
+                            </pe:if>
+                        </div>
+                        <div style='margin-top:30px;margin-bottom:10px;'>
+                            <input type='button'
+                                   name='login_button'
+                                   style="width: 300px;
+                                        height: 44px;
+                                        color: #d3d3d3;
+                                        background-color: #404BF5;
+                                        background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"
+                                   onclick='login()'
+                                   value='<%= L"登录"%>' />
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <div width='50%'
+                                    style='float: left;
+                                        padding-right: 5px;'>
+                                <input width='100%'
+                                        type='button'
+                                        onclick='register'
+                                        style='text-align: center; color: #d3d3d3; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                        value='<%= L"注册" %>' />
+                            </div>
+                            <div width='50%'
+                                    style='float: left;
+                                        padding-left: 5px;'>
+                                <input width='100%'
+                                        onclick='use_offline'
+                                        type='button'
+                                        style='text-align: center; color: #d3d3d3; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                        value='<%= L"本地模式" %>' />
+                            </div>
+                        </div>
+                    </pe:container>
+                    <pe:container name='phone_mode' visible='false' style='position: relative;background:;'>
+                        <pe:container name='phone_field_error'
+                                      visible='false'
+                                      style='position: relative; margin-left: 74px; margin-top: 84px; height: 16px;
+                                             line-height: 5px;
+                                             background: ;'>
+                            <!-- error message -->
+                            <label style='font-size: 12px;
+                                          base-font-size: 12px;
+                                          line-height: 5px;
+                                          text-align: right;
+                                          color: #FC3632;'
+                                   name='phone_field_error_msg' />
+                        </pe:container>
+                        <pe:container name='captcha_field_error'
+                                      visible='false'
+                                      style='position: relative; margin-left: 0px; margin-top: 246px; height: 16px;
+                                             line-height: 5px;
+                                             background: ;'>
+                            <!-- error message -->
+                            <label style='font-size: 12px;
+                                          base-font-size: 12px;
+                                          line-height: 5px;
+                                          color: #FC3632;'
+                                    name='captcha_field_error_msg' />
+                        </pe:container>
+                        <div style = "margin-top: 20px;
+                                        height: 44px;
+                                        width: 300px;
+                                        background-color: #2b2b2b; 
+                                        background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                            <div onclick='set_account_mode'
+                                 style='float: left;
+                                        font-size: 14px;
+                                        base-font-size: 14px;
+                                        text-align: center;
+                                        margin-top: 8px;
+                                        color: #d3d3d3;
+                                        height: 36px;
+                                        width: 140px;'>
+                                <div style="margin-top: 4px; margin-left: 5px;">
+                                    <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        <%= L'账号登录' %>
+                                    </pe:if>
+                                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        Account
+                                    </pe:if>
+                                </div>
+                            </div>
+                            <div style="float: left;
+                                            width: 150px;
+                                            height: 36px;
+                                            margin-top: 4px;
+                                            margin-left: 4px;
+                                            background-color: #353535 
+                                            background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                <div style='font-size: 14px;
+                                            base-font-size: 14px;
+                                            text-align: center;
+                                            margin-top: 8px;
+                                            height: 36px;
+                                            line-height: 5px;
+                                            color: #d3d3d3; 
+                                            width: 150px;
+                                            font-weight: bold;'>
+                                    <pe:if condition='<%= not Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        <%= L'手机号登录' %>
+                                    </pe:if>
+                                    <pe:if condition='<%= Mod.WorldShare.Utils.IsEnglish() %>'>
+                                        Phone
+                                    </pe:if>
+                                </div>
+                            </div>
+                        </div>
+                        <div style='width: 300px;height: 165px; margin-top: 20px;'>
+                            <div>
+                                <div style="width: 160px; height: 20px;">
+                                    <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#366 238 16 16);"></div>
+                                    <div style="float: left; margin-left: 10px; margin-top: -4px; color: #d3d3d3;"><%=L"手机号"%></div>
+                                </div>
+                                <div style="margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <input type='text'
+                                    name='phone_number'
+                                    RemoveSpaces='true'
+                                    SkipAutoBadWordFilter='true'
+                                    onchange='update_phone_login_button_status'
+                                    style='height: 30px;
+                                            margin-left: 10px;
+                                            width: 260px;
+                                            margin-top: 6px;
+                                           text-valign: center;
+                                           background:;
+                                           textcolor: #d3d3d3;'
+                                    MoveViewWhenAttachWithIME='true'
+                                    EmptyText='<%= L"请输入您的手机号" %>' />
+                                </div>
+                                
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <div style="width: 160px; height: 20px;">
+                                    <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#666 2 20 20);"></div>
+                                    <div style="float: left; margin-left: 10px; margin-top: -4px; color: #d3d3d3;"><%=L"验证码"%></div>
+                                </div>
+                                <input type='button'
+                                       value='<%= L"获取验证码" %>'
+                                       zorder='1'
+                                       onclick='get_phone_captcha'
+                                       name='get_phone_captcha'
+                                       style='background: url(Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#331 70 90 22:5 5 5 5));
+                                              width: 124px;
+                                              height: 40px;
+                                              text-singleline: true;
+                                              color: #d3d3d3;
+                                              position: relative;
+                                              margin-left: 180px;
+                                              margin-top: 10px;' />
+                                <div style="margin-top: 10px; width: 165px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                    <input type='text'
+                                       name='phone_captcha'
+                                       onchange='update_phone_login_button_status'
+                                       style='height: 35px;
+                                              margin-left: 10px;
+                                              text-singleline: true;
+                                              text-valign: center;
+                                              background:;
+                                              textcolor: #d3d3d3;'
+                                       RemoveSpaces='true'
+                                       MoveViewWhenAttachWithIME='true'
+                                       EmptyText='<%= L"请输入验证码" %>' />
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div style='margin-top:57px;margin-bottom:10px;'>
+                            <input type='button'
+                                   name='phone_login_button'
+                                   style="width: 300px;
+                                   height: 44px;
+                                   color: #d3d3d3;
+                                   background-color: #404BF5;
+                                   background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"
+                                   onclick='login_with_phone()'
+                                   value='<%= L"登录"%>' />
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <div width='50%'
+                                    style='float: left;
+                                        padding-right: 5px;'>
+                                <input width='100%'
+                                    type='button'
+                                    onclick='register'
+                                    style='text-align: center; color: #d3d3d3; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                    value='<%= L"注册" %>' />
+                            </div>
+                            <div width='50%'
+                                    style='float: left;
+                                        padding-left: 5px;'>
+                                <input width='100%'
+                                        onclick='use_offline'
+                                        type='button'
+                                        style='text-align: center; color: #d3d3d3; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                        value='<%= L"本地模式" %>' />
+                            </div>
+                        </div>
+                        
+                    </pe:container>
+                    <pe:container name='auto_login_mode'
+                                  visible='false'
+                                  style='background:;'>
+                        <div style='height: 140px; margin-top: 130px;'>
+                            <label style='font-size: 24px;
+                                          base-font-size: 24px;
+                                          text-align: center;
+                                          color: #d3d3d3;
+                                          height: 50px;
+                                          margin-top: 50px;'
+                                   name='auto_username' />
+                        </div>
+                        <div style='margin-top:30px;margin-bottom:10px;'>
+                            <input type='button'
+                                   name='start_button'
+                                   style="width: 300px;
+                                        height: 44px;
+                                        color: #d3d3d3;
+                                        background-color: #404BF5;
+                                        background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"
+                                   onclick='start()'
+                                   value='<%= L"登录"%>' />
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <div width='50%'
+                                    style='float: left;
+                                        padding-right: 5px;'>
+                                <input width='100%'
+                                        type='button'
+                                        onclick='change'
+                                        style='text-align: center; color: #d3d3d3; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                        value='<%= L"切换账号" %>' />
+                            </div>
+                            <div width='50%'
+                                    style='float: left;
+                                        padding-left: 5px;'>
+                                <input width='100%'
+                                        onclick='update_password'
+                                        type='button'
+                                        style='text-align: center; color: #d3d3d3; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                                        value='<%= L"修改密码" %>' />
+                            </div>
+                        </div>
+                    </pe:container>
+                </div>
+            </pe:container>
+        </pe:mcml>
+    </body>
+</html>

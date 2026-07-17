@@ -133,6 +133,7 @@ function CreateModulPage.ShowView()
     CreateModulPage.select_module_index = 1
     CreateModulPage.HandleData(nil, true)
     
+
     local params = {
         url = "script/apps/Aries/Creator/Game/Tasks/World2In1/CreateModulPage.html",
         name = "CreateModulPage.Show", 
@@ -143,7 +144,7 @@ function CreateModulPage.ShowView()
         enable_esc_key = true,
         zorder = 0,
         directPosition = true,
-        
+        isTopLevel = true,
         align = "_ct",
         x = -854/2,
         y = -573/2,
@@ -267,16 +268,15 @@ function CreateModulPage.GetDesc1()
     return "欢迎来到创作区，你可以选择下面模板快速创建属于你的迷你地块，并入驻至课程世界与其他同学PK哦！"
 end
 
-function CreateModulPage.OnClickCreate()
-    local project_name = page:GetValue("project_text") or ""
+function CreateModulPage.CreateWorldImp(project_name)
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then
         _guihelper.MessageBox(L"您尚未登录，只能创建普通的迷你世界", function()
             page:CloseWindow()
             CreateModulPage.close_cb = nil
             CreateModulPage.CloseView()
 
-            local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
-            CreateNewWorld.CreateWorldByName(project_name, "paraworldMini")
+            local CreateWorld = NPL.load('(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua')
+            CreateWorld:CreateWorldByName(project_name, "paraworldMini",true)
         end);
 
         return
@@ -304,23 +304,8 @@ function CreateModulPage.OnClickCreate()
         CreateModulPage.close_cb = nil
         CreateModulPage.CloseView()
 
-        local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
-        CreateNewWorld.CreateWorldByName(project_name, "paraworldMini")
-        return
-    end
-
-    if string.find(project_name, "*") then
-        GameLogic.AddBBS("create_module", string.format("含有敏感词，请修改", world), 5000, "255 0 0");
-        return
-    end
-    
-    if project_name == "" then
-        GameLogic.AddBBS("create_module", L"请输入项目名称", 5000, "255 0 0");
-        return
-    end
-
-    if string.len(project_name) > 40 then
-        GameLogic.AddBBS("create_module", L"世界名字太长了, 请重新输入", 5000, "255 0 0");
+        local CreateWorld = NPL.load('(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua')
+        CreateWorld:CreateWorldByName(project_name, "paraworldMini",true)
         return
     end
 
@@ -336,7 +321,7 @@ function CreateModulPage.OnClickCreate()
         page:CloseWindow()
         CreateModulPage.CloseView()
         
-        CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update -fork %d]], project_name, parent_id,region_id))
+        CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update -fork %d -mode admin]], project_name, parent_id,region_id))
     end
 
     local name = commonlib.Encoding.Utf8ToDefault(project_name)
@@ -363,10 +348,49 @@ function CreateModulPage.OnClickCreate()
         else
             CreateModulPage.to_path = CreateModulPage.project_file_path .. "/" .. project_name
 
-            CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update -fork %d]], project_name, parent_id,region_id))
+            CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update -fork %d -mode admin]], project_name, parent_id,region_id))
         end
     end
-    -- CommandManager:RunCommand(format([[/createworld -name "%s" -fork %d]], project_name,region_id))
+end
+
+function CreateModulPage.OnClickCreate()
+    --print("CreateModulPage.OnClickCreate")
+    if not CreateModulPage.CreateWorld then
+        CreateModulPage.CreateWorld = commonlib.debounce(function()
+            local project_name = page:GetValue("project_text") or ""
+            if project_name == "" then
+                GameLogic.AddBBS("create_module", L"请输入项目名称", 5000, "255 0 0");
+                return
+            end
+
+            if string.find(project_name, "*") then
+                GameLogic.AddBBS("create_module", "项目名称含有敏感词，请修改", 5000, "255 0 0");
+                return
+            end
+
+            if string.len(project_name) > 40 then
+                GameLogic.AddBBS("create_module", L"世界名字太长了, 请重新输入", 5000, "255 0 0");
+                return
+            end
+            GameLogic.GetFilters():add_filter("OnBeforeLoadWorld", CreateModulPage.OnBeforeLoadWorld); 
+            local Compare = NPL.load('(gl)Mod/WorldShare/service/SyncService/Compare.lua')
+            CreateModulPage.create_project_name = project_name
+            Compare:GetNewWorldName(project_name, function(worldName,worldPath,last_world_name)
+                CreateModulPage.CreateWorldImp(worldName)
+            end)
+        end, 300)
+    end
+    CreateModulPage.CreateWorld()
+end
+
+function CreateModulPage.OnBeforeLoadWorld()
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local worldName = CreateModulPage.create_project_name
+    if worldName and worldName ~= "" then
+        WorldCommon.SetWorldTag("name", worldName);
+        WorldCommon.SaveWorldTag()
+    end
+    GameLogic.GetFilters():remove_filter("OnBeforeLoadWorld",CreateModulPage.OnBeforeLoadWorld);
 end
 
 function CreateModulPage.SelectType(index)

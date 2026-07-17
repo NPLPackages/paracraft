@@ -38,7 +38,7 @@ local VideoRenderQueue = commonlib.inherit(commonlib.gettable("System.Core.ToolB
 HttpWrapper.Create("keepwork.admins.login", "%MAIN%/core/v0/admins/login", "POST", true)
 
 --http://yapi.kp-para.cn/project/32/interface/api/5210 --获取生成视频任务
-HttpWrapper.Create("keepwork.projectVideoPools.task", "%MAIN%/core/v0/projectVideoPools/task", "GET", true)
+HttpWrapper.Create("keepwork.projectVideoPools.task", "%MAIN%/core/v0/projectVideoPools/task", "POST", true)
 
 --
 --http://yapi.kp-para.cn/project/32/interface/api/5215 --上传7牛成功后保存视频链接
@@ -259,11 +259,23 @@ function VideoRenderQueue:ReqTask()
         self:gotoWorld(self._curTask.projectId)
         return
     end
+    --暂时只生成视频在帕帕奇遇记的世界上面
     keepwork.projectVideoPools.task({
-        clientId = clientId
+        clientId = clientId,
+        platform = {
+        "paracraft_papa",
+        "paracraft-android_tatfook_papa",
+        "paracraft-android_yingyongbao_papa",
+        "paracraft-android_xiaomi_papa",
+        "paracraft-android_huawei_papa",
+        "paracraft-android_oppo_papa",
+        "paracraft-android_vivo_papa",
+        "paracraft-android_qihu360_papa",
+        "paracraft-android_baidu_papa",
+        "paracraft-android_meizu_papa",
+        "paracraft-ios_papa",
+        "paracraft-mac_papa",},
     },function(err,msg,data)
-        -- print("projectVideoPools======err",err)
-        -- echo(data,true)
         if err==401 or err==403 then
             _fileLog:output_video_log(nil, "info", "VideoRenderQueue", "keepwork.projectVideoPools.task失败,要去重新获取管理员token. err:"..(err or "nil"));
             self:adminLogin(nil,nil,function(token)
@@ -549,7 +561,7 @@ function VideoRenderQueue:StartRecord()
         return
     end
 	ReplayManager:Play({
-		speed = 3
+		speed = 1
 	},_onFinished,self._curTask.id)
 
 end
@@ -619,44 +631,47 @@ function VideoRenderQueue:upload2Qiniu(nameTag,videoPath,callback)
             self:CheckRestartApp()
             return;
         end
-        local content = file:GetText(0, -1);
-        file:close();
+        do 
+            local content = file:GetText(0, -1);
+            file:close();
 
-        if not content then
-            VideoRenderQueue._errorOccur = "read file 550,filepath:"..tostring(videoPath)
-            self:CheckRestartApp()
-            return;
-        end
-
-        local token = data.data.token;
-        local key = data.data.key;
-        local file_name = commonlib.Encoding.DefaultToUtf8(ParaIO.GetFileName(file_path));
-        GameLogic.GetFilters():apply_filters(
-            'qiniu_upload_file',
-            token,
-            key,
-            file_name,
-            content,
-            function(result, err)
-                if err==401 or err==403 then
-                    _fileLog:output_video_log(nil, "error", "VideoRenderQueue", "qiniu_upload_file失败,要去重新获取管理员token. err:%s",err);
-                    VideoRenderQueue._errorOccur = "qiniu_upload_file失败,要去重新获取管理员token"
-                    self:CheckRestartApp()
-                    return
-                end
-                
-                -- echo(result,true)
-                if err ~= 200 or result.data==nil or result.data.url==nil then
-                    _fileLog:output_video_log(nil, "error", "VideoRenderQueue", "上传错误,err:%s",err);
-                    VideoRenderQueue._errorOccur = "QiniuRootApi:Upload 574"
-                    self:CheckRestartApp()
-                    return;
-                end
-                local url = result.data.url.."?t="..os.time()
-                -- _fileLog:output_video_log(nil, "info", "VideoRenderQueue", "上传成功,url:%s",url);
-                callback(url)
+            if not content then
+                VideoRenderQueue._errorOccur = "read file 550,filepath:"..tostring(videoPath)
+                self:CheckRestartApp()
+                return;
             end
-        )
+
+            local token = data.data.token;
+            local key = data.data.key;
+            local file_name = commonlib.Encoding.DefaultToUtf8(ParaIO.GetFileName(file_path));
+            GameLogic.GetFilters():apply_filters(
+                'qiniu_upload_file',
+                token,
+                key,
+                file_name,
+                content,
+                function(result, err)
+                    if err==401 or err==403 then
+                        _fileLog:output_video_log(nil, "error", "VideoRenderQueue", "qiniu_upload_file失败,要去重新获取管理员token. err:%s",err);
+                        VideoRenderQueue._errorOccur = "qiniu_upload_file失败,要去重新获取管理员token"
+                        self:CheckRestartApp()
+                        return
+                    end
+                
+                    -- echo(result,true)
+                    if err ~= 200 or result.data==nil or result.data.url==nil then
+                        _fileLog:output_video_log(nil, "error", "VideoRenderQueue", "上传错误,err:%s",err);
+                        VideoRenderQueue._errorOccur = "QiniuRootApi:Upload 574"
+                        self:CheckRestartApp()
+                        return;
+                    end
+                    local url = result.data.url.."?t="..os.time()
+                    -- _fileLog:output_video_log(nil, "info", "VideoRenderQueue", "上传成功,url:%s",url);
+                    callback(url)
+                end
+            )
+        end
+        collectgarbage("collect");
     end)
 end
 

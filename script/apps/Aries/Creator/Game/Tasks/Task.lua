@@ -111,6 +111,14 @@ function Task:GetSceneContext()
 	return self.sceneContext;
 end
 
+-- check if scene context is still active, if not, reload it.
+-- we may lose scene context if user switch to another tool(task) and then back.
+function Task:CheckRestoreSceneContext()
+	if(not self.sceneContext or not self.sceneContext:IsSelected()) then
+		self:LoadSceneContext();
+	end
+end
+
 -- create get tool window, one can then show the window with mcml content
 function Task:CreateGetToolWindow()
 	if(not self.window) then

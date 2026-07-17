@@ -51,6 +51,11 @@ function OnClickEmptyBagSlot(mcmlNode)
         EditEntityPage.OnClickEmptyBagSlot(item.slotNumber);
     end
 end
+
+function GetMoveViewOffset()
+    local top = math.floor((System.Windows.Screen:GetHeight() / 2))
+    return top + 30
+end
     
 ]]></script>
 <pe:container style="background:;">
@@ -78,7 +83,22 @@ end
     <div class="mc_line" width="100%" height="1"></div>
     <div style="text-align:center;padding-left:5px;padding-right:5px;"><%=EditEntityPage.GetEntity():GetCommandTitle() or ""%></div>
     <div style="margin-right:1px; margin-left:1px;" class="mc_paper_panel" width="100%" >
-        <input uiname="EditEntityPage.command" name="command" rows="4" ShowLineNumber="true" UseSystemControl="true" value='<%=EditEntityPage.GetCommand()%>' EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="margin-bottom:1px;margin-top:1px;margin-left:3px;margin-right:5px;textcolor:#000000" />
+        <input uiname="EditEntityPage.command"
+               name="command"
+               rows="4"
+               ShowLineNumber="true"
+               enable_ime="false"
+               UseSystemControl="true"
+               MoveViewWhenAttachWithIME="true"
+               MoveViewOffset="<%=GetMoveViewOffset()%>"
+               value='<%=EditEntityPage.GetCommand()%>'
+               EmptyText='<%=L"点击这里输入..."%>'
+               CaretColor="#000000"
+               style="margin-bottom: 1px;
+                      margin-top: 1px;
+                      margin-left: 3px;
+                      margin-right: 5px;
+                      textcolor: #000000;" />
     </div>
 </div>
 </pe:if>

@@ -115,6 +115,7 @@ function Entity:OpenEditor(editor_name, entity)
 		self:EndEdit();
 	end
 	GameLogic.SetModified();
+	return true;
 end
 
 function Entity:GetCheckpointName()

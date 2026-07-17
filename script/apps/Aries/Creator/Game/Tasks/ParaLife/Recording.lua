@@ -117,6 +117,22 @@ function Recording.DrawProgressView(parent)
 end
 
 function Recording.StartRecord()
+	local MobilePermissionPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobilePermissionPage.lua")
+	MobilePermissionPage.ShowPage(function()
+		Recording.StartRecordImp()
+	end,function()
+		if record_timer then
+			record_timer:Change()
+			record_timer = nil
+		end	
+		ParalifeLiveModel.SetRecord(false)
+		ParalifeLiveModel.HideCamera(false)
+		Recording.IsRecording = false
+		Recording.ClosePage()
+	end)
+end
+
+function Recording.StartRecordImp()
 	if Recording.IsRecording then
 		return 
 	end

@@ -254,7 +254,7 @@ end
 
 -- whether is recording actor's action. 
 function MovieClip:SetRecording(bIsRecording)
-	local actor = self:GetFocus();
+	local actor = self.recording_actor or self:GetFocus();
 	if(actor) then
 		return actor:SetRecording(bIsRecording);
 	end

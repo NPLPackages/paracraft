@@ -88,15 +88,16 @@ function DesktopMenuPage.TogglePinned()
 	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 	local Screen = commonlib.gettable("System.Windows.Screen");
 	local viewport = ViewportManager:GetSceneViewport();
+	local viewportUI = ViewportManager:GetGUIViewport();
 	if(DesktopMenuPage.IsPinned) then
 		local height = 32;
 		SceneViewport.SetVirtualMarginTop(0)
 		if(viewport:GetMarginTopHandler() == nil) then
-			viewport:SetTop(math.floor(32 * (Screen:GetUIScaling()[2])));
+			viewport:SetTop(math.floor(32 * (Screen:GetUIScaling()[2])) + viewportUI:GetTop());
 			viewport:SetMarginTopHandler(DesktopMenuPage);
 		end
 	else
-		viewport:SetTop(0);
+		viewport:SetTop(0 + viewportUI:GetTop());
 		if(viewport:GetMarginTopHandler() == DesktopMenuPage) then
 			viewport:SetMarginTopHandler(nil);
 		end
@@ -126,13 +127,26 @@ function DesktopMenuPage.ActivateMenu(bActivate,bForce)
 				DesktopMenuPage.ShowPage(false);
 			end
 			SceneViewport.SetVirtualMarginTop(0)
+
+			if bForce then
+				DesktopMenuPage.IsPinned = false
+				local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+				local viewport = ViewportManager:GetSceneViewport();
+				local viewportUI = ViewportManager:GetGUIViewport();
+				viewport:SetTop(viewportUI:GetTop());
+				if(viewport:GetMarginTopHandler() == DesktopMenuPage) then
+					viewport:SetMarginTopHandler(nil);
+				end
+			end
 		end
 	end
 end
 
 -- show/hide
 function DesktopMenuPage.ShowPage(bShow)
-
+	if System.options.isStrictGameMode then
+		return
+	end
 	if GameLogic.GetFilters():apply_filters("DesktopMenuPage.ShowPage", false, bShow) then
 		return;
 	end

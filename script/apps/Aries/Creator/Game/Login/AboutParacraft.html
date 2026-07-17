@@ -66,32 +66,33 @@ end
 if System.options.channelId_431 then
     ClientVersion = string.format(L"帕拉卡客户端 v%s", GameLogic.options.GetClientVersion());
     CompanyName = L"深圳市帕拉卡科技有限公司"
+elseif System.options.isShenzhenAi5 then
+    ClientVersion = string.format(L"深教AI4客户端 v%s", GameLogic.options.GetClientVersion());
+    CompanyName = "";
 else
-    local androidFlavor = ParaEngine.GetAppCommandLineByParam('android_flavor', nil);
+    local androidFlavor = System.os.GetAndroidFlavor();
 
-    if (androidFlavor == "Xiaomi") then
+    if (androidFlavor == "xiaomi") then
         ClientVersion = string.format(L"Paracraft帕拉卡3D虚拟社区学习软件 v%s", GameLogic.options.GetClientVersion());
-        CompanyName = L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"
+        CompanyName = L"powered by NPL and ParaEngine"
     else
-        ClientVersion = string.format(L"Paracraft帕拉卡 v%s", GameLogic.options.GetClientVersion());
-        CompanyName = L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"
+        ClientVersion = string.format(L"Paracraft 帕拉卡 v%s", GameLogic.options.GetClientVersion());
+        CompanyName = L"powered by NPL and ParaEngine"
     end
 end
 
 function GetTitle()
     if System.options.channelId_431 then
        return L"关于帕拉卡客户端"
+    elseif System.options.isShenzhenAi5 then
+        return L"关于"
     else
         return L"关于Paracraft"
     end
 end
 
 function GetOfficalNet()
-    if System.options.channelId_431 then
-        return L"https://edu.palaka.cn"
-    else
-        return L"https://paracraft.cn/"
-    end
+    return L"https://paracraft.cn/"
 end
 ]]></script>
 <aries:window mode="thin" width="600" title='<%=GetTitle() %>' onclose="OnClose">
@@ -103,12 +104,12 @@ end
             <div style="margin:10px;">
                 <div style="margin-top:5px"><%=Eval("ClientVersion")%></div>
                 <div style="margin-top:5px;"><%=Eval("CompanyName")%></div>
-                <div style="margin-top:5px;"><%=L"官网:"%><input type="button" value='<%=GetOfficalNet()%>' class="linkbutton_yellow" style="" onclick="OnClickOfficialSite" /></div>
-                <pe:if  condition='<%= not System.options.isChannel_430%>'>
-                    <pe:if  condition='<%= not System.options.channelId_431%>'>
-                        <div style="margin-top:5px;"><%=L"协议:"%><input type="button" value='<%="License"%>' class="linkbutton_yellow" style="" onclick="OnClickLicenseSite" /></div>
-                        <div style="margin-top:5px;"><%=L"隐私:"%><input type="button" value='<%="Privacy"%>' class="linkbutton_yellow" style="" onclick="OnClickPrivacySite" /></div>
-                    </pe:if>
+                <pe:if condition="<%= not System.options.isShenzhenAi5%>">
+                    <div style="margin-top:5px;"><%=L"官网:"%><input type="button" value='<%=GetOfficalNet()%>' class="linkbutton_yellow" style="" onclick="OnClickOfficialSite" /></div>
+                </pe:if>
+                <pe:if  condition='<%= (not System.options.isEducatePlatform or System.os.IsTouchMode()) %>'>
+                    <div style="margin-top:5px;"><%=L"协议:"%><input type="button" value='<%=L"[点击查看]"%>' class="linkbutton_yellow" style="" onclick="OnClickLicenseSite" /></div>
+                    <div style="margin-top:5px;"><%=L"隐私:"%><input type="button" value='<%=L"[点击查看]"%>' class="linkbutton_yellow" style="" onclick="OnClickPrivacySite" /></div>
                 </pe:if>
                 
             </div>
@@ -116,7 +117,7 @@ end
     </div>
     <hr />
     <div style="margin-top:30px;margin-bottom:30px;" class="default">
-        <pe:if  condition='<%= not System.options.channelId_431%>'>
+        <pe:if  condition='<%= not System.options.isEducatePlatform%>'>
             <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnOpenModulePage" />    
             <!-- <input type="button" value='<%=L"捐赠" %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnClickDonate" /> -->
             <input type="button" value='<%=L"致谢"%>'  class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnClickCredits" />

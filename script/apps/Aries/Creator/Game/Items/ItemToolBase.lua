@@ -72,15 +72,7 @@ end
 -- virtual function: when selected in right hand
 function ItemToolBase:OnSelect(itemStack)
 	ItemToolBase._super.OnSelect(self, itemStack)
-	self:DeleteTask();
-	self:SetCurrentItemStack(itemStack);
-	if(not GameLogic.GameMode:IsEditor() and not self.allowTaskInGameMode) then
-		return;
-	end
-	self.curTask = self:CreateTask(itemStack);
-	if(self.curTask) then
-		self.curTask:Run();
-	end
+	self:ReloadTask(itemStack)
 end
 
 function ItemToolBase:DeleteTask()
@@ -103,3 +95,16 @@ end
 -- virutal function: return a new task command object
 function ItemToolBase:CreateTask(itemStack)
 end
+
+function ItemToolBase:ReloadTask(itemStack)
+	self:DeleteTask();
+	self:SetCurrentItemStack(itemStack);
+	if(not GameLogic.GameMode:IsEditor() and not self.allowTaskInGameMode) then
+		return;
+	end
+	self.curTask = self:CreateTask(itemStack);
+	if(self.curTask) then
+		self.curTask:Run();
+	end
+end
+

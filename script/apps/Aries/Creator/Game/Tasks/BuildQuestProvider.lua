@@ -497,6 +497,11 @@ function task_class:AddID()
 		next_id = next_id + 1;
 	end
 end
+
+-- default is nil or false , if templatename ~= "" and templatename ~= nil  then will use cmd "/loadtemplate x,y,z templatename"
+function task_class:SetLoadTemplate(templatename)
+	self.templatename = templatename
+end
 	
 function task_class:Reload()
 	local taskpath = self.filepath;
@@ -767,11 +772,30 @@ local global_template_name_utf8 = L"全局模板";
 local global_dir_utf8 = myThemePath..global_template_name_utf8.."/";
 local global_dir_default = commonlib.Encoding.Utf8ToDefault(global_dir_utf8);
 
+function BuildQuestProvider.RefreshTemplatePath(path)
+	local old_myThemePath = myThemePath
+	local old_global_template_name_utf8 = global_template_name_utf8
+	local old_global_dir_utf8 = global_dir_utf8
+	local old_global_dir_default = global_dir_default
+	if path ~= nil and path ~= "" then
+		myThemePath = path
+		global_template_name_utf8 = ""
+		global_dir_utf8 = myThemePath..global_template_name_utf8.."/";
+		global_dir_default = commonlib.Encoding.Utf8ToDefault(global_dir_utf8);
+		categoryPaths["template"] = path
+		BuildQuestProvider.RefreshDataSource()
+	end
+	myThemePath = old_myThemePath
+	global_template_name_utf8 = old_global_template_name_utf8
+	global_dir_utf8 = old_global_dir_utf8 
+	global_dir_default = old_global_dir_default
+	categoryPaths["template"] = nil
+end
+
 function BuildQuestProvider.PrepareGlobalTemplateDir()
 	if(not System.options.IsMobilePlatform) then
 		ParaIO.CreateDirectory(global_dir_default);
 	end
-	
 end
 
 -- to be compatible with old file structure. we will need to move from old template position. 

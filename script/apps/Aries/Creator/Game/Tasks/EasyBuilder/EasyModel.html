@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<style>
+    .icon_container {
+        width:64px;
+        height:64px;
+        background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12);
+    }
+    .icon_img {
+        margin-left:20px;
+        margin-bottom:2px;
+        margin-top:10px;
+        width:24px;
+        height:24px;
+    }
+    .icon_btn {
+        width:64px;
+        height:24px;
+        color:#fff;
+        background:;
+    }
+    .brush_btn {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        font-size: 14px;
+        width: 64px;
+        height: 56px;
+        float: left;
+        color: #000000;
+    }
+    .brush_btn_selected {
+        background: url(Texture/Aquarius/Button_Highlight_Large.png:15 15 15 15);
+    }
+</style>
+<script type="text/npl" src="EasyModel.lua" refresh="false">
+<![CDATA[
+EasyModel = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyModel");
+EasyModel.InitPage(Page);
+function OnClickDummy() 
+end
+function GetBrushModeClass(mode)
+    local currentMode = EasyModel.GetCurrentBrushMode();
+    if(mode == currentMode) then
+        return "brush_btn brush_btn_selected";
+    else
+        return "brush_btn";
+    end
+end
+]]>
+</script>
+<pe:container onclick="OnClickDummy" zorder="-10" style="padding:12px;background-color:#000000a0;color:#ffffff;width:230px;">
+    <div>
+        <input type="button" style="margin-left:0px" onclick="EasyModel.OnSelectBrushMode" name="add" tooltip="<%=L'添加模式 - 在空白处添加方块'%>" value="<%=L'添加'%>" class="<%=GetBrushModeClass('add')%>" />
+        <input type="button" style="margin-left:5px" onclick="EasyModel.OnSelectBrushMode" name="replace" tooltip="<%=L'替换模式 - 替换单个方块'%>" value="<%=L'替换'%>" class="<%=GetBrushModeClass('replace')%>" />
+        <input type="button" style="margin-left:5px" onclick="EasyModel.OnSelectBrushMode" name="fill" tooltip="<%=L'填充模式 - 填充相同颜色的连续方块'%>" value="<%=L'填充'%>" class="<%=GetBrushModeClass('fill')%>" />
+        <!-- it is better to use delete slot instead of delete brush mode, but this is implemented for completeness
+        <input type="button" onclick="EasyModel.OnSelectBrushMode" name="delete" tooltip="<%=L'删除模式 - 删除方块'%>" value="<%=L'删除'%>" class="<%=GetBrushModeClass('delete')%>" />
+        -->
+    </div>
+    <div style="margin-top:10px;">
+        <pe:container name="SelectBG" zorder="-1" style="position: relative;width:66px;height:66px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12)" />
+        <div>
+            <div name="Pick" uiname="EasyModel.Pick" tooltip="Alt + 左键" onclick="EasyModel.OnSelectSlot" param="Pick" style="float:left;">
+                <div zorder="-2" class="icon_container">
+                    <img src="Texture/3DMapSystem/Creator/Objects/select.png" class="icon_img"/>
+                    <input type="button" value="拾取" class="icon_btn"/>
+                </div>
+            </div>
+            <div name="Model" uiname="EasyModel.Model" tooltip="添加活动模型物品" onclick="EasyModel.OnAddLiveModel" param="Model" style="float:left;margin-left:5px;">
+                <div zorder="-2" class="icon_container">
+                    <img src="Texture/3DMapSystem/Creator/Objects/Object_Add.png" class="icon_img"/>
+                    <input type="button" value="物品" class="icon_btn"/>
+                </div>
+            </div>
+            <div name="ObjectList" uiname="EasyModel.ObjectList" tooltip="打开物品列表" onclick="EasyModel.OnOpenObjectList" style="float:left;margin-left:5px;">
+                <div zorder="-2" class="icon_container">
+                    <img src="Texture/3DMapSystem/Creator/Objects/openMap.png" class="icon_img"/>
+                    <input type="button" value="清单" class="icon_btn"/>
+                </div>
+            </div>
+        </div>
+        <div style="clear:both;margin-top:5px;">            
+            <div name="Delete" uiname="EasyModel.Delete" tooltip="长按或shift+左键" onclick="EasyModel.OnSelectSlot" param="Delete" style="float:left;">
+                <div zorder="-2" class="icon_container">
+                    <img src="Texture/3DMapSystem/Creator/Objects/error.png" class="icon_img"/>
+                    <input type="button" value="删除" class="icon_btn"/>
+                </div>
+            </div>
+            <div name="Select" uiname="EasyModel.Select" tooltip="Ctrl+左键" onclick="EasyModel.OnSelectSlot" param="Select" style="float:left;margin-left:5px;">
+                <div zorder="-2" class="icon_container">
+                    <img src="Texture/3DMapSystem/Creator/Objects/Tool_Select.png" class="icon_img"/>
+                    <input type="button" value="选择" class="icon_btn"/>
+                </div>
+            </div>
+            <div name="CloneBag" uiname="EasyModel.CloneBag" tooltip="空间口袋可在不同存档间搬运物品" onclick="EasyModel.OnOpenCloneBag" style="float:left;margin-left:5px;">
+                <div zorder="-2" class="icon_container">
+                    <img src="Texture/Aries/Common/ThemeKid/magic_star/bag_32bits.png;0 0 48 48" class="icon_img"/>
+                    <input type="button" value="口袋" class="icon_btn"/>
+                </div>
+            </div>
+        </div>
+        <div style="clear:both;margin-top:5px;">
+            <div name="Undo" uiname="EasyModel.Undo" tooltip="Ctrl+Z" onclick="EasyModel.OnSelectSlot" param="Undo" style="float:left;">
+                <div zorder="-2" class="icon_container">
+                    <img src="Texture/3DMapSystem/Creator/Objects/undo.png" class="icon_img"/>
+                    <input type="button" value="撤销" class="icon_btn"/>
+                </div>
+            </div>
+            <div name="Redo" uiname="EasyModel.Redo" tooltip="Ctrl+Y" onclick="EasyModel.OnSelectSlot" param="Redo" style="float:left;margin-left:5px;">
+                <div zorder="-2" class="icon_container">
+                    <img src="Texture/3DMapSystem/Creator/Objects/redo.png" class="icon_img"/>
+                    <input type="button" value="反撤销" class="icon_btn"/>
+                </div>
+            </div>
+            <div name="More" uiname="EasyModel.More" tooltip="Ctrl+S" onclick="EasyModel.OnClickSave" style="float:left;margin-left:5px;">
+                <div zorder="-2" class="icon_container">
+                    <img src="Texture/Aries/Profile/Save_32bits.png;0 0 28 28" class="icon_img"/>
+                    <input type="button" value="保存" class="icon_btn"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</pe:container>
+<pe:container ClickThrough="true" style="width:220px;height:56px;background:;">
+    <input type="button" name="CloseBtn" onclick="EasyModel.OnClickClose" align="right" style="position:relative;margin-top:5px;width:56px;height:56px;background:url(Texture/player/close.png)" />
+    <div style="color:#ffffff;font-size:14px;text-shadow:true;margin-top:10px;max-width:166px;background-color: #00000080;padding:5px;">
+        <%=EasyModel.status%>
+    </div>
+</pe:container>
+<script type="text/npl" src="EasyModel.lua" refresh="true">
+<![CDATA[
+    -- move EasyModel.Slots.SelectBG to the selected slot
+    local selectedSlot = EasyModel.selectedSlot;
+    local slotName;
+    for name, idx in pairs(EasyModel.SlotsNames) do
+        if idx == selectedSlot then
+            slotName = name;
+            break;
+        end
+    end
+    local bg = Page:FindUIControl("SelectBG")
+    -- SelectBG is only visible for slots with corresponding buttons in the toolbar
+    -- Exclude ColorBlock (8) and ColorStair (9) which don't have toolbar buttons
+    if(slotName and selectedSlot and selectedSlot < 8) then
+        local selectedBtn = Page:FindUIControl(slotName);
+        if(bg and selectedBtn) then
+            bg.visible = true;
+            bg.x = selectedBtn.x;
+            bg.y = selectedBtn.y;
+        end
+    else
+        if(bg) then
+            bg.visible = false;
+        end
+    end
+]]>
+</script>
+</pe:mcml>
+</html>

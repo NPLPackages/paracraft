@@ -5,7 +5,8 @@
         local MobileCreatorPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileCreatorPage.lua")
         MobileCreatorPage.ShowPage()
 ]]
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua");
+local CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
 local MobileCreatorPage = NPL.export()
 
 MobileCreatorPage.tabview_ds = {
@@ -30,6 +31,16 @@ function MobileCreatorPage.ShowPage(bShow)
         MobileCreatorPage.ClosePage()
         return 
     end
+    if CreatorDesktop.IsMovie then
+        MobileCreatorPage.tabview_ds = {
+            {text=L"环境", name="env", url="script/apps/Aries/Creator/Game/Mobile/MobileEnvFramePage.html?version=1", enabled=true}, 
+        }
+    else
+        MobileCreatorPage.tabview_ds = {
+            {text=L"建造", name="building", url="script/apps/Aries/Creator/Game/Mobile/MobileBuilderFramePage.html?version=1", enabled=true},
+            {text=L"环境", name="env", url="script/apps/Aries/Creator/Game/Mobile/MobileEnvFramePage.html?version=1", enabled=true}, 
+        }
+    end
     MobileCreatorPage.tabview_index = 1
 
     local params = {
@@ -52,6 +63,20 @@ function MobileCreatorPage.ShowPage(bShow)
             DesignResolutionHeight = 720,
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);
+    if(params._page) then
+		params._page.OnClose = function()
+			if CreatorDesktop.IsMovie then
+				CreatorDesktop.IsMovie = false
+				CreatorDesktop.IsExpanded = false
+                MobileCreatorPage.IsExpanded = false
+                if CreatorDesktop.new_page_params then
+                    CreatorDesktop.new_page_params.align = "_ctr"
+                    CreatorDesktop.new_page_params.x = 0
+                end
+			end
+			
+		end
+    end
 end
 
 function MobileCreatorPage.RefreshPage()

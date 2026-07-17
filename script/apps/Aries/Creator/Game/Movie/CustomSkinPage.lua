@@ -61,9 +61,10 @@ function CustomSkinPage.OnInit()
 end
 
 -- @param skinIdString: optional skin string
-function CustomSkinPage.ShowPage(OnClose, skinIdString)
-	currentModelFile = CustomCharItems.defaultModelFile;
-	currentSkin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString);
+function CustomSkinPage.ShowPage(OnClose, skinIdString, model_file)
+	currentModelFile = model_file or CustomCharItems.defaultModelFile;
+	local default_skin = CustomCharItems:GetDefaultSkinString(currentModelFile)
+	currentSkin = CustomCharItems:SkinStringToItemIds(default_skin, true);
 	if skinIdString and skinIdString ~= "" then
 		currentSkin = skinIdString
 	end
@@ -108,29 +109,32 @@ function CustomSkinPage.ShowPage(OnClose, skinIdString)
 			CustomSkinPage.model_index = -1;
 			for i = 1, data.count do
 				local actor = data.rows[i];
-				CustomSkinPage.Current_Model_DS[i] = {asset = actor.equipment.asset, skin = actor.equipment.skin, id = actor.id, name = actor.name, alias = actor.equipment.alias or string.format(L"新建模型%d", actor.id)};
-			end
-			if (CustomSkinPage.Current_Model_DS[1].asset ~= currentModelFile) then
-				currentModelFile = CustomSkinPage.Current_Model_DS[1].asset;
-				page:CallMethod("MyPlayer", "SetAssetFile", currentModelFile);
-			end
-			if not currentSkin then
-				CustomSkinPage.model_index = 1
-				currentSkin = CustomSkinPage.Current_Model_DS[1].skin;
-			end
-
-			local items = CustomCharItems:GetUsedItemsBySkin(currentSkin);
-			for _, item in ipairs(items) do
-				local index = CustomSkinPage.GetIconIndexFromName(item.name);
-				if (index > 0) then
-					CustomSkinPage.Current_Icon_DS[index].id = item.id;
-					CustomSkinPage.Current_Icon_DS[index].name = item.name;
-					CustomSkinPage.Current_Icon_DS[index].icon = item.icon;
+				if actor.equipment.asset == currentModelFile then
+					CustomSkinPage.Current_Model_DS[#CustomSkinPage.Current_Model_DS + 1] = {asset = actor.equipment.asset, skin = actor.equipment.skin, id = actor.id, name = actor.name, alias = actor.equipment.alias or string.format(L"新建模型%d", actor.id)};
 				end
 			end
-
-		--else
-			-- CustomSkinPage.Current_Model_DS[1] = {asset = currentModelFile, skin = currentSkin};
+			if #CustomSkinPage.Current_Model_DS > 0 then
+				if (CustomSkinPage.Current_Model_DS[1].asset ~= currentModelFile) then
+					currentModelFile = CustomSkinPage.Current_Model_DS[1].asset;
+					page:CallMethod("MyPlayer", "SetAssetFile", currentModelFile);
+				end
+				if not currentSkin then
+					CustomSkinPage.model_index = 1
+					currentSkin = CustomSkinPage.Current_Model_DS[1].skin;
+				end
+	
+				local items = CustomCharItems:GetUsedItemsBySkin(currentSkin);
+				for _, item in ipairs(items) do
+					local index = CustomSkinPage.GetIconIndexFromName(item.name);
+					if (index > 0) then
+						CustomSkinPage.Current_Icon_DS[index].id = item.id;
+						CustomSkinPage.Current_Icon_DS[index].name = item.name;
+						CustomSkinPage.Current_Icon_DS[index].icon = item.icon;
+					end
+				end
+			end
+		-- elseif model_file then
+			-- page:CallMethod("MyPlayer", "SetAssetFile", currentModelFile);
 		end
 		CustomSkinPage.OnChangeCategory(CustomSkinPage.category_index);
 	end);
@@ -199,6 +203,11 @@ function CustomSkinPage.OnChangeCategory(index)
 	if (category) then
 		CustomSkinPage.Current_Item_DS = CustomCharItems:GetModelItems(currentModelFile, category.name, currentSkin) or {};
 	end
+	if System.options.isHideVip then
+		CustomSkinPage.Current_Item_DS = commonlib.filter(CustomSkinPage.Current_Item_DS,function (item)
+			return item.type ~= "1" -- SKIN_ITEM_TYPE.VIP
+		end)
+	end
 	CustomSkinPage.Refresh();
 end
 
@@ -233,7 +242,10 @@ end
 
 function CustomSkinPage.CreateNewActor()
 	local index = #CustomSkinPage.Current_Model_DS+1;
-	local model = {asset = CustomCharItems.defaultModelFile, skin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString)};
+	local default_skin = CustomCharItems:GetDefaultSkinString(currentModelFile)
+	
+	local model = {asset = currentModelFile, skin = CustomCharItems:SkinStringToItemIds(default_skin)};
+	
 	keepwork.actors.add({name = guid.uuid(), equipment = model}, function(err, msg, data)
 		if (err == 200) then
 			local model = {asset = data.equipment.asset, skin = data.equipment.skin, id = data.id, name = data.name, alias = string.format(L"新建模型%d", data.id)};
@@ -260,15 +272,16 @@ end
 function CustomSkinPage.OnClickOK()
 	currentSkin = CustomCharItems:ChangeSkinStringToItems(currentSkin);
 	CustomSkinPage.OnClickSave();
-	if GameLogic.Macros:IsPlaying() then
-		page:CloseWindow();
-	else
-		GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
-			if(isVip) then
-				page:CloseWindow();
-			end
-		end)
-	end
+	page:CloseWindow();
+	-- if GameLogic.Macros:IsPlaying() then
+	-- 	page:CloseWindow();
+	-- else
+	-- 	GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+	-- 		if(isVip) then
+	-- 			page:CloseWindow();
+	-- 		end
+	-- 	end)
+	-- end
 end
 
 function CustomSkinPage.OnClose()

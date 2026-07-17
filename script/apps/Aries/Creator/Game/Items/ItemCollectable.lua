@@ -69,9 +69,14 @@ function ItemCollectable:OnCreate(result)
 				-- ignore it if there is already an entity there. 
 				local entity_class = EntityManager.GetEntityClass(self.entity_class or "collectable")
 				if(entity_class) then
-					local entity = entity_class:Create({bx=bx,by=by,bz=bz, item_id = self.block_id, name = self.name});
-					entity:Attach();
-					return true;
+					local entity = entity_class:Create({bx=bx,by=by,bz=bz, item_id = self.block_id, name = self.name, 
+							filename = self:GetAssetFile(),
+							scaling = self:GetScaling()
+						});
+					if(entity) then
+						entity:Attach();
+						return true;
+					end
 				end
 			end
 		end

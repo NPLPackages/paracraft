@@ -7,6 +7,8 @@
     NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
     local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems");
     local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+    SKIN_ITEM_TYPE = UserInfoPage.SKIN_ITEM_TYPE
+    FRIEND_TYPE = UserInfoPage.FRIEND_TYPE
     local page = document:GetPageCtrl();
     local skinId = page:GetRequestParam("s");
     local data = CustomCharItems:GetItemById(skinId);

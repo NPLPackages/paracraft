@@ -239,7 +239,7 @@ function ConvertImageToBlocks:LoadToScene()
 							-- transparent pixel does not show up. 
 							local block_id, block_data = GetBlockIdFromPixel(pixel, colors);
 							if(block_id) then
-								CreateBlock_(x,y, block_id, block_data);
+								CreateBlock_(x, height - y + 1, block_id, block_data);
 								count = count + 1;
 								if((count%block_per_tick) == 0) then
 									coroutine.yield(true);

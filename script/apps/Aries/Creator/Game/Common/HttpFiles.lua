@@ -62,7 +62,7 @@ function RemoteFile:Download()
 			if(msg.header) then
 				local content_type = string.lower(msg.header):match("\ncontent%-type:%s*([^\r\n]+)");
 				if(content_type) then
-					if(content_type:match("mp3") or content_type:match("audio")) then
+					if(content_type:match("mp3")) then
 						fileExt = "mp3";
 					elseif(content_type:match("wav")) then
 						fileExt = "wav";
@@ -76,12 +76,21 @@ function RemoteFile:Download()
 						fileExt = "png";
 					elseif(content_type:match("stl")) then
 						fileExt = "stl";
+					elseif(content_type:match("audio")) then
+						fileExt = "mp3";
 					end
 				end
 			end
 			if(fileExt) then
 				filename = filename .. "." ..fileExt;
 			end
+
+			if(type(data) ~= "string") then
+				LOG.std(nil, "warn", "RemoteFile", "can not save file to %s. data is not string", filename);
+				echo(data)
+				return
+			end
+
 			self.err = nil;
 			self.filename = filename;
 			local file = ParaIO.open(filename, "w");

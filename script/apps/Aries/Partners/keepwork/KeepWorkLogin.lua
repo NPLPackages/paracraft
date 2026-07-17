@@ -23,9 +23,6 @@ end
 
 function KeepWorkLogin.LoadLocalData()
     local local_data = MyCompany.Aries.Player.LoadLocalData("KeepWork_Local_UserInfo_Data", {});
-	if local_data and local_data.username then
-		KeepWorkRealname.LoadGameTime()
-	end
     return local_data.username,local_data.password;
 end
 function KeepWorkLogin.SaveLocalData(username,password)
@@ -50,26 +47,30 @@ function KeepWorkLogin.ShowPage()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
 	local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
 	ParaWorldLoginDocker.InitParaWorldClient();
-
-	if(System.User and System.User.keepworktoken) then
-		if(System.User.keepworktoken == "waiting") then
-			KeepWorkLogin.mytimer = KeepWorkLogin.mytimer or commonlib.Timer:new({callbackFunc = function(timer)
-				if(System.User.keepworktoken == "error") then
-					timer:Change();
-				elseif(System.User.keepworktoken ~= "waiting") then
-					KeepWorkLogin.LoginWithToken(System.User.keepworktoken)
-					timer:Change();
-				end
-			end})
-			KeepWorkLogin.mytimer:Change(300, 300);
-		elseif(System.User.keepworktoken == "error") then
-			return 
+	KeepWorkRealname.InitServerConfig(function()
+		KeepWorkRealname.LoadGameTime()
+		LOG.std(nil,"info","KeepWorkLogin", "login with token=======================")
+		echo(System.User.keepworktoken)
+		if(System.User and System.User.keepworktoken) then
+			if(System.User.keepworktoken == "waiting") then
+				KeepWorkLogin.mytimer = KeepWorkLogin.mytimer or commonlib.Timer:new({callbackFunc = function(timer)
+					if(System.User.keepworktoken == "error") then
+						timer:Change();
+					elseif(System.User.keepworktoken ~= "waiting") then
+						KeepWorkLogin.LoginWithToken(System.User.keepworktoken)
+						timer:Change();
+					end
+				end})
+				KeepWorkLogin.mytimer:Change(300, 300);
+			elseif(System.User.keepworktoken == "error") then
+				return 
+			else
+				KeepWorkLogin.LoginWithToken(System.User.keepworktoken)
+			end
 		else
-			KeepWorkLogin.LoginWithToken(System.User.keepworktoken)
+			KeepWorkLogin.ShowLoginPage()
 		end
-	else
-		KeepWorkLogin.ShowLoginPage()
-	end
+	end)
 end
 
 function KeepWorkLogin.site()
@@ -85,9 +86,24 @@ function KeepWorkLogin.LoginWithToken(token)
             ["Authorization"] = " Bearer " .. token,
         },
     }, function(err, msg, data)
+		LOG.std(nil, "info", "keepwork login err", err);
+		LOG.std(nil, "info", "keepwork login msg", commonlib.serialize_compact(data));
 		if(err == 200) then
 			local userInfo = data.data;
 			if(userInfo and userInfo.username) then
+				_guihelper.MessageBox(nil);
+				--实名认证
+				local idcardAuth = userInfo.idcardAuth
+				if not idcardAuth or idcardAuth.status ~= 0 then
+					_guihelper.MessageBox("你的账号未实名，是否进行实名认证",function ()
+						KeepWorkLogin.RealNameAuth(token)
+					end)
+					return
+				end
+				--正常流程
+				KeepWorkRealname.SetUserAge(idcardAuth)
+				KeepWorkLogin.GetOrCreateSessionId()
+
 				local username = userInfo.username;
 				LOG.std(nil, "debug", "keepwork login username", username);
 				LOG.std(nil, "debug", "keepwork login token", token);
@@ -108,6 +124,7 @@ function KeepWorkLogin.ShowLoginPage()
 		name = "keepwork.KeepWorkLogin", 
 		isShowTitleBar = false,
 		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+		allowDrag = false,
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		zorder = 1,
 		directPosition = true,
@@ -117,7 +134,6 @@ function KeepWorkLogin.ShowLoginPage()
 			width = 0,
 			height = 0,
 	};
-	
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
 
@@ -305,17 +321,22 @@ function KeepWorkLogin.agreeOauth(username,client_id,token)
 				end
 			end
 
-            MainLogin:next_step({IsLoginStarted=true, 
-                auth_user = {
-			        username = username,
-			        plat = Platforms.PLATS.KEEPWORK,
-			        token = code,
-			        oid = string.lower(username),
-                    from = Platforms.PLATS.KEEPWORK,
-                    loginplat = 1,
-                    rememberusername = true
-                }
-            });
+			if KeepWorkRealname.CheckCanEnterGame() then
+				MainLogin:next_step({IsLoginStarted=true, 
+					auth_user = {
+						username = username,
+						plat = Platforms.PLATS.KEEPWORK,
+						token = code,
+						oid = string.lower(username),
+						from = Platforms.PLATS.KEEPWORK,
+						loginplat = 1,
+						rememberusername = true
+					}
+				});
+			else
+				System.User.keepworktoken = nil;
+				MainLogin:next_step({IsLoginStarted = false,});
+			end
             return;
         end
          if(data and data.error)then

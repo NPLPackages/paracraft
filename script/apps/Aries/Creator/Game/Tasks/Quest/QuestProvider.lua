@@ -319,18 +319,20 @@ end
 -- search quest item gsid from exchangeTargets
 function QuestProvider:SearchQuestGsidFromExid(exid)
     local goal = KeepWorkItemManager.GetGoal(exid);
-    for k,group in ipairs(goal) do
-        local goods = group.goods;
-        if(goods)then
-            for kk,item in ipairs(goods) do
-                if(item.goods)then
-                    local bagId = item.goods.bagId;
-                    local gsId = item.goods.gsId;
-                    local bagNo = KeepWorkItemManager.SearchBagNo(bagId)
-                    if(self:IsValidBag(bagNo))then
-                        -- map quest gsid and exid
-                        self.gsid_exid_map[gsId] = exid;
-                        return gsId;
+    if(goal) then
+        for k,group in ipairs(goal) do
+            local goods = group.goods;
+            if(goods)then
+                for kk,item in ipairs(goods) do
+                    if(item.goods)then
+                        local bagId = item.goods.bagId;
+                        local gsId = item.goods.gsId;
+                        local bagNo = KeepWorkItemManager.SearchBagNo(bagId)
+                        if(self:IsValidBag(bagNo))then
+                            -- map quest gsid and exid
+                            self.gsid_exid_map[gsId] = exid;
+                            return gsId;
+                        end
                     end
                 end
             end

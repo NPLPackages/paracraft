@@ -1,0 +1,355 @@
+<html>
+<body>
+<pe:mcml>
+    <script type="text/npl">
+<![CDATA[
+local MiniGameUserProfile = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameUserProfile.lua")
+MiniGameUserProfile.OnInitTeenagers()
+
+function GetTitle(key)
+    return MiniGameUserProfile.GetTitle(key)
+end
+function GetScore(key)
+    return MiniGameUserProfile.GetScore(key)
+end
+]]>
+</script>
+<div  width="100%" height="100%" style="">
+    <div width="100%" zorder="-1" style="position:relative; margin-top: 8px; height:640px; background-color: #f8fafb;"></div>
+    <div style="float: left; width: 870px; height: 180px; margin-top: 8px;">
+        <div style="position: relative; width: 870px; height: 180px;">
+            <div style="width: 870px;height: 2px; background-color: #cccccc;"></div>
+            <div style="width: 870px;height: 2px; background-color: #cccccc; margin-top: 90px;"></div>
+            <div style="width: 870px;height: 2px; background-color: #cccccc; margin-top: 90px;"></div>
+        </div>
+        <div style='float: left;width: 150px;height: 180px;'>
+            <div style="float: left;width: 150px; height: 92px; background-color: #93dffd;">
+                <div style="text-align: center; margin-top: 32px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff; "><%=L"认知能力"%></div>
+            </div>
+            <div style="float: left;width: 150px; height: 90px; margin-top:2px;">
+                <div style="text-align: center; margin-top: 32px; font-size: 18px; base-font-size: 18px; font-weight: bold;"><%=GetScore("cognitiveAbilities")%></div>
+            </div>
+            <div style="margin-left: 0px; margin-top: -181px; width: 2px;height: 182px; background-color: #cccccc;"></div>
+            <div style="margin-left: 149px; margin-top: -181px; width: 2px;height: 182px; background-color: #cccccc;"></div>
+            <div style="margin-left: 870px; margin-top: -186px; width: 2px;height: 186px; background-color: #cccccc;"></div>
+        </div>
+
+        <div style="float: left; width: 720px; height: 180px; ">
+            <div style="float: left; width: 410px; height: 90px;">
+                <div style="float: left; width: 412px;height: 30px;">
+                    <div style="text-align: center; margin-top: 4px;  "><%=L"注意力"%></div>
+                    <div style="margin-top: 5px; width: 412px;height: 2px; background-color: #cccccc;"></div>
+                </div>
+                <!-- 注意力分割线 -->
+                <div style="position: relative; width: 412px; height: 60px;">
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                </div>
+                <div style="float: left; width: 412px;height: 30px;">
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("focusedAttention")%></div>
+                    <div style="float: left; width: 102px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("selectiveAttention")%></div>
+                    <div style="float: left; width: 102px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("shiftingAttention")%></div>
+                    <div style="float: left; width: 102px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("distributedAttention")%></div>
+                </div>
+                <div style="float: left; width: 412px;height: 30px; ">
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("focusedAttention")%></div>
+                    <div style="float: left; width: 102px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("selectiveAttention")%></div>
+                    <div style="float: left; width: 102px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("shiftingAttention")%></div>
+                    <div style="float: left; width: 102px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("distributedAttention")%></div>
+                </div>
+            </div>
+            <div style="float: left; width: 2px;height: 92px; background-color: #cccccc;"></div>
+            <div style="float: left; width: 307px; height: 90px; ">
+                <div style="float: left; width: 307px;height: 30px;">
+                    <div style="text-align: center; margin-top: 4px;  "><%=L"记忆力"%></div>
+                    <div style="margin-top: 5px; width: 307px;height: 2px; background-color: #cccccc;"></div>
+                </div>
+                <!-- 记忆力分割线 -->
+                <div style="position: relative; width: 412px; height: 60px;">
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                </div>
+                <div style="float: left; width: 307px;height: 30px;">
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("visualMemory")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("auditoryMemory")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("workingMemory")%></div>
+                </div>
+                <div style="float: left; width: 307px;height: 30px; ">
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("visualMemory")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("auditoryMemory")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("workingMemory")%></div>
+                </div>
+            </div>
+            <div style="float: left; width: 720px; height: 90px;">
+                <div style="float: left; width: 720px;height: 30px;">
+                    <div style="text-align: center; margin-top: 4px;  "><%=L"思维能力"%></div>
+                    <div style="margin-top: 5px; width: 720px;height: 2px; background-color: #cccccc;"></div>
+                </div>
+                <!-- 思维能力分割线 -->
+                <div style="position: relative; width: 720px; height: 60px;">
+                    <div style="float: left; margin-left: 118px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 118px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 118px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 118px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 118px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                </div>
+                <div style="float: left; width: 720px;height: 30px;">
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetTitle("deductiveReasoning")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetTitle("inductiveReasoning")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetTitle("analogicalReasoning")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetTitle("verbalComprehension")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetTitle("abstractReasoning")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetTitle("visualSpatialIntelligence")%></div>
+                </div>
+                <div style="float: left; width: 720px;height: 30px; ">
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetScore("deductiveReasoning")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetScore("inductiveReasoning")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetScore("analogicalReasoning")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetScore("verbalComprehension")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetScore("abstractReasoning")%></div>
+                    <div style="float: left; width: 119px; height: 30px; text-align: center; margin-top: 6px; "><%=GetScore("visualSpatialIntelligence")%></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学习策略 -->
+    <div style="float: left; width: 870px; height: 90px; margin-top: 24px;">
+        <div style="position: relative; width: 870px; height: 90px;">
+            <div style="width: 870px;height: 2px; background-color: #cccccc;"></div>
+            <!-- <div style="width: 870px;height: 2px; background-color: #cccccc; margin-top: 90px;"></div> -->
+            <div style="width: 870px;height: 2px; background-color: #cccccc; margin-top: 90px;"></div>
+        </div>
+        <div style='float: left;width: 150px;height: 90px;'>
+            <div style="float: left;width: 150px; height: 46px; background-color: #93dffd;">
+                <div style="text-align: center; margin-top: 12px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff; "><%=L"学习策略"%></div>
+            </div>
+            <div style="float: left;width: 150px; height: 45px; margin-top:2px;">
+                <div style="text-align: center; margin-top: 12px; font-size: 18px; base-font-size: 18px; font-weight: bold;"><%=GetScore("learningStrategy")%></div>
+                
+            </div>
+            <div style="margin-left: 0px; margin-top: -91px; width: 2px;height: 91px; background-color: #cccccc;"></div>
+            <div style="margin-left: 149px; margin-top: -91px; width: 2px;height: 90px; background-color: #cccccc;"></div>
+        </div>
+
+        <div style="float: left; width: 720px; height: 90px; ">
+            <div style="float: left; width: 720px;height: 30px;">
+                <div style="float: left; width: 239px; height: 30px; ">
+                    <div style="text-align: center; margin-top: 4px;  "><%=L"认知策略"%></div>
+                    <div style="margin-left: 239px; margin-top: -24px; width: 2px;height: 90px; background-color: #cccccc;"></div>
+                </div>
+                <div style="float: left; width: 239px; height: 30px; ">
+                    <div style="text-align: center; margin-top: 4px;  "><%=L"元认知策略"%></div>
+                    <div style="margin-left: 239px; margin-top: -24px; width: 2px;height: 90px; background-color: #cccccc;"></div>
+                </div>
+                <div style="float: left; width: 239px; height: 30px; ">
+                    <div style="text-align: center; margin-top: 4px;  "><%=L"资源管理"%></div>
+                    <div style="margin-left: 242px; margin-top: -24px; width: 2px;height: 90px; background-color: #cccccc;"></div>
+                </div>
+                <div style="margin-left: 0px; margin-top: 0px; width: 720px;height: 2px; background-color: #cccccc;"></div>
+            </div>
+            <div style="float: left; width: 720px;height: 60px;">
+                <!-- 认知策略分割线 -->
+                <div style="position: relative; width: 720px; height: 60px;">
+                    <div style="float: left; margin-left: 78px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 78px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 80px; margin-top: 0px; width: 0px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 78px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 78px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 160px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 78px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                </div>
+                <div style="float: left; width: 80px; height: 60px; text-align: center; margin-top: 4px;">
+                    <div style="height: 30px; line-height: 30px;"><%=L"复述策略"%></div>
+                    <div style="height: 30px; line-height: 30px;"><%=GetScore("elaborationStrategy")%></div>
+                </div>
+                <div style="float: left; width: 80px; height: 60px; text-align: center; margin-top: 4px;">
+                    <div style="height: 30px; line-height: 30px;"><%=L"精细加工"%></div>
+                    <div style="height: 30px; line-height: 30px;"><%=GetScore("detailedProcessingStrategy")%></div>
+                </div>
+                <div style="float: left; width: 80px; height: 60px; text-align: center; margin-top: 4px;">
+                    <div style="height: 30px; line-height: 30px;"><%=L"组织策略"%></div>
+                    <div style="height: 30px; line-height: 30px;"><%=GetScore("organizationalStrategy")%></div>
+                </div>
+                <div style="float: left; width: 80px; height: 60px; text-align: center; margin-top: 4px;">
+                    <div style="height: 30px; line-height: 30px;"><%=L"元认知计划"%></div>
+                    <div style="height: 30px; line-height: 30px;"><%=GetScore("metacognitivePlanning")%></div>
+                </div>
+                <div style="float: left; width: 80px; height: 60px; text-align: center; margin-top: 4px;">
+                    <div style="height: 30px; line-height: 30px;"><%=L"元认知监控"%></div>
+                    <div style="height: 30px; line-height: 30px;"><%=GetScore("metacognitiveMonitoring")%></div>
+                </div>
+                <div style="float: left; width: 80px; height: 60px; text-align: center; margin-top: 4px;">
+                    <div style="height: 30px; line-height: 30px;"><%=L"元认知调节"%></div>
+                    <div style="height: 30px; line-height: 30px;"><%=GetScore("metacognitiveRegulation")%></div>
+                </div>
+                <div style="float: left; width: 80px; height: 60px; text-align: center; margin-top: 4px;">
+                    <div style="height: 30px; line-height: 30px;"><%=L"努力管理"%></div>
+                    <div style="height: 30px; line-height: 30px;"><%=GetScore("effortManagement")%></div>
+                </div>
+                <div style="float: left; width: 80px; height: 60px; text-align: center; margin-top: 4px;">
+                    <div style="height: 30px; line-height: 30px;"><%=L"时间管理"%></div>
+                    <div style="height: 30px; line-height: 30px;"><%=GetScore("timeManagement")%></div>
+                </div>
+                <div style="float: left; width: 80px; height: 60px; text-align: center; margin-top: 4px;">
+                    <div style="height: 30px; line-height: 30px;"><%=L"资源利用"%></div>
+                    <div style="height: 30px; line-height: 30px;"><%=GetScore("externalResourceUtilization")%></div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- 学习动机 -->
+    <div style="float: left; width: 870px; height: 90px; margin-top: 24px;">
+        <div style="position: relative; width: 870px; height: 90px;">
+            <div style="width: 870px;height: 2px; background-color: #cccccc;"></div>
+            <div style="width: 870px;height: 2px; background-color: #cccccc; margin-top: 90px;"></div>
+        </div>
+        <div style='float: left;width: 150px;height: 45px;'>
+            <div style="float: left;width: 150px; height: 46px; background-color: #93dffd;">
+                <div style="text-align: center; margin-top: 12px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff; "><%=L"学习动机"%></div>
+            </div>
+            <div style="float: left;width: 150px; height: 45px; margin-top:2px;">
+                <div style="text-align: center; margin-top: 12px; font-size: 18px; base-font-size: 18px; font-weight: bold;"><%=GetScore("learningMotivation")%></div>
+                <div style="margin-left: 149px; margin-top: -86px; width: 2px;height: 92px; background-color: #cccccc;"></div>
+            </div>
+        </div>
+
+        <div style="float: left; width: 720px; height: 90px; ">
+            <!-- 内部动机 -->
+            <div style="float: left; width: 411px; height: 90px;">
+                <div style="float: left; width: 412px;height: 30px;">
+                    <div style="text-align: center; margin-top: 4px;  "><%=L"内部动机"%></div>
+                    <div style="margin-top: 5px; width: 412px;height: 2px; background-color: #cccccc;"></div>
+                </div>
+                <!-- 内部动机分割线 -->
+                <div style="position: relative; width: 720px; height: 60px;">
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                </div>
+                <div style="float: left; width: 412px;height: 30px;">
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=L"成长"%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=L"自主"%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=L"互动"%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=L"兴趣"%></div>
+                </div>
+                <div style="float: left; width: 412px;height: 30px; ">
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("growth")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("autonomy")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("interaction")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("interest")%></div>
+                </div>
+            </div>
+            <div style="float: left; width: 2px;height: 92px; background-color: #cccccc;"></div>
+            <!-- 外部动机 -->
+            <div style="float: left; width: 307px; height: 90px;">
+                <div style="float: left; width: 307px;height: 30px;">
+                    <div style="text-align: center; margin-top: 4px;  "><%=L"外部动机"%></div>
+                    <div style="margin-top: 5px; width: 307px;height: 2px; background-color: #cccccc;"></div>
+                </div>
+                 <!-- 外部动机分割线 -->
+                <div style="position: relative; width: 720px; height: 60px;">
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                    <div style="float: left; margin-left: 100px; margin-top: 0px; width: 2px;height: 62px; background-color: #cccccc;"></div>
+                </div>
+                <div style="float: left; width: 307px;height: 30px;">
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("recognition")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("competition")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetTitle("materialReward")%></div>
+                </div>
+                <div style="float: left; width: 307px;height: 30px; ">
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("recognition")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("competition")%></div>
+                    <div style="float: left; width: 101px; height: 30px; text-align: center; margin-top: 4px;"><%=GetScore("materialReward")%></div>
+                </div>
+            </div>
+            <div style="margin-left: -150px; margin-top: -91px; width: 2px;height: 92px; background-color: #cccccc;"></div>
+            <div style="margin-left: 720px; margin-top: -92px; width: 2px;height: 93px; background-color: #cccccc;"></div>
+        </div>
+    </div>
+
+    <!-- 情绪智力 -->
+    <div style="float: left; width: 870px; height: 90px; margin-top: 24px;">
+        <div style="position: relative; width: 870px; height: 90px;">
+            <div style="width: 870px;height: 2px; background-color: #cccccc;"></div>
+            <div style="width: 870px;height: 2px; background-color: #cccccc; margin-top: 45px;"></div>
+            <div style="width: 870px;height: 2px; background-color: #cccccc; margin-top: 45px;"></div>
+        </div>
+        <div style='float: left;width: 150px;height: 90px;'>
+            <div style="float: left;width: 150px; height: 48px; background-color: #93dffd;">
+                <div style="text-align: center; margin-top: 12px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff; "><%=GetTitle("emotionalIntelligence")%></div>
+            </div>
+            <div style="float: left;width: 150px; height: 45px; margin-top:2px;">
+                <div style="text-align: center; margin-top: 12px; font-size: 18px; base-font-size: 18px; font-weight: bold;"><%=GetScore("emotionalIntelligence")%></div>
+            </div>
+            <div style="margin-left: 149px; margin-top: -91px; width: 2px;height: 92px; background-color: #cccccc;"></div>
+        </div>
+
+        <div style="float: left; width: 720px; height: 90px; ">
+             <!-- 外部动机分割线 -->
+            <div style="position: relative; width: 720px; height: 90px;">
+                <div style="float: left; margin-left: 358px; margin-top: 0px; width: 2px;height: 94px; background-color: #cccccc;"></div>
+            </div>
+            <div style="float: left; width: 720px;height: 45px;">
+                <div style="float: left; width: 359px; height: 45px; text-align: center; margin-top: 12px;"><%=GetTitle("emotionalAwareness")%></div>
+                <div style="float: left; width: 359px; height: 45px; text-align: center; margin-top: 12px;"><%=GetTitle("emotionalRegulation")%></div>
+            </div>
+            <div style="float: left; width: 720px;height: 45px; ">
+                <div style="float: left; margin-top: 6px; width: 359px; height: 45px; text-align: center; margin-top: 12px;"><%=GetScore("emotionalAwareness")%></div>
+                <div style="float: left; margin-top: 6px; width: 359px; height: 45px; text-align: center; margin-top: 12px;"><%=GetScore("emotionalRegulation")%></div>
+            </div>
+        </div>
+        <div style="margin-left: 0px; margin-top: -90px; width: 2px; height: 94px; background-color: #cccccc;"></div>
+        <div style="margin-left: 149px; margin-top: -90px; width: 2px; height: 91px; background-color: #cccccc;"></div>
+        <div style="margin-left: 870px; margin-top: -93px; width: 2px; height: 94px; background-color: #cccccc;"></div>
+    </div>
+
+    <!-- 学习品质 -->
+    <div style="float: left; width: 870px; height: 90px; margin-top: 24px;">
+        <div style="position: relative; width: 870px; height: 90px;">
+            <div style="width: 870px;height: 2px; background-color: #cccccc;"></div>
+            <div style="width: 870px;height: 2px; background-color: #cccccc; margin-top: 45px;"></div>
+            <div style="width: 870px;height: 2px; background-color: #cccccc; margin-top: 45px;"></div>
+        </div>
+        <div style='float: left;width: 150px;height: 90px;'>
+            <div style="float: left;width: 150px; height: 48px; background-color: #93dffd;">
+                <div style="text-align: center; margin-top: 12px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff; "><%=L"学习品质"%></div>
+            </div>
+            <div style="float: left;width: 150px; height: 45px; margin-top:2px;">
+                <div style="text-align: center; margin-top: 12px; font-size: 18px; base-font-size: 18px; font-weight: bold;"><%=GetScore("learningQuality")%></div>
+            </div>
+            <div style="margin-left: 149px; margin-top: -91px; width: 2px;height: 90px; background-color: #cccccc;"></div>
+        </div>
+
+        <div style="float: left; width: 720px; height: 90px; ">
+            <!-- 学习品质分割线 -->
+            <div style="position: relative; width: 720px; height: 90px;">
+                <div style="float: left; margin-left: 178px; margin-top: 0px; width: 2px;height: 94px; background-color: #cccccc;"></div>
+                <div style="float: left; margin-left: 178px; margin-top: 0px; width: 2px;height: 94px; background-color: #cccccc;"></div>
+                <div style="float: left; margin-left: 178px; margin-top: 0px; width: 2px;height: 94px; background-color: #cccccc;"></div>
+            </div>
+            <div style="float: left; width: 720px;height: 45px;">
+                <div style="float: left; width: 178px; height: 45px; text-align: center; margin-top: 12px;"><%=L"责任心"%></div>
+                <div style="float: left; width: 179px; height: 45px; text-align: center; margin-top: 12px;"><%=L"严谨性"%></div>
+                <div style="float: left; width: 179px; height: 45px; text-align: center; margin-top: 12px;"><%=L"坚毅性"%></div>
+                <div style="float: left; width: 179px; height: 45px; text-align: center; margin-top: 12px;"><%=L"创新性"%></div>
+            </div>
+            <div style="float: left; width: 720px;height: 45px; ">
+                <div style="float: left; width: 178px; height: 45px; text-align: center; margin-top: 12px;"><%=GetScore("responsibility")%></div>
+                <div style="float: left; width: 179px; height: 45px; text-align: center; margin-top: 12px;"><%=GetScore("seriousness")%></div>
+                <div style="float: left; width: 179px; height: 45px; text-align: center; margin-top: 12px;"><%=GetScore("perseverance")%></div>
+                <div style="float: left; width: 179px; height: 45px; text-align: center; margin-top: 12px;"><%=GetScore("creativity")%></div>
+            </div>
+        </div>
+        <div style="margin-left: 0px; margin-top: -90px; width: 2px;height: 94px; background-color: #cccccc;"></div>
+        <div style="margin-left: 149px; margin-top: -94px; width: 2px;height: 94px; background-color: #cccccc;"></div>
+        <div style="margin-left: 870px; margin-top: -94px; width: 2px;height: 95px; background-color: #cccccc;"></div>
+    </div>
+
+</div>
+</pe:mcml>
+</body>
+</html>

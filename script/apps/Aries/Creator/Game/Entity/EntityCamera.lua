@@ -379,6 +379,27 @@ function Entity:GetEyeLifeup()
 	return self.eye_liftup;
 end
 
+function Entity:SetEyePosition(eye_dist, eye_liftup, eye_rot_y, eye_roll, bUpdateInnerObject)
+	self.eye_dist = eye_dist or 10;
+	self.eye_liftup = eye_liftup or 0;
+	self.eye_rot_y = eye_rot_y or 0;
+	self.eye_roll = eye_roll or 0;
+	if(bUpdateInnerObject) then
+		local obj = self:GetInnerObject();
+		if(obj) then
+			self.facing = self.eye_rot_y
+			obj:SetFacing(self.eye_rot_y);
+			obj:SetField("HeadUpdownAngle", 0);
+			obj:SetField("HeadTurningAngle", 0);
+			local nx, ny, nz = mathlib.math3d.vec3Rotate(0, 1, 0, 0, 0, -self.eye_liftup)
+			nx, ny, nz = mathlib.math3d.vec3Rotate(nx, ny, nz, 0, self.eye_rot_y, 0)
+			self.normal = self.normal or {0,1,0}
+			self.normal[1], self.normal[2], self.normal[3] = nx, ny, nz; 
+			obj:SetField("normal", self.normal);
+		end
+	end
+end
+
 function Entity:SetEyeLifeup(eye_liftup)
 	self.eye_liftup = eye_liftup;
 

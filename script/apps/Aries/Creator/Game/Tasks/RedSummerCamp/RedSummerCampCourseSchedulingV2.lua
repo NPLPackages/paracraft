@@ -1064,7 +1064,7 @@ local function GetMyLessonClass()
 end
 
 function RedSummerCampCourseScheduling.UpdateMyLessonAfterLearn()
-    if System.options.isChannel_430 then
+    if true then
         GetMyLessonClass()
     end
     local keys = GameLogic.GetPlayerController():LoadRemoteData(RedSummerCampCourseScheduling.GetSaveKey(),{});
@@ -1164,7 +1164,7 @@ function RedSummerCampCourseScheduling.LoadUserRoles(callbackFunc)
         RedSummerCampCourseScheduling.UserRoleList = {}
         local timeStamp = QuestAction.GetServerTime()
         keepwork.user.roles({},function(err, msg, data)
-            if(err == 200 and data and #data > 0)then
+            if(err == 200 and data and type(data) == "table" and #data > 0)then
                 for key, v in pairs(data) do
                     if v and v.userRoles then
                         if v.userRoles.deadline then
@@ -1351,6 +1351,12 @@ function RedSummerCampCourseScheduling.DS_classes()
 end
 
 function RedSummerCampCourseScheduling.LoadClassList(callback)
+    if not System.options.isDevMode then
+        if callback then
+            callback({})
+        end
+        return 
+    end
     local ds = RedSummerCampCourseScheduling.DS_classes()
     if #ds>0 then
         if callback then
@@ -1527,12 +1533,8 @@ end
 
 function RedSummerCampCourseScheduling.ReprotErrorData(key,data)
     -- 上报
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ParacraftDebug.lua");
-    local ParacraftDebug = commonlib.gettable("MyCompany.Aries.Game.Common.ParacraftDebug");
-    ParacraftDebug:SendErrorLog("DevDebugLog", {
-        desc = "lesson data err"..(key or ""),
-        errorMessage = commonlib.serialize_compact({data = data}) or "",
-        debugTag = "RedSummerCampCourseScheduling",
-        stackInfo = commonlib.debugstack(),
-    })
+    local desc = "lesson data err"..(key or "")
+    local errorMessage = commonlib.serialize_compact({data = data}) or ""
+    local debugTag = "RedSummerCampCourseScheduling"
+    LOG.std(nil,"info",debugTag,errorMessage)
 end

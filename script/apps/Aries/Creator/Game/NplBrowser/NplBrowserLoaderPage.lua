@@ -66,6 +66,10 @@ function NplBrowserLoaderPage.CheckCef3(callback,bForceReinstall)
     if not NplBrowserLoaderPage.loaded then
         NplBrowserLoaderPage.isOnlyInstallCef3 = bForceReinstall == true
         NplBrowserLoaderPage.ShowInstallPage(callback)
+        return
+    end
+    if callback then
+        callback(true)
     end
 end
 
@@ -77,7 +81,7 @@ function NplBrowserLoaderPage.Check(callback)
 	
 	-- mobile device depends on app store to update. 
     local IsTouchDevice = ParaEngine.GetAppCommandLineByParam('IsTouchDevice', nil)
-    if (IsTouchDevice == "true") then
+    if (IsTouchDevice == "true" and not System.os.IsEmscripten()) then
         return;
     end
 
@@ -96,7 +100,7 @@ function NplBrowserLoaderPage.Check(callback)
     end
 
 	-- School 430 and 431 does not need webview, we will skip checking, but using what is installed as it is. 
-	if not System.options.isChannel_430 and not System.options.channelId_431 then
+	if not System.options.isChannel_430 and not System.options.isEducatePlatform then
 		if (System.os.GetPlatform() == "win32") then
 			-- win32 always use latest webview or latest cef3
 			NplBrowserLoaderPage.CheckWebview(callback)

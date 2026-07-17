@@ -297,7 +297,7 @@ nil, paraworld.HTMLTranslator
 
 --[[ enable post log here 
 ]]
-local bEnablePostLog = true;
+local bEnablePostLog = false;
 local nFailCountDown = 3;
 paraworld.CreateRESTJsonWrapper("paraworld.PostLog", "%LOG%/APIs/PostLog", 
 function (self, msg, id, callback_func, callbackParams, postMsgTranslator)

@@ -124,7 +124,7 @@ end
 <mb:window width = "816" height = "720" title = '<%=L"背包"%>' onclose = "ClosePage">
     <pe:container  style="margin-left:13px;margin-top:87px;width:790px;height:624px;background: url(Texture/Aries/Creator/keepwork/Mobile/bag/di_31x31_32bits.png#0 0 31 31:15 15 15 15);">
         <pe:container  style="margin-left:px;margin-top:px;width:790px;height:264px;background: url()">
-            <pe:if condition="<%= System.options.mc %>">
+            <pe:if condition="<%= System.options.mc and not System.options.isStrictGameMode%>">
                 <pe:container alignment="_rb" style="margin-bottom:10px;margin-right:24px;width:120px;height:48px;background-color: #fff60000;">
                     <input type="button" value='<%=L"主角形象"%>' style="font-weight: bold;color:#1a1a1a;position:relative;margin-top:0px;margin-left:0px;text-offset-y:-1;height:20px;min-width:120px;height:48px;font-size:18px;background: url(Texture/Aries/Creator/keepwork/Mobile/SystemsSetting/btn_confirm_160x64_32bits.png#0 0 160 64);" onclick="SwitchSkin" />    
                 </pe:container>
@@ -148,7 +148,7 @@ end
                     <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" IsInteractive="false" IsActiveRendering="true" RenderTargetSize="256" DefaultCameraObjectDist="5.8" DefaultLiftupAngle = "0"/>
                 </div>
             </div> -->
-            <div style="float:left;width:320px;height:304px;margin-top:0px;margin-left:235px;background-color:#fff60000);">
+            <div style="float:left;width:320px;height:304px;margin-top:0px;margin-left:235px;background-color:#fff60000;">
                 <div style="margin-left:78px;margin-top:24px;width:164px;height:164px; background:url(Texture/Aries/Creator/keepwork/Mobile/esc/touxiang_256x256_32bits.png#0 0 256 256);">
                     <pe:mc_player name="main_user_player" miniscenegraphname="Avatar_User_Character" style="width:164px;height:164px;margin-left: 0px; margin-top: -10px;" IsInteractive="false" fisrtFrameMove = "false" NoFrameMove="true" RenderTargetSize="256" DefaultCameraObjectDist="3.8" DefaultLiftupAngle = "0"/>
                 </div>

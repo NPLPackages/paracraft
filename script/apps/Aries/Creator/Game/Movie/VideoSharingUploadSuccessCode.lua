@@ -16,6 +16,10 @@ function VideoSharingUploadSuccessCode.OnInit()
 end
 
 function VideoSharingUploadSuccessCode.ShowView(url)
+	if true then
+		GameLogic.AddBBS("VideoSharingUpload",L"视频上传成功")
+		return 
+	end
 	VideoSharingUploadSuccessCode.GernerreateQRCode(url)
 	local view_width = 420
 	local view_height = 425

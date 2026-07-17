@@ -20,6 +20,9 @@ local PlayContext = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.S
 PlayContext:Property("Name", "PlayContext");
 PlayContext:Property({"clickToMove", false, "IsClickToMoveEnabled", "EnableClickToMove", auto = true});
 
+PlayContext.enableLeftButtonSelectObjects = false;
+PlayContext.enableRightButtonClick = true;
+
 function PlayContext:ctor()
 	self:EnableAutoCamera(true);
 end
@@ -67,6 +70,18 @@ function PlayContext:HandleQuickSelectKey(event)
 	end
 end
 
+function PlayContext:handleLeftButtonSelectObjects()
+	if(self.enableLeftButtonSelectObjects) then
+		self:DeleteManipulators();
+		NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/Manipulators/SelectBlocksManipContainer.lua");
+		local SelectBlocksManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.SelectBlocksManipContainer");
+		PlayContext.manip = SelectBlocksManipContainer:new();
+		PlayContext.manip.enableLeftButtonSelectObjects = true;
+		PlayContext.manip:init();
+		self:AddManipulator(PlayContext.manip);
+	end
+end
+
 -- virtual: 
 function PlayContext:mousePressEvent(event)
 	PlayContext._super.mousePressEvent(self, event);
@@ -81,6 +96,7 @@ function PlayContext:mousePressEvent(event)
 	self:UpdateClickStrength(0, result);
 
 	if(event.mouse_button == "left") then
+		self:handleLeftButtonSelectObjects();
 		-- play touch step sound when left click on an object
 		if(result and result.block_id and result.block_id > 0) then
 			click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ = result.blockX,result.blockY,result.blockZ;
@@ -202,7 +218,9 @@ function PlayContext:mouseReleaseEvent(event)
 		elseif(event.mouse_button == "left") then
 			self:handleLeftClickScene(event, result)
 		elseif(event.mouse_button == "right") then
-			self:handleRightClickScene(event, result);
+			if(PlayContext.enableRightButtonClick) then
+				self:handleRightClickScene(event, result);
+			end
 		end
 
 		if(event.mouse_button == "left" and not event:IsCtrlKeysPressed() and not event:isAccepted() and result and result.x and GameLogic.GetPlayerController():OnClickSensorsByPoint(result.x, result.y, result.z, event.mouse_button)) then

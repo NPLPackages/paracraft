@@ -279,7 +279,7 @@ end
 	canRun = false,
 	func_description = '(%s..%s)',
 	ToPython = function(self)
-		return string.format('("%s" + "%s")', self:getFieldAsString('left'), self:getFieldAsString('right'));
+		return string.format('(%s + %s)', self:GetValueAsString('left'), self:GetValueAsString('right'));
 	end,
 	ToNPL = function(self)
 		return string.format('("%s".."%s")', self:getFieldAsString('left'), self:getFieldAsString('right'));
@@ -337,7 +337,7 @@ say("length of hello is "..(#"hello"));
 	category = "Operators", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '(%s%%s)',
+	func_description = '(%s%%%s)',
 	ToNPL = function(self)
 		return string.format('(%s%%%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,
@@ -402,6 +402,7 @@ end
 				{ "exp", "exp"},
 				{ L"转成数字", "tonumber"},
 				{ L"转成字符串", "tostring"},
+				{ L".2f字符串", "tostring_2f"},
 			},
 		},
 		{
@@ -416,6 +417,19 @@ end
 	helpUrl = "", 
 	canRun = false,
 	func_description = 'math.%s(%s)',
+	ToPython = function(self)
+		local name = self:getFieldAsString('name')
+		if name == "tostring_2f" then
+			name = "tostring"
+		end
+		if(name == "tostring") then
+			-- name = "str"
+			name = "math."..name
+		else
+			name = "math."..(name or "")
+		end
+		return string.format('%s(%s)', name, self:getFieldAsString('left'));
+	end,
 	ToNPL = function(self)
 		return string.format('math.%s(%s)', self:getFieldAsString('name'), self:getFieldAsString('left'));
 	end,

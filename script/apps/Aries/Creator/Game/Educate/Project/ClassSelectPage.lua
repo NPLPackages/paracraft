@@ -71,7 +71,7 @@ function ClassSelectPage.ShowView(data)
     --         },
     --     }
     -- }
-    if not data then
+    if not data or Game.is_started then
         return
     end
     ClassSelectPage.ServerData = data.rows
@@ -81,7 +81,8 @@ function ClassSelectPage.ShowView(data)
     end
 
     ClassSelectPage.HandleData()
-
+    local view_width = 0
+    local view_height = 0
     local params = {
         url = "script/apps/Aries/Creator/Game/Educate/Project/ClassSelectPage.html",
         name = "ClassSelectPage.Show", 
@@ -92,12 +93,12 @@ function ClassSelectPage.ShowView(data)
         enable_esc_key = true,
         zorder = 1,
         directPosition = true,
-        withBgMask=true,
-        align = "_ct",
-        x = -640/2,
-        y = -393/2,
-        width = 640,
-        height = 393,
+        -- withBgMask=true,
+        align = "_fi",
+        x = -view_width/2,
+        y = -view_height/2,
+        width = view_width,
+        height = view_height,
         isTopLevel = true,
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);

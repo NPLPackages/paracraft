@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="CommunityMainPage.lua">
+<![CDATA[
+CommunityMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityMainPage.lua");
+CommunityMainPage.OnInit()
+local page = document:GetPageCtrl()
+
+function GetMenuData()
+    return CommunityMainPage.GetMenuData()
+end
+
+function GetCategoryDSIndex()
+    return CommunityMainPage.GetCategoryDSIndex()
+end
+
+function OnChangeTabview(index)
+    CommunityMainPage.OnChangeTabview(index)
+end
+
+function GetMenuFrame()
+    return CommunityMainPage.GetMenuFrame()
+end
+
+function OpenMoreMenu()
+    CommunityMainPage.ShowMoreMenu()
+end
+
+function IsSelectMall()
+    return GetCategoryDSIndex() == 3
+end
+
+function IsSelectLearn()
+    return GetCategoryDSIndex() == 4
+end
+
+function OnClickLearn()
+    CommunityMainPage.OpenLearnPage()
+end
+
+function OpenChatPage()
+    CommunityMainPage.OpenChatPage()
+end
+]]>
+</script>
+<style type="text/mcss">
+    {
+        opus_bar_button = {
+            background = 'Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#205 112 86 46',
+        },
+        head_text = {
+            ["base-font-size"] = 14,
+            ["font-size"] = 14,
+            ["font-weight"] = "bold",
+            float = "left",
+            color = "#d3d3d3",
+        },
+    }
+</style>
+
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#1a1a1a;">
+    <pe:if condition="<%=IsSelectMall()%>">
+        <pe:container ClickThrough="true"  zorder="2" alignment="_ml" width="80" height="0" style="position: relative; margin-top: 56px; background-color:#262626;">
+            <div style=" margin-left: 0px; width: 80px; height: 664px;">
+                <div style="position: relative; width: 80px; height: 664px;">
+                    <pe:repeat DataSource="<%=GetMenuData()%>" >
+                        <pe:repeatitem style="float:left;min-width:40px; ">
+                            <pe:if condition='<%=GetCategoryDSIndex() == Eval("index") %>' >
+                                <input type="button" tooltip='<%=Eval("value")%>' name='<%=Eval("index")%>'  icon="<%=Eval('icon1')%>" icon_width="22" icon_height="22" icon_off_x="-2" icon_off_y="-3" onclick="OnChangeTabview" style="text-align: left; font-weight:bold;margin-top: 18px; text-offset-x:1; margin-left: 20px;min-width:40px;height:40px; background-color: #404040; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)" />
+                            </pe:if>
+                            <pe:if condition='<%=GetCategoryDSIndex() ~= Eval("index") %>' >
+                                <input type="button" tooltip='<%=Eval("value")%>' name='<%=Eval("index")%>'  icon="<%=Eval('icon')%>"  icon_width="22" icon_height="22" icon_off_x="-2" icon_off_y="-3" onclick="OnChangeTabview" style="text-align: left; font-weight:bold;margin-top: 18px; text-offset-x:1; margin-left: 20px;min-width:40px;height:40px;background:url()" />
+                            </pe:if>
+                        </pe:repeatitem>
+                    </pe:repeat>
+                </div>
+                <div style="position: relative; width: 1px; height: 1300px; margin-left: 80px; background-color: #313131ff"></div>
+            </div>
+        </pe:container>
+        <pe:container zorder="-1"  alignment="_ct" ClickThrough="true" style="position: relative; margin-left:-640px;margin-top:-360px; background: ;">
+            <div style="width: 1200px; height: 720px; margin-left: 80px; margin-top: 56px;">
+                <div style="position: relative; margin-left: 0px;margin-top:0px;">
+                    <iframe name="CommunityMainPageFrame" src="<%=GetMenuFrame()%>"></iframe>
+                </div>
+            </div>
+        </pe:container>
+    </pe:if>
+    <pe:if condition="<%=not IsSelectMall()%>">
+        <pe:container ClickThrough="true"  zorder="2" alignment="_ml" width="142" height="0" style="position: relative; margin-top: 56px; background-color:#262626;">
+            <div style=" margin-left: 0px; width: 142px; height: 664px;">
+                <div style="position: relative; width: 142px; height: 664px;">
+                    <pe:repeat DataSource="<%=GetMenuData()%>" >
+                        <pe:repeatitem style="float:left;min-width:118px; ">
+                            <pe:if condition='<%=GetCategoryDSIndex() == Eval("index") %>' >
+                                <input type="button" value='<%=Eval("value")%>' name='<%=Eval("index")%>'  icon="<%=Eval('icon1')%>" icon_width="22" icon_height="22" icon_off_x="-40" icon_off_y="-1" onclick="OnChangeTabview" style="text-align: left; font-weight:bold;margin-top: 12px; text-offset-x:39; text-offset-y:2; margin-left: 12px;color:#ffffff;font-size:14px;min-width:118px;height:40px; background-color: #404040; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)" />
+                            </pe:if>
+                            <pe:if condition='<%=GetCategoryDSIndex() ~= Eval("index") %>' >
+                                <input type="button" value='<%=Eval("value")%>' name='<%=Eval("index")%>'  icon="<%=Eval('icon')%>"  icon_width="22" icon_height="22" icon_off_x="-40" icon_off_y="-1" onclick="OnChangeTabview" style="text-align: left; font-weight:bold;margin-top: 12px; text-offset-x:39; text-offset-y:2; margin-left: 12px;color:#A8A7B0;font-size:14px;min-width:118px;height:40px; background:url()" />
+                            </pe:if>
+                        </pe:repeatitem>
+                    </pe:repeat>
+                </div>
+                <div style="position: relative; width: 1px; height: 1300px; margin-left: 142px; background-color: #313131ff"></div>
+            </div>
+        </pe:container>
+        <pe:container zorder="-1"  alignment="_ct" ClickThrough="true" style="position: relative; margin-left:-640px;margin-top:-360px; background: ;">
+            <div style="width: 1140px; height: 720px; margin-left: 140px; margin-top: 56px;">
+                <pe:if condition='<%=IsSelectLearn()%>' >
+                    <div style="width: 1140px; height: 664px; background: url(Texture/Aries/Creator/keepwork/Community/community_learn_32bits.png#0 0 1140 664);">
+                        <input type="button" onclick="OnClickLearn()" value="" style="margin-left: 109px; margin-top: 366px; width: 240px; height: 68px; background: Texture/Aries/Creator/keepwork/Community/community_learn_32bits.png#24 708 480 140; background2: Texture/Aries/Creator/keepwork/Community/community_learn_32bits.png#560 708 480 140;"/>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not IsSelectLearn()%>' >
+                    <div style="position: relative; margin-left: 0px;margin-top:0px;">
+                        <iframe name="CommunityMainPageFrame" src="<%=GetMenuFrame()%>"></iframe>
+                    </div>
+                </pe:if>
+            </div>
+        </pe:container>
+    </pe:if>
+    
+    <pe:container ClickThrough="true"  zorder="3" alignment="_lb" style="position: relative; width: 190px; height: 300px; margin-bottom: 0px; background: url();">
+        <pe:if condition="<%=not IsSelectMall()%>">
+            <input type="button"
+                    uiname="team_button" 
+                    icon="Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#222 226 20 20" 
+                    icon_width="20" 
+                    icon_height="20" 
+                    icon_off_x="-36"
+                    icon_off_y="0"  
+                    onclick="OpenChatPage()"  
+                    value="<%=L'频道聊天'%>"   
+                    style="width: 120px; height: 36px; 
+                    font-weight: bold; 
+                    color:#d3d3d3;
+                    font-size:14px;
+                    margin-left: 12px; 
+                    margin-top: 250px; 
+                    text-offset-x: 10; 
+                    background-color: #353536; 
+                    background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"/>
+        </pe:if>
+        <pe:if condition="<%=IsSelectMall()%>">
+            <input type="button"
+                    uiname="team_button" 
+                    icon="Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#222 226 20 20" 
+                    icon_width="20" 
+                    icon_height="20" 
+                    icon_off_x="0"
+                    icon_off_y="0"  
+                    onclick="OpenChatPage()"  
+                    value=""
+                    style="width: 40px; height: 40px; 
+                    margin-left: 18px; 
+                    margin-top: 250px; 
+                    background-color: #353536; 
+                    background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"/>
+        </pe:if>
+    </pe:container>
+</pe:container>
+
+</pe:mcml>
+</body>
+</html>
+

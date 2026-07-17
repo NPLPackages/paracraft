@@ -97,7 +97,6 @@ local buildInModList = {
 		-- load this module when the package is loaded
 		-- loadOnStartup = true, 
 	},
-	]]
     {
 		name = "PyRuntime", 
 		package_path = "npl_packages/ParacraftBuildinMod/", 
@@ -106,6 +105,7 @@ local buildInModList = {
 		version = "1.0.0",
 		homepage = "https://github.com/tatfook/PyRuntime",
 	},
+	]]
     {
 		name = "NplMicroRobot", 
 		package_path = "npl_packages/ParacraftBuildinMod/", 

@@ -476,6 +476,7 @@ function VipFullPage.GetQRInputUrl(productCode, from)
 	local hosts = {
 		ONLINE = "https://keepwork.com",
 		RELEASE = "http://rls.kp-para.cn",
+		STAGE = "http://dev.kp-para.cn",
 	};
     local httpwrapper_version = HttpWrapper.GetDevVersion();
 	local host = hosts[httpwrapper_version];

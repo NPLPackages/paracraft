@@ -10,17 +10,13 @@ local ReplayManager = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildReplay
 ReplayManager:Init()
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCamera.lua");
-local EntityCamera = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCamera")
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildReplay/RecordBlockBuild.lua");
 local RecordBlockBuild = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildReplay.RecordBlockBuild");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildReplay/RecordUserPath.lua");
 local RecordUserPath = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildReplay.RecordUserPath");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildReplay/RecordCode.lua");
 local RecordCode = commonlib.gettable("MyCompany.Aries.Game.Tasks.RecordCode");
-NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoRecorderSettings.lua");
 local VideoRecorderSettings = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoRecorderSettings");
@@ -35,29 +31,26 @@ local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/U
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildReplay/RecordActorBone.lua");
 local RecordActorBone = commonlib.gettable("MyCompany.Aries.Game.Tasks.RecordActorBone");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityHomePoint.lua");
 local EntityHomePoint = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityHomePoint")
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlock.lua");
 local CodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieChannel.lua");
 local MovieChannel = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieChannel");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
 local EntityMovieClip = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip")
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCommandBlock.lua");
 local EntityCommandBlock = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCommandBlock")
 NPL.load("(gl)script/apps/Aries/Creator/Game/Neuron/Mod/MovieText.lua");
 local MovieText = commonlib.gettable("MyCompany.Aries.Game.Mod.MovieText");
 local FileLogUtil = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildReplay.FileLogUtil");
-
+local GenerateVideoQueue = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildReplay/GenerateVideoQueue.lua");
 local ReplayManager = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildReplay.ReplayManager"));
 
 local _fileLog = FileLogUtil:new({filename = "log_video_queue.txt"})
 
 function ReplayManager:Init()
     GameLogic:Connect("WorldLoaded", ReplayManager, ReplayManager.OnWorldLoaded, "UniqueConnection");
-    GameLogic:Connect("WorldSaved", ReplayManager, ReplayManager.OnWorldSaved, "UniqueConnection");
+    -- GameLogic:Connect("WorldSaved", ReplayManager, ReplayManager.OnWorldSaved, "UniqueConnection");
+    GameLogic:Connect("beforeWorldSaved", ReplayManager, ReplayManager.OnWorldSaved, "UniqueConnection");
     RecordCode:OnInit()
     RecordActorBone:OnInit()
+    GenerateVideoQueue:Init()
 end
 
 function ReplayManager:OnWorldLoaded()
@@ -66,6 +59,7 @@ function ReplayManager:OnWorldLoaded()
         RecordUserPath:OnEnterWorld()
         RecordCode:OnWorldLoaded()
         RecordActorBone:OnWorldLoaded()
+        GenerateVideoQueue:OnWorldLoaded()
         ReplayManager._isPlaying = nil
     end,0)
 
@@ -81,30 +75,32 @@ function ReplayManager:OnWorldLoaded()
 end
 
 function ReplayManager:OnWorldSaved()
-    commonlib.TimerManager.SetTimeout(function() --即使报错，也尽量不中断程序
-        RecordBlockBuild:_saveHistory()
-        RecordUserPath:_saveHistory()
-        RecordCode:OnBeforeWorldSave()
-        RecordActorBone:SaveWorldBoneData()
-        local model_entity_num = 0
-        local entities = GameLogic.EntityManager.FindEntities({category="searchable",type = GameLogic.EntityManager.EntityLiveModel.class_name});
+    -- 不可以延后一帧处理，会导致数据存不上的bug
+    -- commonlib.TimerManager.SetTimeout(function() --即使报错，也尽量不中断程序
         
-        if entities then 
-            for i=#entities,1,-1 do
-                if entities[i]:IsOfType(GameLogic.EntityManager.EntityInvisibleClickSensor.class_name) then
-                    table.remove(entities,i)
-                end
+    -- end,0)
+    RecordBlockBuild:_saveHistory()
+    RecordUserPath:_saveHistory()
+    RecordCode:OnBeforeWorldSave()
+    RecordActorBone:SaveWorldBoneData()
+    local model_entity_num = 0
+    local entities = GameLogic.EntityManager.FindEntities({category="searchable",type = GameLogic.EntityManager.EntityLiveModel.class_name});
+    
+    if entities then 
+        for i=#entities,1,-1 do
+            if entities[i]:IsOfType(GameLogic.EntityManager.EntityInvisibleClickSensor.class_name) then
+                table.remove(entities,i)
             end
-            model_entity_num = model_entity_num + #entities
         end
-        entities = GameLogic.EntityManager.FindEntities({category="searchable",type = GameLogic.EntityManager.EntityBlockModel.class_name});
-        if entities then 
-            model_entity_num = model_entity_num + #entities
-        end
+        model_entity_num = model_entity_num + #entities
+    end
+    entities = GameLogic.EntityManager.FindEntities({category="searchable",type = GameLogic.EntityManager.EntityBlockModel.class_name});
+    if entities then 
+        model_entity_num = model_entity_num + #entities
+    end
 
-        WorldCommon.SetWorldTag("model_entity_num",model_entity_num)
-        WorldCommon.SaveWorldTag()
-    end,0)
+    WorldCommon.SetWorldTag("model_entity_num",model_entity_num)
+    WorldCommon.SaveWorldTag()
 end
 
 function ReplayManager:OnWorldUnload()
@@ -120,6 +116,7 @@ function ReplayManager:OnWorldUnload()
         RecordUserPath:OnExitWorld()
         RecordCode:OnWorldUnloaded()
         RecordActorBone:OnWorldUnloaded()
+        GenerateVideoQueue:OnWorldUnloaded()
         -- GameLogic.AddBBS(10,"离开世界")
     end,0)
 end
@@ -158,6 +155,8 @@ end
 function ReplayManager:_createOrGetCamera()
     local _camera = ReplayManager._camera
     if _camera==nil then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCamera.lua");
+        local EntityCamera = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCamera")
         _camera = EntityCamera:Create({item_id = block_types.names.TimeSeriesCamera});
         ReplayManager._camera = _camera
         _camera:SetPersistent(false);
@@ -231,7 +230,7 @@ end
     duration : speed为空，限制播放时间
     subtitle : false|true 是否有字幕
 ]]
-function ReplayManager:Play(options,callback,taskId)
+function ReplayManager:Play(options,callback,taskId,isCommand)
     if ReplayManager._isPlaying then
         return
     end
@@ -248,21 +247,21 @@ function ReplayManager:Play(options,callback,taskId)
     local _buildings = RecordBlockBuild:SearchHotBuildings()
     _searchTime = os.clock()-_searchTime
     _fileLog:output_video_log(nil, "info", "ReplayManager", "Play SearchHotBuildings,#_buildings:%s,time:%s",#_buildings,_searchTime);
-    if #_buildings==0 then
-        ReplayManager._isPlaying = nil
-        if ReplayManager._playCallback then
-            ReplayManager._playCallback()
-            ReplayManager._playCallback = nil
-        end
-        return
-    end
+    -- if #_buildings==0 and not isCommand then --有可能沒有建造
+    --     ReplayManager._isPlaying = nil
+    --     if ReplayManager._playCallback then
+    --         ReplayManager._playCallback()
+    --         ReplayManager._playCallback = nil
+    --     end
+    --     return
+    -- end
 
     RecordBlockBuild.SetConfig({
         TIME_SPEED = math.min(speed,8),
         MAX_TIME = options.maxTime,
     })
     RecordUserPath.SetConfig({
-        TIME_SPEED = math.max(speed,8),
+        TIME_SPEED = isCommand == true and speed or math.max(speed,8),
         MAX_TIME = options.maxTime,
     })
 
@@ -443,7 +442,7 @@ function ReplayManager:Play(options,callback,taskId)
                         end)
                     end)
                 end
-                local codePlayTime = 3
+                local codePlayTime = 5
                 local num = RecordCode:GenerateCode()
                 if num>0 then
                     -- print("2-----time",os.clock()-xx_time,"num",num);xx_time = os.clock();

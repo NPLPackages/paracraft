@@ -1,0 +1,108 @@
+<html>
+<body> 
+<pe:mcml>
+    <script type="text/npl">
+<![CDATA[
+local MiniGameMap = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameMap.lua")
+MiniGameMap.OnInit()
+
+function OnClose()
+    MiniGameMap.ClosePage()
+end
+
+function TreeItems()
+    return MiniGameMap.TreeItems()
+end
+
+function ChangeMenuType(level, index)
+    MiniGameMap.ChangeMenuType(level, index)
+end
+
+function TypeBeExpand(expanded)
+    return MiniGameMap.TypeBeExpand(expanded)
+end
+
+function ChangeMenuItem(name, mcmlNode)
+    local node = mcmlNode:GetAttribute("param1")  
+    local menu_item_index = tonumber(mcmlNode:GetAttribute("param2"))
+    MiniGameMap.ChangeMenuItem(node, menu_item_index)
+end
+
+local pos={
+    {19246,5,18686},
+    {19518,150,18689},
+    {18992,6,19943},
+}
+function OnClickPoint(name)
+    local index = tonumber(name)
+    if index and pos[index] then
+        OnClose()
+        MiniGameMap:TeleportToPos({x=pos[index][1],y=pos[index][2],z=pos[index][3]})
+    end
+end
+]]>
+    </script>
+<pe:container zorder="-1" style="position:relative; width:900px;height:512px;background:url(Texture/Aries/WorldMaps/Teen/map_bg.png#0 0 512 512)">
+    <input align="right" onclick="OnClose" type="button" style="position: relative; margin-right: 16px; margin-top: 16px; width: 32px; height: 32px; background: url(Texture/Aries/Quest/MoodPerDay/close_32bits.png);"/>
+    <div style="position: relative; width: 170px; height: 440px; margin-left: 40px; margin-top: 40px;">
+        <div style="padding-top:3px;padding-bottom:3px;">
+            <pe:treeview name="tvwMenus" DataSource='<%=TreeItems()%>' 
+            VerticalScrollBarStep="32" 
+            DefaultNodeHeight="56"
+            VerticalScrollBarOffsetX="-6"
+            ItemToggleSize="0" style="height:430px;background:" >
+                <NodeTemplates>
+                    <NodeTemplate DataType="type">
+                        <pe:treenode RenderTemplate="type_template" MouseOverBG="" expanded='<%=XPath("this|expanded")%>' can_select="true"></pe:treenode>
+                    </NodeTemplate>
+                    <NodeTemplate DataType="type_template">
+                        <div style="height:56px">
+                            <div style="margin-left:0px;margin-top:7px;height:48px;width:140px;background:">
+                                <input type="button" value='' zorder="-1" name='<%=XPath("this|index") %>' onclick="ChangeMenuType" param1='<%=XPath("this|level") %>' param2='<%=XPath("this|index") %>' style="position:relative; text-offset-x:-10; margin-left:0px;width:140px;height:48px; font-weight:bold;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8)" />
+                                <div style="float:left;margin-left: -20px;margin-top: 3px;">
+                                    <div style="position:relative;margin-left: 0px;margin-top: 10px; font-size: 16px; text-align:center;color: #181818;"><%=XPath("this|text") %></div>
+                                    <div style="position:relative;margin-left:124px;margin-top:16px;width:14px;height:8px;background:url(Texture/Aries/Creator/keepwork/Mall/icon_qiehuan1_14X8_32bits.png#0 0 14 8);" />
+                                </div>
+                            </div>
+                        </div>
+                    </NodeTemplate>
+                    <NodeTemplate DataType="item">
+                        <div style="margin-left:5px;margin-top:5px;height:48px;width:140px;background:">
+                            <div style="float:left;margin-left: -20px;margin-top: 3px;">
+                                <input type="button" value='<%=XPath("this|text") %>' onclick="ChangeMenuItem" param1='<%= XPath("this") %>' param2='<%= XPath("this|menu_item_index") %>' style="margin-left: 3px; width:140px;height:48px;color:#181818;font-size: 16px; text-align:center;background:url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan3_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
+                            </div>
+                        </div>
+                    </NodeTemplate>
+                </NodeTemplates>
+            </pe:treeview>
+        </div>
+    </div>
+    <pe:container alignment="_ct" uiname="map" style="margin-top:-256px; margin-left:-256px; width:512px; height:512px;background:url(Texture/Aries/Creator/keepwork/minigame/map_512x512_32bits.png)">
+        <pe:container uiname="map_perseverance" style="position: relative; margin-left: 40px; margin-top: 120px; width: 132px; height: 172px; background: url();">
+            
+        </pe:container>
+        <pe:container uiname="map_motivation" style="position: relative; margin-left: 196px; margin-top: 172px; width: 120px; height: 112px; background: url();">
+
+        </pe:container>
+        <pe:container uiname="map_strategy" style="position: relative; margin-left: 186px; margin-top: 70px; width: 126px; height: 94px; background: url();">
+
+        </pe:container>
+        <pe:container uiname="map_emotion" style="position: relative; margin-left: 320px; margin-top: 110px; width: 142px; height: 120px; background: url();">
+
+        </pe:container>
+        <pe:container uiname="map_wisdom" style="position: relative; margin-left: 136px; margin-top: 292px; width: 180px; height: 122px; background: url();">
+
+        </pe:container>
+        <pe:container uiname="map_friend" style="position: relative; margin-left: 326px; margin-top: 252px; width: 120px; height: 160px; background: url();">
+
+        </pe:container>
+    </pe:container>
+    <div style="position: relative; margin-left: 620px; margin-top: 430px;">
+        <input type="button" tooltip="<%=L'家园选址08'%>" onclick="OnClickPoint" name="1" style="width: 72px; height: 72px; background: url(Texture/Aries/Creator/keepwork/minigame/map1.png);"/>
+        <input type="button" tooltip="<%=L'家园选址09'%>" onclick="OnClickPoint" name="2" style="width: 72px; height: 72px; background: url(Texture/Aries/Creator/keepwork/minigame/map2.png);"/>
+        <input type="button" tooltip="<%=L'新城市'%>" onclick="OnClickPoint" name="3" style="width: 72px; height: 72px; background: url(Texture/Aries/Creator/keepwork/minigame/map3.png);"/>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

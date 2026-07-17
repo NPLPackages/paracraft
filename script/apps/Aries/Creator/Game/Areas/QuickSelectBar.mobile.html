@@ -39,15 +39,14 @@ function GetExpValue()
 end
 
 function OnCreateExpBar(params,node)
-    local _this = ParaUI.CreateUIObject("button", "mc_exp_bar", 
-        params.alignment, params.left, params.top, params.width, params.height);
-	_this.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;340 45 10 4:4 2 4 2";
+    local _this = ParaUI.CreateUIObject("button", "mc_exp_bar", params.alignment, params.left, params.top, params.width, params.height);
+	_this.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;340 45 10 4:4 1 4 1";
     _guihelper.SetUIColor(_this, "#ffffffff");
 	params.parent:AddChild(_this);
 end
 
 function IsShowMallIcon()
-    return not System.options.isCodepku
+    return not System.options.isCodepku and not System.options.isStrictGameMode
 end
 
 function IsHomeWorld()
@@ -75,7 +74,19 @@ end
 <div style="width:900px;height:160px;" >
     <!-- 自定义按钮 -->
     <div style="height:36px;margin-top:6px;width:450px;"></div>
-    <pe:container style="margin-top:5px;width:900px;height:160px;background:url();">
+    <pe:if condition='<%=IsEditor()%>'>
+        <div style="position:relative;height:32px;margin-left:220px;margin-top:-22px;">
+            <pe:container zorder="2" ClickThrough="true" name="progress_wnd" visible='<%=QuickSelectBar.IProgressBar~=nil %>' style="width:510px; height:32px;background:url()">
+                <div style="float:left; margin-top:13px; width:424px;height:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#355 45 10 7:4 3 4 3);">
+                    <pe:custom name="mc_exp_bar" oncreate="OnCreateExpBar" style="margin-left:2px; margin-top:2px; width:70px;height:10px;" />   
+                </div>
+                <div style="float:left; margin-top:13px; ">
+                    <input type="button" name="btnAccelerate" value='<%=L"自动完成"%>' onclick="QuickSelectBar.OnClickAccelerateProgress" style="text-offset-y:-1; color:#000000aa; margin-left:2px;margin-top:-13px;width:80px;height:36px;background:url(Texture/Aries/Creator/keepwork/Window/button/huanganniu_32x32_32bits.png#0 0 32 32:14 14 14 14);" />
+                </div>
+            </pe:container>
+        </div>
+    </pe:if>
+    <pe:container style="margin-top:5px;width:900px;height:160px;background:url()">
         <pe:container name="handtool_highlight_bg" zorder="-1" style="position:relative;margin-top:12px;margin-left:12px;width:72px;height:72px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12)">
         </pe:container>
         <input name="handtool_tooltip" type="button" visible="false" enabled="false" zorder="-1" style="color:#cccccc;position:relative;font-weight:bold;font-size:14px;margin-top:-36px;background-color:#ffffffff;margin-left:3px;width:100px;height:36px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12)" />
@@ -97,23 +108,26 @@ end
                 DataSource='<%=ds_CustomBtn%>'>
 	            <Columns>
 		            <div style="width:70px;height:70px;margin-left:2px; margin-top: 2px;">
-                        <div style="margin-left: 6px; margin-top: 7px;">
+                        <div style="margin-left: 7px; margin-top: 7px;">
                             <pe:mc_slot uiname='<%=format("QuickSelectBar.btn%d", Eval("index"))%>' tooltip="" tooltip_is_lock_position="true" tooltip_offset_x="-4" tooltip_offset_y="-40" bagpos ='<%=Eval("index")%>' style="width:60px;height:60px;" onclick='OnClickItem' />
                         </div>
                     </div>
 	            </Columns>
             </pe:gridview>
-        </div>
+        </div>        
         <div style="position:relative;margin-left:740px;margin-top:14px;">
-            <pe:if condition='<%=IsEditor() and GameLogic.options:GetProjectId() ~= "29477"%>'>
-                <input uiname="QuickSelectBar.btnInventory" name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:1px;margin-left:0px;width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/icon/E_64x64_32bits.png#0 0 64 64)"/>
-
-                <pe:if condition='<%=IsShowMallIcon() %>'>
+            <pe:if condition='<%=IsEditor()%>'>
+                <pe:if condition='<%=QuickSelectBar.bShowInventoryButton%>'>
+                    <input uiname="QuickSelectBar.btnInventory" name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:1px;margin-left:0px;width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/icon/E_64x64_32bits.png#0 0 64 64)"/>
+                </pe:if>
+                <pe:if condition='<%=IsShowMallIcon() and QuickSelectBar.bShowMallButton%>'>
                     <input uiname="QuickSelectBar.btnMall" name="btnMall" type="button" onclick="QuickSelectBar.OnClickMall" tooltip='<%=L"资源: 快捷键R"%>' style="margin-top:1px;margin-left:20px;width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/icon/shangdian_64x64_32bits.png#0 0 64 64)" />
                 </pe:if>
             </pe:if>
             <pe:if condition='<%=not IsEditor()%>'>
-                <input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:0px;margin-left:0px;width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/icon/huiseshangcheng_64x64_32bits.png#0 0 64 64)"/>
+                <pe:if condition='<%=QuickSelectBar.bShowInventoryButton%>'>
+                    <input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:0px;margin-left:0px;width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/icon/huiseshangcheng_64x64_32bits.png#0 0 64 64)"/>
+                </pe:if>
             </pe:if>
             
         </div>

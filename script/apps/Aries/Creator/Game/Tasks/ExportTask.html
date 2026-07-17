@@ -15,16 +15,16 @@ function OnClose()
     Page:CloseWindow();
 end
 ]]></script>
-<aries:window style="width:512px;" title='<%=L"导出"%>' mode="thin" uiname_onclose="ExportTask.OnClose" onclose="OnClose">
+<aries:window style="width:680px;" title='<%=L"导出"%>' mode="thin" uiname_onclose="ExportTask.OnClose" onclose="OnClose">
     <div style="margin:10px;color:#ffffff;font-size:14px;">
         <div><%=L"请选择你希望导出的文件类型"%></div>
-        <pe:treeview style="background:;height:256px;" ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="false" DefaultIndentation="0">
+        <pe:treeview style="margin-top:5px;background:;height:306px;" ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="false" DefaultIndentation="0" VerticalScrollBarStep="50">
             <pe:repeat DataSource="<%=Export.GetExporterDB()%>">
                 <pe:repeatitem>
-                    <div name='<%=Eval("id")%>' uiname='<%="ExportTask.OnClick_"..Eval("id")%>' onclick="Export.OnSelectExporter" style="margin:3px;" width="100%"class="mc_button_grey">
+                    <div name='<%=Eval("id")%>' uiname='<%="ExportTask.OnClick_"..Eval("id")%>' onclick="Export.OnSelectExporter" style="float:left;margin-right:10px;margin-bottom:10px;height:96px;width:310px" class="mc_button_grey">
                         <pe:container zorder="1" style="background:;margin:3px;color:#000000" enabled="false">
-                            <div style="font-weight:bold"><%=Eval("title")%></div>
-                            <div><%=Eval("desc") or ""%></div>
+                            <div style="font-weight:bold;font-size:14px;"><%=Eval("title")%></div>
+                            <div style="color:#333333;margin-top:3px;"><%=Eval("desc") or ""%></div>
                         </pe:container>
                     </div>
                 </pe:repeatitem>

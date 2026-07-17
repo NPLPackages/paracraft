@@ -12,10 +12,8 @@ local quest = Quest:new():Init(extendedcost);
 ]]
 NPL.load("(gl)script/ide/GraphHelp.lua");
 NPL.load("(gl)script/ide/Graph.lua");
-NPL.load("(gl)script/apps/Aries/Quest/QuestHelp.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestProvider.lua");
 local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
-local QuestHelp = commonlib.gettable("MyCompany.Aries.Quest.QuestHelp");
 local Graph = commonlib.gettable("commonlib.Graph");
 local GraphNode = commonlib.gettable("commonlib.GraphNode");
 local GraphArc = commonlib.gettable("commonlib.GraphArc");
@@ -128,5 +126,7 @@ function Quest:GetQuestNodes()
 end
 
 function Quest:SaveQuestToDgml(filepath)
+	NPL.load("(gl)script/apps/Aries/Quest/QuestHelp.lua");
+	local QuestHelp = commonlib.gettable("MyCompany.Aries.Quest.QuestHelp");
 	QuestHelp.SaveToDgml(self.graphData, filepath);
 end

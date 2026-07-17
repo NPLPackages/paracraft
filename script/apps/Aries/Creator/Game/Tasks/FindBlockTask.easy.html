@@ -1,0 +1,56 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/FindBlockTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="FindBlockTask.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask")
+FindBlockTask.OnInit();
+
+function GetText(name, distanceSq)
+    name = name:match("([^/\\]+)$") or name
+    local text = commonlib.Encoding.EncodeHTMLInnerText(name) or ""
+    if distanceSq and distanceSq < 25 then
+        local distance = math.sqrt(distanceSq)
+        text = string.format("(%.1f米内)", distance)..text
+    end
+    return text
+end
+]]></script>
+<div style="width:512px;background-color:#000000a0">
+    <input type="button" zorder="2" name="CloseBtn" onclick="FindBlockTask.OnClose" align="right" style="position:relative;width:56px;height:56px;background:url(Texture/player/close.png)" />
+    <input type="button" name="NearbyItemsBtn" onclick="FindBlockTask.OnSortByDistance" align="right" style="position:relative;margin-right:80px;width:80px;height:36px;margin-top:10px;color:#ffffff" value="附近物品" />
+    <div style="padding-top:15px;padding-left:15px;height:40px">
+        <span style="font-size:16px;color:#ffffff;"><%=FindBlockTask.titleText%></span>
+        <pe:label style="font-size:16px;color:#ffffff;margin-left:5px;height:22px" name="itemCountLabel" value="" />
+    </div>
+    <div style="margin:10px;color:#ffffff;font-size:14px;">
+        <div class="mc_paper_panel">
+            <pe:treeview name="result" ShowIcon="false" style="background:;height:256px;" VerticalScrollBarStep="32" DefaultNodeHeight="32" DataSource='<%=FindBlockTask.GetDataSource()%>' ItemToggleSize="0" ItemToggleRightSpacing="0" DefaultIndentation="0">
+                <NodeTemplates>
+                    <NodeTemplate DataType="block">
+                        <div style="height:40px;">
+                            <img style="width:40px;height:40px;" src='<%=XPath("this|icon")%>' tooltip='<%=XPath("this|class_name")%>' />
+                            <pe:if condition='<%=XPath("this|isLocked")%>'>
+                                <div tooltip='<%=L"锁定中(点击可解锁)"%>' onclick="FindBlockTask.OnClickUnLock" style="float:left;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/TeachingQuest/task_locked_32bits.png#0 0 40 40);"></div>    
+                            </pe:if>
+                            <pe:if condition='<%=XPath("this|invisible")%>'>
+                                <div tooltip='<%=L"不可见"%>' style="float:left;width:16px;height:16px;margin:2px;background:url(texture/3dmapsystem/common/eye.png);"></div>
+                            </pe:if>
+                            <div style="float:left;position:relative;height:40px;background2:url(Texture/alphadot.png);" width="100%" onclick="FindBlockTask.OnClickItem" uiname='<%="FindBlockTask.sel_"..XPath("this|index")%>'></div>
+                            <div style="float:left;margin-top:7px;font-size:16px;text-singleline:true"><%=GetText(XPath("this|name"), XPath("this|distanceSq"))%></div>
+                        </div>
+                    </NodeTemplate>
+                </NodeTemplates>
+            </pe:treeview>
+        </div>
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>

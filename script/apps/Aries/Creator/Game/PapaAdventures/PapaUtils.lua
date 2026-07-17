@@ -105,28 +105,34 @@ function PapaUtils.GetOsInfo(sysInfo)
 end
 
 function PapaUtils.GetDeviceInfo(call_back_func)
-    local platform = System.os.GetPlatform()
-    if platform=="android" or platform=="ios" or platform=="mac" then
+    local platform = System.os.GetPlatform();
+    local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+    if (platform == "android" or platform=="ios" or platform == "mac") then
         local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
-        local sysInfo = PlatformBridge.getDeviceInfo() 
-        local appInfo = PlatformBridge.getAppInfo()
+        local sysInfo = PlatformBridge.getDeviceInfo();
+        local appInfo = PlatformBridge.getAppInfo();
 
         for k,v in pairs(appInfo) do
-            sysInfo[k] = v
+            sysInfo[k] = v;
         end
-        local deviceInfo = {}
-        deviceInfo.gpuInfo = {}
-        deviceInfo.osInfo = PapaUtils.GetOsInfo(sysInfo)
-        deviceInfo.cpuInfo = ""
-        deviceInfo.memoryInfo = PapaUtils.GetMemoryInfo(sysInfo)
-        deviceInfo.netInfo = "able"
-        deviceInfo.miniPhoneInfo = "able"
 
-        deviceInfo.clientVersion = GameLogic.options.GetClientVersion()
+        local deviceInfo = {};
+
+        deviceInfo.gpuInfo = {};
+        deviceInfo.osInfo = PapaUtils.GetOsInfo(sysInfo);
+        deviceInfo.cpuInfo = "";
+        deviceInfo.memoryInfo = PapaUtils.GetMemoryInfo(sysInfo);
+        deviceInfo.netInfo = "able";
+        deviceInfo.miniPhoneInfo = "able";
+        deviceInfo.clientVersion = GameLogic.options.GetClientVersion();
+        deviceInfo.engineEnv = HttpWrapper.GetDevVersion()
+
         local deviceList = {};
         local devices = ParaEngine.GetAttributeObject():GetField("AudioDeviceName", "");
+
         if (devices and devices ~= "") then
             local names = commonlib.split(devices, ";");
+
             for i = 1, #names do
                 deviceList[#deviceList + 1] = {
                     text = names[i],
@@ -134,20 +140,22 @@ function PapaUtils.GetDeviceInfo(call_back_func)
                 };
             end
         end
-        deviceInfo.soundDevices = deviceList
 
-        deviceInfo.ip = NPL.GetExternalIP()
-        deviceInfo.machineID = ParaEngine.GetAttributeObject():GetField('MachineID', '')
-        deviceInfo.machineID_old = ParaEngine.GetAttributeObject():GetField('MachineID_old', '')
+        deviceInfo.soundDevices = deviceList;
 
-        local versionXml = ParaXML.LuaXML_ParseFile('config/Aries/creator/paracraft_script_version.xml')
-        local login_version = versionXml[1][1] or ""
-        deviceInfo.login_version = login_version
-        deviceInfo.appId = System.options.appId
-        if call_back_func then
-            call_back_func(deviceInfo)
+        deviceInfo.ip = NPL.GetExternalIP();
+        deviceInfo.machineID = GameLogic.GetMachineID(ParaEngine.GetAttributeObject():GetField('MachineID', ''));
+        deviceInfo.machineID_old = ParaEngine.GetAttributeObject():GetField('MachineID_old', '');
+
+        local versionXml = ParaXML.LuaXML_ParseFile('config/Aries/creator/paracraft_script_version.xml');
+        local login_version = versionXml[1][1] or "";
+        deviceInfo.login_version = login_version;
+        deviceInfo.appId = "paracraft"; -- System.options.appId;
+        if (call_back_func) then
+            call_back_func(deviceInfo);
         end
-        return
+
+        return;
     end
 
     local LuaCallbackHandler = NPL.load("(gl)script/ide/PlatformBridge/LuaCallbackHandler.lua");
@@ -315,4 +323,102 @@ function PapaUtils.IsPapaCreate()
     else
         return false
     end
+end
+
+function PapaUtils.ReportLoginTime()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+    local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+    QuestAction.ReportLoginTime()
+end
+
+function PapaUtils.ReportDeviceInfo()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Common/SysInfoStatistics.lua");
+    local SysInfoStatistics = commonlib.gettable("MyCompany.Aries.Game.Common.SysInfoStatistics")
+    
+    commonlib.TimerManager.SetTimeout(function()
+        if platform=="android" or platform=="ios" or platform=="mac" then
+            local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
+            if PlatformBridge.IsAgreePrivacy() then
+                PlatformBridge.onAgreeUserPrivacy()
+            end
+        end
+        local papa_web_version =  GameLogic.GetPlayerController():LoadLocalData("_papa_web_version_", "", true);
+        SysInfoStatistics.checkGetSysInfoAndUpload({papa_web_version = papa_web_version})
+    end,500)
+end
+
+
+local PapaUrls = {
+	win32 = {
+		STAGE = "https://adventure-dev.kp-para.cn/client/",
+		RELEASE = "https://adventure-rls.kp-para.cn/client/",
+		ONLINE = "https://papa.palaka.cn/client/"
+	},
+	mac = {
+		STAGE = "https://adventure-dev.kp-para.cn/client/",
+		RELEASE = "https://adventure-rls.kp-para.cn/client/",
+		ONLINE = "https://papa.palaka.cn/client/"
+	},
+	android = {
+		STAGE = "https://adventure-app-dev.kp-para.cn/client",
+		RELEASE = "https://adventure-app-rls.kp-para.cn/client",
+		ONLINE = "https://papa-app.palaka.cn/client/"
+	},
+	ios = {
+		STAGE = "https://adventure-app-dev.kp-para.cn/client",
+		RELEASE = "https://adventure-app-rls.kp-para.cn/client",
+		ONLINE = "https://papa-app.palaka.cn/client/"
+	},
+}
+function PapaUtils.GetPapaClientUrl()
+    local env = string.upper(ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE"))
+    local os = System.os.GetPlatform()
+    LOG.std(nil,"info","PapaUtils","PapaUtils GetUrl----channelId==="..env.."---os==="..(os or ""))
+    local urls = PapaUrls[os] or PapaUrls["win32"]
+    local url = urls[env]
+    return url
+end
+
+local downUrls = {
+	win32 = {
+		STAGE = "https://adventure-dev.kp-para.cn/download/",
+		RELEASE = "https://adventure-rls.kp-para.cn/download/",
+		ONLINE = "https://papa.palaka.cn/download/"
+	},
+	mac = {
+		STAGE = "https://adventure-dev.kp-para.cn/download/",
+		RELEASE = "https://adventure-rls.kp-para.cn/download/",
+		ONLINE = "https://papa.palaka.cn/download/"
+	},
+	android = {
+		STAGE = "https://adventure-dev.kp-para.cn/download",
+		RELEASE = "https://adventure-rls.kp-para.cn/download",
+		ONLINE = "https://papa.palaka.cn/download/"
+	},
+	ios = {
+		STAGE = "https://adventure-dev.kp-para.cn/download",
+		RELEASE = "https://adventure-rls.kp-para.cn/download",
+		ONLINE = "https://papa.palaka.cn/download/"
+	},
+}
+
+function PapaUtils.GetPapaDownUrl()
+    local env = string.upper(ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE"))
+    local os = System.os.GetPlatform()
+    LOG.std(nil,"info","PapaUtils","PapaUtils GetUrl----channelId==="..env.."---os==="..(os or ""))
+    local urls = downUrls[os] or downUrls["win32"]
+    local url = urls[env]
+    return url
+end
+
+local paracraftUrls = {
+    STAGE = "https://paracraft-dev.kp-para.cn/download",
+    RELEASE = "https://paracraft-rls.kp-para.cn/download",
+    ONLINE = "https://paracraft.cn/download",
+}
+
+function PapaUtils.GetParacraftDownUrl()
+    local env = string.upper(ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE"))
+    local url = paracraftUrls[env]
+    return url
 end

@@ -46,14 +46,15 @@ local CameraModes = {
 	ThirdPersonFreeLooking = 0,
 	FirstPerson = 1,
 	ThirdPersonLookCamera = 2,
+	ThirdPersonLookAhead = 3,
 }
-
+CameraController.CameraModes = CameraModes;
 local camera_mode = CameraModes.ThirdPersonFreeLooking;
 
 -- if camera object distance is smaller than this value, the character will always face the lookat position
 -- rather than the mouse picking point. 
 local disable_facing_mouse_dist = 3;
-
+local rotation_speed_scale = 1;
 -- default to false, whether to always rotation camera when mouse move. 
 -- if false, only rotate camera when right button is held. 
 CameraController.IsAlwaysRotateCameraWhenFPS = true;
@@ -158,6 +159,7 @@ function CameraController.IsFPSView()
 	return GameLogic.IsFPSView;
 end
 
+-- do not call this, use CameraController.ChangeCameraMode instead.
 function CameraController:SetMode(mode)
 	if(camera_mode ~= mode) then
 		camera_mode = mode;
@@ -168,38 +170,33 @@ function CameraController:GetMode()
 	return camera_mode;
 end
 
--- may also toggle UI. 
--- toggle between 3 modes
--- @param IsFPSView: nil to toggle, otherwise to set
-function CameraController.ToggleCamera(IsFPSView)	
-	if CameraController.cur_railcar_camera_mod then
-		CameraController.SetRailCarCameraMod(nil)
-		RailCarPage.SelectType()
-		IsFPSView = false
-	end
+function CameraController.SetRotationSpeedScale(scale)
+	rotation_speed_scale = scale or 1;
+	CameraController.SetRotationScaler()
+end
 
+function CameraController.SetRotationScaler(value)
+	CameraController.rotation_scaler = value or CameraController.GetRotationScaler();
+	ParaCamera.GetAttributeObject():SetField("RotationScaler", CameraController.rotation_scaler * rotation_speed_scale);
+end
+
+function CameraController.GetRotationScaler()
+	return CameraController.rotation_scaler or 0.01;
+end
+
+function CameraController.ChangeCameraMode(mode)
 	local self = CameraController;
-	if(IsFPSView == nil) then
-		self:SetMode((CameraController:GetMode()+1)%3);
-		IsFPSView = CameraController:GetMode() == CameraModes.FirstPerson;
-	else
-		if(IsFPSView) then
-			self:SetMode(CameraModes.FirstPerson);
-		else
-			self:SetMode(CameraModes.ThirdPersonFreeLooking);
-		end
-	end
-
-	GameLogic.IsFPSView = IsFPSView;
+	self:SetMode(mode);
+	GameLogic.IsFPSView = CameraController:GetMode() == CameraModes.FirstPerson;
 	local att = ParaCamera.GetAttributeObject();
-	if(IsFPSView) then
+	if(GameLogic.IsFPSView) then
 		-- eye position is 1.5 meters
 		att:SetField("MaxCameraObjectDistance", 0.3);
 		att:SetField("NearPlane", 0.1);
 		-- att:SetField("FieldOfView", 60/180*3.1415926)
 
 		--att:SetField("MoveScaler", 5);
-		att:SetField("RotationScaler", 0.0025);
+		CameraController.SetRotationScaler(0.0025);
 		--att:SetField("TotalDragTime", 5)
 		--att:SetField("SmoothFramesNum", 8)
 
@@ -261,7 +258,7 @@ function CameraController.ToggleCamera(IsFPSView)
 		--att:SetField("FieldOfView", 60/180*3.1415926)
 
 		--att:SetField("MoveScaler", 5);
-		att:SetField("RotationScaler", 0.01);
+		CameraController.SetRotationScaler(0.01);
 		--att:SetField("TotalDragTime", 0.5)
 		--att:SetField("SmoothFramesNum", 2)
 		att:SetField("EnableMouseWheel", false);
@@ -278,6 +275,30 @@ function CameraController.ToggleCamera(IsFPSView)
 			CameraController.FPS_MouseTimer:Change();
 		end
 	end
+end
+
+-- may also toggle UI. 
+-- toggle between 3 modes
+-- @param IsFPSView: nil to toggle, otherwise to set
+function CameraController.ToggleCamera(IsFPSView)	
+	if CameraController.cur_railcar_camera_mod then
+		CameraController.SetRailCarCameraMod(nil)
+		RailCarPage.SelectType()
+		IsFPSView = false
+	end
+
+	local self = CameraController;
+	local mode;
+	if(IsFPSView == nil) then
+		mode = (CameraController:GetMode()+1)%3
+	else
+		if(IsFPSView) then
+			mode = CameraModes.FirstPerson;
+		else
+			mode = CameraModes.ThirdPersonFreeLooking;
+		end
+	end
+	CameraController.ChangeCameraMode(mode);
 end
 
 -- toggle with last fov and the given gov
@@ -456,22 +477,25 @@ end
 -- private: 
 function CameraController:ApplyAdditionalCameraRotate(d_yaw, d_pitch, d_roll)
 	local yaw_, pitch_, roll_ = CameraController:GetAdditionalCameraRotate();
-	local att = ParaCamera.GetAttributeObject();
 	camera_params[1], camera_params[2], camera_params[3] = yaw_+ (d_yaw or 0) , pitch_ + (d_pitch or 0), roll_ + (d_roll or 0);
 	local entity = EntityManager:GetFocus();
 	if(entity) then
 		camera_params[3] = camera_params[3] + entity:GetCameraRoll();
 	end
-	att:SetField("AdditionalCameraRotate", camera_params);
+	Cameras:GetCurrent():SetAdditionalCameraRotate(camera_params[1], camera_params[2], camera_params[3])
 end
 
 -- @param yaw, pitch, roll: can be nil
-function CameraController:SetAdditionalCameraRotate(yaw, pitch, roll)
+-- @param bApply: if true, the rotation will be applied immediately.
+function CameraController:SetAdditionalCameraRotate(yaw, pitch, roll, bApply)
 	local params = camera_params;
 	params[1] = yaw or self.additional_yaw or 0;
 	params[2] = pitch or self.additional_pitch or 0;
 	params[3] = roll or self.additional_roll or 0;
 	self.additional_yaw, self.additional_pitch, self.additional_roll = params[1], params[2], params[3];
+	if(bApply) then
+		self:ApplyAdditionalCameraRotate()
+	end
 end
 
 -- @return yaw, pitch, roll
@@ -545,7 +569,7 @@ end
 function CameraController.IsMovieOrCameraMode()
 	if(GameLogic.GameMode:IsMovieMode()) then
 		return true;
-	else
+	elseif(not CameraController.IsRestrictCameraEntity()) then
 		local entity = EntityManager.GetFocus()
 		if(entity and entity:isa(EntityManager.EntityCamera)) then
 			return true
@@ -561,7 +585,10 @@ function CameraController.OnCameraFrameMove()
 	
 	CameraController.UpdateFlyMode();
 
-	Cameras:GetCurrent():FrameMoveCameraControl()
+	local currentCam = Cameras:GetCurrent()
+	if(currentCam and currentCam.FrameMoveCameraControl) then
+		currentCam:FrameMoveCameraControl()
+	end
 
 	if(not CameraController.IsMovieOrCameraMode()) then
 		local bIsAnimatingView;
@@ -576,7 +603,16 @@ function CameraController.OnCameraFrameMove()
 end
 
 function CameraController.ClearCameraRestrictions()
+	CameraController.SetRestrictCameraEntity(false)
 	CameraController.SetCameraRestrictions()
+end
+
+function CameraController.SetRestrictCameraEntity(bRestrictCameraEntity)
+	CameraController.bRestrictCameraEntity = bRestrictCameraEntity;
+end
+
+function CameraController.IsRestrictCameraEntity()
+	return CameraController.bRestrictCameraEntity;
 end
 
 -- @param minYaw, maxYaw: in radians, if nil, means no restrictions
@@ -590,8 +626,9 @@ end
 function CameraController.ApplyCameraRestrictions()
 	local self = CameraController;
 	--  and not GameLogic.GameMode:IsEditor()
-	if(CameraController.IsMovieOrCameraMode()) then
-		if(not ParaUI.IsMousePressed(0) and not ParaUI.IsMousePressed(1) and not Cameras:GetCurrent():IsDragging()) then
+	if(not CameraController.IsMovieOrCameraMode()) then
+		local currentCam = Cameras:GetCurrent();
+		if(not ParaUI.IsMousePressed(0) and not ParaUI.IsMousePressed(1) and not (currentCam and currentCam.IsDragging and currentCam:IsDragging())) then
 			-- apply restrictions
 			local att = ParaCamera.GetAttributeObject();
 			local dist, pitch, yaw = att:GetField("CameraObjectDistance", 0), att:GetField("CameraLiftupAngle", 0), att:GetField("CameraRotY", 0);
@@ -719,7 +756,7 @@ function CameraController.LockRailCarFirstPersonView()
 		local att = ParaCamera.GetAttributeObject();
 		att:SetField("MaxCameraObjectDistance", 0.3);
 		att:SetField("NearPlane", 0.1);
-		att:SetField("RotationScaler", 0.0025);
+		CameraController.SetRotationScaler(0.0025);
 		att:SetField("IsShiftMoveSwitched", true);
 		local facing = entity.ridingEntity:GetFacing() or 0
 		local rotation_pitch = entity.ridingEntity:GetRotationPitch()
@@ -778,7 +815,7 @@ function CameraController.LockRailCarFixedView()
 	local time = fiexd_camera_data.change_time or 10
 	local is_random = fiexd_camera_data.is_random
 
-	CameraController.StartFiexdCamrea(movies_pos_list, time, is_random)
+	CameraController.StartFixedCamera(movies_pos_list, time, is_random)
 end
 
 function CameraController.LockRailCarMovieView()
@@ -870,7 +907,7 @@ function CameraController.StartSurroundCamrea()
 	CameraController.RailCarCameraTimer:Change(5000,50);
 end
 
-function CameraController.StartFiexdCamrea(movies_pos_list, time, is_random)
+function CameraController.StartFixedCamera(movies_pos_list, time, is_random)
 	if movies_pos_list == nil or #movies_pos_list == 0 then
 		local channel = MovieManager:CreateGetMovieChannel("railcar_fiexd_moives");
 		if channel then
@@ -889,7 +926,7 @@ function CameraController.StartFiexdCamrea(movies_pos_list, time, is_random)
 	end
 
 	CameraController.RailCarCameraTimer =  commonlib.Timer:new({callbackFunc = function()
-		CameraController.StartFiexdCamrea(movies_pos_list, time, is_random) 
+		CameraController.StartFixedCamera(movies_pos_list, time, is_random) 
 	end})
 	CameraController.RailCarCameraTimer:Change(time * 1000);
 end
@@ -960,7 +997,7 @@ function CameraController.ChangeCameraFreeLookMod()
 	--att:SetField("FieldOfView", 60/180*3.1415926)
 
 	--att:SetField("MoveScaler", 5);
-	att:SetField("RotationScaler", 0.01);
+	CameraController.SetRotationScaler(0.01);
 	--att:SetField("TotalDragTime", 0.5)
 	--att:SetField("SmoothFramesNum", 2)
 	att:SetField("EnableMouseWheel", false);
@@ -1037,7 +1074,8 @@ function CameraController.ApplyCameraRotationGridRestrictions()
 	if(not CameraController.IsCameraRotationGridEnabled() or CameraController.IsFPSView()) then
 		return
 	end
-	local isCameraKeyPressed = ParaUI.IsMousePressed(0) or Cameras:GetCurrent():IsDragging();
+	local currentCam = Cameras:GetCurrent();
+	local isCameraKeyPressed = ParaUI.IsMousePressed(0) or (currentCam and currentCam.IsDragging and currentCam:IsDragging());
 	-- this fixed a temporary android bug where ParaUI.IsMousePressed(1) always return true until we long hold to right click. 
 	if(not System.os.IsMobilePlatform() and ParaUI.IsMousePressed(1)) then
 		isCameraKeyPressed = true;
@@ -1095,7 +1133,8 @@ function CameraController.ApplyAutoRoomViewCamera()
 	if(not CameraController.IsAutoRoomViewEnabled() or CameraController.IsFPSView()) then
 		return roomViewSatisfied;
 	end
-	local isCameraKeyPressed = ParaUI.IsMousePressed(0) or Cameras:GetCurrent():IsDragging();
+	local currentCam = Cameras:GetCurrent();
+	local isCameraKeyPressed = ParaUI.IsMousePressed(0) or (currentCam and currentCam.IsDragging and currentCam:IsDragging());
 	-- this fixed a temporary android bug where ParaUI.IsMousePressed(1) always return true until we long hold to right click. 
 	if(not System.os.IsMobilePlatform() and ParaUI.IsMousePressed(1)) then
 		isCameraKeyPressed = true;

@@ -342,6 +342,7 @@ function Actor:GetParentLink(curTime)
 end
 
 function Actor:ComputePosition(curTime)
+	curTime = curTime or self:GetTime();
 	local new_x = self:GetValue("lookat_x", curTime);
 	local new_y = self:GetValue("lookat_y", curTime);
 	local new_z = self:GetValue("lookat_z", curTime);
@@ -391,6 +392,7 @@ function Actor:FrameMovePlaying(deltaTime)
 	if(self.offset_facing and eye_rot_y) then
 		eye_rot_y = eye_rot_y + self.offset_facing;
 	end
+	entity:SetEyePosition(eye_dist, eye_liftup, eye_rot_y, eye_roll);
 
 	local allow_user_control;
 	if(entity:HasFocus()) then

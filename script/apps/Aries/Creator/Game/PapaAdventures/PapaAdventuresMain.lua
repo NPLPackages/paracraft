@@ -17,6 +17,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
 NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");
+local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
+local Creation = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Lessons.Creation");
 local PapaWorldLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaWorldLogic.lua");
 local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI")
 local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
@@ -86,12 +89,13 @@ function PapaAdventuresMain:Show(name, url,callback)
         y = 0,
         width = 0,
         height = 0,
-        DesignResolutionWidth = 1280,
-        DesignResolutionHeight = 720,
+        -- DesignResolutionWidth = 1280,
+        -- DesignResolutionHeight = 720,
     }
 
     System.App.Commands.Call("File.MCMLWindowFrame", params);
     System.Windows.Screen:Connect("sizeChanged", self, self.OnResize, "UniqueConnection");
+    GameLogic.GetFilters():add_filter("nplbrowser_checked", self.OnResize);
     self.params = params;
 
     local pageCtrl = params._page;
@@ -115,7 +119,8 @@ end
 local function GetTruePixel(px)
     if (System.os.GetPlatform() == "win32" or
         System.os.GetPlatform() == "ios" or
-        System.os.GetPlatform() == "mac") then
+        System.os.GetPlatform() == "mac" or
+        System.os.GetPlatform() == "android") then
         local uiScales = System.Windows.Screen:GetUIScaling(true);
 
         if (uiScales[1] ~= 1 or uiScales[2] ~= 1) then
@@ -135,6 +140,7 @@ function PapaAdventuresMain.OnResize()
                 PapaAdventuresMain.displayMode.callback();
             return;
         end
+        BackgroundMusic:Silence()
         PapaAdventuresMain:SetContainerVisible(true)
         local screenWidth = GetTruePixel(System.Windows.Screen:GetWidth());
         local screenHeight = GetTruePixel(System.Windows.Screen:GetHeight());
@@ -155,6 +161,13 @@ function PapaAdventuresMain:GotoUrl(name,url,callback)
     self:Show(name, url, callback);
 
     PapaAPI:Init(self.browser_name);
+end
+
+function PapaAdventuresMain:OpenUrl(url)
+    if self.pageCtrl then
+        self.url = url;
+        self.pageCtrl:CallMethod("papa_nplbrowser_instance", "Reload", self.url)
+    end
 end
 
 function PapaAdventuresMain:OpenBrowser(name,url,callback)
@@ -212,7 +225,9 @@ end
 
 function PapaAdventuresMain:OnDisplayModeChange(mode)
     self.mode = mode
+    Creation:ShowInGameButton(false)
     if (mode == "mini") then
+        BackgroundMusic:Recover()
         self:HideBrowser(false)
         self.displayMode = {
             mode = "mini",
@@ -235,6 +250,7 @@ function PapaAdventuresMain:OnDisplayModeChange(mode)
 
         self.displayMode.callback();
     elseif (mode == "ingame") then
+        BackgroundMusic:Silence()
         self:HideBrowser(false);
         self.displayMode = {
             mode = "ingame",
@@ -255,6 +271,7 @@ function PapaAdventuresMain:OnDisplayModeChange(mode)
 
         self.displayMode.callback();
     elseif (mode == "max") then
+        BackgroundMusic:Silence()
         self:HideBrowser(false);
         self.displayMode = {
             mode = "max",
@@ -277,13 +294,21 @@ function PapaAdventuresMain:OnDisplayModeChange(mode)
 
         self.displayMode.callback();
     elseif (mode == "hide") then
+        BackgroundMusic:Recover()
         self.displayMode = nil;
         PapaAdventuresMain.OnResize();
         self:HideBrowser(true);
     elseif (mode == "show") then
+        BackgroundMusic:Silence()
         self.displayMode = nil;
         PapaAdventuresMain.OnResize();
         self:HideBrowser(false);
+    elseif(mode == "button") then
+        BackgroundMusic:Recover()
+        self.displayMode = nil;
+        PapaAdventuresMain.OnResize();
+        self:HideBrowser(true);
+        Creation:ShowInGameButton(true)
     end
 end
 
@@ -309,6 +334,10 @@ function PapaAdventuresMain:CloseBrowser()
     end
 
     self:SetVisible(false);
+end
+
+function PapaAdventuresMain:GetWebStatus()
+    return self.mode or "ingame"
 end
 
 function PapaAdventuresMain:Goto(url)
@@ -357,6 +386,14 @@ function PapaAdventuresMain:OnSaveFile(msg)
     end
     local fileStr = Encoding.unbase64(msg.base64);
     if (not fileStr) then
+        return;
+    end
+
+    if (System.os.GetPlatform() == "android" or
+        System.os.GetPlatform() == "ios") then
+
+        local jsonStr = commonlib.Json.Encode(msg)
+        ParaEngine.GetAttributeObject():SetField("SaveImageToGallery", jsonStr);
         return;
     end
 

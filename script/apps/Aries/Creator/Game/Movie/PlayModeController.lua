@@ -15,6 +15,7 @@ PlayModeController:InitSingleton();
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/KeyFrameCtrl.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tools/ToolTouchBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/CameraController.lua");
+local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -121,7 +122,7 @@ end
 
 -- when the game movie mode is changed
 function PlayModeController:OnModeChanged(mode)
-	if(mode == "movie" and not MovieManager:IsLastModeEditor()) then
+	if(mode == "movie" and (not AllContext:GetContext("movie"):IsForceEditorMode() and not MovieManager:IsLastModeEditor())) then
 		--LOG.std(nil, "info", "PlayModeController", "enter")
 		PlayModeController.ShowPage(true);
 	else

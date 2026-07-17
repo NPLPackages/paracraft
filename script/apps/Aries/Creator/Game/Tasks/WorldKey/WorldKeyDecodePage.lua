@@ -38,9 +38,15 @@ function WorldKeyDecodePage.ShowView()
     end
     
     WorldKeyDecodePage.InitData()
-    
+    local pageUrl = "script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePage.html"
+    if System.options.isCommunity  then
+        pageUrl = "script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePageCommunity.html"
+    end
+    if System.options.isEducatePlatform then
+        pageUrl = "script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePage.431.html"
+    end
     local params = {
-        url = "script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePage.html",
+        url = pageUrl,
         name = "WorldKeyDecodePage.Show", 
         isShowTitleBar = false,
         DestroyOnClose = true,
@@ -61,6 +67,9 @@ function WorldKeyDecodePage.ShowView()
 end
 
 function WorldKeyDecodePage.OnCreate()
+    if System.options.isCommunity or System.options.isEducatePlatform then
+        return
+    end
     local parent  = ParaUI.GetUIObject("decode_wxcode_root")
     
     local qrcode_width = 100
@@ -143,6 +152,10 @@ end
 
 function WorldKeyDecodePage.DecodeWorld()
     local code = page:GetValue("key_text") or ""
+    local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
+    if BroadcastHelper then
+        BroadcastHelper.GetSingletonTipsStack():Show(true)
+    end
     if code == "" then
         GameLogic.AddBBS(nil, L"请输入激活码", 3000, "255 0 0")
         return

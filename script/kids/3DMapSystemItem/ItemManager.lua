@@ -23,6 +23,8 @@ local item = Map3DSystem.Item.ItemManager:FindItem(1)
 Map3DSystem.Item.ItemManager:ItemManager:AddItem(item);
 ------------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/Json.lua");
+
 local LOG = LOG;
 NPL.load("(gl)script/kids/3DMapSystemApp/profiles/ProfileManager.lua");
 local ItemManager = commonlib.gettable("Map3DSystem.Item.ItemManager");

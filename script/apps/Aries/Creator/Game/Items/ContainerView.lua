@@ -89,6 +89,10 @@ function ContainerView:GetSlot(slot_index)
 	end
 end
 
+function ContainerView:GetSlotCount()
+	return #(self.slots);
+end
+
 -- get slot by index, this function can also be used as the ds function to pe:mc_slot
 -- @param slot_index: if nil, return the total count
 function ContainerView:GetSlotDS(slot_index)

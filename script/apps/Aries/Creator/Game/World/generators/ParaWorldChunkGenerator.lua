@@ -69,7 +69,6 @@ function ParaWorldChunkGenerator:OnExit()
 	if(self.lock_timer) then
 		self.lock_timer:Change();
 	end
-	MyCompany.Aries.ChatSystem.ChatWindow.ResetPosition(false);
 end
 
 -- for temporary world files
@@ -103,7 +102,6 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId() and GameLogic.GetFilters():apply_filters('is_signed_in')) then
 		GameLogic.RunCommand("/mode strictgame")
 		GameLogic.RunCommand("/ggs connect -silent=false");
-		MyCompany.Aries.ChatSystem.ChatWindow.ResetPosition(true);
 		for i = 1, #TeachingQuestPage.TaskTypeNames do
 			ParaWorldNPC.CreateTeacherNPC(nil, nil, TeachingQuestPage.TaskTypeNames[i]);
 		end

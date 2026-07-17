@@ -49,9 +49,15 @@ function ItemBlockModel:GetItemModelInHandOffset()
 	return self.inhandOffset or default_inhand_offset;
 end
 
--- whether filename is a block template file. 
+-- whether filename is a block template file, both ply and blocks.xml are considered template file 
 function ItemBlockModel:IsBlockTemplate(filename)
-	return filename and filename:match("%.blocks%.xml$") and true;
+	if(filename) then
+		if(filename:match("%.blocks%.xml$")) then
+			return true;
+		elseif(filename:match("%.ply$") and self.id ~= block_types.names.LiveModel) then
+			return true;
+		end
+	end
 end
 
 -- load the model as block templates into the world.
@@ -86,11 +92,18 @@ function ItemBlockModel:TryCreate(itemStack, entityPlayer, x,y,z, side, data, si
 	local local_filename = itemStack:GetDataField("tooltip");
 	local filename = local_filename;
 	if(filename) then
-		if (not self:IsBlockTemplate(filename) and filename:match("^temp/onlinestore/")) then
+		if (not self:IsBlockTemplate(filename) and (filename:match("^temp/onlinestore/") or filename:match("^temp/personnalstore/"))) then
 			filename = commonlib.Encoding.Utf8ToDefault(filename)
 			local _filename = "onlinestore/"..filename:match("[^/\\]+$")
-			if(ParaIO.DoesFileExist(Files.GetWritablePath()..filename, true)) then
-				if ParaIO.CopyFile(Files.GetWritablePath()..filename, Files.WorldPathToFullPath(_filename), true) then
+			if filename:match("^temp/personnalstore/") then
+				_filename = "personnalstore/"..filename:match("[^/\\]+$")
+			end
+			local copy_src = Files.GetWritablePath()..filename
+			local copy_dst = Files.WorldPathToFullPath(_filename)
+			local is_file_exist = ParaIO.DoesFileExist(copy_src, true)
+			if(is_file_exist) then
+				local copy_result = ParaIO.CopyFile(copy_src, copy_dst, true)
+				if copy_result then
 					itemStack:SetTooltip(commonlib.Encoding.DefaultToUtf8(_filename))
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
 					local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
@@ -233,6 +246,11 @@ end
 -- virtual function: when selected in right hand
 function ItemBlockModel:OnSelect(itemStack)
 	ItemBlockModel._super.OnSelect(self, itemStack);
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if IsMobileUIEnabled then
+		GameLogic.SetStatus(L"选择+长按模型编辑命令, 长按编辑模型");
+		return 
+	end
 	GameLogic.SetStatus(L"Ctrl+右键点击模型编辑命令, 右键点击编辑模型");
 end
 

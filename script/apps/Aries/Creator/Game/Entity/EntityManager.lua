@@ -133,6 +133,8 @@ function EntityManager.RegisterEntities()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityNplCadEditor.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityLiveModel.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityInvisibleClickSensor.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityThrowBall.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityUserPoint.lua");
 end
 
 -- register a new entity class
@@ -438,6 +440,22 @@ function EntityManager.GetEntityById(entityId)
 	end
 end
 
+function EntityManager.GetBlockEntityByObjectId(id, name)
+	local entity = EntityManager.GetEntityByObjectID(id);
+	if(not entity and name) then
+		local x, y, z = name:match("^(%d+),(%d+),(%d+)$");
+		if(x and y and z) then
+			x,y,z = tonumber(x), tonumber(y), tonumber(z);
+			entity = EntityManager.GetBlockEntity(x,y,z)
+		end
+	end
+	if(entity) then
+		if(entity:IsBlockEntity()) then
+			return entity;
+		end
+	end
+end
+
 -- rename a given entity in the manager. 
 function EntityManager.RenameEntity(entity, old_name, new_name)
 	if(old_name) then
@@ -698,7 +716,8 @@ end
 
 -- @param parentDirectory: should be nil, unless you want to stage changes to another folder. 
 function EntityManager.SaveToFile(parentDirectory)
-	local filename = format("%s%s", parentDirectory or ParaWorld.GetWorldDirectory(), default_filename);
+	local isBackupMode = parentDirectory and parentDirectory ~= GameLogic.GetWorldDirectory()
+	local filename = format("%s%s", parentDirectory or GameLogic.GetWorldDirectory(), default_filename);
 
 	local root = {name='entities', attr={file_version="0.1"} }
 	local entity;
@@ -763,10 +782,16 @@ function EntityManager.SaveToFile(parentDirectory)
 				ParaIO.CreateDirectory(filename)
 			end
 			region:SaveToFile(filename);
+			if isBackupMode then
+				region:SetModified()
+			end
 		end
 	end
 
 	EntityManager.SaveAllPlayers(parentDirectory);
+
+	local BlockManager = NPL.load("script/ide/System/UI/Blockly/Blocks/BlockManager.lua");
+	BlockManager.SaveWorldAllCustomCurrentBlockCategoryAndBlockMap();
 end
 
 -- @param chunkX, chunkZ: chunk pos, if chunkZ is nil, chunkX is packed index
@@ -994,7 +1019,7 @@ function EntityManager.FrameMoveSentientList(deltaTime, cur_time, destroy_list)
 end
 
 -- filter entity by params
--- @param params: {name, type, nontype, tag, tagName, mname, count}
+-- @param params: {name, type, nontype, tag, tagName, mname, count, filterFunc}
 -- name: only entities with given name.
 -- mname: match regular expression of the given name
 -- type: only entities of given type. 
@@ -1003,10 +1028,14 @@ end
 -- tag: tag Value of entity's GetTag() field. 
 -- r: get entities only less than r blocks from the origin
 -- rm: get entities only more than rm blocks from the origin.
+-- fileterFunc: function(entity) return true end, return false to filter out the entity.
 -- count: return as most this number of objects, usually in order of distance from the origin.
 -- @param entities: nil or array of comparing entities
 -- @return entity of nil
 function EntityManager.FilterEntity(entity, params, entities)
+	if(params.filterFunc and not params.filterFunc(entity)) then
+		return;
+	end
 	if(params.nontype and entity:IsOfType(params.nontype)) then
 		return;
 	end
@@ -1048,6 +1077,75 @@ function EntityManager.FilterEntity(entity, params, entities)
 	end
 end
 
+-- similar to EntityManager.FindEntities({category="b", type = class_name}), but slightly faster. 
+function EntityManager.FindEntitiesByClassName(class_name)
+	local output;
+	for _, entities in pairs(chunk_column_entities) do
+		for i=1, #entities do
+			local entity = entities[i];
+			if(entity and entity.class_name == class_name) then
+				output = output or {};
+				output[#output+1] = entity;
+			end
+		end
+	end
+	return output;
+end
+
+-- @param filterFunc: function(entity) return true end, it can also a table of params like in EntityManager.FindEntities
+-- @return nil or entity found
+function EntityManager.FindFirstEntity(filterFunc)
+	if(type(filterFunc) == "function") then
+		for _, entities in pairs(chunk_column_entities) do
+			for i=1, #entities do
+				local entity = entities[i];
+				if(entity and filterFunc(entity)) then
+					return entity;
+				end
+			end
+		end
+	elseif(type(filterFunc) == "table") then
+		for _, entities in pairs(chunk_column_entities) do
+			for i=1, #entities do
+				local entity = entities[i];
+				if(entity and EntityManager.FilterEntity(entity, filterFunc)) then
+					return entity;
+				end
+			end
+		end
+	end
+end
+
+-- iterate through all entities with a callback function
+-- @param filterFunc: function(entity) return true end, it can also a table of params like in EntityManager.FindEntities
+-- if the function return nil, it will simply interate all entities
+-- @return array of entities that match the filter, or nil if none found
+function EntityManager.ForEachEntity(filterFunc)
+	local output;
+	if(type(filterFunc) == "function") then
+		for _, entities in pairs(chunk_column_entities) do
+			for i=1, #entities do
+				local entity = entities[i];
+				if(entity and filterFunc(entity)) then
+					output = output or {};
+					output[#output+1] = entity;
+				end
+			end
+		end
+	elseif(type(filterFunc) == "table") then
+		for _, entities in pairs(chunk_column_entities) do
+			for i=1, #entities do
+				local entity = entities[i];
+				if(entity and EntityManager.FilterEntity(entity, filterFunc)) then
+					output = output or {};
+					output[#output+1] = entity;
+				end
+			end
+		end
+	end
+	return output;
+end
+
 -- find entities by a number of matching parameters
 -- @param params: {category, type, nontype, name, tag, x,y,z,dz,dy,dz,r,rm, count}
 -- category: "e" all entities except block entities (if nil, it default to "e"),"p" for nearest player, "r" random player, "a" all players
@@ -1061,6 +1159,7 @@ end
 -- tag: tag Value of entity's GetTag() field. 
 -- x,y,z: center of origin to selects entities. 
 -- r: get entities only less than r blocks from the origin
+-- ry: horizontal radius, if nil, default to r
 -- rm: get entities only more than rm blocks from the origin.
 -- dx,dy,dz: this is a cubic volume as defined by extending these blocks from the origin.
 -- count: return as most this number of objects, usually in order of distance from the origin.
@@ -1072,8 +1171,9 @@ function EntityManager.FindEntities(params)
 		if(params.x) then
 			if(params.r) then
 				local radius = params.r;
+				local radius_y = params.ry or radius;
 				for dx, dz in Iterators.SpiralCircle(radius) do
-					for y = params.y-radius, params.y+radius do
+					for y = params.y-radius_y, params.y+radius_y do
 						local entities = EntityManager.GetEntitiesInBlock(params.x + dx, y, params.z + dz);
 						if(entities) then
 							for entity,_ in pairs(entities) do
@@ -1177,8 +1277,9 @@ function EntityManager.FindEntities(params)
 		-- "searchable" for all searchable entities including block entities 
 		if(params.r) then
 			local radius = params.r;
+			local radius_y = params.ry or radius;
 			for dx, dz in Iterators.SpiralCircle(radius) do
-				for y = params.y-radius, params.y+radius do
+				for y = params.y-radius_y, params.y+radius_y do
 					local entities = EntityManager.GetEntitiesInBlock(params.x + dx, y, params.z + dz);
 					if(entities) then
 						for entity,_ in pairs(entities) do
@@ -1203,4 +1304,39 @@ function EntityManager.FindEntities(params)
 		end
 	end
 	return output;
+end
+
+
+-- @param left, top, width, height: if nil, default to full screen
+-- @param filterEntityFunction: function(entity) return true if entity can be selected.
+function EntityManager.GetEntitiesInScreenRect(left, top, width, height, filterEntityFunction)
+	if(not left) then
+		left, top, width, height = ParaUI.GetUIObject("root"):GetAbsPosition();
+	end
+	local result = {};
+	local entities = {};
+	local count = ParaScene.GetObjectsByScreenRect(result, left, top, left + width, top + height, "4294967295", -1);
+	for k, obj in ipairs(result) do
+		if(obj and obj:IsValid())then
+			local id = obj:GetID();
+			local name = obj.name or "";
+			local entity = EntityManager.GetBlockEntityByObjectId(id, name)
+			if(not entity) then
+				entity = EntityManager.GetEntityByObjectID(id);
+			end
+			if(entity) then
+				if(not filterEntityFunction or filterEntityFunction(entity)) then
+					entities[#entities+1] = entity;
+				end
+			end
+		end
+	end
+	return entities;
+end
+
+-- get all entities that is currently on screen(display). 
+-- @param filterEntityFunction: function(entity) return true if entity can be selected.
+function EntityManager.GetEntitiesInScreen(filterEntityFunction)
+	local entities = EntityManager.GetEntitiesInScreenRect(nil, nil, nil, nil, filterEntityFunction)
+	return entities;
 end

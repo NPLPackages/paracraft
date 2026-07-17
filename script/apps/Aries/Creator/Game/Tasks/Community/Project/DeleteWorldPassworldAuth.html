@@ -1,0 +1,77 @@
+<!-- script/apps/Aries/Creator/Game/Tasks/Community/Project/DeleteWorldPassworldAuth.html -->
+<body>
+    <pe:mcml>
+        <script type='text/npl'>
+            <![CDATA[
+                local DeleteWorld = NPL.load('(gl)Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua')
+                local page = document:GetPageCtrl()
+
+                function close_page()
+                    page:CloseWindow()
+                end
+
+
+                function confirm()
+                    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.delete_confirm.click_confirm", {useNoId=true},nil,true);
+                    local password = page:GetValue('password')
+
+                    if not password or
+                       type(password) ~= 'string' then
+                        return
+                    end
+
+                    if password == '' then
+                        _guihelper.MessageBox(L'请输入密码')
+                        return
+                    end
+
+                    if page.callback and
+                       type(page.callback) == 'function' then
+                        page.callback(password)
+                    end
+                end
+
+                function cancel()
+                    close_page()
+                    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.delete_confirm.click_cancel", {useNoId=true},nil,true);
+                end
+
+            ]]>
+        </script>
+        <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+            <pe:container alignment="_ct" width="400" height="310" style="margin-left:-200px;margin-top:-155px;background-color: #2e2e2e; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+                <div style="width: 400;height: 310px;">
+                    <div style="width: 400;height: 40px;margin-top: 0px;">
+                        <div style="float: left;margin-left: 12px;margin-top: 12px;color: #d3d3d3;font-size: 18px;base-font-size: 18px;font-weight: bold;"><%=L"验证登录密码"%></div>
+                        <div onclick="cancel()" style="float: left;margin-left: 240px;margin-top: 16px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+                    </div>
+                    <div style="position: relative; width: 400px; height: 1px; margin-top: 10px; background-color: #313131ff"></div>
+                    
+                    <div style="margin-left: 18px; margin-top: 24px; width: 364px; height: 45px; background-color: #242424; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+                        <input type='text'
+                            name='password'
+                            EmptyText='<%= L"输入登录密码进行验证" %>'
+                            PasswordChar='*'
+                            value=''
+                            EmptyTextColor='#FFFFFFFF' 
+                            textcolor='#FFFFFFFF'
+                            style=' margin-left: 15px;
+                                    margin-top: 5px;
+                                    width: 330px;
+                                    height: 35px;
+                                    text-valign: center;
+                                    background: url()'/>
+                    </div>
+                    <div style="color: #A8A7B0FF; margin-left: 18px; margin-top: 12px; font-size: 14px; base-font-size: 14px;">
+                        1.为了保险起见，删除作品需要验证密码<br/>
+                        2.在回收站中删除将不可恢复，请谨慎操作
+                    </div>
+
+                    <input type="button" value='<%=L"确定删除"%>' onclick='confirm()' style="margin-left: 18px; margin-top: 16px; width: 364px; height: 44px; color: #d3d3d3; background-color: #FF5733; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)"/>
+                    <input type="button" value='<%=L"取消"%>' onclick='cancel()' style="margin-left: 18px; margin-top: 16px; width: 364px; height: 44px; color: #d3d3d3; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 178 32 32: 14 14 14 14)"/>
+                </div>
+            </pe:container>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

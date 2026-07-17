@@ -56,9 +56,6 @@ function PapaAPI:ctor()
         PapaWorldLogic.DeleteWorld(msg)
     end)
     self:RegisterEvent("showSubmitPage", function(msg)
-        NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/Lessons/Creation.lua");
-        local Creation = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Lessons.Creation");
-
         Creation:ShowOpusSubmitPage();
     end);
     self:RegisterEvent("onSaveFile", function(msg)
@@ -90,10 +87,53 @@ function PapaAPI:ctor()
             MyCompany.Aries.Game.MainLogin:SetWindowTitle()
         end
     end);
+    self:RegisterEvent("ClearCache",function(msg)
+        GameLogic.RunCommand("/clearcache");
+    end)
+    self:RegisterEvent("GetWebStatus",function(msg)
+        self:GetWebStatus(msg)
+    end)  
+    
+    self:RegisterEvent("UserAgreement",function(msg)
+        local platform = System.os.GetPlatform()
+        local isTouchDevice = ParaEngine.GetAppCommandLineByParam('IsTouchDevice', nil);
+        if platform == 'android' or platform == 'ios' or (isTouchDevice and isTouchDevice =='true') then
+            NPL.load("(gl)script/ide/System/localserver/LocalStorageUtil.lua");
+            local LocalStorageUtil = commonlib.gettable("System.localserver.LocalStorageUtil");
+            local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
+            local has_agree_userUserPrivacy = LocalStorageUtil.Load_localserver("has_agree_userUserPrivacy","false",true)
+            if has_agree_userUserPrivacy=="false" then
+                PlatformBridge.onAgreeUserPrivacy()
+                LocalStorageUtil.Save_localserver("has_agree_userUserPrivacy","true",true)
+                LocalStorageUtil.Flush_localserver()
+            end
+        end
+    end)  
+    self:RegisterEvent("SetEngineVersion",function(msg)
+        self:SetEngineVersion(msg)
+    end)
+end
+
+function PapaAPI:SetEngineVersion(msg) 
+    self:SetDisplayMode("hide")
+    local VersionSetting = NPL.load('(gl)script/apps/Aries/Creator/Game/Setting/VersionSetting.lua')
+    VersionSetting.ShowPage()
+end
+
+function PapaAPI:GetWebStatus(msg)
+    if msg and msg.callbackId then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAdventuresMain.lua");
+        local PapaAdventuresMain = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Main");
+        local mode = PapaAdventuresMain:GetWebStatus()
+        if mode then
+            self:SendEvent("GetWebStatus",{callbackId = msg.callbackId,mode = mode})
+        end
+    end
 end
 
 function PapaAPI:Init(browser_name)
     self.browser_name = browser_name
+    self.isCreateLoadWorld = false
     return self;
 end
 
@@ -106,8 +146,9 @@ function PapaAPI:SetDisplayMode(mode)
     PapaAPI:OnDisplayModeChange(mode);
 end
 
-function PapaAPI:NextStep()
-    self:SendEvent("nextStep", {});
+function PapaAPI:NextStep(projectId,lessonType)
+    local params = {projectId = projectId,lessonType = lessonType}
+    self:SendEvent("nextStep", params);
 end
 
 function PapaAPI:CreateWorldInWorld()
@@ -142,6 +183,38 @@ function PapaAPI:OpenMyWorks()
     self:SendEvent("OpenMyWorks", {});
 end
 
+function PapaAPI:SendWebLog(strLog)
+    self:SendEvent("SendWebLog", {log=strLog});
+end
+
+function PapaAPI:SendSoftKeyboardStatus(status)
+    self:SendEvent("SoftKeyboardStatus", {status=status}); --status 0 hide status 1 show
+end
+
+function PapaAPI:SendShowHomePage(username,id)
+    local WorldCommon = commonlib.gettable('MyCompany.Aries.Creator.WorldCommon')
+    local kpProjectId = WorldCommon.GetWorldTag("kpProjectId")
+    self:SendEvent("ShowHomePage", {username=username,id=id,projectId=tonumber(kpProjectId or 0)});
+end
+
+function PapaAPI:ReportLesson()
+    if not Creation or not Creation.curSection then
+        return
+    end
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+    local createTime = WorldCommon.GetWorldTag("totalEditSeconds") or 0;
+    local buildCount = tonumber(WorldCommon.GetWorldTag("totalSingleBlocks")) - (self.blockNum or 0);
+    local kpProjectId = WorldCommon.GetWorldTag("kpProjectId");
+    local duration = (createTime - (self.startEditTime or 0))
+    self:SendEvent("ReportLesson", {
+        report={
+            duration=duration,
+            buildCount=buildCount,
+            projectId=tonumber(kpProjectId or 0),
+        }
+    });
+end
 -----------------------------------
 -- implement callbacks from webview
 -----------------------------------
@@ -152,27 +225,45 @@ function PapaAPI:OnSetLoginInfo(loginInfo)
         local KeepworkServiceSession = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceSession.lua');
         loginInfo = PapaAPI.GetUrlDecodeData(loginInfo)
         KeepworkServiceSession:LoginResponse(loginInfo, 200, function(bSucceed, message)
-            LOG.std("", "info", "PapaAPI", "profile from vue", loginInfo);
-            echo(loginInfo)
+            LOG.std("PapaAPI", "info", "profile from vue is ", commonlib.serialize_compact(loginInfo));
+            PapaUtils.ReportLoginTime()
+            PapaUtils.ReportDeviceInfo()
         end);
     end
 end
 
-function PapaAPI:OnCreateLoadWorld(msg)
+function PapaAPI:CreateLoadWorldImp(msg)
+    if self.isCreateLoadWorld then
+        PapaAPI:SendEvent("CreateWorld",{callbackId = msg.callbackId,result = false,message = "同一时间重复进入世界"})
+        return
+    end
+    self.isCreateLoadWorld = true
+    if self.delayTimer then
+        self.delayTimer:Change()
+    end
+    self.delayTimer = self.delayTimer or commonlib.Timer:new({callbackFunc = function(timer)
+        self.isCreateLoadWorld = false
+    end});
+    self.delayTimer:Change(2000,nil)
     GameLogic:Connect("WorldLoaded", self, self.OnWorldLoaded, "UniqueConnection");
-    LOG.std(nil, "debug", "PapaAPI:OnCreateLoadWorld", "msg: %s", commonlib.serialize_compact(msg));
+    
     if msg.code then
         msg.code = commonlib.Encoding.url_decode(msg.code)
     end
+    if msg.curSections and msg.curSections.contents then
+        msg.curSections.contents = {}
+    end
     msg = PapaAPI.GetUrlDecodeData(msg)
-    echo(msg,true)
+    LOG.std(nil, "info", "PapaAPI:OnCreateLoadWorld", "msg: %s", commonlib.serialize_compact(msg));
+    local sendMsg = commonlib.copy(msg)
+    sendMsg.code = "";
     if (msg.type == "lesson") then
         if (not msg or not msg.projectId or not msg.lessonId or not msg.curTask or not msg.curSections or
             not msg.curSection or not msg.scheduleId or not msg.classActivityId) then
             return;
         end
 
-        Creation:SetCurData(msg.curTask, msg.curSections, msg.curSection, msg.classActivityId, msg.scheduleId, 1,msg.code,msg.hasNextStep);
+        Creation:SetCurData(msg.curTask, msg.curSections, msg.curSection, msg.classActivityId, msg.scheduleId, 1,msg.code,msg.hasNextStep,msg.submitType,msg.lessonType);
         if (not Creation.curSection or not Creation.curSection.content) then
             return;
         end
@@ -181,14 +272,21 @@ function PapaAPI:OnCreateLoadWorld(msg)
                 Creation.page:Refresh(0.01);
             end
         end);
-        if (Creation.curSection.content.type == 6) then
-            GameLogic.RunCommand("/loadworld " .. msg.projectId);
-        elseif (Creation.curSection.content.type == 7) then
+        local callbackId = msg.callbackId
+        if (msg.lessonType == 6) then
+            if not callbackId then
+                GameLogic.RunCommand("/loadworld -s -auto -lesson" .. msg.projectId);
+                return 
+            end
+            local data = {callbackId = callbackId,world={type="tuijian",projectId=msg.projectId}}
+            local PapaWorldLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaWorldLogic.lua");
+            PapaWorldLogic.EnterWorld(data,true)
+        elseif (msg.lessonType == 7) then
             if (Creation.curSection.content.content.homeworkType == 0) then
-                Creation:LoadCreationWorld();
+                Creation:LoadCreationWorld(callbackId);
             elseif (Creation.curSection.content.content.homeworkType == 1) then
                 -- TODO: create plane world.
-                Creation:LoadSuperFlatWorld()
+                Creation:LoadSuperFlatWorld(callbackId)
             end
         end
     else
@@ -198,6 +296,28 @@ function PapaAPI:OnCreateLoadWorld(msg)
         local PapaWorldLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaWorldLogic.lua");
         PapaWorldLogic.EnterWorld(msg)
     end
+end
+
+function PapaAPI:OnCreateLoadWorld(msg)
+    local isSigned = GameLogic.GetFilters():apply_filters("is_signed_in")
+    if isSigned then
+        self:CreateLoadWorldImp(msg)
+        return
+    end
+    local token = msg.token
+    local callbackId = msg.callbackId
+    if token and token ~= "" then
+        local MainLogin = NPL.load('(gl)Mod/WorldShare/cellar/MainLogin/MainLogin.lua')
+        MainLogin:LoginWithToken(token, function(bIsSuccessed, reason, message)
+            if not bIsSuccessed then
+                PapaAPI:SendEvent("CreateWorld",{callbackId = callbackId,result = false,message = reason})
+                return
+            end
+            self:CreateLoadWorldImp(msg)
+        end)
+        return
+    end
+    PapaAPI:SendEvent("CreateWorld",{callbackId = callbackId,result = false,message = "重新帕拉卡登录创意空间失败，请联系老师"})
 end
 
 function PapaAPI.OnWorldLoaded()
@@ -280,7 +400,6 @@ end
 
 -- set design resolution 1280*720 ....
 function PapaAPI:SetResolutionRatio(data)
-    echo(data)
     if data then
         local attr = ParaEngine.GetAttributeObject()
         local x, y = string.match(data.ratio or "", "(%d+)%D+(%d+)");
@@ -307,7 +426,7 @@ function PapaAPI:OnExitWorld(msg)
     local isHomeWorkWorld = WorldCommon.GetWorldTag('isHomeWorkWorld')
     local cb = function()
         local WorldExitDialog = NPL.load('Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
-        if msg and msg.save then
+        if msg and msg.save and Game.is_started then
             WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Yes)
         else
             WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
@@ -322,10 +441,16 @@ function PapaAPI:OnExitWorld(msg)
     if isHomeWorkWorld and needUpload then
         GameLogic.QuickSave()
         local ShareWorld = NPL.load('(gl)script/apps/Aries/Creator/Game/Educate/Other/ShareWorld.lua')
-        ShareWorld:SysncWorldNoUI(cb)
+        ShareWorld:SyncWorldNoUI(cb)
     else
         cb()
     end
+end
+
+-- tool function
+function PapaAPI:SetEditStart(time,blockNum)
+    self.startEditTime = time
+    self.blockNum = blockNum
 end
 
 

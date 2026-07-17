@@ -14,6 +14,7 @@ local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.C
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/ide/Transitions/Tween.lua");
 local RedSummerCampMainPage = NPL.export();
+commonlib.setfield("MyCompany.Aries.Game.Tasks.RedSummerCampMainPage",RedSummerCampMainPage)
 local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseSchedulingV2.lua") 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
@@ -25,8 +26,8 @@ local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notic
 local VipRewardPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipRewardPage.lua");
 local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
 local Email = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/Email.lua");
-local EducateProjectManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/EducateProjectManager.lua")
 local page
+local click_help_num = 0
 local notice_time = 3000
 RedSummerCampMainPage.UserData = {}
 RedSummerCampMainPage.ItemData = {
@@ -39,6 +40,18 @@ RedSummerCampMainPage.ItemData = {
 	{name="虚拟校园", is_show_vip=false, is_show_recommend=false, node_name = "ai_school", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_5_220x220_32bits.png#0 0 220 220"},
 	{name="家长指南", is_show_vip=false, is_show_recommend=false, node_name = "parent_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_6_220x220_32bits.png#0 0 220 220"},
 }
+
+local androidFlavor = System.os.GetAndroidFlavor();
+
+if (androidFlavor == "huawei") then
+	RedSummerCampMainPage.ItemData[4] = {
+		name = "优秀作品",
+		is_show_vip = false,
+		is_show_recommend = false,
+		node_name = "explore",
+		img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_4_220x220_32bits.png#0 0 220 220"
+	};
+end
 
 local notice_desc = {
 	-- {desc = [[教师节活动奖励新鲜出炉！！！]], name="teacher_day"},
@@ -79,6 +92,10 @@ function RedSummerCampMainPage.Show()
 		return
 	end
 
+	NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallManager.lua");
+	local MallManager = commonlib.gettable("MyCompany.Aries.Game.KeepWorkMall.MallManager");
+	MallManager.getInstance():Init()
+
 	NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 	local parent_id = type(WorldCommon.GetParentProjectId) =="function" and WorldCommon.GetParentProjectId() or nil
@@ -98,8 +115,20 @@ function RedSummerCampMainPage.Show()
 	local SysInfoStatistics = commonlib.gettable("MyCompany.Aries.Game.Common.SysInfoStatistics")
 	
 	commonlib.TimerManager.SetTimeout(function()
+		if platform=="android" or platform=="ios" or platform=="mac" then
+			local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
+			if PlatformBridge.IsAgreePrivacy() then
+				PlatformBridge.onAgreeUserPrivacy()
+			end
+		end
 		SysInfoStatistics.checkGetSysInfoAndUpload()
-	end,100)
+	end,500)
+
+	if System.options.isEducatePlatform then
+		local EducateMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/EducateMainPage.lua")
+        EducateMainPage.ShowPage()
+		return
+	end
 
 	if RedSummerCampMainPage.hasFirstShow==nil then 
 		RedSummerCampMainPage.hasFirstShow = true
@@ -135,25 +164,28 @@ function RedSummerCampMainPage.Show()
 		RedSummerCampMainPage.BindFilter = true
 	end
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/YellowCodeLimitPage.lua");
-	local YellowCodeLimitPage = commonlib.gettable("MyCompany.Aries.Game.YellowCodeLimitPage");
-	YellowCodeLimitPage.CheckShow()
-
-	if System.options.isChannel_430 or (System.os.GetPlatform() == "mac" or System.os.GetPlatform() == "ios") then
-		local RedSummerCampSchoolMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampSchoolMainPage.lua");
-		RedSummerCampSchoolMainPage.Show();
-		return 
-	elseif System.options.channelId_431 then
-		local EducateMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/EducateMainPage.lua")
-        EducateMainPage.ShowPage()
-		return
+	if not System.options.isOffline then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/YellowCodeLimitPage.lua");
+		local YellowCodeLimitPage = commonlib.gettable("MyCompany.Aries.Game.YellowCodeLimitPage");
+		YellowCodeLimitPage.CheckShow()
 	end
-
 	CustomCharItems:Init();
 
 	local Game = commonlib.gettable("MyCompany.Aries.Game")
 	if(Game.is_started) then
 		Game.Exit()
+	end
+
+	if System.options.isCommunity then
+		local CommunityMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/CommunityMainPage.lua")
+        CommunityMainPage.Show(true)
+		return
+	end
+
+	if System.options.isChannel_430 or (System.os.GetPlatform() == "mac" or System.os.GetPlatform() == "ios") then
+		local RedSummerCampSchoolMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampSchoolMainPage.lua");
+		RedSummerCampSchoolMainPage.Show();
+		return 
 	end
 
 	if page then
@@ -165,6 +197,12 @@ function RedSummerCampMainPage.Show()
 	notice_text_index = 1
 
 	if not RedSummerCampMainPage.BindFilter then
+	end
+
+	if System.options.isHideVip then
+		RedSummerCampMainPage.RightBtData = commonlib.filter(RedSummerCampMainPage.RightBtData,function (item)
+			return item.node_name ~= "skin"
+		end)
 	end
 
 	local enable_esc_key = false
@@ -230,14 +268,18 @@ function RedSummerCampMainPage.Show()
 					return sort_a < sort_b;
 				end)
 			end
-			page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
+			if page then
+				page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
+			end
 			-- RedSummerCampMainPage.Timer = commonlib.Timer:new({callbackFunc = function(timer)
 			-- 	RedSummerCampMainPage.StartNoticeAnim()
 			-- end})
 			-- RedSummerCampMainPage.Timer:Change(notice_time, nil);
 		end)
 	else
-		page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
+		if page then
+			page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
+		end
 		RedSummerCampMainPage.Timer = commonlib.Timer:new({callbackFunc = function(timer)
 			RedSummerCampMainPage.StartNoticeAnim()
 		end})
@@ -245,7 +287,7 @@ function RedSummerCampMainPage.Show()
 	end
 
 	local isVerified = GameLogic.GetFilters():apply_filters('store_get', 'user/isVerified');
-	local hasJoinedSchool = GameLogic.GetFilters():apply_filters('store_get', 'user/hasJoinedSchool');
+	local hasJoinedSchool = true--GameLogic.GetFilters():apply_filters('store_get', 'user/hasJoinedSchool');
 	if not isVerified or not hasJoinedSchool then
 		local func = function()
 			local username = GameLogic.GetFilters():apply_filters('store_get', 'user/username');
@@ -304,13 +346,16 @@ function RedSummerCampMainPage.OnCreate()
 		obj:SetScale(1)
 	end
 
-	RedSummerCampMainPage.HandleQuestRedTip()
-	RedSummerCampMainPage.HandleFriendsRedTip()
+	-- 去掉所有的红点提示，业务已经下架了
+	-- RedSummerCampMainPage.HandleQuestRedTip()
+	-- RedSummerCampMainPage.HandleFriendsRedTip()
+	-- RedSummerCampMainPage.UpdateVideoRedTip()
+	-- DockPage.HandMsgCenterMsgData(function()
+	-- 	-- Email.OpenEmailPage()
+	-- end)
+	-- RedSummerCampMainPage.UpdateRedTip()
+
 	RedSummerCampMainPage.UpdateVideoRedTip()
-	DockPage.HandMsgCenterMsgData(function()
-		Email.OpenEmailPage()
-	end)
-	RedSummerCampMainPage.UpdateRedTip()
 end
 
 function RedSummerCampMainPage.GetAutoNoticeText()
@@ -333,10 +378,15 @@ function RedSummerCampMainPage.OpenHelpPage(btnId)
 	local btn = page:FindUIControl(btnId);
 	if(btn and btn:IsValid()) then
 		local x,y,width, height = btn:GetAbsPosition();
-
 		if true then
+			click_help_num = click_help_num + 1
+			local pageUrl = string.format("script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampHelperMenu.html?x=%s & y=%s",x,y+70)
+			if click_help_num > 10 then
+				pageUrl = pageUrl .. " & isTest=1"
+				click_help_num = 0
+			end
 			local params = {
-				url = string.format("script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampHelperMenu.html?x=%s & y=%s",x,y+70),
+				url = pageUrl,
 				name = "RedSummerCampHelperMenu.Show", 
 				isShowTitleBar = false,
 				DestroyOnClose = true,
@@ -790,10 +840,25 @@ function RedSummerCampMainPage.IsFinishVideo()
 end
 
 function RedSummerCampMainPage.UpdateVideoRedTip()
-	local uiObj = ParaUI.GetUIObject("red_tip")
-	if uiObj and uiObj:IsValid() then
-		uiObj.visible = not RedSummerCampMainPage.IsFinishVideo()
+	local IsFinishVideo = RedSummerCampMainPage.IsFinishVideo()
+	if IsFinishVideo then
+		local uiObj = ParaUI.GetUIObject("red_tip")
+		if uiObj and uiObj:IsValid() then
+			uiObj.visible = false
+		end
+		return
 	end
+	RedSummerCampMainPage.UpdateRedTipTimer = RedSummerCampMainPage.UpdateRedTipTimer or commonlib.Timer:new({callbackFunc = function(timer)
+		local uiObj = ParaUI.GetUIObject("red_tip")
+		local IsFinishVideo = RedSummerCampMainPage.IsFinishVideo()
+		if uiObj and uiObj:IsValid() then
+			uiObj.visible = not IsFinishVideo
+		end
+		if IsFinishVideo then
+			timer:Change()
+		end
+	end})
+	RedSummerCampMainPage.UpdateRedTipTimer:Change(0, 1000);
 end
 
 function RedSummerCampMainPage.RefreshPage()
@@ -889,22 +954,6 @@ function RedSummerCampMainPage.HandleQuestRedTip()
 end
 
 function RedSummerCampMainPage.HandleFriendsRedTip()
-	if not RedSummerCampMainPage.IsVisible() then
-		if RedSummerCampMainPage.CheckRedTipTimer then
-			RedSummerCampMainPage.CheckRedTipTimer:Change()
-			RedSummerCampMainPage.CheckRedTipTimer = nil
-		end
-		return
-	end
-
-	if nil == RedSummerCampMainPage.CheckRedTipTimer then
-		RedSummerCampMainPage.CheckRedTipTimer = commonlib.Timer:new({callbackFunc = function(timer)
-			RedSummerCampMainPage.HandleFriendsRedTip()
-		end})
-
-		RedSummerCampMainPage.CheckRedTipTimer:Change(60000, 60000);
-	end
-
 	FriendManager:LoadAllUnReadMsgs(function ()
 		-- 处理未读消息
 		if FriendManager.unread_msgs and FriendManager.unread_msgs.data then
@@ -1031,6 +1080,8 @@ function RedSummerCampMainPage.GetVipTimeIconDiv(margin_top,click_func_name)
 end
 
 function RedSummerCampMainPage.EnterWorldFail()
+	NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 	WorldCommon.SetParentProjectId()
 	GameLogic.GetFilters():remove_filter("enter_world_fail",RedSummerCampMainPage.EnterWorldFail)
 	if not RedSummerCampMainPage.IsVisible() then

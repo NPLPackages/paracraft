@@ -223,13 +223,15 @@ end
 -- @return: return true if it is an action block and processed . 
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	if(GameLogic.isRemote) then
-		if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
-			self:OpenEditor("entity", entity);	
+		if(mouse_button=="right") then
+			if(GameLogic.GameMode:CanEditBlock() and not self:IsLocked()) then
+				self:OpenEditor("entity", entity);	
+				return true;
+			end
 		end
 	else
 		return Entity._super.OnClick(self, x, y, z, mouse_button, entity, side);
 	end
-	return true;
 end
 
 -- Overriden to provide the network packet for this entity.
@@ -394,5 +396,18 @@ function Entity:FindFile(text, bExactMatch)
 	local code = self:GetText()
 	if(code) then
 		return mathlib.StringUtil.FindTextInLine(code, text, bExactMatch)
+	end
+end
+
+-- whether this entity is locked.
+function Entity:IsLocked()
+	return self.bx and not GameLogic.EditableWorld:IsEditableBlock(self.bx, self.by, self.bz)
+end
+
+function Entity:SetLocked(bLocked)
+	if(not bLocked) then
+		GameLogic.EditableWorld:AddEditablePos(self.bx, self.by, self.bz)
+	else
+		GameLogic.EditableWorld:RemoveEditablePos(self.bx, self.by, self.bz)
 	end
 end

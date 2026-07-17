@@ -81,13 +81,46 @@ function GetIdleAnimDS()
     };
 end
 function GetMountPointDS()
-    return EditModelProperty.mountpoints or {}
+    local points = EditModelProperty.mountpoints or {}
+    if #points <= 3 then
+        return points
+    end
+    local ds = {}
+    for i,v in ipairs(points) do
+        if i <= 3 then
+            ds[#ds+1] = v
+        else
+            break
+        end
+    end
+    return ds
+end
+
+function GetMountPointDS_Ex()
+    local points = EditModelProperty.mountpoints or {}
+    if #points <= 3 then
+        return points
+    end
+    local ds = {}
+    for i,v in ipairs(points) do
+        if i > 3 then
+            ds[#ds+1] = v
+        end
+    end
+    echo(ds,true)
+    return ds
+end
+
+function IsExpandMount()
+    local points = EditModelProperty.mountpoints or {}
+    return #points > 3
 end
 
 function GetCategoryDS()
     return {
         {value="", text=L"默认", selected=true},
         {value="disabled", text=L"禁用",},
+        {value="staticblock", text=L"静态积木",},
         {value="character", text=L"人物",},
         {value="bigobject", text=L"大物品",},
         {value="smallobject", text=L"小物品",},
@@ -144,6 +177,7 @@ end
             <div style="float:left;" ><%=L"模型:"%></div>
             <input type="text" uiname="EditModelProperty.modelfile" name="modelfile" style="width:200px;height:24px;"/>
             <!--<input type="button" value="..." uiname="EditModelProperty.openmodelfile" name="openmodelfile" style="" class="mc_light_grey_button_with_fillet" onclick="EditModelProperty.OnOpenModelFile" />-->
+            <input type="button" value="换肤" uiname="EditModelProperty.changeskin" name="changeskin" style="margin-left:5px;" class="mc_light_grey_button_with_fillet" onclick="EditModelProperty.OnChangeSkin" />
         </div>
     </div>
         
@@ -167,6 +201,10 @@ end
             <input uiname="EditModelProperty.enableDropFall"  type="checkbox" name="enableDropFall" checked="checked" style="margin-top:3px;"/>
             <div style="float:left" for="enableDropFall"><%=L"拖动后掉落"%></div>
         </div>
+        <div style="float: left; margin-left: 10px;min-width:100px;">
+            <input uiname="EditModelProperty.isLocked"  type="checkbox" name="isLocked" checked="checked" style="margin-top:3px;"/>
+            <div style="float:left" for="isLocked" tooltip ="锁定后无法编辑和删除，可在Ctrl+F搜索中取消"><%=L"锁定"%></div>
+        </div>
     </div>
     <div style="margin-top: 5px;">
         <div style="float: left;">
@@ -182,8 +220,12 @@ end
         <pe:if condition='<%=#GetIdleAnimDS()>0%>'>
             <div style="float: left; margin-left: 20px;">
                 <%=L"待机动画:"%>
-                <select uiname="EditModelProperty.idleAnim" name="idleAnim" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetIdleAnimDS()%>'>
+                <select uiname="EditModelProperty.idleAnim" name="idleAnim" style="height:24px;" DataSource='<%=GetIdleAnimDS()%>'>
                 </select>
+            </div>
+            <div style="float: left; margin-left: 10px;">
+                <div style="float: left;" tooltip='<%=L"非空，将定格动画在指定帧"%>'><%=L"动画帧:"%></div>
+                <input type="text" uiname="EditModelProperty.animFrame" name="animFrame" style="width:60px;height:24px;" />
             </div>
         </pe:if>
     </div>
@@ -191,6 +233,11 @@ end
         <div style="float: left;">
             <input uiname="EditModelProperty.isDisplayModel"  type="checkbox" name="isDisplayModel" checked="checked" style="margin-top:3px;"/>
             <div style="float:left" for="isDisplayModel"><%=L"显示模型"%></div>
+        </div>
+        <div style="float: left;margin-left: 20px;">
+            <%=L"颜色:"%>
+            <input type="text" uiname="EditModelProperty.color" name="color" value="" style="width:60px;height:24px;"/>
+            <input type="button" value="选择" uiname="EditModelProperty.choosecolor" name="choosecolor" style="" class="mc_light_grey_button_with_fillet" onclick="EditModelProperty.OnChooseColor" />
         </div>
         <div style="float: left;margin-left: 20px;">
             <%=L"透明度:"%>
@@ -212,7 +259,7 @@ end
             <select uiname="EditModelProperty.category" name="category" AllowUserEdit="true" style="min-width:70px;height:24px;" DataSource='<%=GetCategoryDS()%>'></select>
         </div>
         <div style="float: left;margin-left: 20px;">
-            <div style="float:left" tooltip='<%=L"逗号分割,例如: lefthand,food"%>'><%=L"静态标签:"%></div>
+            <div style="float:left" onclick="EditModelProperty.ShowStaticPhysicsPropertiesEditor" tooltip='<%=L"逗号分割,例如: lefthand,food"%>'><%=L"静态标签:"%></div>
             <input type="text" uiname="EditModelProperty.staticTag" EmptyText="food, ..." name="staticTag" style="width:100px;height:24px;"/>
         </div>
         <div style="float: left; margin-left: 20px;">
@@ -224,13 +271,31 @@ end
         <div style="float:left;width:90px;">
             <div tooltip='<%=L"sit,lie,eat"%>'><%=L"插件点名称:"%></div>
         </div>
-        <div style="float:left;width:280px;height:50px;">
+        <div style="float:left;width:280px;height:30px; background-color: #00000033;">
             <pe:repeat name="mountpoints" DataSource="<%=GetMountPointDS()%>">
-                <pe:repeatitem style="float:left;width:80px;height:25px;">
-                    <input type="text" tooltip='<%=format(L"插件点%d", Eval("index"))%>' uiname='<%=format(L"EditModelProperty.mountpoint%d", Eval("index"))%>' name='<%=format(L"mountpointName%d", Eval("index"))%>' value="<%=Eval('name')%>" style="margin-left:5px;width:70px;height:24px;" onchange="EditModelProperty.OnTextChange"/>
+                <pe:repeatitem style="float:left;width:80px;height:25px; ">
+                    <input type="text" tooltip='<%=format(L"插件点%d", Eval("index"))%>' uiname='<%=format(L"EditModelProperty.mountpoint%d", Eval("index"))%>' name='<%=format(L"mountpointName%d", Eval("index"))%>' value="<%=Eval('name')%>" style="margin-left:5px;margin-top: 2px;width:70px;height:24px;" onchange="EditModelProperty.OnTextChange"/>
                 </pe:repeatitem>
             </pe:repeat>
+
+            <pe:if condition='<%=IsExpandMount()%>'>
+                <input type="button" name="expandmountpoint" uinam="EditModelProperty.expandmountpoint" onclick="EditModelProperty.OnClickExpand" tooltip="<%=L'更多插件点'%>" style="float: left; margin-left: 5px; margin-top: 2px; width: 25px; height: 25px; background:url(Texture/Aries/Creator/keepwork/WorldKey/btn_xiala_38X36_32bits.png#0 0 38 36)" />
+                <pe:container zorder="3" uiname="EditModelProperty.mountpoints_container" visible="false" style="width: 250px; height: 110px; background-color: #ffffff;">
+                    <pe:treeview VerticalScrollBarOffsetX="4" style="margin-top: 6px; width: 250px; height: 100px; background: url();">
+                        <div style="width: 250px; margin-left: -10px;">
+                            <pe:repeat name="mountpoints_2" DataSource="<%=GetMountPointDS_Ex()%>">
+                                <pe:repeatitem style="float: left; width: 70px; height: 25px;">
+                                    <div style="float: left; margin-left: 5px; margin-top: 2px; width: 70px; height: 25px; background-color: #ff00cc00;">
+                                        <input type="text" tooltip='<%=format(L"插件点%d", Eval("index"))%>' uiname='<%=format(L"EditModelProperty.mountpoint%d", Eval("index"))%>' name='<%=format(L"mountpointName%d", Eval("index"))%>' value="<%=Eval('name')%>" style="width:70px;height:24px;" onchange="EditModelProperty.OnTextChange"/>
+                                    </div>
+                                </pe:repeatitem>
+                            </pe:repeat>
+                        </div>
+                    </pe:treeview>
+                </pe:container>
+            </pe:if>
         </div>
+        
         <pe:if condition='<%=EditModelProperty.GetEntity() and EditModelProperty.GetEntity():HasRule()%>'>
         <div style="float:left;height:50px;">
             <div style="float:left;padding-left:5px;padding-right:5px;"><%=L"AI物品:"%></div>
@@ -280,6 +345,20 @@ end
             <div style="float: left; margin-left: 10px;">
                 <div class="link_button" uiname="EditModelProperty.onEndDragEventMore" name="onEndDragEventMore" onclick="EditModelProperty.OnClickBuildinFunctions" tooltip='<%=L"结束拖动事件:".."\n".."/sendevent __entity_onenddrag {x,y,z,name,targetName}\nreturn true to restore drop location."%>'><%=L"结束拖动:"%></div>
                 <input type="text" uiname="EditModelProperty.onEndDragEvent" name="onEndDragEvent" style="min-width:50px;max-width:120px;height:24px;"/>
+            </div>
+        </div>
+        <div>
+            <div style="float: left;">
+                <input uiname="EditModelProperty.isTrigger"  type="checkbox" name="isTrigger" checked="checked" style="margin-top:3px;"/>
+                <div style="float:left" for="isTrigger" tooltip='<%=L"当主角与本模型接触与离开时，是否发触碰消息"%>'><%=L"是否触碰"%></div>
+            </div>
+            <div style="float: left; margin-left: 10px;">
+                <div class="link_button" uiname="EditModelProperty.onTriggerEnterEventMore" name="onTriggerEnterEventMore" onclick="EditModelProperty.OnClickBuildinFunctions"  tooltip='<%=L"触碰开始事件:".."\n".."/sendevent __entity_ontriggerenter {x,y,z,name,targetName}"%>'><%=L"触碰开始:"%></div>
+                <input type="text" uiname="EditModelProperty.onTriggerEnterEvent" name="onTriggerEnterEvent" style="width:120px;height:24px;"/>
+            </div>
+            <div style="float: left; margin-left: 10px;">
+                <div class="link_button" uiname="EditModelProperty.onTriggerExitEventMore" name="onTriggerExitEventMore" onclick="EditModelProperty.OnClickBuildinFunctions" tooltip='<%=L"触碰结束事件:".."\n".."/sendevent __entity_ontriggerexit {x,y,z,name,targetName}\nreturn true to restore drop location."%>'><%=L"触碰结束:"%></div>
+                <input type="text" uiname="EditModelProperty.onTriggerExitEvent" name="onTriggerExitEvent" style="width:120px;height:24px;"/>
             </div>
         </div>
     </div>

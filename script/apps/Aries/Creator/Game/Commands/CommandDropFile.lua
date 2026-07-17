@@ -41,11 +41,15 @@ other files...
 		local filename = commonlib.Encoding.Utf8ToDefault(cmd_text);
 		local ext = filename:match("%.(%w+)$");
 		ext = ext and ext:lower();
-		if(ext == "zip") then
+		if not GameLogic.options.CanDropFile then
+			GameLogic.AddBBS(nil,L"拖入文件失败，当前世界禁止拖入文件")
+			return
+		end
+		if(ext == "zip" or ext == "pkg" or ext == "p3d") then
 			DragDropHandlers.handleZipFile(filename);
 		elseif(filename:match("%.blocks%.stream%.xml$")) then
 			DragDropHandlers.handleBlockStreamFile(filename)
-		elseif(ext == "fbx" or ext == "glb" or ext == "gltf" or ext == "x" or ext == "bmax" or filename:match("%.blocks%.xml$")) then
+		elseif(ext == "fbx" or ext == "glb" or ext == "gltf" or ext == "x"  or ext == "ply" or ext == "bmax" or filename:match("%.blocks%.xml$")) then
 			DragDropHandlers.handleModelFile(filename, ext);
 		end
 	end,
@@ -55,7 +59,7 @@ other files...
 -- @param filename: file name of the zip archive file. such as "temp/abc.zip"
 -- @return nil | "world" | "blocktexture" | "mod" | "npl_package"
 function DragDropHandlers.GetZipFileType(filename)
-	if(filename:match("%.zip$") and ParaAsset.OpenArchive(filename, false)) then
+	if((filename:match("%.zip$") or filename:match("%.pkg$") or filename:match("%.p3d$")) and ParaAsset.OpenArchive(filename, false)) then
 		local zipType;
 		if(not zipType) then
 			local result = commonlib.Files.Find({}, "", 0, 1, "Mod/*/main.lua", filename);
@@ -99,24 +103,24 @@ end
 
 function DragDropHandlers.handleZipFile(filename)
 	local beWorld;
-	local name = filename:match("[/\\]([^/\\]+%.zip)$");
-	local file_dir = string.gsub(filename,name,"");
+	local name = filename:match("[/\\]([^/\\]+%.%w%w%w)$");
+	local file_dir = string.gsub(filename, name, "");
 	local temp_dir = ParaIO.GetWritablePath().."temp/dropfiles/";
 	local temp_path = temp_dir..name;
-	local zipType;
-	if(ParaIO.CopyFile(filename, temp_path, true)) then
-		zipType = DragDropHandlers.GetZipFileType(temp_path)
-		ParaIO.DeleteFile(temp_path);
-	end
+	local zipType = DragDropHandlers.GetZipFileType(filename)
 	LOG.std(nil, "info", "handleZipFile", "%s is of type %s", filename, zipType or "unknown");
+
 	if(zipType == "blocktexture") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/TextureModPage.lua");
 		local TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
 		TextureModPage.InstallTexturePack(filename);
 	elseif(zipType == "world") then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/EnterGamePage.lua");
-		local EnterGamePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnterGamePage");
-		EnterGamePage.OnOpenPkgFile(filename)
+		_guihelper.MessageBox(format(L"确定要打开外部世界: %s?", filename), function(res)
+			if(res == _guihelper.DialogResult.Yes) then
+				GameLogic.RunCommand("/loadworld "..filename)
+			end
+		end, _guihelper.MessageBoxButtons.YesNo);
+		
 	elseif(zipType == "mod") then
 		_guihelper.MessageBox(format(L"确定要安装Mod插件: %s?", name), function(res)
 			if(res == _guihelper.DialogResult.Yes) then

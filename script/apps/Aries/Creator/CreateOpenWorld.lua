@@ -328,7 +328,8 @@ function CreateOpenWorld.OnClickLoadWorld()
 			CreateOpenWorld.ClosePage();
 			WorldCommon.OpenWorld(world.worldpath, CreateOpenWorld.IsNewVersion)
 		else
-			_guihelper.MessageBox("无效的世界文件");
+			GameLogic.AddBBS(nil,"进入世界失败，请重试~~~")
+        	GameLogic.SendErrorLog("CreateOpenWorld","load world failed","load world failed============")
 		end
 	end
 end

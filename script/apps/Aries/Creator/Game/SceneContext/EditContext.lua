@@ -182,7 +182,7 @@ function EditContext:handleLeftClickScene(event, result)
 	if( self.left_holding_time < 150) then
 		if(result and (result.obj or result.entity) and (not result.block_id or result.block_id == 0)) then
 			-- for scene object selection, blocks has higher selection priority.  
-			if(event.alt_pressed and result.entity) then
+			if(event.alt_pressed and result.entity and not result.entity:IsLocked()) then
 				-- alt + left button to pick entity to item stack. 
 				GameLogic.GetPlayerController():PickItemByEntity(result.entity);
 			else
@@ -221,7 +221,7 @@ function EditContext:handleLeftClickScene(event, result)
 					-- alt + left click to get the block in hand without destroying it
 					if(result.block_id) then
 						GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ, result.side);
-					elseif(result.entity) then
+					elseif(result.entity and not result.entity:IsLocked()) then
 						GameLogic.GetPlayerController():PickItemByEntity(entity);
 					end
 				elseif(ctrl_pressed and result and result.blockX) then
@@ -409,6 +409,9 @@ function EditContext:keyPressEvent(event)
 		event:accept();
 	elseif(dik_key == "DIK_0") then
 		-- activate last memory
+		if(not EntityManager.GetPlayer()) then
+			return
+		end
 		local memoryContext = EntityManager.GetPlayer():GetMemoryContext();
 		if(memoryContext) then
 			GameLogic.AddBBS("memory", "force working memory activation");

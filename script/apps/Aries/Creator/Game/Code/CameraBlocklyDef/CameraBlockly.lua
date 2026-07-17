@@ -8,9 +8,6 @@ use the lib:
 local CameraBlockly = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CameraBlockly.lua");
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharing.lua");
 local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 local CodeActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
 local VideoSharing = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharing");
@@ -121,6 +118,7 @@ end
 
 function CameraBlockly.RunAndExportVideo()
 	CodeBlockWindow.CloseEditorWindow();
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharing.lua");
 	VideoSharing.ToggleRecording(1, function()
 		CodeBlockWindow.OnClickCompileAndRun(function()
 			VideoSharing.StopRecording();

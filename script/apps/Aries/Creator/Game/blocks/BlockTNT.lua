@@ -81,7 +81,7 @@ end
 -- Called upon block activation (right click on the block.)
 function block:OnActivated(x, y, z, entityPlayer)
 	if(not GameLogic.isRemote) then
-		if (entityPlayer and entityPlayer:GetItemInRightHand() and self:IsTriggerBlock(entityPlayer:GetItemInRightHand().id)) then
+		if (entityPlayer and entityPlayer.GetItemInRightHand and entityPlayer:GetItemInRightHand() and self:IsTriggerBlock(entityPlayer:GetItemInRightHand().id)) then
 			BlockEngine:SetBlockToAir(x, y, z);
 			self:ExplodeNearbyBlocks(x, y, z, 1, entityPlayer);
 			-- TODO: decrease count

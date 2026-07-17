@@ -31,7 +31,7 @@ function DefaultFilters.worldFileChanged(msg)
 		local isAsset;
 		if(ext == "fbx" or ext == "x") then
 			isAsset = true;
-		elseif(ext == "bmax") then
+		elseif(ext == "bmax" or ext == "ply") then
 			isAsset = true;
 		elseif(ext == "png" or ext == "jpg") then
 			isAsset = true;

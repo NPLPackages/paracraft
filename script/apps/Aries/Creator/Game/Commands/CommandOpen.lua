@@ -106,13 +106,15 @@ local mcml2_window = nil;
 
 Commands["open"] = {
 	name="open", 
-	quick_ref="/open [-p] [-d] url", 
+	quick_ref="/open [-p] [-d] [-ai] url", 
 	desc=[[open url in external browser
 @param -p: if -p is used, it will ask user for permission. 
 @param -d: url is a directory
+@param -webview: open fullscreen webview in paracraft
 Examples: 
 /open http://www.paraengine.com
 /open -name test_wnd_1 -title 窗口 -width 800 -height 600 -alignment _ct https://keepwork.com
+/open -webview http://127.0.0.1:8099/console
 /open -p http://www.paraengine.com
 /open npl://learn	open NPL code wiki pages
 /open -d temp/
@@ -121,7 +123,9 @@ Examples:
 /open mcml1://hello.html    open with mcml v1
 /open mcml2://hello.html    open with mcml v2
 /open paracraft://cmd/loadworld Worlds/DesignHouse/GGSDemo
-/open self    open another instance of current world
+/open self open another instance of current world
+/open -ai 		will open characterManager
+/open -gameName characterManager 	will open characterManager
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options = {};
@@ -136,20 +140,70 @@ Examples:
 			elseif(option == "name" or option == "alignment" or option == "title") then
 				value, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);
 				options[option] = value;
+			elseif(option == "webview") then
+				value, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);
+				options[option] = value;
+			elseif(option == "gameName" or option == "projectPath") then
+				value, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);
+				options[option] = value;
 			else
 				options[option] = true;
 			end
 		end
 
+		if(options.ai) then
+			options.gameName = "characterManager";
+		end
+
 		local url = cmd_text;
 		url = GameLogic.GetFilters():apply_filters("cmd_open_url", url, options);
+		if(not url and not options.gameName) then
+			return;
+		end
 
-		if(not url) then
+		if(options.gameName) then
+			local gameName = options.gameName;
+			local projectPath = options.projectPath or "maisi/maisi/webgames/data";
+			local arg_str = url; -- use remaining cmd_text as arg_str
+			
+			local open_url = string.format(
+					"https://keepwork.com/public/resource/miniGameProxy.html?projectPath=%s&gameName=%s%s",
+					projectPath, gameName, arg_str or "")
+			local env
+			if (type(System.os.IsEmscripten) == 'function' and System.os.IsEmscripten()) then
+				env = 'asIframeInWebParacraft'
+			else
+				env = 'asWebviewInParacraftClient'
+			end
+			if open_url ~= nil and open_url ~= "" then
+				local sep = open_url:find("?") and "&" or "?"
+				open_url = string.format("%s%s%s=true", open_url, sep, env)
+				local MiniGamePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGamePage.lua")
+				MiniGamePage.OpenBrowser(open_url, function()
+						LOG.std(nil, "info", "cmd_open", "close webview %s", gameName);
+				 end);
+			end
 			return;
 		end
 
 		if(options.d) then
 			Map3DSystem.App.Commands.Call("File.WinExplorer", url);
+		elseif(options.webview and options.webview ~= "") then
+			local env
+			if (type(System.os.IsEmscripten) == 'function' and System.os.IsEmscripten()) then
+				env = 'asIframeInWebParacraft'
+			else
+				env = 'asWebviewInParacraftClient'
+			end
+			local open_url = options.webview
+			if open_url ~= nil and open_url ~= "" then
+				local sep = open_url:find("?") and "&" or "?"
+				open_url = string.format("%s%s%s=true", open_url, sep, env)
+				local MiniGamePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGamePage.lua")
+				MiniGamePage.OpenBrowser(open_url,function() 
+					LOG.std(nil, "info", "cmd_open", "close webview %s", options.webview);
+				end)
+			end
 		elseif(url) then
 			local protocol = url:match("^(%w+)://");
 			if(not protocol) then
@@ -250,16 +304,26 @@ Examples:
 
 Commands["registerurlprotocol"] = {
 	name="registerurlprotocol", 
-	quick_ref="/registerurlprotocol", 
+	quick_ref="/registerurlprotocol [-p3d]", 
 	desc=[[register url protocol, so that we can download and open url from web browser directly. 
-Currently only supported on window platform.
+Or double click *.p3d file to open the world. Currently only supported on window platform.
+
+/registerurlprotocol      register url protocol
+/registerurlprotocol -p3d    register p3d file extension
 Examples:
 paracraft://cmd/loadworld https://github.com/LiXizhi/HourOfCode/archive/master.zip
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua");
 		local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlProtocolHandler");
-		UrlProtocolHandler:RegisterUrlProtocol()
+		
+		local option;
+		option, cmd_text = CmdParser.ParseOption(cmd_text);	
+		if(option == "p3d") then
+			UrlProtocolHandler:RegisterFileExtensionProtocol()
+		else
+			UrlProtocolHandler:RegisterUrlProtocol()
+		end
 	end,
 };
 
@@ -271,6 +335,7 @@ Commands["hasurlprotocol"] = {
 Examples:
 /hasurlprotocol
 /hasurlprotocol paracraft://     check url protocol
+/hasurlprotocol p3d      check p3d file extension
 /if $(hasurlprotocol paracraft)==true /tip protocol installed
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
@@ -282,6 +347,36 @@ Examples:
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua");
 		local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlProtocolHandler");
-		return UrlProtocolHandler:HasUrlProtocol(protocol_name)
+
+		if(protocol_name == "p3d") then
+			return UrlProtocolHandler:HasFileExtensionProtocol()
+		else
+			return UrlProtocolHandler:HasUrlProtocol(protocol_name)
+		end
+	end,
+};
+
+Commands["start"] = {
+	name="start", 
+	quick_ref="/start [npl|nplcodewiki|vscode]", 
+	desc=[[start a given service
+Examples:
+/start npl     start nplcodewiki
+/start vscode
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local serviceName = CmdParser.ParseWord(cmd_text)
+		if(serviceName == "nplcodewiki" or serviceName == "npl") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
+			local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
+			NPLWebServer.CheckServerStarted();
+		elseif(serviceName == "vscode") then
+			if(not GameLogic.IsReadOnly()) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockFileSync.lua");
+				local CodeBlockFileSync = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockFileSync");
+				CodeBlockFileSync:InitWorldFolder();
+				CodeBlockFileSync:OpenInVsCode()
+			end
+		end
 	end,
 };

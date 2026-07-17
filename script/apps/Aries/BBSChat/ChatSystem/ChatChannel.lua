@@ -91,9 +91,11 @@ ChatChannel.channels = {
 
 {name="本地",bshow=true,color="ffffff",}, -- "KpNearBy" 21
 {name="全局",bshow=true,color="fced4b",}, -- "KpBroadCast" 22
-{name="官方公告",bshow=true,color="fced4b",}, -- "KpSystem" 23
-{name="学校",bshow=true,color="ffa74f",}, -- "KpSchool" 24
-{name="好友",bshow=true,color="00dcff",}, -- "KpFriend" 25
+{name="官方公告",bshow=false,color="fced4b",}, -- "KpSystem" 23
+{name="学校",bshow=false,color="ffa74f",}, -- "KpSchool" 24
+{name="好友",bshow=false,color="00dcff",}, -- "KpFriend" 25
+{name="组队",bshow=true,color="067AFE",}, -- "KpTeam" 26
+{name="私聊",bshow=true,color="A641E9",}, -- "KpPrivate" 27
 };
 
 ChatChannel.channels_theme_kids = ChatChannel.channels;
@@ -121,6 +123,8 @@ local EnumChannels = {
 	KpSystem = 23,
 	KpSchool = 24,
 	KpFriend = 25,
+	KpTeam = 26,
+	KpPrivate = 27,
     KpMax = 29,
 }
 ChatChannel.EnumChannels = EnumChannels;
@@ -163,7 +167,7 @@ function ChatChannel.Init()
 	end
 
 	if(ChatChannel.ChannelIndexAssemble==nil)then
-		ChatChannel.SetAppendEventCallbackFilter({1,2,3,4,5,6,7,8,9,11,12,13,14,21,22,23});
+		ChatChannel.SetAppendEventCallbackFilter({1,2,3,4,5,6,7,8,9,11,12,13,14,21,22,23,26,27});
 	end
 
 	NPL.load("(gl)script/ide/Network/StreamRateController.lua");
@@ -315,7 +319,6 @@ function ChatChannel.AppendChat(msgdata, bIgnoreSelf, nid)
 			return;
 		end
 	end
-
 	ChatChannel.ValidateMsg(msgdata, ChatChannel.OnProcessMsg);
 end
 
@@ -327,7 +330,7 @@ function ChatChannel.OnProcessMsg(msgdata)
 	msgdata.color = channel.color;
 	table.insert( ChatChannel.chatdata, msgdata );
 
-	local is_skip_msg;
+	local is_skip_msg = msgdata.skip_in_chatwnd;
 	--if( msgdata.words and msgdata.words:match("^<") ) then
 		--local xmlRoot = ParaXML.LuaXML_ParseString(msgdata.words);
 		--if(xmlRoot) then
@@ -377,8 +380,12 @@ function ChatChannel.OnProcessMsg(msgdata)
 	end
 
 	if(not is_skip_msg) then
-		if(ChatChannel.callback and type(ChatChannel.callback)=="function" and (ChatChannel.AppendFilter[msgdata.ChannelIndex] or msgdata.ChannelIndex == EnumChannels.BroadCast  ))then
-			ChatChannel.callback(msgdata,true);
+		if(ChatChannel.callback and type(ChatChannel.callback)=="function" and (ChatChannel.AppendFilter[msgdata.ChannelIndex] or msgdata.ChannelIndex == EnumChannels.BroadCast))then
+			if ChatChannel.Is_Keepwork_Channel(msgdata.ChannelIndex) then
+				ChatChannel.CheckInBlackList(msgdata)
+			else
+				ChatChannel.callback(msgdata,true);
+			end
 		end
 		--NOTE:added by leio,used for lobby chat
 		if((msgdata.ChannelIndex == EnumChannels.AllTeam or msgdata.ChannelIndex == EnumChannels.BroadCast or msgdata.ChannelIndex == EnumChannels.Lobby) and ChatChannel.callback_lobbychat and type(ChatChannel.callback_lobbychat)=="function")then
@@ -447,6 +454,7 @@ function ChatChannel.SendMessage_Keepwork(ChannelIndex, to, toname, words, input
 
     NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
     local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+	local ChatManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatManager.lua");
 
 	local generatorName = WorldCommon.GetWorldTag("world_generator");
 
@@ -468,6 +476,14 @@ function ChatChannel.SendMessage_Keepwork(ChannelIndex, to, toname, words, input
             return
         end
     end
+	local chat_chanel = ChatManager.GetChatChanel(words)
+	if (chat_chanel and type(chat_chanel) == "number" ) then
+		ChannelIndex = chat_chanel
+	end
+	if ChannelIndex == ChatChannel.EnumChannels.KpTeam or ChannelIndex == ChatChannel.EnumChannels.KpPrivate then
+		local result = ChatManager.SendMessage(ChannelIndex, words,"text");
+		return result
+	end
 
     local msgdata = KpChatChannel.CreateMessage(ChannelIndex, to, toname, words, nil, nil, projectId);
 
@@ -567,6 +583,24 @@ function ChatChannel.SendMessage_Keepwork(ChannelIndex, to, toname, words, input
         end
 
 	    ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+	elseif  (msgdata.ChannelIndex == EnumChannels.KpNearBy) then --走ggschat
+		NPL.load("Mod/GeneralGameServerMod/App/Client/AppGeneralGameClient.lua");
+		local AppGeneralGameClient = commonlib.gettable("Mod.GeneralGameServerMod.App.Client.AppGeneralGameClient");
+		if not AppGeneralGameClient:IsLogin() then
+			ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+			return true
+		end
+		local world = AppGeneralGameClient:GetWorld()
+		if not world then
+			ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+			return true
+		end
+		local playerManager = world:GetPlayerManager()
+		if not playerManager then
+			ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+			return true
+		end
+		playerManager:SendUserChat(msgdata)
     else
 	    ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
     end
@@ -952,5 +986,31 @@ function ChatChannel.Is_Keepwork_Channel(index)
     if(index ~= nil and index >= ChatChannel.EnumChannels.KpNearBy and index <= ChatChannel.EnumChannels.KpMax)then
         return true;
     end
+end
+
+function ChatChannel.CheckInBlackList(msgdata)
+	local userId ,username
+	if (msgdata.ChannelIndex == EnumChannels.KpNearBy) then
+		userId = msgdata.kp_from_id
+		username = msgdata.kp_username
+	elseif (msgdata.ChannelIndex == EnumChannels.KpPrivate) then
+		userId = msgdata.msgUserId
+		username = msgdata.msgUsername
+	elseif (msgdata.ChannelIndex == EnumChannels.KpTeam) then
+		userId = msgdata.userId
+		username = msgdata.username
+	end
+	local ChatManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatManager.lua");
+	ChatManager.CheckInBlackList(userId,function(result)
+		if (result) then
+			LOG.std(nil, "debug", "chat", "CheckInBlackList:userId="..userId.." username="..username.." is in black list");
+			table.remove(ChatChannel.chatdata)
+			return
+		end
+		if ChatChannel.callback and type(ChatChannel.callback)=="function" then
+			ChatChannel.callback(msgdata,true);
+		end
+		GameLogic.GetFilters():apply_filters("process_chat_msg", msgdata)
+	end)
 end
 

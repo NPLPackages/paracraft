@@ -173,6 +173,24 @@ function NplMicrobit.CompileCode(code, filename, codeblock)
         codeLanguageType = entity:GetCodeLanguageType();
     end
     if(codeLanguageType == "python")then
+        local hasPythonSupport = ParaEngine.GetAttributeObject():GetFieldIndex("PythonToLua") >= 0;
+		if (hasPythonSupport) then
+			code = code.."\n" -- python requires the last line to be a new line.
+			ParaEngine.GetAttributeObject():SetField("PythonToLua", code); 
+			local luacode = ParaEngine.GetAttributeObject():GetField("PythonToLua") or "";
+			LOG.std(nil, "debug", "python code:", code)
+			
+			luacode = [[local py_env, env_error_msg = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/polyfill.lua")
+local code_env = codeblock:GetCodeEnv()
+py_env['_set_codeblock_env'](code_env)
+for name, api in pairs(py_env) do
+	code_env[name] = api
+end
+]]..luacode
+			LOG.std(nil, "debug", "npl code:", luacode)
+			return compiler:Compile(luacode);
+		end
+
         local pyruntime = NPL.load("Mod/PyRuntime/Transpiler.lua")
 		if(not ParacraftCodeBlockly.isPythonRuntimeLoaded) then
 			ParacraftCodeBlockly.isPythonRuntimeLoaded = true;

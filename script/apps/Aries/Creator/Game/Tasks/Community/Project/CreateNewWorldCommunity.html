@@ -1,0 +1,80 @@
+<!-- script/apps/Aries/Creator/Game/Tasks/Community/Project/CreateNewWorldCommunity.html -->
+<body>
+    <pe:mcml>
+        <script type='text/npl'>
+            <![CDATA[
+                NPL.load("(gl)script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua");
+                local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+                local CreateNewWorldCommunity = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Community/Project/CreateNewWorldCommunity.lua")
+                CreateNewWorldCommunity.OnInit()
+                local page = document:GetPageCtrl()
+
+                function close_page()
+                    page:CloseWindow()
+                    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.community.create_new_world.click_cancel", {useNoId=true},nil,true);
+                end
+
+                function create_new_world()
+                    CreateNewWorldCommunity.CreateNewWorld()
+                end
+
+                function GetImageUrl()
+                    return CreateNewWorldCommunity.GetImageUrl()
+                end
+
+                function IsFroceCreate()
+                    return CreateNewWorldCommunity.IsFroceCreate()
+                end
+
+                function GetWorldName()
+                    return CreateNewWorldCommunity.GetFolderName()
+                end
+
+                function OnWorldNameChange()
+                    CreateNewWorld.LastWorldName = page:GetUIValue("new_world_name", "");
+                end
+
+                
+                function GetInputStyle()
+                    if Mod.WorldShare.Utils.IsEnglish() then
+                        return "float: left; margin-top: -6px; margin-left: 14px; width: 344px; height: 40px; background-color: #262626; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"
+                    end
+                    return "float: left; margin-top: -6px; margin-left: 14px; width: 380px; height: 40px; background-color: #262626; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"
+                end
+            ]]>
+        </script>
+        <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+            <pe:container alignment="_ct" width="520" height="480" style="margin-left:-260px;margin-top:-240px;background-color: #3D3D3D; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+                <div style="width: 472px; height: 270px; margin-left: 24px; margin-top: 24px; background-color: #C9C5B3;">
+                    <img src="<%=GetImageUrl()%>"  style="width: 470px; height: 268px; margin-left: 1px; margin-top: 1px;"/>
+                </div>
+                <div style="margin-top: 12px; width: 520xp; height: 30px; text-align: center; color: #d3d3d3; font-size: 20px; base-font-size: 20px; font-weight: bold; "><%=L"新建世界"%></div>
+                <div style="margin-top: 16px; width: 470px; margin-left: 24px; height: 40px; ">
+                    <div style="float: left; color: #d3d3d3; font-size: 16px; base-font-size: 16px; font-weight: bold;"><%=L"世界名称:"%></div>
+                    <div style="<%=GetInputStyle()%>">
+                        <input type="text" width="90%" SkipAutoBadWordFilter="true" ReadOnly="<%= IsFroceCreate() %>" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" onkeyup="OnWorldNameChange" style="float:left;margin-top:6px;margin-left:10px;height:25px; textcolor: #d3d3d3; background: url();"/>
+                    </div>
+                </div>
+                <div style="margin-top: 18px; margin-left: 24px;">
+                    <div width='130'
+                            style='float: left;
+                                padding-right: 5px;'>
+                        <input width='100%'
+                            type='button'
+                            onclick='close_page'
+                            style='text-align: center; color: #d3d3d3; height: 44px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#526 214 32 32:14 14 14 14);'
+                            value='<%= L"返回" %>' />
+                    </div>
+                    <div width='320'style='float: left; margin-left: 14px;'>
+                        <input width='100%'
+                                onclick='create_new_world'
+                                type='button'
+                                style='text-align: center; color: #d3d3d3; height: 44px; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)'
+                                value='<%= L"创建新世界" %>' />
+                    </div>
+                </div>
+            </pe:container>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

@@ -34,6 +34,12 @@ function ItemCodeBlock:CompareItems(left, right)
 end
 
 function ItemCodeBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
+	if(itemStack) then
+		local color8_data = itemStack:GetDataField("color8data");
+		if(color8_data) then
+			data = (data or 0) + color8_data
+		end
+	end
 	if(ItemCodeBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region)) then
 		if(itemStack) then
 			local entity = EntityManager.GetBlockEntity(x,y,z);
@@ -64,7 +70,6 @@ function ItemCodeBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 				if(displayName) then
 					entity:SetDisplayName(displayName)
 				end
-
 				if(nplCode or blockly_nplcode) then
 					entity:AutoCreateMovieEntity();
 				end
@@ -98,7 +103,7 @@ function ItemCodeBlock:PickItemFromPosition(x,y,z)
 			elseif(data == 768) then
 				-- tricky: fixed picking python block. 
 				-- TODO: this is not a good way to implement it. Do it formally. 
-				itemStack.id = block_types.names.PyRuntimeCodeBlock or itemStack.id;
+				-- itemStack.id = block_types.names.PyRuntimeCodeBlock or itemStack.id;
 			elseif(data == 1280) then
 				-- tricky: fixed picking haqi block. 
 				itemStack.id = block_types.names.HaqiCodeBlock or itemStack.id;
@@ -111,7 +116,7 @@ function ItemCodeBlock:PickItemFromPosition(x,y,z)
 	end
 end
 
-local displayMap = { npl_blockpen = "pen", npl_teacher = "Teacher", npl_camera = "cam"}
+local displayMap = { npl_blockpen = "pen", npl_teacher = "Teacher", npl_camera = "cam", micropython="mPY", npl_python="pyth", arduino="ardui", cpp="c++"}
 function ItemCodeBlock:GetLangIconDisplayText(langName)
 	return displayMap[langName or ""];
 end
@@ -124,6 +129,8 @@ local tooltipMap = {
 	npl_teacher = L"教师",
 	npl_camera = L"摄影机",
 	npl_junior = L"代码方块初级版",
+	micropython = L"micropython硬件",
+	arduino = L"arduino硬件",
 }
 
 function ItemCodeBlock:GetLangTooltipText(langName)
@@ -160,6 +167,7 @@ function ItemCodeBlock:DrawIcon(painter, width, height, itemStack)
 	if(lang) then
 		local text = self:GetLangIconDisplayText(lang)
 		if(text) then
+			painter:SetFont("System;12")
 			painter:DrawText(0, height-15, width-1, 15, text, 0x122);
 		end
 	end
@@ -172,7 +180,7 @@ function ItemCodeBlock:GetTooltipFromItemStack(itemStack)
 		if(lang) then
 			local tip = self:GetLangTooltipText(lang)
 			if(tip) then
-				text = (text or "").." "..tip;
+				text = tip.." "..(text or "");
 			end
 		end
 	end

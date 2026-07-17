@@ -164,9 +164,9 @@ function WorldKeyManager.DecodeSearchKey(key_num)
 end
 
 function WorldKeyManager.HasActivate(project_id)
-    if GameLogic.IsVip() then
-        return true
-    end
+    -- if GameLogic.IsVip() then --vip用户不受限制去掉，20240902
+    --     return true
+    -- end
 
     local DecodeWorldList = GameLogic.GetPlayerController():LoadRemoteData("WorldKeyManager.DecodeWorldList", {});
     if DecodeWorldList[project_id] then
@@ -218,7 +218,7 @@ function WorldKeyManager.AddInvalidKey(key, world_data, succee_cb)
     if projectId == nil then
         return
     end
-
+    local KeepworkServiceProject = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceProject.lua')
     KeepworkServiceProject:UpdateProject(projectId, params, function(data, err)
         if err == 200 then
             GameLogic.AddBBS(nil, L"注销成功", 3000, "0 255 0")

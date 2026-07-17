@@ -155,14 +155,14 @@ local presets = {
 		margin = 16,
 		stereo = 0,
 	},
-	["mp3"]	= {
-		Codec="mp3",
-		VideoResolution={640, 480},
-		VideoBitRate = 0, 
-		FPS = 60, 
-		margin = 16,
-		stereo = 0,
-	},
+	-- ["mp3"]	= {
+	-- 	Codec="mp3",
+	-- 	VideoResolution={640, 480},
+	-- 	VideoBitRate = 0, 
+	-- 	FPS = 60, 
+	-- 	margin = 16,
+	-- 	stereo = 0,
+	-- },
 }
 
 local page;
@@ -280,6 +280,9 @@ function VideoRecorderSettings.IsRecordAudio()
 end
 
 function VideoRecorderSettings.IsShowLogo()
+	if System.options.isShenzhenAi5 then
+		return false;
+	end
 	return settings.isShowLogo == true;
 end
 

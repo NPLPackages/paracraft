@@ -28,6 +28,8 @@ local EditMovieContext = commonlib.inherit(commonlib.gettable("MyCompany.Aries.G
 
 EditMovieContext:Property("Name", "EditMovieContext");
 EditMovieContext:Property({"ReadOnlyMode", false, "IsReadOnlyMode", "SetReadOnlyMode", auto=true});
+EditMovieContext:Property({"forceEditorMode", false, "IsForceEditorMode", "SetForceEditorMode", auto=true});
+
 -- following property is used by GameMode 
 EditMovieContext:Property({"ModeShouldHideTouchController", nil, "GetModeShouldHideTouchController", });
 EditMovieContext:Property({"ModeCanSelect", nil, "GetModeCanSelect", });
@@ -66,7 +68,7 @@ end
 -- virtual function: 
 -- try to select this context. 
 function EditMovieContext:OnSelect()
-	self:SetReadOnlyMode(not MovieManager:IsLastModeEditor());
+	self:SetReadOnlyMode(not self:IsForceEditorMode() and not MovieManager:IsLastModeEditor());
 	self:EnableAutoCamera(not self:IsReadOnlyMode());
 	-- initialize manipulators and actors
 	self:OnSelectedActorChange();
@@ -254,6 +256,11 @@ function EditMovieContext:updateManipulators()
 				bUseFreeCamera = true;
 			end
 		end
+
+		if(actor:IsAgent()) then
+			bUseFreeCamera = true;
+		end
+
 		-- add selected actor's entity AABB display in all cases
 		local entity = actor:GetEntity();
 		if(entity and actor:CanShowSelectManip()) then
@@ -356,13 +363,20 @@ end
 function EditMovieContext:SetRestoreActorFreeCameraPos(bRestoreLastActorFreeCameraPos)
 	local cameraEntity = GameLogic.GetFreeCamera();
 	local actor = self:GetActor();
+	
 	if(bRestoreLastActorFreeCameraPos) then
 		self.m_bSaveActorFreeCameraPos = true;
-		actor:RestoreLastFreeCameraPosition();
-		cameraEntity:Connect("focusOut", self, self.OnFreeCameraFocusLost, "UniqueConnection");
+		if(actor) then
+			actor:RestoreLastFreeCameraPosition();
+		end
+		if(cameraEntity) then
+			cameraEntity:Connect("focusOut", self, self.OnFreeCameraFocusLost, "UniqueConnection");
+		end
 	else
 		self.m_bSaveActorFreeCameraPos = false;
-		cameraEntity:Disconnect("focusOut", self, self.OnFreeCameraFocusLost);
+		if(cameraEntity) then
+			cameraEntity:Disconnect("focusOut", self, self.OnFreeCameraFocusLost);
+		end
 	end
 end
 
@@ -668,7 +682,7 @@ function EditMovieContext:HighlightPickEntity(result)
 	local bSelectNew;
 	if(not result.block_id and (result.entity or result.obj)) then
 		local actor = self:GetActor();
-		if(actor and actor:GetEntity()== result.entity) then
+		if(actor and not actor:IsAgent() and actor:GetEntity()== result.entity) then
 			result.entity = nil;
 			result.obj = nil;
 		else

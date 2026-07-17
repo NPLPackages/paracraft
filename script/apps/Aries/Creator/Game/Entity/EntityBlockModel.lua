@@ -103,8 +103,10 @@ function Entity:EnablePhysics(bEnabled)
 		local x, y, z = self:GetBlockPos()
 		local block_id, block_data, entity_data = Game.BlockEngine:GetBlockFull(x,y,z)
 		local item_id = bEnabled and 22 or 254;
-		entity_data.attr.item_id = item_id;
-		BlockEngine:SetBlock(x,y,z, item_id, block_data, 3, entity_data)
+		if entity_data then
+			entity_data.attr.item_id = item_id;
+			BlockEngine:SetBlock(x,y,z, item_id, block_data, 3, entity_data)
+		end
 		return EntityManager.GetBlockEntity(x,y,z)
 	end
 end
@@ -141,14 +143,18 @@ end
 function Entity:CreateInnerObject(filename, scale)
 	filename = filename or self:GetModelFile()
 
-	local skin = CustomCharItems:GetSkinByAsset(filename)
+	local skin,default_assets = CustomCharItems:GetSkinByAsset(filename)
 	if(skin) then
 		-- tricky: for custom character
 		self.isBiped = true;
-		filename = CustomCharItems.defaultModelFile;
+		filename = default_assets or CustomCharItems.defaultModelFile;
+	end
+	self.isCustomModel = PlayerAssetFile:IsCustomModel(filename);
+	if(self.isCustomModel)then
+		self.isBiped = true;
 	end
 
-	filename = Files.GetFilePath(self:GetModelDiskFilePath(filename)) or self.default_file;
+	filename = self:GetModelDiskFilePath(filename) or self.default_file;
 	local x, y, z = self:GetPosition();
 
 	if(filename == self.default_file) then
@@ -169,7 +175,9 @@ function Entity:CreateInnerObject(filename, scale)
 		model:SetPersistent(false);
 		model:SetField("MovementStyle", 3); -- linear
 	end
-	if(skin) then
+	if(self.isCustomModel) then
+		PlayerAssetFile:RefreshCustomModel(model, skin, filename)
+	elseif(skin) then
 		PlayerAssetFile:RefreshCustomGeosets(model, skin);
 	end
 	if(self.scaling) then
@@ -289,13 +297,26 @@ function Entity:Destroy()
 	Entity._super.Destroy(self);
 end
 
+-- whether it is a custom model
+function Entity:IsCustomModel()
+	return self.isCustomModel
+end
+
+
 function Entity:Refresh()
 	local obj = self:GetInnerObject();
 	if(obj) then
 		local filename = self:GetModelFile()
-		local skin = CustomCharItems:GetSkinByAsset(filename)
+		if(self.isCustomModel) then
+			if type(self.GetSkin) == "function" then
+				PlayerAssetFile:RefreshCustomModel(obj, self:GetSkin(), filename)
+			end
+			return
+		end
+		local skin, default_assets = CustomCharItems:GetSkinByAsset(filename)
 		if(skin) then
-			filename = CustomCharItems.defaultModelFile;
+			filename = default_assets or CustomCharItems.defaultModelFile;
+
 			obj = self:UpgradeInnerObjectToBiped()
 			if(obj) then
 				obj:SetField("assetfile", filename);
@@ -319,6 +340,14 @@ end
 
 function Entity:GetModelFile()
 	return self.filename;
+end
+
+function Entity:SetMainAssetPath(filename)
+	self:SetModelFile(filename)
+end
+
+function Entity:GetMainAssetPath()
+	return self:GetModelFile()
 end
 
 function Entity:SetSkin(skin)
@@ -523,7 +552,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			-- tricky: unlike LiveModel entity, block model will always return true if there is an onclick event
 			return true;
 		else
-			if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
+			if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock() and not self:IsLocked()) then
 				self:OpenEditor("entity", entity);
 				return true;
 			elseif(mouse_button=="left") then
@@ -633,13 +662,16 @@ function Entity:SetOffsetPos(v)
 		v[1] = math.min(math.max(-BlockEngine.half_blocksize, v[1]), BlockEngine.half_blocksize);
 		v[2] = math.min(math.max(0, v[2]), BlockEngine.blocksize);
 		v[3] = math.min(math.max(-BlockEngine.half_blocksize, v[3]), BlockEngine.half_blocksize);
-		self.offsetPos:set(v);
-		local obj = self:GetInnerObject();
-		if(obj) then
-			obj:SetPosition(x + v[1], y + v[2], z + v[3]);
-			obj:UpdateTileContainer();
+
+		if(not self.offsetPos:equals(v)) then
+			self.offsetPos:set(v);
+			local obj = self:GetInnerObject();
+			if(obj) then
+				obj:SetPosition(x + v[1], y + v[2], z + v[3]);
+				obj:UpdateTileContainer();
+			end
+			self:valueChanged();
 		end
-		self:valueChanged();
 	end
 end
 

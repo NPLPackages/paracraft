@@ -47,9 +47,7 @@ Examples:
         if options.isFreezetime then
             GameLogic.options:SetTimesAutoGo(options.isFreezetime~="false")
         end
-        if tonumber(options.time) then
-            GameLogic.options:SetFrozenDayTime(options.time)
-        end
+        
         if options.lightcolor then
             local block_light_scale = options.block_light_scale or 172;
             local arr = commonlib.split(options.lightcolor,",")

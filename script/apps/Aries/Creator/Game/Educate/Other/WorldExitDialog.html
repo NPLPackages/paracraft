@@ -24,7 +24,7 @@
                     local Desktop = commonlib.gettable('MyCompany.Aries.Creator.Game.Desktop')
 
                     local page = document:GetPageCtrl()
-
+                    local isModified = WorldCommon.IsModified()
                     page:SetNodeValue('ShareWorldImage', WorldExitDialog.GetPreviewImagePath())
 
                     function get_cur_world_name()
@@ -94,33 +94,89 @@
                     end
 
                     function on_click_save_and_share()
-                        if not KeepworkServiceSession:IsSignedIn() then
-                            return
-                        end
                         _guihelper.SetMessageBoxLockHide(true)
                         GameLogic.QuickSave()
                         _guihelper.SetMessageBoxLockHide(false)
                         WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Cancel)
 
-                        ShareWorld:SysncWorld(function(bSuccess)
+                        if IsOfflineMode() then
+                            ExitWorld()
+                            return 
+                        end
+                        if not KeepworkServiceSession:IsSignedIn() then
+                            LOG.std(nil,"info","WorldExitDialog","Login info error=================")
+                            return
+                        end
+                        ShareWorld:SyncWorld(function(bSuccess)
                             if bSuccess then
                                 WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
                             else
                                 GameLogic.AddBBS(nil,"保存世界失败")
                             end
-                        end)
+                        end,"exit_world")
+                    end
+
+                    function on_exit_to_login()
+                        Mod.WorldShare.MsgBox:Close()
+                        local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+                        CreateNewWorld.profile = nil
+                        System.options.cmdline_world = nil
+                        MyCompany.Aries.Game.MainLogin:set_step({HasInitedTexture = true}); 
+                        MyCompany.Aries.Game.MainLogin:set_step({IsPreloadedTextures = true}); 
+                        MyCompany.Aries.Game.MainLogin:set_step({IsLoadMainWorldRequested = true}); 
+                        MyCompany.Aries.Game.MainLogin:set_step({IsCreateNewWorldRequested = true});
+                        MyCompany.Aries.Game.MainLogin:next_step({IsLoginModeSelected = false})
+                    end
+
+                    function on_exit_game()
+                        NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+                        local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+                        CustomCharItems:Init();
+                        local Game = commonlib.gettable("MyCompany.Aries.Game")
+                        if(Game.is_started) then
+                            Game.Exit()
+                        end
+                    
+                        GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true)
+                    
+                        local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+                        CreateNewWorld.profile = nil
+                        ParaUI.GetUIObject('root'):RemoveAll()
+                        NPL.load("(gl)script/ide/TooltipHelper.lua");
+                        local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
+                        if(type(BroadcastHelper.Reset) == "function") then
+                            BroadcastHelper.Reset();
+                        end
+                        AudioEngine.Init()
+
+                        NPL.load("(gl)script/apps/Aries/Creator/Game/Login/MainLogin.lua");
+                        local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
+                        if MainLogin then
+                            MainLogin:SetWindowTitle()
+                        end
                     end
 
                     function on_click_exit_without_save()
+                        if IsOfflineMode() then
+                            ExitWorld()
+                            return 
+                        end
+                        if not KeepworkServiceSession:IsSignedIn() then
+                            WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Cancel)
+                            on_exit_game()
+                            on_exit_to_login()
+                            return
+                        end
                         if GameLogic.IsReadOnly() then
                             WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
                             return 
                         end
-                        local remote_revision = tonumber(Mod.WorldShare.Store:Get('world/remoteRevision') or 0)
-                        local current_revision = tonumber(Mod.WorldShare.Store:Get('world/currentRevision') or 0)
+                        --GameLogic.QuickSave()
+                        --local remote_revision = tonumber(Mod.WorldShare.Store:Get('world/remoteRevision') or 0)
+                        --local current_revision = tonumber(Mod.WorldShare.Store:Get('world/currentRevision') or 0)
 
-                        if remote_revision < current_revision then
-                            _guihelper.MessageBox("注意：当前世界未保存，退出将丢失已进行的修改", function(res)
+                        if isModified then --remote_revision < current_revision
+                            _guihelper.MessageBox(L"注意：当前世界未保存，退出将丢失已进行的修改", function(res)
                                 if(res and res == _guihelper.DialogResult.Yes) then
                                     WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
                                 end
@@ -168,7 +224,7 @@
                     function is_community_world_exit()
                         if KeepworkServiceSession:IsSignedIn() then
                             local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
-                            if currentEnterWorld.communityWorld == "true" or currentEnterWorld.communityWorld == true then
+                            if currentEnterWorld and currentEnterWorld.communityWorld == "true" or currentEnterWorld.communityWorld == true then
                                 if currentEnterWorld.members and type(currentEnterWorld.members) == 'table' then
                                     local username = Mod.WorldShare.Store:Get('user/username')
                                     for key, item in ipairs(currentEnterWorld.members) do
@@ -190,11 +246,16 @@
                     function is_show_unlock_button()
                         local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
 
-                        if currentEnterWorld.shared then
+                        if currentEnterWorld and currentEnterWorld.shared and not GameLogic.IsReadOnly() then
                             return true
                         else
                             return false
                         end
+                    end
+
+                    function is_shared_world()
+                        local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+                        return currentEnterWorld and currentEnterWorld.shared
                     end
 
                     function unlock()
@@ -211,6 +272,18 @@
                             end,
                             _guihelper.MessageBoxButtons.YesNo
                         )                    
+                    end
+
+                    function IsOfflineMode()
+                        local isOffline = System.options.isOffline
+                        return isOffline
+                    end
+
+                    function ExitWorld()
+                        local EducateOfflinePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Offline/EducateOfflinePage.lua")
+                        EducateOfflinePage.ShowPage()
+                        local Desktop = commonlib.gettable('MyCompany.Aries.Creator.Game.Desktop')
+                        Desktop.is_exiting = true
                     end
                 ]]>
             </script>
@@ -269,35 +342,58 @@
                     </div>
                     <div style='padding-left: 15px;margin-top: 16px;color: #000000'>
                         <pe:if condition='<%= not is_community_world_exit() %>'>
-                            <pe:if condition='<%=not GameLogic.IsReadOnly() %>'>
+                            <pe:if condition='<%=not GameLogic.IsReadOnly() and not IsOfflineMode()%>'>
                                 <div style='position: relative; margin-left: 5px; color: #181818; margin-top: 5x; base-font-size: 15px; font-size:15px;'>
-                                    <%= L'注意：退出前请上传保存世界，避免作品流失'%>
+                                    <%= L'注意：退出前请上传保存世界，避免作品丢失'%>
                                 </div>
                             </pe:if>
 
-                            <div style='width: 400px; margin-top: 40x; margin-left: 240px;'>
-                                <pe:if condition='<%= not GameLogic.IsReadOnly() and (not has_project_id() or is_user_world()) %>'>
+                            <div style='width:500px; margin-top: 40x; background-color: #ff00ff00;' align="center">
+                                <pe:if condition='<%= not GameLogic.IsReadOnly() %>'>
                                     <input type='button'
-                                           onclick='on_click_save_and_share()'
-                                           value='<%= L"保存后退出" %>'
-                                           class='theme1_orange_button'
-                                           style='min-width:114px;height:44px;' />
+                                            onclick='on_click_save_and_share()'
+                                            value='<%= L"保存后退出" %>'
+                                            class='theme1_orange_button'
+                                            style='min-width:114px;height:44px; margin-left: 20px;' />
+                                    <input type='button'
+                                            onclick='on_click_exit_without_save()'
+                                            value='<%= L"直接退出" %>'
+                                            class='theme1_gray_button'
+                                            style='min-width: 114px;height: 44px; margin-left: 60px;' />
+                                    <input type='button'
+                                            onclick='on_click_cancel()'
+                                            value='<%= L"取消" %>'
+                                            class='theme1_gray_button'
+                                            style='margin-left: 60px;min-width: 114px;height: 44px;' />
                                 </pe:if>
                                 <pe:if condition='<%= GameLogic.IsReadOnly() %>'>
-                                    <input type='button' style='margin-left: -185px; min-width:114px;height:44px; background: url();' />
+                                    <input type='button'
+                                            onclick='on_click_exit_without_save()'
+                                            value='<%= L"直接退出" %>'
+                                            class='theme1_gray_button'
+                                            style='min-width: 114px;height: 44px; margin-left: 80px;' />
+                                    <input type='button'
+                                            onclick='on_click_cancel()'
+                                            value='<%= L"取消" %>'
+                                            class='theme1_gray_button'
+                                            style='margin-left: 90px;min-width: 114px;height: 44px;' />
                                 </pe:if>
-                                
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= is_community_world_exit() %>'>
+                            <div style='width: 300px; margin-top: 40x; background-color: #ff00ff00;' align="center">
+                                <pe:if condition='<%= GameLogic.IsReadOnly() %>'>
+                                    <input type='button'
+                                        onclick='on_click_exit_without_save()'
+                                        value='<%= L"直接退出" %>'
+                                        class='theme1_gray_button'
+                                        style='min-width: 114px;height: 44px;' />
+                                </pe:if>
                                 <input type='button'
-                                       onclick='on_click_exit_without_save()'
-                                       value='<%= L"直接退出" %>'
-                                       class='theme1_gray_button'
-                                       style='margin-left: 20px;min-width: 114px;height: 44px;' />
-                                
-                                <input type='button'
-                                       onclick='on_click_cancel()'
-                                       value='<%= L"取消" %>'
-                                       class='theme1_gray_button'
-                                       style='margin-left: 20px;min-width: 114px;height: 44px;' />
+                                        onclick='on_click_cancel()'
+                                        value='<%= L"取消" %>'
+                                        class='theme1_gray_button'
+                                        style='margin-left: 70px;min-width: 114px;height: 44px;' />
                             </div>
                         </pe:if>
                     </div>

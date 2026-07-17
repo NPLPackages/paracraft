@@ -1,0 +1,250 @@
+<html></html>
+    <body>
+        <pe:mcml>
+            <script type='text/npl' refresh='false'>
+                <![CDATA[
+                    CodeMqttPage = NPL.load('(gl)script/apps/Aries/Creator/Game/Mqtt/CodeBlock/CodeMqttPage.lua')
+                    CodeMqttPage.OnInit()
+
+                    function ClosePage()
+                        CodeMqttPage.ClosePage()
+                    end
+
+                    function Ds_ProjectList(index)
+                        if index == nil then
+                            return #CodeMqttPage.mqttServerList
+                        else
+                            return CodeMqttPage.mqttServerList[index]
+                        end
+                    end
+
+                    function onclickProject(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            CodeMqttPage.OnClickProject(name)
+                        end
+                    end
+
+                    function DS_TopicList(index)
+                        if index == nil then
+                            return #CodeMqttPage.mqttTopicList
+                        else
+                            return CodeMqttPage.mqttTopicList[index]
+                        end
+                    end
+
+                    function load_topic_more()
+                        CodeMqttPage.LoadTopicMore(Eval("index"))
+                    end
+
+                    function onclickTopic(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            CodeMqttPage.OnClickTopic(index)
+                        end
+                    end
+
+                    function load_device_more()
+                        CodeMqttPage.LoadDeviceMore(Eval("index"))
+                    end
+
+                    function DS_DeviceList(index)
+                        if index == nil then
+                            return #CodeMqttPage.mqttDeviceList
+                        else
+                            return CodeMqttPage.mqttDeviceList[index]
+                        end
+                    end
+
+                    function onclickDevice(name)
+                        local index = tonumber(name)
+                        if index and index > 0 then
+                            CodeMqttPage.OnClickDevice(index)
+                        end
+                    end
+
+                    function IsLimitTopicDesc(msg)
+                        if msg == nil or msg == "" then
+                            return false
+                        end
+                        local fontName = "System;12;norm"
+                        local width = _guihelper.GetTextWidth(msg, fontName)
+                        return width and width > 180
+                    end
+
+                    function GetLimitTopicDesc(msg)
+                        return commonlib.GetLimitLabelByTextWidth(msg,180,"System;12;norm")
+                    end
+
+                    function IsLimitDeviceName(name)
+                        if name == nil or name == "" then
+                            return false
+                        end
+                        local fontName = "System;12;norm"
+                        local width = _guihelper.GetTextWidth(name, fontName)
+                        return width and width > 100
+                    end
+
+                    function GetLimitDeviceName(name)
+                        return commonlib.GetLimitLabelByTextWidth(name,100,"System;12;norm")
+                    end
+
+                    function GetPageTitle()
+                        if CodeMqttPage.page_step == 1 then
+                            return L"请选择项目"
+                        end
+                        if CodeMqttPage.page_type == 1 then
+                            return L"请选择设备"
+                        end
+                        if CodeMqttPage.page_type == 2 then
+                            return L"请选择主题"
+                        end
+                    end
+
+                    function GetDeviceName()
+                        return string.format("%s(%s)", Eval("desc"), Eval("clientid"))
+                    end
+
+                    function IsDeviceSelected(index)
+                        return CodeMqttPage.IsDeviceSelected(index)
+                    end
+
+                    function IsTopicSelected(index)
+                        return CodeMqttPage.IsTopicSelected(index)
+                    end
+
+                    function GetTopicDesc()
+                        return string.format("%s(%s)", Eval("desc"), Eval("name"))
+                    end
+
+                    function onclickBack()
+                        CodeMqttPage.OnClickBack()
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    flat_button = {
+                        color = "#cccccc",
+                        ["margin-top"] = 0,
+                        background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8"
+                    },
+                }
+            </style>
+            <!-- mc_green_button_with_fillet -->
+            <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background-color: #00000088;">
+                <pe:container alignment="_ct" width="560" height="360" style="margin-left:-280px;margin-top:-180px;background: ;">
+                    <div style="position: relative; width: 554px; height: 360px;">
+                        <div zorder="-1" style="position: relative; width: 554px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Mobile/esc/title.png);">
+                            <div style="position: relative; font-size: 16px; base-font-size: 16px; font-weight: bold; color: #ffffff; margin-left: 16px; margin-top: 10px;"><%=GetPageTitle()%></div>
+                            <input type="button" value="" onclick="ClosePage()" style="position: relative; margin-left: 520px; margin-top: 10px; width: 22px; height: 22px; background: url(Texture/Aries/Creator/keepwork/Mobile/esc/guanbi_44x44_32bits.png#0 0 44 44);" />
+                        </div>
+                        <div zorder="-2" style="position: relative; width: 554px; height: 360px; background: url(Texture/Aries/Creator/keepwork/Mobile/esc/bg_32bits.png:20 20 20 20);"></div>
+                    </div>
+                    <pe:if condition="<%=CodeMqttPage.page_step == 1%>">
+                        <div style="width: 554px; height: 300px; margin-top: 40px; ">
+                            <pe:gridview RememberScrollPos="true"
+                                        AllowPaging="false"
+                                        VerticalScrollBarStep="50"
+                                        DefaultNodeHeight="48"
+                                        ItemsPerLine="1"
+                                        VerticalScrollBarOffsetX="3"
+                                        DataSource="<%=Ds_ProjectList%>"
+                                        name="code_mqtt_project_list">
+                                <Columns>
+                                    <div style=" margin-left: 16px;margin-top: 12px; width:520px; height:48px; font-size: 12px; background: url(Texture/Aries/Creator/keepwork/Mobile/bag/baigezi_27x27_32bits.png#0 0 27 27:12 12 12 12);" >
+                                        <div style="position: relative; font-size: 14px; base-font-size: 14px; font-weight: bold; margin-left: 16px; margin-top: 14px;"><%=Eval('name')%></div>
+                                        <input type="button" name="<%=Eval('index')%>" onclick="onclickProject" value="" style="position: relative; margin-left: 484px; margin-top: 14px; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/ggs/blockly/select_16x16_32bits.png);"/>
+                                    </div>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <b>空</b>
+                                </EmptyDataTemplate>
+                                <FetchingDataTemplate>
+                                    <b>正在搜索, 请稍候 ... </b>
+                                </FetchingDataTemplate>
+                            </pe:gridview>
+                        </div>
+                    </pe:if>
+                    <pe:if condition="<%=CodeMqttPage.page_step == 2%>">
+                        <pe:if condition="<%=CodeMqttPage.page_type == 1%>">
+                            <div style="width: 554px; height: 300px; margin-top: 40px; ">
+                                <div onclick="onclickBack" style="margin-left: 18px; margin-top: 15px; width: 20px; height: 14px; background: url(Texture/Aries/Creator/keepwork/ggs/blockly/back_20x14_32bits.png#0 0 20 14);"></div>
+                                <div style="width: 554px; height: 250px; margin-top: 0px; ">
+                                    <pe:gridview RememberScrollPos="true"
+                                                AllowPaging="false"
+                                                VerticalScrollBarStep="50"
+                                                DefaultNodeHeight="48"
+                                                ItemsPerLine="1"
+                                                VerticalScrollBarOffsetX="3"
+                                                DataSource="<%=DS_DeviceList%>"
+                                                name="code_mqtt_device_list">
+                                        <Columns>
+                                            <pe:if condition="<%=not IsDeviceSelected(Eval('index'))%>">
+                                                <div style=" margin-left: 16px;margin-top: 12px; width:520px; height:48px; font-size: 12px; background: url(Texture/Aries/Creator/keepwork/Mobile/bag/baigezi_27x27_32bits.png#0 0 27 27:12 12 12 12);" >
+                                                    <div style="position: relative; font-size: 14px; base-font-size: 14px; font-weight: bold; margin-left: 16px; margin-top: 14px;"><%=GetDeviceName()%></div>
+                                                    <input type="button" name="<%=Eval('index')%>" onclick="onclickDevice" value="<%=L'添加'%>" style="position: relative; text-offset-x:-6; margin-left: 480px; color: #404BF5; font-weight: bold; width: 40px; height: 48px; background: url();"/>
+                                                </div>
+                                            </pe:if>
+                                            <pe:if condition="<%=IsDeviceSelected(Eval('index'))%>">
+                                                <div style=" margin-left: 16px;margin-top: 12px; width:520px; height:48px; font-size: 12px; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/Mobile/bag/baigezi_27x27_32bits.png#0 0 27 27:12 12 12 12);" >
+                                                    <div style="position: relative; font-size: 14px; base-font-size: 14px; font-weight: bold; color: #FFFFFF; margin-left: 16px; margin-top: 14px;"><%=GetDeviceName()%></div>
+                                                    <div style="position: relative; margin-left: 484px; margin-top: 14px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/ggs/blockly/use_16x16_32bits.png#0 0 16 16);"></div>
+                                                </div>
+                                            </pe:if>
+                                            <pe:custom oncreate='<%= load_device_more() %>'></pe:custom>
+                                        </Columns>
+                                        <EmptyDataTemplate>
+                                            <b>空</b>
+                                        </EmptyDataTemplate>
+                                        <FetchingDataTemplate>
+                                            <b>正在搜索, 请稍候 ... </b>
+                                        </FetchingDataTemplate>
+                                    </pe:gridview>
+                                </div>
+                            </div>
+                        </pe:if>
+
+                        <pe:if condition="<%=CodeMqttPage.page_type == 2%>">
+                            <div style="width: 554px; height: 300px; margin-top: 40px; ">
+                                <div onclick="onclickBack" style="margin-left: 18px; margin-top: 15px; width: 20px; height: 14px; background: url(Texture/Aries/Creator/keepwork/ggs/blockly/back_20x14_32bits.png#0 0 20 14);"></div>
+                                <div style="width: 554px; height: 250px; margin-top: 0px; ">
+                                    <pe:gridview RememberScrollPos="true"
+                                                AllowPaging="false"
+                                                VerticalScrollBarStep="50"
+                                                DefaultNodeHeight="48"
+                                                ItemsPerLine="1"
+                                                VerticalScrollBarOffsetX="3"
+                                                DataSource="<%=DS_TopicList%>"
+                                                name="code_mqtt_topic_list">
+                                        <Columns>
+                                            <pe:if condition="<%=not IsTopicSelected(Eval('index'))%>">
+                                                <div style=" margin-left: 16px;margin-top: 12px; width:520px; height:48px; font-size: 12px; background: url(Texture/Aries/Creator/keepwork/Mobile/bag/baigezi_27x27_32bits.png#0 0 27 27:12 12 12 12);" >
+                                                    <div style="position: relative; font-size: 14px; base-font-size: 14px; font-weight: bold; margin-left: 16px; margin-top: 14px;"><%=GetTopicDesc()%></div>
+                                                    <input type="button" name="<%=Eval('index')%>" onclick="onclickTopic" value="<%=L'添加'%>" style="position: relative; text-offset-x:-6; margin-left: 480px; color: #404BF5; font-weight: bold; width: 40px; height: 48px; background: url();"/>
+                                                </div>
+                                            </pe:if>
+                                            <pe:if condition="<%=IsTopicSelected(Eval('index'))%>">
+                                                <div style=" margin-left: 16px;margin-top: 12px; width:520px; height:48px; font-size: 12px; background-color: #404BF5; background: url(Texture/Aries/Creator/keepwork/Mobile/bag/baigezi_27x27_32bits.png#0 0 27 27:12 12 12 12);" >
+                                                    <div style="position: relative; font-size: 14px; base-font-size: 14px; font-weight: bold; color: #FFFFFF; margin-left: 16px; margin-top: 14px;"><%=GetTopicDesc()%></div>
+                                                    <div style="position: relative; margin-left: 484px; margin-top: 14px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/ggs/blockly/use_16x16_32bits.png#0 0 16 16);"></div>
+                                                </div>
+                                            </pe:if>
+                                            <pe:custom oncreate='<%= load_topic_more() %>'></pe:custom>
+                                        </Columns>
+                                        <EmptyDataTemplate>
+                                            <b>空</b>
+                                        </EmptyDataTemplate>
+                                        <FetchingDataTemplate>
+                                            <b>正在搜索, 请稍候 ... </b>
+                                        </FetchingDataTemplate>
+                                    </pe:gridview>
+                                </div>
+                            </div>
+                        </pe:if>
+                    </pe:if>
+                </pe:container>
+            </pe:container>            
+        </pe:mcml>
+    </body>
+</html>

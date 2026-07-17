@@ -13,7 +13,7 @@ local RedSummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks
 local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 local InternetLoadWorld = commonlib.gettable('MyCompany.Aries.Creator.Game.Login.InternetLoadWorld')
 RedSummerCampMainPage.OnInit()
-
+local isGotoWorld = false
 local page = document:GetPageCtrl();
 
 function ClosePage()
@@ -43,12 +43,6 @@ function OnOpen(name)
 end
 
 function OnClickRightBt(name)
-    if (System.options.isHideVip) then
-        if (name == "skin" or name == "certificate") then
-            return;
-        end
-    end
-
     RedSummerCampMainPage.OnClickRightBt(name)    
 end
 
@@ -161,18 +155,24 @@ function need_certificate()
 end
 
 function open()
-    local opus_content = page:GetValue('opus_content', '')
+    if not isGotoWorld then
+        local opus_content = page:GetValue('opus_content', '')
 
-    local pid = get_project_id(opus_content)
+        local pid = get_project_id(opus_content)
 
-    if pid then
-        GameLogic.RunCommand("/loadworld " .. pid)
+        if pid then
+            GameLogic.RunCommand("/loadworld " .. pid)
 
-        if pid and tonumber(pid) == "number" then
-            GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.main_worldID_open', {useNoId = true})
+            if pid and tonumber(pid) == "number" then
+                GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.main_worldID_open', {useNoId = true})
+            end
+        else
+            GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.go_to_url', opus_content)
         end
-    else
-        GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.go_to_url', opus_content)
+        isGotoWorld = true
+        commonlib.TimerManager.SetTimeout(function()
+            isGotoWorld = false
+        end,2000)
     end
 end
 
@@ -197,9 +197,6 @@ function create_new_world()
 end
 
 function OpenRole()
-    if (System.options.isHideVip) then
-        return;
-    end
 
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then
         GameLogic.GetFilters():apply_filters('check_signed_in', "请先登录", function(result)
@@ -391,31 +388,33 @@ end
                         </pe:if>
                     </pe:if>
                 </div>
-                <div style="float: left;margin-top: 8px;">
+                <!-- 下架学校相关 -->
+                <!-- <div style="float: left;margin-top: 8px;">
                     <div onclick="ClickSchoolName" tooltip='<%="点击切换学校"%>' name="user_name" style="position: relative;width: 310px; margin-left: 5px;margin-top: 0px;base-font-size:15px; font-size: 15px;color: #ffffff;">
                         <%=GetUserData("limit_school_name")%>
                     </div>
 
+                    
                     <div style="position: relative;margin-left: 168px;margin-top: 0px;">
-                        <!-- <div tooltip='<%=GetUserData("school_name")%>' name="school_name" style="float: left; margin-left: 0px;margin-top: 0px;base-font-size:14px; font-size: 14px;color: #ffffff;">
+                        <div tooltip='<%=GetUserData("school_name")%>' name="school_name" style="float: left; margin-left: 0px;margin-top: 0px;base-font-size:14px; font-size: 14px;color: #ffffff;">
                             <%=GetUserData("limit_school_name")%>
-                        </div> -->
+                        </div>
     
-                        <!-- <pe:if condition='<%=HasSchool()%>'>
+                        <pe:if condition='<%=HasSchool()%>'>
                             <div style="margin-left: 5px;margin-top: 1px;float: left;">
                                 <input type="button" value='' onclick="ClickSchool" class="green_button" style="position: relative;" />
                                 <div class="green_button" style="position: relative;background: ;">更改</div>
                             </div>
-                        </pe:if> -->
+                        </pe:if>
         
-                        <!-- <pe:if condition='<%=not HasSchool()%>'>
+                        <pe:if condition='<%=not HasSchool()%>'>
                             <div style="margin-left: 5px;margin-top: 1px;float: left;">
                                 <input type="button" value='' onclick="ClickSchool" class="green_button" style="position: relative;" />
                                 <div class="green_button" style="position: relative;background: ;">关联</div>
                             </div>
-                        </pe:if>  -->
+                        </pe:if> 
                     </div> 
-                </div>              
+                </div>               -->
             </div>
         </div>
 
@@ -430,7 +429,7 @@ end
                     <input type='text'
                             name='opus_content'
                             spacing='10'
-                            EmptyText='<%= L"输入项目ID或课程ID或服务器地址" %>'
+                            EmptyText='<%= L"输入作品ID或作品链接" %>'
                             EmptyTextColor='#FF25282E'
                             style='width: 336px;
                                     height: 42px;
@@ -463,62 +462,90 @@ end
                 <div zorder="-3" style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
                 <div zorder="-3" style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
             </div>
-            <div style="float: left;margin-top: 52px; width: 1280px;height: 520px;">
+            <div style="float: left;margin-top: 52px; margin-left: 60px; width: 1280px;height: 520px;">
                 <div style="float: left;width: 380px;">
                     <div zorder="-2" onclick="OnOpen" name='main_world' style="margin-left: 22px;margin-top: 0px; width: 362px;height:449px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
-                        <!-- <div zorder="-2" onclick="OnOpen" name='main_world' style="width:348px;height:431px; margin-left: 7px;margin-top: 4px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div> -->
                         <div zorder="-1" style='width: 334px;height: 368px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/chuangyikongjian_334x368_32bits.png#0 0 334 368)'></div>
                         <div style="margin-left: 14px;margin-top: 326px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                             <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
-                                创意空间（课程）
+                               <%= L"创意空间（课程）" %>
                             </div>
                         </div>
-                        <!-- background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24) -->
                         <div zorder="-1" style="base-font-size:20px;font-size: 20px;color: #000000;font-weight: bold;margin-left: 4px; margin-top: 356px;width: 354px; height: 88px; ">
                             <pe:if condition="<%=IsHaveLearnHistroy()%>">
-                                <div style=" position: relative; margin-left: 30px; margin-top: 34px;">最近学习</div>
-                                <input type="button" onclick="OnClickLearn" value="<%=GetLearnContent()%>" style="base-font-size:14px;font-size: 14px;color: #000000;font-weight: bold;  margin-left: 120px; margin-top: 30px; width: 191px; height: 39px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
+                                <div style=" position: relative; margin-left: 50px; margin-top: 34px;">最近</div>
+                                <input type="button" onclick="OnClickLearn" value="<%=GetLearnContent()%>" style="base-font-size:14px;font-size: 14px;color: #000000;font-weight: bold;  margin-left: 100px; margin-top: 26px; width: 191px; height: 39px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
                             </pe:if>
                             <pe:if condition="<%=not IsHaveLearnHistroy()%>">
-                                <div style=" position: relative; margin-left: 50px; margin-top: 34px;">最近无课程记录</div>
-                                <input type="button" value="进入课程" onclick="OnClickLearn" style="base-font-size:14px;font-size: 14px;color: #000000;font-weight: bold; margin-left: 200px; margin-top: 30px; width: 131px; height: 39px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
+                                <pe:if condition="<%= Mod.WorldShare.Utils.IsEnglish() %>">
+                                    <div style=" position: relative; margin-left: 15px; margin-top: 34px;">
+                                        <%= L"最近无课程记录" %>
+                                    </div>
+                                    <input type="button"
+                                        value="Enter"
+                                        onclick="OnClickLearn"
+                                        style="base-font-size: 14px;
+                                               font-size: 16px;
+                                               color: #000000;
+                                               font-weight: bold;
+                                               margin-left: 250px;
+                                               margin-top: 30px;
+                                               width: 90px;
+                                               height: 39px;
+                                               background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
+                                </pe:if>
+                                <pe:if condition="<%= not Mod.WorldShare.Utils.IsEnglish() %>">
+                                    <div style=" position: relative; margin-left: 50px; margin-top: 34px;">
+                                        <%= L"最近无课程记录" %>
+                                    </div>
+                                    <input type="button"
+                                        value="<%= L'进入课程' %>"
+                                        onclick="OnClickLearn"
+                                        style="base-font-size: 14px;
+                                                font-size: 14px;
+                                                color: #000000;
+                                                font-weight: bold;
+                                                margin-left: 200px;
+                                                margin-top: 30px;
+                                                width: 131px;
+                                                height: 39px;
+                                                background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
+                                </pe:if>
                             </pe:if>
                         </div>
                     </div>
                 </div>
     
-                <div style="float: left;margin-top: 2px;">
-                    <pe:repeat DataSource="<%=GetItemData()%>">
-                        <pe:repeatitem>
-                            <div zorder="-2" style="float: left;margin-left: 19px;margin-top: -6px; width: 248px;height:230px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
-                                <!-- <input type="button" zorder="-1" value='' width="220" height="220" onclick="OnOpen" style='<%=GetBgStyle(Eval("img"))%>' name='<%=Eval("node_name")%>' /> -->
-                                <div zorder="-2" onclick="OnOpen" name='<%=Eval("node_name")%>' style="width:233px;height:215px; margin-left: 7px;margin-top: 3px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
-                                <div zorder="-1" style='<%=GetBgStyle(Eval("img"))%>'></div>
-                                <pe:if condition='<%=Eval("is_show_recommend") == true%>'>
-                                    <div style="position: relative;margin-left: -3px;margin-top: -2px; width: 110px;height: 32px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi1_32X32_32bits.png#0 0 32 32:14 5 7 12)">
-                                        <div style="base-font-size:12px;font-size: 12px;text-align: center;margin-left: 8px;margin-top: 3px;font-weight: bold;">国家级大赛</div>
-                                    </div>
-                                </pe:if>
-
-                                <pe:if condition='<%=Eval("is_show_vip")%>'>
-                                    <div style="position: relative;margin-left: -2px;margin-top: -11px; width: 48px;height: 53px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi2_48X53_32bits.png#0 0 48 53)"></div>
-                                </pe:if>
-                                <pe:if condition='<%=IsCourseNode(Eval("node_name"))%>'>
-                                    <pe:container uiname="red_tip" style="position: relative;margin-left: 212px; margin-top: 18px; width: 13px; height: 13px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/hongdian_13x13_32bits.png#0 0 13 13)"></pe:container>
-                                </pe:if>
-                                <div style="margin-left: 14px;margin-top: 169px; position: relative;width: 220px;height:41px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
-                                    <div style="margin-top: 10px; text-align: center;base-font-size:18px;font-size: 18px;color: #ffffff;font-weight: bold;">
-                                        <%=Eval("name")%>
-                                    </div>
-                                </div>
+                <div style="float: left;width: 380px;">
+                    <div zorder="-2" style="margin-left: 22px;margin-top: 0px; width: 362px;height:449px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
+                        <div zorder="-2" onclick="OnOpen" name='course_page' style="width:348px;height:431px; margin-left: 7px;margin-top: 4px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
+                        <div zorder="-1" style='width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zixueshiping_335x421_32bits.png#0 0 335 421)'></div>
+                        <div style="margin-left: 14px;margin-top: 378px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
+                            <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
+                                <%= L"入门必看" %>
                             </div>
-                        </pe:repeatitem>
-                    </pe:repeat>
+                        </div>
+                        <pe:container uiname="red_tip" style="position: relative;margin-left: 322px; margin-top: 18px; width: 13px; height: 13px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/hongdian_13x13_32bits.png#0 0 13 13)"></pe:container>
+                    </div>
                 </div>
+    
+
+                <div style="float: left;width: 380px;">
+                    <div zorder="-2" style="margin-left: 22px;margin-top: 0px; width: 362px;height:449px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
+                        <div zorder="-2" onclick="OnOpen" name='explore' style="width:348px;height:431px; margin-left: 7px;margin-top: 4px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
+                        <div zorder="-1" style='width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/tuijianzuoping_334x421_32bits.png#0 0 334 421)'></div>
+                        <div style="margin-left: 14px;margin-top: 378px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
+                            <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
+                                <%= L"推荐作品" %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
             </div>
         </pe:container>
         
-        <pe:container alignment="_ctr" width="87" height="550" style="margin-right: 0px;margin-top: -55px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bj3_98X128_32bits.png#0 0 98 128:20 40 20 40);">
+        <!-- <pe:container alignment="_ctr" width="87" height="550" style="margin-right: 0px;margin-top: -55px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bj3_98X128_32bits.png#0 0 98 128:20 40 20 40);">
             <div style="margin-left: 15px;margin-top: 30px;">
                 <pe:repeat DataSource="<%=GetRightBtData()%>">
                     <pe:repeatitem>
@@ -540,13 +567,11 @@ end
                                                     background: url(Texture/Aries/Creator/keepwork/LearningDailyCheck/red_tip_32bits.png#0 0 10 10);">
                             </pe:container>
                         </pe:if>
-                        <!-- <kp:redtip value="true" name='<%=Eval("node_name") .. "_red_icon"%>' style="position:relative;margin-left: -5px; margin-top:-66px;"></kp:redtip> -->
-                        <!-- <div name='<%=Eval("red_icon_name")%>' style="width: 10px;height: 10px; position:relative;margin-left: -5px; margin-top:-66px;background: url(Texture/Aries/Creator/keepwork/LearningDailyCheck/red_tip_32bits.png#0 0 10 10);"></div> -->
                     </pe:repeatitem>
                 </pe:repeat>
             </div>
 
-        </pe:container>
+        </pe:container> -->
 
         <pe:container alignment="_lb" width="598" height="60" style="margin-left: 32px;margin-bottom: 48px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/di_32X60_32bits.png#0 0 32 60:8 8 8 8);">
             <pe:container SelfPaint="true" width="598" height="60" style="margin-left: 50px; background:;">
@@ -561,19 +586,11 @@ end
         </pe:container>
 
         <pe:container alignment="_rb" width="600" height="102" style="margin-right: 98px;margin-bottom: 26px;background:;">
-            <!-- <input type="button" value='' uiname="RedSummerCampMainPage.create_new_world" onclick="create_new_world" style="width: 156px;height: 56px; margin-left:0px;margin-top:26px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b3_156X56_32bits.png#0 0 156 56)" /> -->
             <pe:if condition="<%=CheckHasPermission()%>">
                 <input type="button" value='' uiname="RedSummerCampMainPage.CreateMatch" onclick="CreateMatch" style="position: relative;margin-left:170px;margin-top:10px; width: 102px;height: 82px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/chuangzuoguangchang_102x82_32bits.png#0 0 102 82)" />
             </pe:if>
             <input type="button" value='' uiname="RedSummerCampMainPage.QuickStart" onclick="QuickStart" style="position: relative;margin-left:315px;margin-top:0px; width: 279px;height: 110px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b4_279X110_32bits.png#0 0 279 110)" />
-        </pe:container>
-            <!-- <input type="button" value='打开 神通杯' name="shentongbei" />
-            <input type="button" value='打开 推荐课程' name="RedSummerCampRecCoursePage" onclick="OnOpen" />
-            <input type="button" value='打开 我的作品' name="MyWorks" onclick="OnOpen" />
-            <input type="button" value='打开 家长指南' name="RedSummerCampParentsPage" onclick="OnOpen" /> -->
-        
-
-
+        </pe:container>       
     </pe:container>
 </pe:container>
 

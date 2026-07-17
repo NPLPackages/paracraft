@@ -1,0 +1,58 @@
+<!-- script/apps/Aries/Creator/Game/Areas/ChatSystem/TeamUserCtrl.html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" src="TeamUserCtrl.lua"><![CDATA[
+local TeamUserCtrl = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/TeamUserCtrl.lua");
+TeamUserCtrl.OnInit();
+
+function GetTeamInfo()
+    return TeamUserCtrl.allUserInfo
+end
+
+function IsHaveModel()
+    return  Eval("modelUrl") and Eval("modelUrl") ~= ""
+end
+
+function OnClickUser(name)
+local index = tonumber(name)
+    if index then
+        local user = GetTeamInfo()[index]
+        if user then
+            TeamUserCtrl.ShowTeamOperate(user)
+        end
+    end
+end
+
+]]></script>
+
+<div width="100%" height="100%" style="background-color: #404040; background:url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14)">
+   <div height="100%"   style=" margin-left: 0px;">
+    <pe:repeat DataSource="<%=GetTeamInfo()%>">
+        <pe:repeatitem>
+            <div style="float: left; width: 40px; height: 40px; margin-top: 10px; margin-left: 14px; background-color: #428BDF;">
+                <div name="<%=Eval('index')%>" onclick="OnClickUser" style="position: relative; width: 40px; height: 40px; background: url();"></div>
+                <pe:if condition="<%= Eval('index') == 1%>">
+                    <div zorder="3" style="position: relative; margin-left:-6px; margin-top: -8px; width:  18px; height: 18px; background: url(Texture/Aries/Creator/keepwork/Community/community_chat_32bits.png#246 12 18 18);"></div>
+                </pe:if>
+                <div style="float: left; width: 32px; height: 32px;">
+                    <pe:if condition="<%=IsHaveModel()%>">
+                        <pe:mc_player name='<%="team_ctrl_player_".. Eval("index")%>' miniscenegraphname='<%="team_ctrl_player_miniscene_".. Eval("index")%>' style="margin-left:-4px;margin-top:-10px;width:46px;height:46px;" IsInteractive="false" NoFrameMove="true" DefaultCameraObjectDist="3.0" LookAtHeight="1.57" DefaultLiftupAngle="0.1" fisrtFrameMove="false"/>
+                    </pe:if>
+                    <pe:if condition="<%=not IsHaveModel()%>">
+                        <img src="<%=Eval('portrait')%>" style="width: 40px; height: 40px;" />
+                    </pe:if>
+                </div>
+            </div>
+        </pe:repeatitem>
+    </pe:repeat>
+   </div>
+</div>
+</pe:mcml> 
+</body>
+</html>

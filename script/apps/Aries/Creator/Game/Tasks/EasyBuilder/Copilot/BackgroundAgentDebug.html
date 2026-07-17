@@ -1,0 +1,1112 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/BackgroundAgentDebug.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>BackgroundAgent Debug</title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="BackgroundAgent.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/BackgroundAgent.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/SceneVisionManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/VoiceContextManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/CopilotManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/CopilotLandKeeper.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/CopilotDragonPet.lua");
+
+BackgroundAgent = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.BackgroundAgent");
+SceneVisionManager = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.SceneVisionManager");
+VoiceContextManager = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.VoiceContextManager");
+CopilotManager = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.CopilotManager");
+CopilotLandKeeper = commonlib.gettable("MyCompany.Aries.Game.Tasks.CopilotLandKeeper");
+CopilotDragonPet = commonlib.gettable("MyCompany.Aries.Game.Tasks.CopilotDragonPet");
+
+local agent = nil;
+local lastLLMResponse = "";
+local lastLLMToolCalls = "";
+
+function GetAgent()
+    if not agent then
+        agent = BackgroundAgent:GetInstance();
+    end
+    return agent;
+end
+
+function OnClose()
+    GetAgent():ShowDebugUI(false);
+end
+
+-- Playback controls
+function OnPlay()
+    GetAgent():Play();
+    -- Also start voice monitoring
+    VoiceContextManager:Start();
+    RefreshPage();
+end
+
+function OnPause()
+    GetAgent():Pause();
+    RefreshPage();
+end
+
+function OnStop()
+    GetAgent():Stop();
+    VoiceContextManager:Stop();
+    RefreshPage();
+end
+
+function OnStep()
+    GetAgent():Step(function(result)
+        if result then
+            lastLLMResponse = result.llmResult and result.llmResult.response or "";
+            if result.llmResult and result.llmResult.toolCalls then
+                local calls = {};
+                for _, call in ipairs(result.llmResult.toolCalls) do
+                    table.insert(calls, call.name .. ": " .. commonlib.serialize_compact(call.params));
+                end
+                lastLLMToolCalls = table.concat(calls, "\n");
+            else
+                lastLLMToolCalls = "";
+            end
+        end
+        RefreshPage();
+    end);
+    RefreshPage();
+end
+
+-- Clear history
+function OnClearSceneHistory()
+    GetAgent():ClearSceneVisionHistory();
+    RefreshPage();
+end
+
+function OnClearVoiceHistory()
+    GetAgent():ClearVoiceHistory();
+    RefreshPage();
+end
+
+function OnClearAllHistory()
+    GetAgent():ClearSceneVisionHistory();
+    GetAgent():ClearVoiceHistory();
+    GetAgent():ClearLLMHistory();
+    lastLLMResponse = "";
+    lastLLMToolCalls = "";
+    RefreshPage();
+end
+
+-- Manual capture
+function OnCaptureScreenshot()
+    SceneVisionManager:ForceCaptureNow(function(entry)
+        RefreshPage();
+    end);
+end
+
+-- Toggle debug mode
+function OnToggleDebug()
+    local agent = GetAgent();
+    agent:SetDebugEnabled(not agent:IsDebugEnabled());
+    RefreshPage();
+end
+
+-- Register default copilots
+function OnRegisterCopilots()
+    -- Register CopilotLandKeeper
+    local landKeeper = CopilotLandKeeper.GetInstance and CopilotLandKeeper.GetInstance();
+    if not landKeeper then
+        landKeeper = CopilotLandKeeper:new();
+        landKeeper:CreateEntity();
+    end
+    CopilotManager.GetInstance():Register(landKeeper);
+    
+    -- Register CopilotDragonPet
+    local dragonPet = CopilotDragonPet.GetInstance and CopilotDragonPet.GetInstance();
+    if not dragonPet then
+        dragonPet = CopilotDragonPet:new();
+        dragonPet:CreateEntity();
+    end
+    CopilotManager.GetInstance():Register(dragonPet);
+    
+    -- Discover copilots in BackgroundAgent
+    GetAgent():DiscoverCopilots();
+    
+    RefreshPage();
+end
+
+function RefreshPage()
+    if Page then
+        Page:Refresh(0.1);
+    end
+end
+
+-- State getters
+function GetPlaybackState()
+    return GetAgent():GetPlaybackState();
+end
+
+function GetStateColor()
+    local state = GetPlaybackState();
+    if state == "playing" then
+        return "#00ff66";
+    elseif state == "paused" then
+        return "#ffaa00";
+    else
+        return "#888888";
+    end
+end
+
+function GetStateText()
+    local state = GetPlaybackState();
+    if state == "playing" then
+        return L"Playing";
+    elseif state == "paused" then
+        return L"Paused";
+    else
+        return L"Stopped";
+    end
+end
+
+function IsPlaying()
+    return GetPlaybackState() == "playing";
+end
+
+function IsPaused()
+    return GetPlaybackState() == "paused";
+end
+
+function IsStopped()
+    return GetPlaybackState() == "stopped";
+end
+
+function IsDebugEnabled()
+    return GetAgent():IsDebugEnabled();
+end
+
+-- Copilot info
+function GetRegisteredCopilotCount()
+    local copilots = GetAgent():GetDiscoveredCopilots();
+    return copilots and #copilots or 0;
+end
+
+function GetCopilotNames()
+    local copilots = GetAgent():GetDiscoveredCopilots();
+    if not copilots or #copilots == 0 then
+        return L"None";
+    end
+    local names = {};
+    for _, c in ipairs(copilots) do
+        table.insert(names, c.displayName or "Unknown");
+    end
+    return table.concat(names, ", ");
+end
+
+-- Scene Vision History
+function GetSceneVisionCount()
+    return #GetAgent():GetSceneVisionHistory();
+end
+
+function GetSceneVisionEntry(index)
+    local history = GetAgent():GetSceneVisionHistory();
+    local reversedIndex = #history - index + 1;
+    return history[reversedIndex];
+end
+
+function HasSceneVisionEntry(index)
+    return GetSceneVisionEntry(index) ~= nil;
+end
+
+function GetSceneVisionTimestamp(index)
+    local entry = GetSceneVisionEntry(index);
+    if entry and entry.timestamp then
+        return os.date("%H:%M:%S", entry.timestamp);
+    end
+    return "";
+end
+
+function GetSceneVisionStatus(index)
+    local entry = GetSceneVisionEntry(index);
+    if not entry then return ""; end
+    if entry.imageUrl then
+        return entry.sentToLLM and L"Sent" or L"Ready";
+    end
+    return L"Uploading...";
+end
+
+function GetSceneVisionStatusColor(index)
+    local entry = GetSceneVisionEntry(index);
+    if not entry then return "#888888"; end
+    if entry.sentToLLM then return "#00cc55"; end
+    if entry.imageUrl then return "#ffaa00"; end
+    return "#ff4444";
+end
+
+function GetSceneVisionDescription(index)
+    local entry = GetSceneVisionEntry(index);
+    if entry then
+        if entry.description then
+            return TruncateText(entry.description, 40);
+        elseif entry.imageUrl then
+            return L"Screenshot captured";
+        end
+    end
+    return "";
+end
+
+-- Voice History
+function GetVoiceHistoryCount()
+    return #GetAgent():GetVoiceHistory();
+end
+
+function GetVoiceEntry(index)
+    local history = GetAgent():GetVoiceHistory();
+    local reversedIndex = #history - index + 1;
+    return history[reversedIndex];
+end
+
+function HasVoiceEntry(index)
+    return GetVoiceEntry(index) ~= nil;
+end
+
+function GetVoiceTimestamp(index)
+    local entry = GetVoiceEntry(index);
+    if entry and entry.timestamp then
+        return os.date("%H:%M:%S", entry.timestamp);
+    end
+    return "";
+end
+
+function GetVoiceDuration(index)
+    local entry = GetVoiceEntry(index);
+    if entry and entry.duration then
+        return string.format("%.1fs", entry.duration / 1000);
+    end
+    return "";
+end
+
+function GetVoiceTranscript(index)
+    local entry = GetVoiceEntry(index);
+    if entry and entry.transcript then
+        return TruncateText(entry.transcript, 35);
+    end
+    return "";
+end
+
+function GetVoiceStatus(index)
+    local entry = GetVoiceEntry(index);
+    if not entry then return ""; end
+    if entry.llmResponse then return L"Responded"; end
+    if entry.sentToLLM then return L"Processing"; end
+    return L"Pending";
+end
+
+function GetVoiceStatusColor(index)
+    local entry = GetVoiceEntry(index);
+    if not entry then return "#888888"; end
+    if entry.llmResponse then return "#00cc55"; end
+    if entry.sentToLLM then return "#ffaa00"; end
+    return "#ff8844";
+end
+
+function GetVoiceLLMResponse(index)
+    local entry = GetVoiceEntry(index);
+    if entry and entry.llmResponse then
+        return TruncateText(entry.llmResponse, 50);
+    end
+    return "";
+end
+
+function HasVoiceLLMResponse(index)
+    local entry = GetVoiceEntry(index);
+    return entry and entry.llmResponse ~= nil;
+end
+
+-- Pending voice count
+function GetPendingVoiceCount()
+    return GetAgent():GetPendingVoiceCount();
+end
+
+-- Voice monitor state
+function GetVoiceMonitorState()
+    return VoiceContextManager:GetState();
+end
+
+function GetVoiceMonitorStateText()
+    local state = GetVoiceMonitorState();
+    if state == "paused_tts" then
+        return "paused (TTS)";
+    end
+    return state;
+end
+
+function GetVoiceMonitorStateColor()
+    local state = GetVoiceMonitorState();
+    if state == "monitoring" then
+        return "#00ff66";
+    elseif state == "recording" then
+        return "#ff6644";
+    elseif state == "paused" then
+        return "#ffaa00";
+    elseif state == "paused_tts" then
+        return "#ff00ff";  -- Purple for TTS pause
+    else
+        return "#888888";
+    end
+end
+
+--------------------------------------------------------------------------------
+-- LLM History Functions
+--------------------------------------------------------------------------------
+
+function GetLLMHistoryCount()
+    return GetAgent():GetLLMHistoryCount();
+end
+
+function GetLLMEntry(index)
+    return GetAgent():GetFormattedLLMEntry(index);
+end
+
+function HasLLMEntry(index)
+    return GetLLMEntry(index) ~= nil;
+end
+
+function GetLLMEntryTime(index)
+    local entry = GetLLMEntry(index);
+    if entry then
+        return entry.timeStr or "";
+    end
+    return "";
+end
+
+function GetLLMEntryStatus(index)
+    local entry = GetLLMEntry(index);
+    if not entry then return ""; end
+    if entry.status == "success" then
+        return L"Success";
+    elseif entry.status == "error" then
+        return L"Error";
+    elseif entry.status == "pending" then
+        return L"Pending";
+    end
+    return entry.status or "";
+end
+
+function GetLLMEntryStatusColor(index)
+    local entry = GetLLMEntry(index);
+    if not entry then return "#888888"; end
+    if entry.status == "success" then
+        return "#00cc55";
+    elseif entry.status == "error" then
+        return "#ff4444";
+    elseif entry.status == "pending" then
+        return "#ffaa00";
+    end
+    return "#888888";
+end
+
+function GetLLMEntryDuration(index)
+    local entry = GetLLMEntry(index);
+    if entry and entry.durationStr then
+        return entry.durationStr;
+    end
+    return "";
+end
+
+function GetLLMEntryInput(index)
+    local entry = GetLLMEntry(index);
+    if entry then
+        return TruncateText(entry.inputPromptShort, 40);
+    end
+    return "";
+end
+
+function GetLLMEntryResponse(index)
+    local entry = GetLLMEntry(index);
+    if entry then
+        return TruncateText(entry.responseShort, 60);
+    end
+    return "";
+end
+
+function GetLLMEntryToolCount(index)
+    local entry = GetLLMEntry(index);
+    if entry and entry.toolCallCount > 0 then
+        return string.format("[%d tools]", entry.toolCallCount);
+    end
+    return "";
+end
+
+function GetLLMEntryHasImage(index)
+    local entry = GetLLMEntry(index);
+    return entry and entry.hasImage;
+end
+
+function GetLatestLLMResponse()
+    local entry = GetLLMEntry(1);
+    if entry and entry.response then
+        return entry.response;
+    end
+    return "";
+end
+
+function GetLatestLLMToolCalls()
+    local entry = GetLLMEntry(1);
+    if entry and entry.toolCalls and #entry.toolCalls > 0 then
+        local calls = {};
+        for _, call in ipairs(entry.toolCalls) do
+            table.insert(calls, call.name .. ": " .. commonlib.serialize_compact(call.params));
+        end
+        return table.concat(calls, "\n");
+    end
+    return "";
+end
+
+function OnClearLLMHistory()
+    GetAgent():ClearLLMHistory();
+    RefreshPage();
+end
+
+-- Utility
+function TruncateText(text, maxLen)
+    maxLen = maxLen or 50;
+    return commonlib.GetLimitLabel(text or "", maxLen);
+end
+
+-- Combined history for display
+function GetCombinedHistoryEntry(index)
+    local history = GetAgent():GetFormattedContextHistory(10);
+    return history[index];
+end
+
+function HasCombinedEntry(index)
+    return GetCombinedHistoryEntry(index) ~= nil;
+end
+
+function GetCombinedEntryText(index)
+    local entry = GetCombinedHistoryEntry(index);
+    if not entry then return ""; end
+    
+    local timeStr = os.date("%H:%M:%S", entry.timestamp);
+    local typeStr = entry.type == "screenshot" and "[截图]" or "[语音]";
+    local statusStr = entry.sentToLLM and "✓" or "○";
+    local content = TruncateText(entry.content, 30);
+    
+    return string.format("%s %s %s %s", timeStr, typeStr, statusStr, content);
+end
+
+function GetCombinedEntryColor(index)
+    local entry = GetCombinedHistoryEntry(index);
+    if not entry then return "#888888"; end
+    if entry.type == "screenshot" then
+        return entry.sentToLLM and "#00cc55" or "#4488ff";
+    else
+        return entry.sentToLLM and "#00cc55" or "#ffaa00";
+    end
+end
+
+-- Learning task info
+function HasPrimaryTask()
+    return GetAgent():GetPrimaryLearningTask() ~= nil;
+end
+
+function GetPrimaryTaskText()
+    local task = GetAgent():GetPrimaryLearningTask();
+    if task and task.text then
+        return TruncateText(task.text, 60);
+    end
+    return L"No task set (General Assistant Mode)";
+end
+
+-- LLM Response
+function GetLastLLMResponse()
+    -- Use LLM history instead of local variable
+    local entry = GetLLMEntry(1);
+    if entry and entry.response then
+        return entry.response;
+    end
+    -- Fallback to voice history
+    local history = GetAgent():GetVoiceHistory();
+    for i = #history, 1, -1 do
+        if history[i].llmResponse then
+            return history[i].llmResponse;
+        end
+    end
+    return lastLLMResponse or "";
+end
+
+function GetLastLLMToolCalls()
+    -- Use LLM history instead of local variable
+    local entry = GetLLMEntry(1);
+    if entry and entry.toolCalls and #entry.toolCalls > 0 then
+        local calls = {};
+        for _, call in ipairs(entry.toolCalls) do
+            table.insert(calls, call.name .. ": " .. commonlib.serialize_compact(call.params));
+        end
+        return table.concat(calls, "\n");
+    end
+    return lastLLMToolCalls or "";
+end
+
+function HasLLMResponse()
+    return GetLastLLMResponse() ~= "" or GetLLMHistoryCount() > 0;
+end
+--------------------------------------------------------------------------------
+-- Chat Message History Functions
+--------------------------------------------------------------------------------
+
+function GetChatMessageCount()
+    return GetAgent():GetChatMessageCount();
+end
+
+function GetChatMessage(index)
+    return GetAgent():GetChatMessage(index);
+end
+
+function GetCurrentChatMessage()
+    return GetAgent():GetCurrentChatMessage();
+end
+
+function HasChatMessage(index)
+    return GetChatMessage(index) ~= nil;
+end
+
+function GetChatMessageRole(index)
+    local msg = GetChatMessage(index);
+    if msg then
+        return msg.role == "user" and L"User" or L"Assistant";
+    end
+    return "";
+end
+
+function GetChatMessageContent(index)
+    local msg = GetChatMessage(index);
+    if msg and msg.content then
+        return msg.content;
+    end
+    return "";
+end
+
+function GetChatMessageTime(index)
+    local msg = GetChatMessage(index);
+    if msg and msg.timestamp then
+        return os.date("%H:%M:%S", msg.timestamp);
+    end
+    return "";
+end
+
+function GetChatMessageColor(index)
+    local msg = GetChatMessage(index);
+    if msg then
+        return msg.role == "user" and "#88ccff" or "#ccffcc";
+    end
+    return "#cccccc";
+end
+
+function HasCurrentChatMessage()
+    return GetCurrentChatMessage() ~= nil;
+end
+
+function GetCurrentChatContent()
+    local msg = GetCurrentChatMessage();
+    if msg and msg.content then
+        return msg.content;
+    end
+    return "";
+end
+
+function GetCurrentChatContentForDisplay()
+    local content = GetCurrentChatContent();
+    if content == "" then return ""; end
+    
+    -- Remove consecutive empty lines, keeping single line breaks
+    content = content:gsub("\n\n+", "\n");
+    -- Remove leading/trailing whitespace
+    content = content:match("^%s*(.-)%s*$") or content;
+    
+    return content;
+end
+
+function OnClearChatHistory()
+    GetAgent():ClearChatHistory();
+    RefreshPage();
+end
+--------------------------------------------------------------------------------
+-- Helper function to run test with optional screenshot capture
+--------------------------------------------------------------------------------
+
+local function RunTestCase(testName, prompt, captureFirst)
+    local agent = GetAgent();
+    if not agent then
+        GameLogic.AddBBS("BackgroundAgentDebug", L"Agent not initialized", 3000, "255 100 100");
+        return;
+    end
+    
+    GameLogic.AddBBS("BackgroundAgentDebug", testName, 2000, "100 200 255");
+    
+    local function sendToLLM(imageUrl)
+        -- Callback to handle LLM response
+        local function onResponse(result)
+            if result and result.success then
+                GameLogic.AddBBS("BackgroundAgentDebug", L"LLM Response received", 2000, "100 255 100");
+                UpdateUI();
+            else
+                local errMsg = result and result.error or "Unknown error";
+                GameLogic.AddBBS("BackgroundAgentDebug", L"LLM Error: " .. tostring(errMsg), 3000, "255 100 100");
+            end
+        end
+        
+        -- Call ProcessWithLLM with proper parameters: (userQuery, callback, options)
+        agent:ProcessWithLLM(prompt, onResponse, {
+            includeImage = true,
+            imageUrl = imageUrl,
+        });
+    end
+    
+    -- Capture screenshot first if requested
+    if captureFirst then
+        -- Use agent's CaptureSceneAsImage method
+        agent:CaptureSceneAsImage(function(imageUrl)
+            if imageUrl then
+                sendToLLM(imageUrl);
+            else
+                -- Proceed without image if capture failed
+                sendToLLM(nil);
+            end
+        end);
+    else
+        sendToLLM(nil);
+    end
+end
+
+--------------------------------------------------------------------------------
+-- Text Input for LLM
+--------------------------------------------------------------------------------
+
+local inputText = "";
+
+function GetInputText()
+    return inputText;
+end
+
+function SetInputText(value)
+    inputText = value or "";
+end
+
+-- Helper to get current input text from page (in case onchange hasn't fired yet)
+function GetCurrentInputText()
+    if Page then
+        local value = Page:GetValue("inputText");
+        if value and value ~= "" then
+            inputText = value;  -- sync local variable
+            return value;
+        end
+    end
+    return inputText;
+end
+
+function OnSendText()
+    local text = GetCurrentInputText();
+    if not text or text == "" then
+        GameLogic.AddBBS("BackgroundAgentDebug", L"Please enter text first", 2000, "255 200 100");
+        return;
+    end
+    
+    -- Clear input after getting the text
+    inputText = "";
+    if Page then
+        Page:SetValue("inputText", "");
+    end
+    
+    RunTestCase(L"Manual Input", text, false);
+end
+
+function OnSendTextWithImage()
+    local text = GetCurrentInputText();
+    if not text or text == "" then
+        GameLogic.AddBBS("BackgroundAgentDebug", L"Please enter text first", 2000, "255 200 100");
+        return;
+    end
+    
+    -- Clear input after getting the text
+    inputText = "";
+    if Page then
+        Page:SetValue("inputText", "");
+    end
+    
+    RunTestCase(L"Manual Input + Screenshot", text, true);
+end
+
+--------------------------------------------------------------------------------
+-- Fixed Test Cases
+--------------------------------------------------------------------------------
+
+-- Test 1: Basic dialog "你好！"
+function OnTestHello()
+    RunTestCase(L"Test: Hello (你好！)", "你好,你的名字是什么？", false);
+end
+
+-- Test 2: Scene understanding "当前场景中有什么"
+function OnTestSceneQuery()
+    RunTestCase(L"Test: Scene Query (场景查询)", "当前场景中有什么", true);
+end
+
+-- Test 3: Movement tool "让抱抱龙往前走10米"
+function OnTestMove()
+    RunTestCase(L"Test: Move (移动测试)", "让抱抱龙往前走10米", true);
+end
+
+-- Test 4: Speech tool "让抱抱龙说'你好！我在这里'"
+function OnTestSay()
+    RunTestCase(L"Test: Say (说话测试)", "让抱抱龙说'你好！我在这里'", true);
+end
+
+-- Auto-refresh timer
+local refreshTimer = nil;
+
+function StartAutoRefresh()
+    if not refreshTimer then
+        refreshTimer = commonlib.Timer:new({
+            callbackFunc = function()
+                if Page then
+                    UpdateUI();
+                end
+            end
+        });
+        refreshTimer:Change(100, 100);  -- 100ms for responsive typewriter effect
+    end
+end
+
+function StopAutoRefresh()
+    if refreshTimer then
+        refreshTimer:Change();
+        refreshTimer = nil;
+    end
+end
+
+-- Track if streaming content changed to avoid unnecessary updates
+local lastStreamingContent = "";
+local lastChatCount = 0;
+
+function UpdateUI()
+    if not Page then return; end
+    
+    -- Update state labels (these use SetValue, no refresh needed)
+    Page:SetValue("stateText", GetStateText());
+    Page:SetValue("voiceMonitorState", GetVoiceMonitorStateText());
+    Page:SetValue("sceneCount", tostring(GetSceneVisionCount()));
+    Page:SetValue("voiceCount", tostring(GetVoiceHistoryCount()));
+    Page:SetValue("pendingCount", tostring(GetPendingVoiceCount()));
+    Page:SetValue("copilotCount", tostring(GetRegisteredCopilotCount()));
+    
+    -- Update combined history
+    for i = 1, 5 do
+        Page:SetValue("historyEntry" .. i, GetCombinedEntryText(i));
+    end
+    
+    -- Update streaming chat content using SetValue (no page refresh needed)
+    local currentContent = GetCurrentChatContentForDisplay();
+    
+    -- Debug log (only log when content changes and is non-empty)
+    if currentContent ~= lastStreamingContent and currentContent ~= "" then
+        LOG.std(nil, "debug", "BackgroundAgentDebug", "[UI] SetValue streamingChatContent: %s (length: %d)", 
+            string.sub(currentContent, 1, 100), #currentContent);
+        lastStreamingContent = currentContent;
+    end
+    
+    Page:SetValue("streamingChatContent", currentContent);
+    
+    -- Update streaming label status
+    local streamingLabel = HasCurrentChatMessage() and L"Streaming..." or L"Waiting...";
+    Page:SetValue("streamingLabel", streamingLabel);
+    
+    -- Only do a full page refresh when chat message count changes (new message added/completed)
+    -- This allows the pe:if conditions to re-evaluate
+    local currentChatCount = GetChatMessageCount();
+    
+    -- Check if we need a full refresh (structure changed, not just content)
+    if currentChatCount ~= lastChatCount then
+        lastChatCount = currentChatCount;
+        -- Delay refresh slightly to batch multiple rapid changes
+        Page:Refresh(0.2);
+    end
+end
+
+-- Handle chat content update signal for immediate UI refresh
+local pendingContentUpdate = nil;
+local contentUpdateTimer = nil;
+
+function OnChatContentUpdate(content)
+    if not Page or not content then return; end
+    
+    -- Store the latest content
+    pendingContentUpdate = content;
+    
+    -- Cancel existing timer if any
+    if contentUpdateTimer then
+        contentUpdateTimer:Change();
+    end
+    
+    -- Set a very short delay (50ms) to batch rapid updates
+    contentUpdateTimer = commonlib.Timer:new({
+        callbackFunc = function()
+            if Page and pendingContentUpdate then
+                LOG.std(nil, "debug", "BackgroundAgentDebug", "[UI] Applying batched SetValue, length: %d", #pendingContentUpdate);
+                -- Filter empty lines before setting value
+                local filtered = pendingContentUpdate:gsub("\n\n+", "\n");
+                filtered = filtered:match("^%s*(.-)%s*$") or filtered;
+                Page:SetValue("streamingChatContent", filtered);
+                pendingContentUpdate = nil;
+            end
+            contentUpdateTimer = nil;
+        end
+    });
+    contentUpdateTimer:Change(50, nil);  -- 50ms delay, no repeat
+end
+
+-- Connect to agent's chatContentUpdate signal
+local agent = GetAgent();
+if agent then
+    agent:Connect("chatContentUpdate", nil, OnChatContentUpdate);
+end
+
+-- Start auto-refresh when page loads
+StartAutoRefresh();
+]]></script>
+
+<aries:window mode="thin" style="width:1100px;" title='<%=L"BackgroundAgent Debug"%>' onclose="OnClose">
+    <div style="margin:5px;">
+        <!-- Top Section: Status + Controls -->
+        <div style="margin-bottom:6px;">
+            <!-- Status Section -->
+            <div style="float:left;width:520px;">
+                <div style="font-weight:bold;margin-bottom:4px;color:#ffffff;"><%=L"Agent Status"%></div>
+                <div style="float:left;width:260px;">
+                    <div style="margin-bottom:3px;">
+                        <span style="color:#cccccc;"><%=L"Playback: "%></span>
+                        <pe:label name="stateText" style="color:<%=GetStateColor()%>;font-weight:bold;"><%=GetStateText()%></pe:label>
+                    </div>
+                    <div style="margin-bottom:3px;">
+                        <span style="color:#cccccc;"><%=L"Voice Monitor: "%></span>
+                        <pe:label name="voiceMonitorState" style="color:<%=GetVoiceMonitorStateColor()%>;"><%=GetVoiceMonitorStateText()%></pe:label>
+                    </div>
+                    <div style="margin-bottom:3px;">
+                        <span style="color:#cccccc;"><%=L"Copilots: "%></span>
+                        <pe:label name="copilotCount" style="color:#ffffff;"><%=GetRegisteredCopilotCount()%></pe:label>
+                        <span style="color:#888888;font-size:10px;"> (<%=GetCopilotNames()%>)</span>
+                    </div>
+                </div>
+                <div style="float:left;width:240px;">
+                    <div style="margin-bottom:3px;">
+                        <span style="color:#cccccc;"><%=L"Screenshots: "%></span>
+                        <pe:label name="sceneCount" style="color:#ffffff;"><%=GetSceneVisionCount()%></pe:label>
+                        <span style="color:#cccccc;margin-left:15px;"><%=L"Voice: "%></span>
+                        <pe:label name="voiceCount" style="color:#ffffff;"><%=GetVoiceHistoryCount()%></pe:label>
+                    </div>
+                    <div style="margin-bottom:3px;">
+                        <span style="color:#cccccc;"><%=L"Pending: "%></span>
+                        <pe:label name="pendingCount" style="color:#ffaa00;"><%=GetPendingVoiceCount()%></pe:label>
+                        <span style="color:#cccccc;margin-left:15px;"><%=L"Debug: "%></span>
+                        <span style="color:<%=IsDebugEnabled() and '#00ff66' or '#888888'%>;"><%=IsDebugEnabled() and L"ON" or L"OFF"%></span>
+                    </div>
+                    <div style="margin-bottom:3px;font-size:11px;">
+                        <span style="color:#cccccc;"><%=L"Mode: "%></span>
+                        <span style="color:<%=HasPrimaryTask() and '#ffffff' or '#88ccff'%>;"><%=TruncateText(GetPrimaryTaskText(), 30)%></span>
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+            
+            <!-- Control Buttons -->
+            <div style="float:left;width:550px;">
+                <div style="margin-bottom:4px;padding:4px;background-color:#333333;">
+                    <input type="button" value="<%=L'Play'%>" style="width:50px;height:22px;margin-right:3px;background-color:#00aa44;color:#ffffff;" onclick="OnPlay"/>
+                    <input type="button" value="<%=L'Pause'%>" style="width:50px;height:22px;margin-right:3px;background-color:#cc8800;color:#ffffff;" onclick="OnPause"/>
+                    <input type="button" value="<%=L'Stop'%>" style="width:50px;height:22px;margin-right:3px;background-color:#cc4444;color:#ffffff;" onclick="OnStop"/>
+                    <input type="button" value="<%=L'Step'%>" style="width:50px;height:22px;margin-right:3px;background-color:#4488ff;color:#ffffff;" onclick="OnStep"/>
+                    <input type="button" value="<%=L'Debug'%>" style="width:50px;height:22px;margin-right:3px;background-color:<%=IsDebugEnabled() and '#00aa44' or '#666666'%>;color:#ffffff;" onclick="OnToggleDebug"/>
+                    <input type="button" value="<%=L'Copilots'%>" style="width:55px;height:22px;margin-right:3px;background-color:#6644aa;color:#ffffff;" onclick="OnRegisterCopilots"/>
+                    <input type="button" value="<%=L'Capture'%>" style="width:55px;height:22px;background-color:#555555;color:#ffffff;" onclick="OnCaptureScreenshot"/>
+                </div>
+                <div style="padding:4px;background-color:#2a3a2a;border:1px solid #4a6a4a;">
+                    <input type="text" name="inputText" value='<%=GetInputText()%>' style="width:340px;height:22px;background-color:#1a2a1a;color:#ffffff;font-size:12px;" onchange="SetInputText" EmptyText="<%=L'Enter text to send to LLM...'%>"/>
+                    <input type="button" value='<%=L"Send"%>' style="width:50px;height:22px;margin-left:3px;background-color:#44aa44;color:#ffffff;" onclick="OnSendText"/>
+                    <input type="button" value='<%=L"+Img"%>' style="width:45px;height:22px;margin-left:3px;background-color:#4488aa;color:#ffffff;" onclick="OnSendTextWithImage"/>
+                </div>
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+        
+        <!-- Main Content: Two Columns -->
+        <div style="margin-bottom:6px;">
+            <!-- Left Column: Chat Messages -->
+            <div style="float:left;width:540px;margin-right:10px;">
+                <!-- Chat Messages Display (expanded height after removing LLM History) -->
+                <pe:container style="margin-bottom:6px;padding:5px;background-color:#0a1a0a;height:390px; background: url();">
+                    <div style="font-weight:bold;margin-bottom:4px;color:#88ffaa;">
+                        <%=L"Chat Messages"%> (<span style="color:#ffffff;"><%=GetChatMessageCount()%></span>)
+                        <span style="float:right;">
+                            <input type="button" value="<%=L'Clear'%>" style="width:45px;height:18px;background-color:#555555;color:#ffffff;font-size:10px;" onclick="OnClearChatHistory"/>
+                        </span>
+                    </div>
+                    <pe:treeview name="chatMessagesTreeview" DefaultNodeHeight="20" style="margin-left:0px;margin-top:0px;width:530px;height:355px;font-size:11px;background: url();">
+                        <div style="padding:4px;">
+                            <!-- Current streaming message (updated via SetValue for typewriter effect) - SHOWN FIRST -->
+                            <div name="streamingContainer" style="margin-bottom:5px;padding:4px;background-color:#0a1a1a;border-left:3px dashed #ffffaa;min-height:30px;">
+                                <div style="font-size:10px;color:#ffff88;font-weight:bold;">
+                                    <pe:label name="streamingLabel"><%=HasCurrentChatMessage() and L"Streaming..." or L"Waiting..."%></pe:label>
+                                </div>
+                                <textarea name="streamingChatContent" ReadOnly="false" UseSystemControl="true" WordWrap="true" rows="2" style="font-size:11px;textcolor:#ffffcc;margin-top:2px;word-wrap:break-word;min-height:16px;"><%=GetCurrentChatContentForDisplay()%></textarea>
+                            </div>
+                            <!-- Show recent 10 messages, newest first -->
+                            <pe:if condition='<%= HasChatMessage(1) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(1)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(1)%></span>
+                                    <span style="color:<%=GetChatMessageColor(1)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(1)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#ccffcc;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(1)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= HasChatMessage(2) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(2)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(2)%></span>
+                                    <span style="color:<%=GetChatMessageColor(2)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(2)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#cccccc;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(2)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= HasChatMessage(3) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(3)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(3)%></span>
+                                    <span style="color:<%=GetChatMessageColor(3)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(3)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#999999;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(3)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= HasChatMessage(4) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(4)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(4)%></span>
+                                    <span style="color:<%=GetChatMessageColor(4)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(4)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#888888;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(4)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= HasChatMessage(5) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(5)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(5)%></span>
+                                    <span style="color:<%=GetChatMessageColor(5)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(5)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#666666;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(5)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= HasChatMessage(6) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(6)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(6)%></span>
+                                    <span style="color:<%=GetChatMessageColor(6)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(6)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#666666;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(6)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= HasChatMessage(7) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(7)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(7)%></span>
+                                    <span style="color:<%=GetChatMessageColor(7)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(7)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#555555;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(7)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= HasChatMessage(8) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(8)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(8)%></span>
+                                    <span style="color:<%=GetChatMessageColor(8)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(8)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#555555;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(8)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= HasChatMessage(9) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(9)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(9)%></span>
+                                    <span style="color:<%=GetChatMessageColor(9)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(9)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#444444;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(9)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= HasChatMessage(10) %>'>
+                            <div style="margin-bottom:5px;padding:4px;background-color:#0a1a0a;border-left:3px solid <%=GetChatMessageColor(10)%>;">
+                                <div style="font-size:10px;color:#888888;">
+                                    <span style="color:#aaaaaa;"><%=GetChatMessageTime(10)%></span>
+                                    <span style="color:<%=GetChatMessageColor(10)%>;margin-left:6px;font-weight:bold;"><%=GetChatMessageRole(10)%></span>
+                                </div>
+                                <div style="font-size:11px;color:#444444;margin-top:2px;word-wrap:break-word;"><%=GetChatMessageContent(10)%></div>
+                            </div>
+                            </pe:if>
+                            <pe:if condition='<%= not HasChatMessage(1) and GetCurrentChatContent() == "" %>'>
+                            <div style="color:#666666;font-size:11px;text-align:center;padding:20px;"><%=L"No chat messages yet"%></div>
+                            </pe:if>
+                        </div>
+                    </pe:treeview>
+                </pe:container>
+            </div>
+            
+            <!-- Right Column: Context History + Test Cases -->
+            <div style="float:left;width:520px;">
+                <!-- Context History -->
+                <div style="margin-bottom:6px;border:1px solid #444;padding:5px;background-color:#1a1a1a;height:200px;">
+                    <div style="font-weight:bold;margin-bottom:4px;color:#ffffff;">
+                        <%=L"Context History"%>
+                        <span style="float:right;">
+                            <input type="button" value="<%=L'Scene'%>" style="width:40px;height:18px;background-color:#555555;color:#ffffff;font-size:10px;" onclick="OnClearSceneHistory"/>
+                            <input type="button" value="<%=L'Voice'%>" style="width:40px;height:18px;background-color:#555555;color:#ffffff;font-size:10px;" onclick="OnClearVoiceHistory"/>
+                            <input type="button" value="<%=L'All'%>" style="width:35px;height:18px;background-color:#664444;color:#ffffff;font-size:10px;" onclick="OnClearAllHistory"/>
+                        </span>
+                    </div>
+                    <div style="height:165px;overflow-y:auto;background-color:#111111;padding:4px;border:1px solid #333;">
+                        <div style="height:18px;margin-bottom:2px;"><pe:label name="historyEntry1" style="color:<%=GetCombinedEntryColor(1)%>;font-size:11px;"><%=GetCombinedEntryText(1)%></pe:label></div>
+                        <div style="height:18px;margin-bottom:2px;"><pe:label name="historyEntry2" style="color:<%=GetCombinedEntryColor(2)%>;font-size:11px;"><%=GetCombinedEntryText(2)%></pe:label></div>
+                        <div style="height:18px;margin-bottom:2px;"><pe:label name="historyEntry3" style="color:<%=GetCombinedEntryColor(3)%>;font-size:11px;"><%=GetCombinedEntryText(3)%></pe:label></div>
+                        <div style="height:18px;margin-bottom:2px;"><pe:label name="historyEntry4" style="color:<%=GetCombinedEntryColor(4)%>;font-size:11px;"><%=GetCombinedEntryText(4)%></pe:label></div>
+                        <div style="height:18px;margin-bottom:2px;"><pe:label name="historyEntry5" style="color:<%=GetCombinedEntryColor(5)%>;font-size:11px;"><%=GetCombinedEntryText(5)%></pe:label></div>
+                    </div>
+                </div>
+                
+                <!-- Test Cases + Legend -->
+                <div style="border:1px solid #444;padding:5px;background-color:#2a2a3a;height:180px;">
+                    <div style="font-weight:bold;margin-bottom:4px;color:#aaaaff;"><%=L"Test Cases (LLM Stability)"%></div>
+                    <div style="margin-bottom:6px;">
+                        <input type="button" value='<%=L"你好！"%>' style="width:60px;height:24px;margin-right:4px;background-color:#336699;color:#ffffff;" onclick="OnTestHello"/>
+                        <input type="button" value='<%=L"场景查询"%>' style="width:70px;height:24px;margin-right:4px;background-color:#339966;color:#ffffff;" onclick="OnTestSceneQuery"/>
+                        <input type="button" value='<%=L"移动测试"%>' style="width:70px;height:24px;margin-right:4px;background-color:#996633;color:#ffffff;" onclick="OnTestMove"/>
+                        <input type="button" value='<%=L"说话测试"%>' style="width:70px;height:24px;background-color:#993366;color:#ffffff;" onclick="OnTestSay"/>
+                    </div>
+                    <div style="font-size:10px;color:#888888;margin-bottom:10px;">
+                        <%=L"1.Basic dialog 2.Scene understanding 3.Move tool 4.Say tool"%>
+                    </div>
+                    
+                    <!-- Legend -->
+                    <div style="border-top:1px solid #444;padding-top:8px;font-size:10px;color:#888888;">
+                        <div style="font-weight:bold;color:#aaaaaa;margin-bottom:4px;"><%=L"Legend"%></div>
+                        <span style="color:#4488ff;">●</span> <%=L"Screenshot"%>  
+                        <span style="color:#ffaa00;">●</span> <%=L"Voice pending"%>  
+                        <span style="color:#00cc55;">✓</span> <%=L"Sent to LLM"%>
+                        <div style="margin-top:4px;">
+                            <span style="color:#00cc55;">●</span> <%=L"Success"%>  
+                            <span style="color:#ff4444;">●</span> <%=L"Error"%>  
+                            <span style="color:#ffaa00;">●</span> <%=L"Pending"%>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+    </div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

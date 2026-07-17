@@ -49,7 +49,7 @@ end
 
 Commands["paralife"] = {
 	name="paralife", 
-	quick_ref="/paralife [show|hide|buy|checkbuy|openbook] [-addbag|-askonce|setbag|setbagtype|pickbagitem|clearbag|showbag]", 
+	quick_ref="/paralife [show|hide|buy|checkbuy|openbook] [-addbag|-askonce|setbag|setbagtype|pickbagitem|clearbag|showbag|-mobilepad]", 
 	desc=[[paralife logic. 
 @param show: show paralife mode [-showplayer -noedit -nobackbutton -nobookbutton]
 @param hide: hide paralife mode
@@ -63,6 +63,7 @@ Commands["paralife"] = {
 @param pathfinding: handles pathfinding logic. [-jumpHeightWhileHidden] set jump height while hidden
 e.g.
 /paralife show -showplayer -noedit -nobackbutton -nobookbutton -nofacial -nobag
+/paralife show -mobilepad  this command is equal (/paralife show -noedit -nobackbutton -nobookbutton -nofacial -nobag)
 /paralife hide
 /paralife setbagtype grid
 /paralife setbagtype gridbottom  |  gridtop  [-count=8] [-size=48]
@@ -82,13 +83,21 @@ e.g.
 		sub_cmd, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);
 		if sub_cmd=="show" then
             local options
-			options, cmd_text = CmdParser.ParseOptions(cmd_text);
-            -- print("-------options")
-            -- for k,v in pairs(options) do
-            --     print("-----k,v",k,v,type(v))
-            -- end
-			ParaLife:SetShowOptions(options)
-			ParaLife:SetEnabled(true)
+            local option, cmd_text = CmdParser.ParseOption(cmd_text);
+            if option == "mobilepad" then
+                options= {noedit =  true,nobookbutton = true,nobackbutton = true,nofacial = true,nobag = true}
+                ParaLife:SetShowOptions(options)
+                ParaLife:SetEnabled(true)
+            else
+                
+                options, cmd_text = CmdParser.ParseOptions(cmd_text);
+                -- print("-------options")
+                -- for k,v in pairs(options) do
+                --     print("-----k,v",k,v,type(v))
+                -- end
+                ParaLife:SetShowOptions(options)
+                ParaLife:SetEnabled(true)
+            end
         elseif sub_cmd=="hide" then
 			ParaLife:SetEnabled(false)
         elseif sub_cmd=="setbag" then

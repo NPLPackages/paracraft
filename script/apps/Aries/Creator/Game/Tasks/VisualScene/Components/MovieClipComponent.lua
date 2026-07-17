@@ -8,15 +8,10 @@ use the lib:
 local MovieClipComponent = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/Components/MovieClipComponent.lua");
 ------------------------------------------------------------
 --]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
 local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local VisualSceneLogic = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/VisualSceneLogic.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
 local BaseComponent = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/BaseComponent.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-NPL.load("(gl)script/ide/timer.lua");
-
 local MovieClipComponent = commonlib.inherit(BaseComponent, NPL.export());
 
 MovieClipComponent:Property({"ComponentName", "MovieClipComponent", auto = true,  camelCase = true, });

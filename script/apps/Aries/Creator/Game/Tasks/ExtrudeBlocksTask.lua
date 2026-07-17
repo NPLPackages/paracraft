@@ -82,10 +82,11 @@ function ExtrudeBlocks:Run()
 				end
 			end
 		end
-		if(GameLogic.GameMode:CanAddToHistory()) then
+		if(GameLogic.GameMode:CanAddToHistory() or self.add_to_history) then
 			if(#(self.history) > 0) then
 				UndoManager.PushCommand(self);
 				GameLogic.SetModified();
+				GameLogic.GetFilters():apply_filters("BatchModifyBlocks", self.history)
 			end
 		end
 	end

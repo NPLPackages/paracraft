@@ -52,58 +52,6 @@ end
 </script>
 <aries:window style="width:400px;height:600px" title='<%=L"换装"%>' mode="thin" onclose="OnClose">
 <pe:tabs name="AdvTools" style="margin:8px">
-    <!-- old file
-    <pe:tab-item name="Basic" text="基本" style="padding:4px">
-        <div style="" class="default">
-            Part 1: Base Character Skin
-            <pe:gridview DataSource="<%=DS_Func_BaseSkins%>" name="BaseSkins" style="width:350px;height:71px;" 
-                VerticalScrollBarStep="71" CellPadding="0"  DefaultNodeHeight = "70" 
-                ItemsPerLine="4" AllowPaging="false" pagesize="250">
-                <Columns>
-                    <a style="width:70px;height:70px;margin:0px;"
-                        onclick="EditCCSTask.TestSkin" param1='<%=Eval("color")%>'>
-                        <img style="width:64px;height:64px;margin:3px;" src='<%=Eval("img")%>'/>
-                    </a>
-                </Columns>
-                <EmptyDataTemplate>
-                    <b>Empty Items</b>
-                </EmptyDataTemplate>
-                <FetchingDataTemplate>
-                    <b>Data Fetching, Please wait ... </b>
-                </FetchingDataTemplate>
-            </pe:gridview>
-            <hr/>
-            Part 2: EyeAddon
-            <br/>
-            <a style="width:64px;" onclick="EditCCSTask.TestEyeAddon" param1='0'>Nothing</a>
-            <a style="width:64px;" onclick="EditCCSTask.TestEyeAddon" param1='1'>Glass1</a>
-            <a style="width:64px;" onclick="EditCCSTask.TestEyeAddon" param1='2'>Glass2</a>
-            <hr/>
-            Part 3: Wings
-            <br/>
-            <a style="width:64px;" onclick="EditCCSTask.TestWings" param1='0'>Nothing</a>
-            <a style="width:64px;" onclick="EditCCSTask.TestWings" param1='1'>Wings1</a>
-            <a style="width:64px;" onclick="EditCCSTask.TestWings" param1='2'>Wings2</a>
-            <br/>
-            Part 4: Generate Database
-            <input type="button" value="Generate!" style="width:64px;" onclick="EditCCSTask.ClickDBUpdate"/>
-            <br/>
-            Part 5: 抱抱龙颜色
-            <input type="button" value="1" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_Purple"/>
-            <input type="button" value="2" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_Red"/>
-            <input type="button" value="3" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_Green"/>
-            <input type="button" value="4" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_Orange"/>
-            <input type="button" value="5" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_DarkPurple"/>
-            <input type="button" value="6" style="width:32px;" onclick="EditCCSTask.UpdateDragonSkin_DarkRed"/>
-            <br/>
-            Part 6: 换资源路径
-            <div>新路径:<input style="width:200px" name="newasset"/><input type="button" name="changeasset" value="改资源" onclick="EditCCSTask.OnChangeAsset"/></div>
-            <br/>
-            <hr/>
-            <hr/>
-        </div>
-    </pe:tab-item>
-    -->
     <pe:tab-item name="Hair" text="头发&肤色" style="padding:4px">
         <div style="" class="default">
             <div>发型：</div>
@@ -276,8 +224,7 @@ end
                     <input type="button" value="背包空空" style="width:64px;" onclick="EditCCSTask.ClickBackUpdate" gsid="0"/>
                     <br/>
                     <div style="height:20px;"/>
-             <form>
-      <br/>
+      
         <input type="button" value="右烈火S4" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2304_FireMagicWandS4" gsid="2304"/>
         <input type="button" value="右寒冰S4" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2305_IceMagicWandS4" gsid="2305"/>
         <input type="button" value="右风暴S4" style="width:64px;" onclick="EditCCSTask.ClickRightHandUpdate" tooltip="2306_StormMagicWandS4" gsid="2306"/>
@@ -492,7 +439,6 @@ end
         <input type="button" value="VIP10" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1299"/>
         <input type="button" value="VIP11" style="width:48px;" onclick="EditCCSTask.ClickRightHandUpdate" gsid="1300"/>
         <br/>
-                    </form>
                 </div>
             </form>
             </Columns>
@@ -1507,22 +1453,7 @@ end
             </Columns>
         </pe:gridview>
     </pe:tab-item>
-<!--    <pe:tab-item name="Attachment" text="Attachment" style="padding:4px">
-        <div style="">
-            Part 1: Attachment Test
-            <hr/>
-            Part 2: Standard Attachment
-            <hr/>
-        </div>
-    </pe:tab-item>
-    <pe:tab-item name="Animation" text="Animation" style="padding:4px">
-        <div style="">
-            Part 1: Generic Animation Test
-            <hr/>
-            Part 2: Custom Animation Test
-            <hr/>
-        </div>
-    </pe:tab-item>-->
+
 </pe:tabs>
 
 </aries:window>

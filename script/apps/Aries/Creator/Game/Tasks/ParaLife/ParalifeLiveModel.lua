@@ -781,8 +781,13 @@ function ParalifeLiveModel.CreateFaceView()
 end
 
 function ParalifeLiveModel.DropFacialExpressionAtCursor(data)
+	local context = GameLogic.GetSceneContext()
+	if not context then
+		LOG.std(nil,"info","ParalifeLiveModel","create livemodel in paralife context is Error")
+		return
+	end
 	local event = MouseEvent:init("mousePressEvent")
-	local result, targetEntity = GameLogic.GetSceneContext():CheckMousePick(event);
+	local result, targetEntity = context:CheckMousePick(event);
 	if not targetEntity and result and result.blockX then
 		local entityBlock = EntityManager.GetBlockEntity(result.blockX, result.blockY, result.blockZ)
 		if(entityBlock and entityBlock:isa(EntityManager.EntityBlockModel)) then

@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    EducateOfflinePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Offline/EducateOfflinePage.lua")
+    EducateOfflinePage.OnInit()
+    function ClosePage()
+        EducateOfflinePage.OnClickExitBtn()
+    end  
+    function GetUserPortrait()
+        return "Texture/Aries/Creator/paracraft/Educate/icon_offline_96x96_32bits.png#0 0 96 96"
+    end    
+
+    function IsShowCreateWorld()
+        return EducateOfflinePage.isShowCreateWorld
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#E3EEFD; ">
+    <!--Close-->
+    <pe:container alignment="_ctl" zorder="2" style="width: 100px;height: 720px; background:;">
+        <div style="width: 123px; height: 720px; background: url(Texture/Aries/Creator/paracraft/Educate/cebianlan_123x720_32bits.png#0 0 123 720);">
+            <div style="margin-top: 32px; width: 100xp; height: 40px;">
+                <div style="width: 50px; height: 50px; margin-left: 28px; ">
+                    <div style="position: relative; width: 48px; height: 48px; background: url(Texture/Aries/Creator/paracraft/Educate/touxiangdi_48x48_32bits.png#0 0 48 48);"></div>
+                    <img name="img_protrait" src="<%=GetUserPortrait()%>" style="position: relative; margin: 2px; width: 44px; height: 44px;"/>
+                </div>
+            </div>
+            <div style="width: 100px; height: 60px; margin-top: 540px;">
+                <input type="button" onclick="ClosePage" style="width: 40px; height: 40px; margin-left: 30px; background: url(Texture/Aries/Creator/paracraft/Educate/guanbi_40x40_32bits.png#0 0 40 40);" />
+            </div>
+
+        </div>
+    </pe:container>
+    <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">   
+        <div style="position: relative; height:35px;margin-top:34px;" >            
+        </div>    
+        <!-- RIGHT -->
+        <div style="position: relative; margin-left:124px;margin-top:90px;width:1132px;height:600px;background:url(Texture/Aries/Creator/paracraft/Educate/beijingdi_50x50_32bits.png#0 0 50 50 :24 24 24 24);">
+            <div style="position: relative; width: 320px; height: 112px; background: url(Texture/Aries/Creator/paracraft/Educate/biaotidiban_320x112_32bits.png#0 0 320 112);"></div>
+            
+        </div>
+        <div style="position: relative; margin-left: 124px;margin-top:90px;">
+            <pe:if condition ="<%=IsShowCreateWorld()%>">
+                <iframe name="educate_main_frame" src="script/apps/Aries/Creator/Game/Educate/CreateWorld/CreateNewWorld.html"></iframe>
+            </pe:if>
+            <pe:if condition ="<%=not IsShowCreateWorld()%>">
+                <iframe name="educate_main_frame" src="script/apps/Aries/Creator/Game/Educate/Offline/Project/EducateProject.html"></iframe>
+            </pe:if>
+        </div>
+    </pe:container>
+
+</pe:container>
+</pe:mcml>
+</body>
+</html>

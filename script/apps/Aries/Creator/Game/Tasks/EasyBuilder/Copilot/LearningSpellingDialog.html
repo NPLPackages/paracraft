@@ -1,0 +1,155 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/LearningSpellingDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Learning Spelling Dialog</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/LearningToolUI.lua");
+local LearningToolUI = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.LearningToolUI");
+
+local page = document:GetPageCtrl();
+local userInput = "";
+
+function GetParams()
+    return LearningToolUI.GetParams();
+end
+
+function GetWord()
+    local params = GetParams();
+    return params.word or "";
+end
+
+function GetHint()
+    local params = GetParams();
+    return params.hint or params.translation or "";
+end
+
+function GetPrompt()
+    local params = GetParams();
+    if params.translation then
+        return string.format("请拼写: %s", params.translation);
+    end
+    return "请拼写这个单词";
+end
+
+function GetFeedback()
+    return LearningToolUI.GetFeedbackResult();
+end
+
+function IsFeedbackShowing()
+    local feedback = GetFeedback();
+    return feedback and feedback.show;
+end
+
+function GetFeedbackText()
+    local feedback = GetFeedback();
+    return feedback and feedback.text or "";
+end
+
+function GetFeedbackColor()
+    local feedback = GetFeedback();
+    return feedback and feedback.color or "#333333";
+end
+
+function OnInputChange(value)
+    userInput = value or "";
+end
+
+function OnSubmit()
+    if IsFeedbackShowing() then
+        return;
+    end
+    
+    local inputCtrl = page:FindControl("spelling_input");
+    if inputCtrl then
+        userInput = inputCtrl:GetText() or "";
+    end
+    
+    if userInput == "" then
+        return;
+    end
+    
+    local word = GetWord();
+    local isCorrect = LearningToolUI.CompareSpelling(word, userInput);
+    
+    LearningToolUI.SubmitAnswer(isCorrect, userInput, {
+        expectedWord = word,
+    });
+end
+
+function OnPlayWord()
+    local word = GetWord();
+    LearningToolUI.PlayDemoAudio(word);
+end
+
+function OnClose()
+    LearningToolUI.Close({success = false, cancelled = true});
+end
+
+function IsPlayButtonEnabled()
+    return not LearningToolUI.IsSpeaking();
+end
+
+function GetPlayButtonText()
+    return LearningToolUI.IsSpeaking() and "播放中..." or "🔊 听发音";
+end
+]]></script>
+
+<div style="width:390px;background-color:#ffffff;">
+    <!-- Title Bar -->
+    <div style="width:390px;height:40px;background-color:#9C27B0;position:relative;">
+        <div style="position:relative;left:15px;top:10px;color:#ffffff;font-size:16px;font-weight:bold;">
+            拼写练习
+        </div>
+        <div style="position:relative;left:352px;top:6px;">
+            <input type="button" value="✕" style="width:28px;height:28px;background-color:#7B1FA2;color:#ffffff;font-size:14px;background:url();" onclick="OnClose"/>
+        </div>
+    </div>
+    
+    <!-- Prompt Area -->
+    <div style="width:360px;margin:15px;text-align:center;">
+        <div style="font-size:14px;color:#666666;margin-bottom:10px;">
+            <%=GetPrompt()%>
+        </div>
+        
+        <!-- Hint (translation) -->
+        <pe:if condition='<%=GetHint() ~= ""%>'>
+            <div style="font-size:22px;color:#333333;font-weight:bold;margin-bottom:15px;">
+                <%=GetHint()%>
+            </div>
+        </pe:if>
+        
+        <!-- Play Button -->
+        <input type="button" value="<%=GetPlayButtonText()%>" style="width:120px;height:34px;background-color:#4CAF50;color:#ffffff;font-size:13px;" onclick="OnPlayWord" enabled="<%=IsPlayButtonEnabled()%>"/>
+    </div>
+    
+    <!-- Input Area -->
+    <div style="width:360px;margin-left:15px;margin-bottom:15px;">
+        <div style="width:350px;height:45px;background-color:#f5f5f5;padding:5px;">
+            <input type="text" name="spelling_input" style="width:340px;height:35px;font-size:18px;text-align:center;background-color:#ffffff;" EmptyText="在此输入..." onchange="OnInputChange"/>
+        </div>
+        
+        <!-- Submit Button -->
+        <div style="margin-top:20px;margin-left:105px;">
+            <input type="button" value="提交答案" style="width:150px;height:42px;background-color:#2196F3;color:#ffffff;font-size:16px;" onclick="OnSubmit"/>
+        </div>
+    </div>
+    
+    <!-- Feedback Overlay -->
+    <pe:if condition='<%=IsFeedbackShowing()%>'>
+        <div style="position:relative;width:390px;height:250px;margin-top:-250px;background-color:#00000080;">
+            <div style="margin-left:95px;margin-top:85px;width:200px;height:80px;background-color:#ffffff;text-align:center;">
+                <div style="margin-top:25px;font-size:20px;font-weight:bold;color:<%=GetFeedbackColor()%>;">
+                    <%=GetFeedbackText()%>
+                </div>
+            </div>
+        </div>
+    </pe:if>
+</div>
+</pe:mcml>
+</body>
+</html>

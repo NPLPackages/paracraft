@@ -21,6 +21,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 
 local MultiAnimBlock = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Common.MultiAnimBlock"));
+MultiAnimBlock.tableType = "MultiAnimBlock";
 
 function MultiAnimBlock:ctor()
 	self.variables = commonlib.OrderedArraySet:new();
@@ -36,6 +37,19 @@ end
 
 function MultiAnimBlock:GetVariable(nIndex)
 	return self.variables[nIndex];
+end
+
+-- get the first key time containing the time, 
+-- @Note duplicated values are merged.  for example, if key1 and key2 both have the same value, their start time is merged key1's time is returned. 
+function MultiAnimBlock:getStartTime(anim, time)
+	local time = 0;
+	for i=1, #(self.variables) do
+		local t = self.variables[i]:getStartTime(anim, time);
+		if(t > time) then
+			time = t;
+		end
+	end
+	return time;
 end
 
 -- variable is returned as an array of individual variable value at the given time. 

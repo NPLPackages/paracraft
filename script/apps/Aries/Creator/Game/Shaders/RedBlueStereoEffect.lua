@@ -12,6 +12,8 @@ local effect = RedBlueStereoEffect:new():Init(effect_manager, name);
 local effect = GameLogic.GetShaderManager():GetEffect("RedBlueStereo");
 if(effect) then
 	effect:SetEnabled(true);
+	effect:SetRedBlueMode();
+	-- effect:SetInterfacedMode();
 end
 -------------------------------------------------------
 ]]
@@ -30,6 +32,14 @@ function RedBlueStereoEffect:SetEnabled(bEnable)
 	local viewport = attr:GetChild("ViewportManager"):GetChild("final_composite");
 	if(viewport) then
 		if(bEnable ~= false) then
+			if(System.os.GetPlatform()=="win32") then
+				local effect = ParaAsset.GetEffectFile("RedBlueStereo");
+				effect:LoadAsset();
+				if(System.os.GetRendererName() == "DirectX") then
+					LOG.std(nil, "info", "RedBlueStereoEffect", "loading RedBlueStereo.fx effect file, fallback to RedBlueStereo.fxo");
+					effect = ParaAsset.LoadEffectFile("RedBlueStereo","script/apps/Aries/Creator/Game/Shaders/RedBlueStereo.fxo");
+				end
+			end
 			viewport:SetField("RenderScript", "MyCompany.Aries.Game.Shaders.RedBlueStereoEffect.OnRender()");
 		else
 			viewport:SetField("RenderScript", "");
@@ -45,10 +55,23 @@ function RedBlueStereoEffect.OnRender()
 	end
 end
 
+-- displayed vertically left, right, left, right, ...
+function RedBlueStereoEffect:SetInterfacedMode()
+	self.mode = "interlaced";
+end
+
+-- this is the default mode
+function RedBlueStereoEffect:SetRedBlueMode()
+	self.mode = "redblue";
+end
+
+function RedBlueStereoEffect:IsInterlacedMode()
+	return self.mode == "interlaced";
+end
+
 -- do the per frame scene rendering here. 
 function RedBlueStereoEffect:OnRenderPostProcessing()
-	local effect = ParaAsset.LoadEffectFile("RedBlueStereo","script/apps/Aries/Creator/Game/Shaders/RedBlueStereo.fxo");
-	effect = ParaAsset.GetEffectFile("RedBlueStereo");
+	local effect = ParaAsset.GetEffectFile("RedBlueStereo");
 		
 	if(effect:Begin()) then
 		local params = effect:GetParamBlock();
@@ -56,18 +79,19 @@ function RedBlueStereoEffect:OnRenderPostProcessing()
 		-- 0 stands for S0_POS_TEX0,  all data in stream 0: position and tex0
 		ParaEngine.SetVertexDeclaration(0); 
 		
-		-- save the current render target
-		local old_rt = ParaEngine.GetRenderTarget();
-		
 		-- "_LeftViewRT" is internal left viewport image.
 		local _LeftViewRT = ParaAsset.LoadTexture("_LeftViewRT", "_LeftViewRT", 0); 
 			
-		-- right viewport image is on backbuffer
+		-- right viewport image is on "_ColorRT"
 		local _RightViewRT = ParaAsset.LoadTexture("_ColorRT", "_ColorRT", 0); 
-		ParaEngine.StretchRect(old_rt, _RightViewRT);
 		
-		ParaEngine.SetRenderTarget(old_rt);
-		effect:BeginPass(0);
+		local nPass = 0;
+		if(self:IsInterlacedMode()) then
+			params:SetParam("screenParam", "vec2ScreenSize");
+			nPass = 1;
+		end
+
+		effect:BeginPass(nPass);
 			params:SetTextureObj(0, _LeftViewRT);
 			params:SetTextureObj(1, _RightViewRT);
 			effect:CommitChanges();

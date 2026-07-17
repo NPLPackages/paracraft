@@ -335,7 +335,7 @@ say("length of hello is "..(#"hello"));
 	category = "NplMicrobit.Operators", 
 	helpUrl = "", 
 	canRun = false,
-	func_description = '(%s%%s)',
+	func_description = '(%s%%%s)',
 	ToNPL = function(self)
 		return string.format('(%s%%%s)', self:getFieldAsString('left'), self:getFieldAsString('right'));
 	end,

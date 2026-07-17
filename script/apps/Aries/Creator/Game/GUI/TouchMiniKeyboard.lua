@@ -172,6 +172,14 @@ end
 
 -- static method
 function TouchMiniKeyboard.CheckShow(bShow)
+	if true then
+		if bShow then
+			GameLogic.SendErrorLog("TouchMiniKeyboard","TouchMiniKeyboard.CheckShow","there is no need to call this function, because it is deprecated.")
+			print("TouchMiniKeyboard.CheckShow is deprecated")
+			--print(commonlib.debugstack())
+		end
+		return
+	end
 	local self = TouchMiniKeyboard.GetSingleton()
 	if self.open_button and self.show_open_bt then
 		self.open_button.visible = bShow

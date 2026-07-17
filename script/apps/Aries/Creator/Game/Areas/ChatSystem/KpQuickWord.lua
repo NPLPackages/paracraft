@@ -152,6 +152,8 @@ function KpQuickWord.SendQuickword(node)
             txt = string.format("%s", node.Text);
 	        ChatChannel.SendMessage(ChatChannel.EnumChannels.KpNearBy, nil, nil, txt, false, ChatChannel.InputTypes.FromQuickWord);
         end
+	else
+		ChatEdit.SendText(node.Text)
     end
 end
 

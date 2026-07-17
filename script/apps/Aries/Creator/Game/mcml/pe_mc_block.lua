@@ -53,6 +53,8 @@ function pe_mc_block.render_callback(mcmlNode, rootName, bindingContext, _parent
 
 	mcmlNode.uiobject_id = _this.id;
 
+	local name = mcmlNode:GetAttributeWithCode("name", nil, true);
+
 	local block_id;
 	local block_count;
 	local bagpos = mcmlNode:GetAttributeWithCode("bagpos", nil, true);
@@ -127,6 +129,15 @@ function pe_mc_block.render_callback(mcmlNode, rootName, bindingContext, _parent
 		_this.text = tostring(block_count);
 	end
 	
+	-- enable drag if ondragend event is defined
+	local ondragend = mcmlNode:GetAttributeWithCode("ondragend");
+	if(ondragend) then
+		_this.candrag = true;
+		_this:SetScript("ondragbegin", function() pe_mc_block.OnDragBegin(mcmlNode); end)
+		_this:SetScript("ondragmove", function() pe_mc_block.OnDragMove(mcmlNode); end)
+		_this:SetScript("ondragend", function() pe_mc_block.OnDragEnd(mcmlNode); end)
+	end
+	
 	local isclickable = mcmlNode:GetBool("isclickable",true);
 	if(isclickable)then
 		_this:SetScript("onclick", pe_mc_block.OnClick, bagpos, mcmlNode);
@@ -151,7 +162,11 @@ function pe_mc_block.render_callback(mcmlNode, rootName, bindingContext, _parent
 		else
 			local tooltip2 = mcmlNode:GetAttributeWithCode("tooltip2");
 			if(tooltip2) then
-				tooltip = format("%s\n%s", tooltip or "", tooltip2)
+				tooltip = format("%s\n%s", tooltip2,  tooltip or "")
+			end
+			local tooltip3 = mcmlNode:GetAttributeWithCode("tooltip3");
+			if(tooltip3) then
+				tooltip = format("%s\n%s", tooltip or "", tooltip3)
 			end
 			_this.tooltip = tooltip;
 		end
@@ -179,6 +194,29 @@ function pe_mc_block.OnClick(ui_obj, bagpos, mcmlNode)
 	local onclick = mcmlNode:GetAttributeWithCode("onclick");
 	if(onclick) then
 		-- if there is onclick event
-		Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onclick, mcmlNode.bag_pos_ or mcmlNode.block_id, mcmlNode);
+		local name = mcmlNode:GetAttributeWithCode("name", nil);
+		Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onclick, name or mcmlNode.bag_pos_ or mcmlNode.block_id, mcmlNode);
+	end
+end
+
+function pe_mc_block.OnDragBegin(mcmlNode)
+	mcmlNode.isDragging = true;
+	drag_src_mcml_node = mcmlNode;
+end
+
+function pe_mc_block.OnDragMove(mcmlNode)
+	-- since, both receiver and dragging node will receive OnDragMove, we will only process the dragging node.
+	if(mcmlNode and not mcmlNode.isDragging) then return end
+end
+
+function pe_mc_block.OnDragEnd(mcmlNode)
+	mcmlNode.isDragging = nil;
+	drag_src_mcml_node = nil;
+	
+	-- invoke user defined callback
+	local ondragend = mcmlNode:GetAttributeWithCode("ondragend");
+	if(ondragend) then
+		local name = mcmlNode:GetAttributeWithCode("name", nil) or mcmlNode.bag_pos_ or mcmlNode.block_id;
+		Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, ondragend, name, mcmlNode);
 	end
 end

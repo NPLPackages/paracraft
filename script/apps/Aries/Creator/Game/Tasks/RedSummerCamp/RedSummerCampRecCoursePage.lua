@@ -13,12 +13,22 @@ local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/G
 
 local RedSummerCampRecCoursePage = NPL.export();
 
+local is_online = nil
+local function IsOnlineEnv()
+	if is_online == nil then
+		local version = ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE");
+		version = string.upper(version);
+		is_online = version == "ONLINE"
+	end
+	return is_online
+end
+
 RedSummerCampRecCoursePage.courses = {
 	{ id = 29477, label = L"基础操作",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/welcome_32bits.png;0 0 195 100",  },
 	{ id = 42701, label = L"建模入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/lala_32bits.png;0 0 195 100",  },
-	{ id = 42457, label = L"编程入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/papa_32bits.png;0 0 195 100",  },
+	{ id = IsOnlineEnv() and 42457 or 20799, label = L"编程入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/papa_32bits.png;0 0 195 100",  },
 
-	{ id = 42670, label = L"动画入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/kaka_32bits.png;0 0 195 100",  },
+	{ id = IsOnlineEnv() and 42670 or 1499, label = L"动画入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/kaka_32bits.png;0 0 195 100",  },
 	{ id = 455, label = L"有了想法怎么做",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/idea_32bits.png;0 0 195 100",  },
 	{ id = 113, label = L"肇庆市第一中学",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/ke1_195x100_32bits.png;0 0 195 100",  },
 

@@ -1,0 +1,145 @@
+<html>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl">
+                <![CDATA[
+                    -- bottles
+                    MainLogin = NPL.load('(gl)Mod/WorldShare/cellar/MainLogin/MainLogin.lua')
+    
+                    -- libs
+                    NPL.load('(gl)script/apps/Aries/Creator/Game/Common/Translation.lua')
+                    local Translation = commonlib.gettable('MyCompany.Aries.Game.Common.Translation')
+                    local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop")
+                    local page = document:GetPageCtrl()
+                    MainLogin.language_index = 1
+                    local curLanguage = Translation.GetCurrentLanguage()
+                    if curLanguage == "zhCN" then
+                        MainLogin.language_index = 1
+                    end
+                    if curLanguage == "enUS" then
+                        MainLogin.language_index = 2
+                    end
+                    if curLanguage == "zhTW" then
+                        MainLogin.language_index = 3
+                    end
+                    page.OnCreate = function()
+                        local language_menu = page:FindControl('language_menu')
+                        language_menu.visible = IsShowLanguageMenu() 
+                    end
+                    --{name="auto", text=L"系统默认:"..Translation.GetSystemLanguage()},
+                    function DS_Languages()
+                        return {
+                            {name="zhCN", text=L"简体中文"},
+                            {name="enUS", text=L"English"},
+                            {name="zhTW", text=L"繁体中文"},
+                        }
+                    end
+
+                    
+
+                    function OnChangeLanguage(name)
+                        local curLanguage = Translation.GetCurrentLanguage()
+                        if not name or not curLanguage or curLanguage == name then
+                            return
+                        end
+                        Mod.WorldShare.Store:Set('user/isSettingLanguage', true)
+                        Translation.SetCustomLanguage(name, true)
+                        --Translation.ChangeLanguage(name, true);
+                        ShowLanguageMenu()
+                        if(curLanguage ~= Translation.GetCurrentLanguage()) then
+                            NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.lua");
+                            local ParaWorldLoginDocker = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ParaWorldLoginDocker")
+                            ParaWorldLoginDocker.Restart("paracraft")
+                        end
+                    end
+
+                    function ShowLanguageMenu()
+                        MainLogin.is_language_menu_show = not MainLogin.is_language_menu_show
+                        page:Refresh(0)                        
+                    end
+                    
+                    function GetLanguageText()
+                        local curLanguage = Translation.GetCurrentLanguage()
+                        if curLanguage == "zhCN" then
+                            return L"简体中文"
+                        end
+                        if curLanguage == "enUS" then
+                            return L"English"
+                        end
+                        if curLanguage == "zhTW" then
+                            return L"繁体中文"
+                        end
+                    end
+
+                    function IsShowLanguageMenu()
+                        local isShow = MainLogin.is_language_menu_show == true or MainLogin.is_language_menu_show == "true"
+                        return isShow
+                    end
+
+                    function IsSelectLanguage(index)
+                        local index = tonumber(index)
+                        return index and index == MainLogin.language_index
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss" src='Mod/WorldShare/cellar/Theme/Mcss/MainLoginMcss.mcss'>
+                {
+                        
+                }
+            </style>
+            <div style="width: 200px; height: 200px;">
+                <!-- Texture/Aries/Common/underline_white_32bits.png:3 3 3 3 -->
+                <pe:container name="language_menu" visible="<%=IsShowLanguageMenu()%>" style="position: relative;border-radius: 20px; margin-left: 80px; margin-top: 46x; width: 110px;height: 110px; background-color:#ffffff;">
+                    <div style="width: 110px; height: 120px;">
+                        <pe:repeat DataSource="<%=DS_Languages()%>">
+                            <pe:repeatitem style="float:left; width: 110px; height: 30px;">
+                                
+                                <div style="float: left; width: 110px;height: 28px; margin-top: 6px;">
+                                    <pe:if condition="<%=IsSelectLanguage(Eval('index')) %>">
+                                        <input type="button"
+                                            icon="Texture/Aries/Creator/paracraft/Educate/Login/icon_select_21x21_32bits.png#0 0 20 20"
+                                            icon_width= 20
+                                            icon_height= 20
+                                            icon_off_y= 3
+                                            icon_off_x= 40
+                                            value="<%='   '..Eval('text')%>"  
+                                            name='<%=Eval("name")%>' 
+                                            onclick="OnChangeLanguage"
+                                            style=" text-align: left;  
+                                                color: #000000; 
+                                                width: 110px;
+                                                height: 28px; 
+                                                background: url();" />
+                                    </pe:if>
+                                    <pe:if condition="<%=not IsSelectLanguage(Eval('index'))  %>">
+                                        <input type="button" 
+                                            value="<%='   '..Eval('text')%>"
+                                            name='<%=Eval("name")%>' 
+                                            onclick="OnChangeLanguage"
+                                            style=" text-align: left;  
+                                            color: #000000; 
+                                            width: 110px;
+                                            height: 28px; 
+                                            background: url();" />
+                                    </pe:if>
+                                </div>
+                            </pe:repeatitem>
+                        </pe:repeat>
+                    </div>
+                </pe:container>
+                <div style="width: 110px; height: 30px;margin-top: 180px;margin-left: 80px;">
+                    <div style="float: left; width: 20px; height: 20px; background: url(Texture/Aries/Creator/paracraft/Educate/Login/icon_earth_21x21_32bits.png#0 0 21 21);"></div>
+                    <div style="float: left; margin-left: 6px; margin-top: -3px; color: #0E162799; font-size: 16px; base-font-size: 16px;"><%=GetLanguageText()%></div>
+                    <pe:if condition="<%=IsShowLanguageMenu()%>">
+                        <div style="float: left; margin-left: 6px; margin-top: 7px; width: 11px; height: 11px; background: url(Texture/Aries/Creator/paracraft/Educate/Login/icon_show_11x11_32bits.png#0 0 11 11);"></div>
+                    </pe:if>
+                    <pe:if condition="<%=not IsShowLanguageMenu()%>">
+                        <div style="float: left; margin-left: 6px; margin-top: 7px; width: 11px; height: 11px; background: url(Texture/Aries/Creator/paracraft/Educate/Login/icon_hide_11x11_32bits.png#0 0 11 11);"></div>
+                    </pe:if>
+                    <input type="button" onclick='ShowLanguageMenu' style="float: left; width: 110px; height: 30px; margin-top: -31px; background: url();"/>
+                </div>
+                
+            </div>
+        </pe:mcml>
+    </body>
+</html>

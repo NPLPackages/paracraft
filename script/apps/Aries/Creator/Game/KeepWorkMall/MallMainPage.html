@@ -1,0 +1,86 @@
+<!-- "script/apps/Aries/Creator/Game/KeepWorkMall/MallMainPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="MallMainPage.lua">
+            <![CDATA[
+                MallMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallMainPage.lua");
+                MallMainPage.OnInit();
+
+                function ClosePage()
+                    MallMainPage.CloseView()
+                end
+
+                function onClickBg()
+
+                end
+
+                function GetData()
+                    return MallMainPage.tabValues;
+                end
+                
+                function IsSelected(index)
+                    return index and tonumber(index) == MallMainPage.select_tab_index;
+                end
+
+                function OnChangeMenu(name)
+                    print("name========",name)
+                    MallMainPage.OnChangeMenu(name)
+                end
+
+                function GetIframe()
+                    if MallMainPage.select_tab_index == 1 then
+                        return "script/apps/Aries/Creator/Game/KeepWorkMall/MallPage.html"
+                    elseif MallMainPage.select_tab_index == 2 then
+                        return "script/apps/Aries/Creator/Game/KeepWorkMall/MallOtherPage.html?type=collect"
+                    elseif MallMainPage.select_tab_index == 3 then
+                        return "script/apps/Aries/Creator/Game/KeepWorkMall/MallOtherPage.html?type=histroy"
+                    elseif MallMainPage.select_tab_index == 4 then
+                        return "script/apps/Aries/Creator/Game/KeepWorkMall/MallMinePage.html?type=personnal"
+                    else
+                        return "script/apps/Aries/Creator/Game/KeepWorkMall/MallPage.html"
+                    end
+                end
+            ]]>
+        </script>
+        <pe:container alignment="_fi" zorder="-2" onclick="onClickBg"  width="100%" height="100%" style="background-color:#C4D6F2D8;">
+            <pe:container alignment="_mt" width="0" style="height: 70px; background-color: #ffffff;">
+                <div align="left">
+                    <div style="position: relative; width: 94px; height: 30px; margin-left: 30px; margin-top: 16px; background: url(Texture/Aries/Creator/keepwork/Mall1/title_icon_94x30_32bits.png#0 0 94 30);"></div>
+                    <div style="position: relative; margin-left: 208px; margin-top: 12px;  width: 428px; height: 46px; background: url(Texture/Aries/Creator/keepwork/Mall1/tab_bg_428x46_32bits.png#0 0 428 46);">
+                        <pe:container uiname="tab_selecte_ctrl" style="width: 112px; height: 42px; margin-top: 4px; margin-left: 2px; background: url(Texture/Aries/Creator/keepwork/Mall1/btn_112x42_32bits.png#0 0 112 42);"></pe:container>
+                    </div>
+                    <div style="position: relative; margin-left: 208px; margin-top: 12px;  width: 428px; height: 46px; background: url();">
+                        <div style="margin-left: 2px;">
+                            <pe:repeat DataSource="<%=GetData()%>">
+                                <pe:repeatitem >
+                                    <div style="float:left;width:100px; margin-left: 5px; margin-top: 3px;">
+                                        <pe:if condition="<%=IsSelected(Eval('index'))%>">
+                                            <input type="button" name="<%=Eval('index')%>" onclick="OnChangeMenu" value="<%=Eval('name')%>" style="width: 100px; height: 40px; color: #404BF5; font-size: 18px; base-font-size: 18px; font-weight: bold; background: url();"/>
+                                        </pe:if>
+                                        <pe:if condition="<%=not IsSelected(Eval('index'))%>">
+                                            <input type="button" name="<%=Eval('index')%>" onclick="OnChangeMenu" value="<%=Eval('name')%>" style="width: 100px; height: 40px; color: #7B7A8A; font-size: 18px; base-font-size: 18px; font-weight: bold; background: url();"/>
+                                        </pe:if>
+                                    </div>
+                                </pe:repeatitem>
+                            </pe:repeat>
+                        </div>
+                    </div>
+                </div>
+            </pe:container>  
+            <pe:container alignment="_rt" style="background: url();">
+                <input type="button" onclick="ClosePage()" style="margin-top: 18px; margin-right: 20px;  width: 32px; height: 32px; background: url(Texture/Aries/Creator/keepwork/Mall1/btn_close_32x32_32bits.png);"/>
+            </pe:container>
+            <pe:container  alignment="_ct" style="width: 1280px; margin-left:-640px;margin-top:-282px;height:640px;background: url();">
+                <iframe name="mall_main_frame" src="<%=GetIframe()%>"></iframe>
+            </pe:container>
+        </pe:container>
+         
+    </pe:mcml>
+</body>
+</html>

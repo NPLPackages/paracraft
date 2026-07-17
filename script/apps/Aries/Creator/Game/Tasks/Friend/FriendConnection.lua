@@ -56,10 +56,10 @@ function FriendConnection:Connect(callback)
         targetId = self.userId , 
     },function(err, msg, data)
 
-        -- commonlib.echo("==========startChatToUser");
-        -- commonlib.echo(err);
-        -- commonlib.echo(msg);
-        -- commonlib.echo(data,true);
+        commonlib.echo("==========startChatToUser");
+        commonlib.echo(err);
+        commonlib.echo(msg);
+        commonlib.echo(data,true);
         if(err ~= 200)then
             return
         end
@@ -105,36 +105,10 @@ function FriendConnection:LoadUnReadMsgs(callback)
         },
         roomId = self.roomId,
     },function(err, msg, data)
-        -- commonlib.echo("==========LoadUnReadMsgs");
-        -- commonlib.echo(err);
-        -- commonlib.echo(msg);
-        -- commonlib.echo(data,true);
-        --[[
-         {
-data = {
-            count=11,
-            rows= {
-                      {
-                        content="hello world",
-                        createdAt="2020-09-07T05:51:54.000Z",
-                        id=11,
-                        msgKey="a15a301e-4790-4f93-a1fe-e08169ab7a27",
-                        roomId=1,
-                        senderId=760,
-                        updatedAt="2020-09-07T05:51:54.000Z" 
-                      },
-                      {
-                        content="hello world",
-                        createdAt="2020-09-07T05:51:16.000Z",
-                        id=10,
-                        msgKey="2cd85ea2-1820-4606-9d31-7c7ec878d2b3",
-                        roomId=1,
-                        senderId=760,
-                        updatedAt="2020-09-07T05:51:16.000Z" 
-                      },
-                    }
-            }
-        --]]
+        commonlib.echo("==========LoadUnReadMsgs");
+        commonlib.echo(err);
+        commonlib.echo(msg);
+        commonlib.echo(data,true);
         if(err ~= 200)then
             return
         end

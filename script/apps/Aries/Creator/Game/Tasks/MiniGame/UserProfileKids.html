@@ -1,0 +1,52 @@
+<html>
+<body> 
+<pe:mcml>
+    <script type="text/npl">
+<![CDATA[
+local MiniGameUserProfile = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MiniGame/MiniGameUserProfile.lua")
+MiniGameUserProfile.OnInitKids()
+
+function GetSheetData(index)
+    return MiniGameUserProfile.sheetData[index]
+end
+
+function GetSheetDataStyle(index)
+    return MiniGameUserProfile.GetDataSheetStyle(index)
+end
+]]>
+</script>
+<div  width="100%" height="100%" style="">
+    <div style="float: left; width: 860px; height: 110px;">
+        <div style="position: relative; width: 860px; height: 52px; background-color: #f8fafb; margin-top: 0px;"></div>
+        <div style="position: relative; width: 860px; height: 52px; background-color: #ade0fe; margin-top: 52px;"></div>
+        <%=GetSheetDataStyle(1)%>
+    </div>
+    <div style="float: left; width: 860px; height: 110px; margin-top: 6px;">
+        <div style="position: relative; width: 860px; height: 52px; background-color: #f8fafb; margin-top: 0px;"></div>
+        <div style="position: relative; width: 860px; height: 52px; background-color: #ade0fe; margin-top: 52px;"></div>
+        <%=GetSheetDataStyle(2)%>
+    </div>
+    <div style="float: left; width: 860px; height: 110px; margin-top: 6px;">
+        <div style="position: relative; width: 860px; height: 52px; background-color: #f8fafb; margin-top: 0px;"></div>
+        <div style="position: relative; width: 860px; height: 52px; background-color: #ade0fe; margin-top: 52px;"></div>
+        <%=GetSheetDataStyle(3)%>
+    </div>
+    <div style="float: left; width: 860px; height: 110px; margin-top: 6px;">
+        <div style="position: relative; width: 860px; height: 52px; background-color: #f8fafb; margin-top: 0px;"></div>
+        <div style="position: relative; width: 860px; height: 52px; background-color: #ade0fe; margin-top: 52px;"></div>
+        <%=GetSheetDataStyle(4)%>
+    </div>
+    <div style="float: left; width: 860px; height: 110px; margin-top: 6px;">
+        <div style="position: relative; width: 860px; height: 52px; background-color: #f8fafb; margin-top: 0px;"></div>
+        <div style="position: relative; width: 860px; height: 52px; background-color: #ade0fe; margin-top: 52px;"></div>
+        <%=GetSheetDataStyle(5)%>
+    </div>
+    <div style="float: left; width: 860px; height: 110px; margin-top: 6px;">
+        <div style="position: relative; width: 860px; height: 52px; background-color: #f8fafb; margin-top: 0px;"></div>
+        <div style="position: relative; width: 860px; height: 52px; background-color: #ade0fe; margin-top: 52px;"></div>
+        <%=GetSheetDataStyle(6)%>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>
