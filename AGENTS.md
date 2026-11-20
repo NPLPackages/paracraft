@@ -31,6 +31,7 @@ Wiki home: [docs/README.md](docs/README.md)
 | Path | Role |
 |------|------|
 | `script/apps/Aries/Creator/` | Paracraft Creator + Game engine |
+| [HaqiBgmPlaylist.lua](script/apps/Aries/Creator/Game/Sound/HaqiBgmPlaylist.lua) | Region-based music selection. Enable `verboseMaskLog` to trace individual mask probes. |
 | `script/apps/Aries/` | Allowlisted shell files (`main_loop.lua`, mcml, …) |
 | `script/kids/` | Allowlisted Map3DSystem helpers |
 | `config/Aries/creator/` | Creator config / localization |

@@ -521,12 +521,11 @@ function HaqiBgmPlaylist:ClearRegionRadarCache()
 	end
 end
 
-function HaqiBgmPlaylist:MountRegionTileAt(x, z, tileName, mode, filepath)
-	if(not (ParaTerrain and ParaTerrain.GetAttributeObjectAt)) then return; end
-	if(not x or not z) then return; end
-	tileName = tileName or self:GetRegionTileName(x, z);
-	filepath = filepath or self:GetRegionTileFilepath(tileName);
-	local mountPath = self:PrepareRegionTileLocalFile(filepath) or filepath;
+local function ResolveRegionTilePath(self, filepath, preparedPaths)
+	if(preparedPaths and preparedPaths[filepath]) then
+		return preparedPaths[filepath];
+	end
+	local localPath = self:PrepareRegionTileLocalFile(filepath);
 	local manifestItem = self:GetRegionManifestItem(filepath);
 	local loadPath = manifestItem and manifestItem.filename or filepath;
 	self.regionTileLoadState = self.regionTileLoadState or {};
@@ -548,6 +547,20 @@ function HaqiBgmPlaylist:MountRegionTileAt(x, z, tileName, mode, filepath)
 			self:ClearRegionRadarCache();
 		end);
 	end
+	-- Reuse successful resolutions only for this scan. Missing downloads can
+	-- become available between probes, and a later scan can enter a new world.
+	if(preparedPaths) then
+		preparedPaths[filepath] = localPath;
+	end
+	return localPath or filepath;
+end
+
+function HaqiBgmPlaylist:MountRegionTileAt(x, z, tileName, mode, filepath, preparedPaths)
+	if(not (ParaTerrain and ParaTerrain.GetAttributeObjectAt)) then return; end
+	if(not x or not z) then return; end
+	tileName = tileName or self:GetRegionTileName(x, z);
+	filepath = filepath or self:GetRegionTileFilepath(tileName);
+	local mountPath = ResolveRegionTilePath(self, filepath, preparedPaths);
 	local cacheKey = string.format("%s:%s:%.1f:%.1f", self.regionTitle, mountPath, x, z);
 	if(self.lastMountedRegionTile == cacheKey) then
 		return mountPath;
@@ -566,10 +579,10 @@ function HaqiBgmPlaylist:MountRegionTileAt(x, z, tileName, mode, filepath)
 	end
 end
 
-function HaqiBgmPlaylist:MountRegionTilePairAt(x, z, sampleX, sampleZ, tileName, mode, filepath)
-	local mountPath = self:MountRegionTileAt(x, z, tileName, mode, filepath);
+function HaqiBgmPlaylist:MountRegionTilePairAt(x, z, sampleX, sampleZ, tileName, mode, filepath, preparedPaths)
+	local mountPath = self:MountRegionTileAt(x, z, tileName, mode, filepath, preparedPaths);
 	if(sampleX and sampleZ and (math.abs(sampleX - x) > 0.001 or math.abs(sampleZ - z) > 0.001)) then
-		mountPath = self:MountRegionTileAt(sampleX, sampleZ, tileName, mode, filepath) or mountPath;
+		mountPath = self:MountRegionTileAt(sampleX, sampleZ, tileName, mode, filepath, preparedPaths) or mountPath;
 	end
 	return mountPath;
 end
@@ -664,14 +677,14 @@ function HaqiBgmPlaylist:GetRegionProbeOffsets()
 	};
 end
 
-function HaqiBgmPlaylist:ReadMaskRegionKeyAt(radar, x, z)
+function HaqiBgmPlaylist:ReadMaskRegionKeyAt(radar, x, z, preparedPaths)
 	local closedKey;
 	local lastEmptyInfo;
 	local candidates = self:GetRegionTileCandidates(x, z);
 	local sampleX, sampleZ = self:GetRegionSamplePosition(x, z);
 	for _, candidate in ipairs(candidates) do
 		for _, filepath in ipairs(self:GetRegionTileFilepaths(candidate.name)) do
-			local mountPath = self:MountRegionTilePairAt(x, z, sampleX, sampleZ, candidate.name, candidate.mode, filepath);
+			local mountPath = self:MountRegionTilePairAt(x, z, sampleX, sampleZ, candidate.name, candidate.mode, filepath, preparedPaths);
 			local val, rgb = GetRegionRgb(self.regionTitle, sampleX, sampleZ);
 			local source = "terrain";
 			local pixelX, pixelY;
@@ -686,25 +699,29 @@ function HaqiBgmPlaylist:ReadMaskRegionKeyAt(radar, x, z)
 			local info = self:GetRegionInfoByRgb(rgb);
 			local key = info and info.key;
 			if(key) then
-				if(self.verboseMaskLog or IsUsableMaskRegionKey(key)) then
+				if(self.verboseMaskLog) then
 					BgmLogDebug("DetectRegionByMask: probe=(%s,%s) sample=(%s,%s) tile=%s path=%s mountPath=%s mode=%s source=%s pixel=(%s,%s) color=%s (%s) key=%s", tostring(x), tostring(z), tostring(sampleX), tostring(sampleZ), candidate.name, filepath, tostring(mountPath), tostring(candidate.mode), source, tostring(pixelX), tostring(pixelY), tostring(val), tostring(rgb), tostring(key));
 				end
 				if(IsUsableMaskRegionKey(key)) then
 					return key;
 				end
 				if(IsClosedRegionKey(key)) then
-					BgmLogDebug("DetectRegionByMask: closed key=%s, source=%s, color=%s (%s), probe=(%s,%s), sample=(%s,%s), pixel=(%s,%s), tile=%s, path=%s, mountPath=%s", tostring(key), source, tostring(val), tostring(rgb), tostring(x), tostring(z), tostring(sampleX), tostring(sampleZ), tostring(pixelX), tostring(pixelY), candidate.name, filepath, tostring(mountPath));
+					if(self.verboseMaskLog) then
+						BgmLogDebug("DetectRegionByMask: closed key=%s, source=%s, color=%s (%s), probe=(%s,%s), sample=(%s,%s), pixel=(%s,%s), tile=%s, path=%s, mountPath=%s", tostring(key), source, tostring(val), tostring(rgb), tostring(x), tostring(z), tostring(sampleX), tostring(sampleZ), tostring(pixelX), tostring(pixelY), candidate.name, filepath, tostring(mountPath));
+					end
 					closedKey = closedKey or key;
 				end
-				if(key == "none") then
+				if(self.verboseMaskLog and key == "none") then
 					lastEmptyInfo = "source="..source..", color="..tostring(val).." ("..tostring(rgb).."), tile="..candidate.name..", path="..filepath..", mountPath="..tostring(mountPath)..", pixel=("..tostring(pixelX)..","..tostring(pixelY)..")";
 				end
 			elseif(val and val ~= 0) then
-				BgmLogInfo("DetectRegionByMask: unknown color=%s (%s), source=%s, probe=(%s,%s), sample=(%s,%s), pixel=(%s,%s), tile=%s, path=%s, mountPath=%s", tostring(val), tostring(rgb), source, tostring(x), tostring(z), tostring(sampleX), tostring(sampleZ), tostring(pixelX), tostring(pixelY), candidate.name, filepath, tostring(mountPath));
+				if(self.verboseMaskLog) then
+					BgmLogInfo("DetectRegionByMask: unknown color=%s (%s), source=%s, probe=(%s,%s), sample=(%s,%s), pixel=(%s,%s), tile=%s, path=%s, mountPath=%s", tostring(val), tostring(rgb), source, tostring(x), tostring(z), tostring(sampleX), tostring(sampleZ), tostring(pixelX), tostring(pixelY), candidate.name, filepath, tostring(mountPath));
+				end
 			elseif(not val and radar and radar.WhereIsXZ) then
 				local args = radar.WhereIsXZ(sampleX, sampleZ);
 				if(args and args.key) then
-					if(self.verboseMaskLog or IsUsableMaskRegionKey(args.key)) then
+					if(self.verboseMaskLog) then
 						BgmLogDebug("DetectRegionByMask: radar fallback probe=(%s,%s) sample=(%s,%s) tile=%s path=%s mountPath=%s mode=%s key=%s", tostring(x), tostring(z), tostring(sampleX), tostring(sampleZ), candidate.name, filepath, tostring(mountPath), tostring(candidate.mode), tostring(args.key));
 					end
 					if(IsUsableMaskRegionKey(args.key)) then
@@ -714,7 +731,7 @@ function HaqiBgmPlaylist:ReadMaskRegionKeyAt(radar, x, z)
 						closedKey = closedKey or args.key;
 					end
 				end
-			else
+			elseif(self.verboseMaskLog) then
 				lastEmptyInfo = "source="..source..", color="..tostring(val).." ("..tostring(rgb).."), tile="..candidate.name..", path="..filepath..", mountPath="..tostring(mountPath)..", pixel=("..tostring(pixelX)..","..tostring(pixelY)..")";
 			end
 		end
@@ -739,8 +756,9 @@ function HaqiBgmPlaylist:DetectRegionByMask()
 	end);
 	radar = ok and radar or nil;
 	local closedKey;
+	local preparedPaths = {};
 	for _, offset in ipairs(self:GetRegionProbeOffsets()) do
-		local key, currentClosedKey = self:ReadMaskRegionKeyAt(radar, px + offset[1], pz + offset[2]);
+		local key, currentClosedKey = self:ReadMaskRegionKeyAt(radar, px + offset[1], pz + offset[2], preparedPaths);
 		if(key) then
 			return key;
 		end
