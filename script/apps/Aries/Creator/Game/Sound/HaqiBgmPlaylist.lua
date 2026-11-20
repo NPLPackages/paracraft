@@ -609,13 +609,14 @@ function HaqiBgmPlaylist:ProbeMaskAvailable()
 		{0, 0}, {64, 0}, {-64, 0}, {0, 64}, {0, -64},
 		{64, 64}, {64, -64}, {-64, 64}, {-64, -64},
 	};
+	local preparedPaths = {};
 	for _, d in ipairs(probes) do
 		local x, z = px + d[1], pz + d[2];
 		local candidates = self:GetRegionTileCandidates(x, z);
 		local sampleX, sampleZ = self:GetRegionSamplePosition(x, z);
 		for _, candidate in ipairs(candidates) do
 			for _, filepath in ipairs(self:GetRegionTileFilepaths(candidate.name)) do
-				local mountPath = self:MountRegionTilePairAt(x, z, sampleX, sampleZ, candidate.name, candidate.mode, filepath);
+				local mountPath = self:MountRegionTilePairAt(x, z, sampleX, sampleZ, candidate.name, candidate.mode, filepath, preparedPaths);
 				local val = GetRegionValue(title, sampleX, sampleZ);
 				local source = "terrain";
 				if((not val or val == 0) and mountPath) then
@@ -678,6 +679,7 @@ function HaqiBgmPlaylist:GetRegionProbeOffsets()
 end
 
 function HaqiBgmPlaylist:ReadMaskRegionKeyAt(radar, x, z, preparedPaths)
+	preparedPaths = preparedPaths or {};
 	local closedKey;
 	local lastEmptyInfo;
 	local candidates = self:GetRegionTileCandidates(x, z);
